@@ -1,0 +1,19 @@
+{
+	"folders": [
+
+		{
+			"path": "."
+		},
+			
+	],
+
+	"settings": {
+
+		"shellcheck.exclude": [
+
+		],
+
+
+	}
+
+}

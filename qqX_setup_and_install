@@ -1,0 +1,671 @@
+#!/bin/bash 
+
+
+##  TO INSTALL  if your file manager allows: mouse click & run as program 
+
+#  OR:  open a terminal from in the folder  &  type  ./qqX_setup_and_install   (note prefix ./)
+
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+# 	licence:  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses 
+
+# IF ANY MODDED CODE BECOMES USED IN THE ORIGINAL QUICKEMU PROJECT,
+
+# OR ANY OTHER PROJECT, YOU SHOULD SHOW BOTH THE LICENCE  
+
+# & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+
+#  See:  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern 
+
+
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+
+# THIS INSTALL SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER  ###
+
+
+# Bash 5.0+     # details: try 'bash -version at the commandline'   (2023: we are now at ver 5 for at least 10 years ...)
+
+# shellcheck disable=SC1090
+
+
+## qqX STANDARD INSTALLATION (default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx)    
+
+#  Differences may be present in non FHS distros & may need manual installation  (in similar way to manually installing quickemu itself)
+
+#  eg NixOS https://discourse.nixos.org/t/install-executable-at-usr-bin/21756   
+
+#  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard   (default, next to quickemu: qqX_Std_Bin_Dir="/usr/bin")
+
+
+qqX_Version="$(./qqX --version 2>/dev/null)"
+
+qqX_XDG_Name="qqX"
+
+qqX_Std_Bin_Dir="/usr/bin"   
+
+qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
+
+qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
+
+
+
+# shellcheck disable=SC2317
+
+function print_manual_uninstall_notes {
+
+  cat << Notes
+
+  #  Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME 
+  
+  #  and any desktop items in (hidden) User folder:  $HOME/.local/share/applications  
+
+  #  followed by:  update-desktop-database  ~/.local/share/applications  
+
+  #  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
+
+Notes
+
+}
+
+## TERMINAL:
+
+# shellcheck disable=SC2317
+
+function print_terminal_notes {
+
+  cat << Notes
+
+  #  The terminal may also be specified by editing 'UserTerm' at the start of the install script 
+  
+  #  if this script is not auto detecting correctly or if a specific profile is needed.
+
+  #  Actual 'Xterm' itself, if installed, will need a bit of custom tweaking
+
+  #  eg  xterm -geometry 150x50 -fa truetype -fs 12
+
+  #  Some XFCE distros default to mate-terminal >  XFCE users may like to install this.
+
+Notes
+
+}
+
+# See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     ( NB use of escape EOF, or quotes, not used )
+
+
+
+UserTerm=
+
+CustomTerminalProfile=
+
+
+## SET TERMINAL SIZES
+
+Term_Width=145
+Term_Height=45
+Term_Taller=55
+
+
+# MATE:
+
+MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title='qqX' "
+
+MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title='qqX' "
+
+
+# GNOME:
+
+GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title='qqX' "
+
+GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title='qqX' "
+
+
+# KONSOLE:
+
+KonsoleTitle="$qqX_XDG_Name "
+
+# REVIEW  normal KDE behaviour is to overide the launcher options if 'remember konsole size and position' has been set  
+
+KonsoleTerminalProfile_Taller=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Taller} "
+
+KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Height}"
+
+
+
+##  Chrome up the display
+
+if [[ ! -d "$(pwd)/qqX.system" ]]; then 
+
+  printf  "\n\n  ERROR  qqX install script must be run from inside the original qqX folder \n\n"
+  sleep 5  ; exit 1
+
+fi
+
+LIST_start=("$(pwd)"/qqX.system/qqX-add-in-boot-level-chrome.*)
+Number_start=${#LIST_start[@]}
+. "${LIST_start[$Number_start-1]}"
+
+
+printf "\033c"
+
+echo
+
+function_qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $qqX_Version "
+
+
+if [[ "$(whoami)" == root ]]; then 
+
+  UserLand_Name="$(users)"
+
+  printColor "\n\n  User-Interactive Scripts:\n\n  Root installation is not currently available. \n\n  Select a trusted UserLand folder (%s) etc\n\n" "$UserLand_Name"
+
+  #  If installing as root, eg making folder /usr/share/qqX  then root will not have xdg data
+
+  #  However core-util 'users' will show who is logged in and thus where non-sudo $HOME is located.
+
+  #  User-Interactive Scripts:  Root installation just adds unneeded (?) complications ...
+  
+  #  When time is available and if demand is present. But probably a bit of a rabbit hole that could end up as creating distro installs ...
+
+  read -rp "  See setup script and installation notes  > "
+
+fi
+
+
+## 
+
+echo
+
+
+
+## PROBE SYSTEM ENVIRONMENT  
+
+LinuxType=$(uname -o) 
+LinuxMachine=$(uname -m) 
+
+if [[ ! $LinuxType ]] || [[ "$LinuxType" != *Linux ]] && [[ $LinuxMachine != "x86_64" ]] ; then 
+
+  printf "\n\n  ERROR OS found: %s  %s "  "$LinuxType"  "$LinuxMachine"
+
+  printColor "\n\n  @ 2023 Quickemu scripts are intended for 64 bit LINUX X86 distributions only \n\n"   
+
+  printf   "\n  Make sure that you have read this script and the docs before continuing \n\n"
+
+  read -rp "  Use 'ctrl-c' to exit or [enter] to continue > "
+
+fi
+
+
+# INITIAL MENU:
+
+printf "\033c"
+
+echo
+
+function_qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
+
+if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  a standard release of quickemu has been found " 
+
+else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu " 
+
+fi  
+
+# REVIEW  add quickemu release/version checking ? 
+
+printf "\n"
+
+
+if [[ ! -e "qqX_settings" ]] || [[ ! -e "qqX" ]] || [[ ! -d  "qqX.system" ]]; then
+
+  printColor "\n\n  ERROR  qqX source files not found \n\n"
+
+  sleep 5; exit 1
+
+else
+
+  InstallSelect=
+
+  printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME" 
+
+  printf "\n\n   sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
+
+  printf "\n\n   sudo ln -s \"%s\" \"%s\"" "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
+
+  printColor "\n\n  [enter] to run the above commands from this terminal"
+  
+  printf "   [s] issue sudo commands separately "
+
+  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [r] re-install/upgrade"
+
+  printf "   [q] to quit \n\n"
+
+  read -rp "   >  "  InstallSelect
+
+  printf "\n\n"
+
+  if [[ $InstallSelect == "q" ]]; then  
+  
+    sleep 0.6 ; exit
+
+  elif [[ $InstallSelect == "u" ]]; then
+
+    print_manual_uninstall_notes
+
+    qqX_RemovalTarget="$(type -p qqx)"
+
+    qqX_RemovalTarget_X="$(type -p qqX)"
+
+    qqX_Remove=
+
+    printColor "\n\n  [y] sudo auto removal of qqX scripts, plus of removal qqX folders & of settings" 
+
+    printf " \n\n  [enter] to quit \n\n"
+
+    read -rp "  >  "  qqX_Remove
+
+    if [[ $qqX_Remove == "y" ]]; then
+
+      [[ $qqX_RemovalTarget ]] && sudo rm "$qqX_RemovalTarget"
+
+      [[ $qqX_RemovalTarget_X ]] && sudo rm "$qqX_RemovalTarget_X"
+
+      rm -r "$HOME/.qqX"  ||  printColor "\n\n  Settings folder ERROR or not found \n\n" 
+
+      rm "$HOME/.local/share/applications/qqX.desktop" ||  printColor "\n\n  qqX.desktop file not found \n\n"
+
+      update-desktop-database  ~/.local/share/applications  ||  printColor "\n\n  XDG desktop utils not available. Try reboot.\n\n"
+
+    else
+
+      sleep 0.6 ; exit
+
+    fi
+
+  else
+
+    # install / re-install  > includes option [r]
+
+    SeparateSudo=
+
+    if  [[ $InstallSelect == "s" ]] ; then 
+
+      printf "\n\n  Open another terminal IN THE SOURCE FOLDER"
+      
+      printf "\n\n  (ctrl-shift-c to copy, ctrl-shift-v to paste)"
+      
+      printf "\n\n  The following commands should be issued from the SOURCE folder:"
+
+      printColor "\n\n  sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
+
+      printColor "\n\n  sudo ln -s \"%s\" \"%s\"" "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
+
+      printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
+
+      read -rp  "  >  "  SeparateSudo
+
+    fi
+
+    if [[  $SeparateSudo != "y" ]]; then
+
+      sudo cp "qqX" "$qqX_Std_File_Path"
+
+      [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
+
+    fi
+
+    sleep 1
+
+    # Make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link   Means copying to qqx will copy to qqX, and vice versa.
+
+    # and check that the right version is there:
+
+    #qqX_Version_Installed="$(qqX --version 2>/dev/null)"
+
+    #if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$qqX_Version_Installed" == "$qqX_Version" ]] ; then 
+    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
+    
+      printColor "\n\n  All good  \n\n" ; sleep 2
+
+    else 
+    
+      printColor "\n\n  ERROR qqX version %s not found. Quit and retry  " "$qqX_Version" ; sleep 2000 
+    
+    fi
+
+
+    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
+
+    #  qqX default location  (has to be slightly opinionated here for the updater to work)  REVIEW  (and at end of script)
+
+    cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
+
+    cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
+
+    if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]]; then
+    
+      printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
+
+      sleep 3 ; exit 1
+
+    fi
+
+  fi
+
+fi
+
+
+
+## The name of the terminal emulator is needed   (may also be manually specified at start of script)  
+
+if [[ ! $UserTerm ]]; then
+
+  LIST_start=("$(pwd)"/qqX.system/qqX-termfind.*)     
+  Number_start=${#LIST_start[@]}
+  . "${LIST_start[$Number_start-1]}"
+
+fi
+
+
+## Determine how the interface will look
+
+printf "\033c"
+
+echo
+
+function_qqX_logo_title  "Setting up the desktop:"
+
+printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
+
+if [[ ! $CustomTerminalProfile ]]; then 
+
+  printf "\n\n  Use extra height (%s) to help show multifile output better"  "$Term_Taller"
+
+  printf "\n\n  but be aware this will hide more of the file manager output"
+
+  printf "\n\n  while some menu screens may contain empty space."
+
+fi
+
+printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
+
+printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+
+printf "\n\n\n"
+
+# REVIEW add W H number entry?
+
+printColor "  [enter] continue at standard height "
+
+[[ ! $CustomTerminalProfile ]] && printf "   [t] extra height   or"
+
+printf "   [q] to exit \n\n"
+
+read -rp "  > "   TerminalHeightChoice
+
+
+if [[ $TerminalHeightChoice == "q" ]]; then
+
+  sleep 0.6 ; exit 
+
+elif [[ $TerminalHeightChoice == "t" ]]; then
+
+  MateTerminalProfile="$MateTerminalProfile_Taller"
+
+  GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
+
+  KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
+
+else
+
+  MateTerminalProfile="$MateTerminalProfile_Standard"
+
+  GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
+
+  KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
+
+fi
+
+echo; echo
+
+
+# Select Icon colour (to go with text shade)
+
+printColor "\n\n  Select Desktop Icon colour "
+
+tput setaf 6
+
+printf " (text colour may be set in the settings file)"   
+
+tput sgr0
+
+printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
+
+read -rp "  >  "  IconSelect
+
+
+if [[ $IconSelect == "b" ]]; then  Icon_Var="blu"
+
+else  Icon_Var="std"; fi
+
+
+
+
+
+## RUN .desktop CREATOR  
+
+
+if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
+
+  printColor "\n\n  XDG desktop not found." 
+
+  UserLand_Name="$(users)"
+
+  if [[ "$(whoami)" == root ]]; then printf "\n\n  User-Interactive Scripts:  Root installation adds complications ... \n\n  Select a UserLand folder (%s) etc\n\n" "$UserLand_Name"
+
+  else printf "\n\n  For menu links, only XDG desktop compliant OS's are supported. \n\n  Running from CLI may be possible.\n\n"
+
+  fi
+
+  No_XDG=1
+
+fi
+
+if [[ ! $(type -p update-desktop-database) ]] && [[ ! $No_XDG ]] ; then
+
+    printColor "\n\n  Incomplete XDG desktop installation. \n\n  Check your distro repository for ""'""desktop-file-utils""'"" \n\n  or see https://www.freedesktop.org/software/desktop-file-utils/releases/ \n\n"
+
+    read -rp "  [q] to quit  or [enter] to install traditional links only " Missing_XDG_Utils
+
+    [[ $Missing_XDG_Utils == "q" ]] && sleep 0.6 && exit
+
+fi
+
+if [[ ! -d  "$HOME/.local/share/applications" ]] && [[ ! $No_XDG ]]; then
+
+  mkdir "$HOME/.local/share/applications"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
+
+fi
+
+if [[ ! -d  "$HOME/VMQs" ]] ; then
+
+  #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
+
+  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" "$HOME/VMQs"
+
+fi
+
+XDG_AppFolder="$HOME/.local/share/applications"
+
+
+if [[ ! -d $XDG_AppFolder ]]; then
+
+  printColor "\n\n  ERROR:  The default XDG user desktop folder cannot be created or found\n\n  See https://www.freedesktop.org/wiki/ \n\n"
+
+fi
+
+
+if [[ $No_XDG ]]; then  
+
+  printColor "\n\n  An XDG desktop cannot be found.  Type 'qqX' at the command line for starting.\n\n"
+
+  sleep 3 ; exit 1
+
+else
+
+  ## Add Icon to links:  https://askubuntu.com/a/617311   https://people.gnome.org/~bmsmith/build/gosnautilus-203.html   
+
+  #[Desktop Entry]
+  #Type=Link
+  #Name=qqX
+  #Icon=$HOME/.qqX/icons/qqX.std.logo.96.png     
+  #URL=/usr/bin/qqX
+
+  # https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup  # $HOME/.icons ?
+
+  # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#recognized-keys
+
+  # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#exec-variables
+
+  # https://wiki.archlinux.org/index.php/Desktop_entries#Validation   & use folder .local/share/applications
+
+  # https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517222
+
+  # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774 
+
+
+
+  #  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+
+
+  XDG_GUI_ItemName="$qqX_XDG_Name.desktop" 
+
+  XDG_GUI_ItemPathName="$XDG_AppFolder/$XDG_GUI_ItemName"   
+
+
+  [[ -f "$XDG_GUI_ItemPathName" ]]  && rm "$XDG_GUI_ItemPathName"
+
+  #  Remove any old launcher file & create a new one  
+
+  # NoDisplay: means don't show in the main menu  (Use =false)
+
+  # Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
+
+
+  {
+    echo "[Desktop Entry]"
+    echo "Type=Application"
+    echo "Terminal=false"
+
+    echo "Name=${qqX_XDG_Name} Virtual Machine Launcher" 
+
+    echo "NoDisplay=false"
+
+    echo "Comment=qqX - quickemu quickget X terminal project"
+
+    # needs quotes
+
+    # REVIEW 
+
+    
+    if [[ $CustomTerminalProfile ]]; then     
+    
+      echo "Exec=$UserTerm $CustomTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+
+    elif [[ $UserTerm == "mate-terminal" ]]; then
+    
+      echo "Exec=$UserTerm $MateTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+    elif [[ $UserTerm == "gnome-terminal" ]]; then
+    
+      echo "Exec=$UserTerm $GnomeTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+    elif [[ $UserTerm == "konsole" ]]; then
+    
+      echo "Exec=$UserTerm $KonsoleTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+    else
+
+      echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
+
+    fi
+
+    echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.96.png"
+    
+    echo "Categories=System;Emulator"
+
+    #https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
+
+    # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
+
+    printf "MimeType=application/x-qemu-disk\n"
+
+    echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
+    echo "#"
+    echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
+
+  }  > "$XDG_GUI_ItemPathName"
+
+
+  chmod +x  "$XDG_GUI_ItemPathName"
+
+
+  # Useful:   
+
+  # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
+
+  # desktop-file-validate  qqX.desktop 
+
+
+  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+
+
+  # Important: 
+
+  update-desktop-database  "$HOME/.local/share/applications" 
+
+  # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
+
+
+  #  REVIEW   Different distros have different setups.
+
+fi
+
+
+printColor  "\n\n  Install process finished:  "
+
+printf "\n\n\n  qqX may be started from the main system menu"
+
+printf "\n\n  by right clicking on qcow2 files, or straight from the terminal."
+
+printf "\n\n\n  The settings file may be edited both via the internal qqX menu"
+
+printf "\n\n  or before starting at %s"  "$HOME/.qqX/qqX_settings"
+
+printColor "\n\n\n  [enter] to close current window and start \n\n "
+ 
+read -rp "  > "
+
+exit
+

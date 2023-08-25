@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# qqX Project  (c)  GPL3  See notes for details
+
+## qqX colour functions
+
+#  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+
+#  https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x405.html
+
+
+# if source without declared shade, set default shade
+
+[[ ! $X_Shade ]]  && X_Shade=3
+
+echColor () {
+
+	# for X_Shade see qqX configs
+
+	if [[ $2 ]] ; then
+
+		if [[ "$1" == "-n" ]] ; then
+			tput setaf "$X_Shade"
+			echo -n "$2"
+			tput sgr0
+		else
+			tput setaf "$X_Shade"
+			# echo "$1 $2"          			
+			echo "$@"          			
+			# REVIEW  and $3 ?
+			tput sgr0
+		fi
+
+	else
+		tput setaf "$X_Shade"
+		echo "$1"
+		tput sgr0
+	fi
+
+}
+
+
+printColor () {
+
+	tput setaf "$X_Shade"
+
+	# NB this calls the printf trap function, not the actual command
+
+	# shellcheck disable=SC2059
+
+	printf "$@"
+
+	tput sgr0
+
+}
