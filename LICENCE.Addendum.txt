@@ -1,0 +1,89 @@
+
+Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+licence:  GPL3   https://www.gnu.org/licenses 
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ https://www.gnu.org/licenses 
+
+
+qqX - quickemu quickget X terminal project  
+
+
+A independant text based menu interface designed to work with QEMU & with the 'quickemu' project
+
+https://github.com/quickemu-project/quickemu   https://gitlab.com/qemu-project/qemu
+
+Users should install 'qemu' & 'quickemu' separately, as normal.
+
+
+IF ANY qqX CODE BECOMES USED IN EITHER THE ORIGINAL QUICKEMU PROJECT, OR ANY OTHER PROJECT, 
+
+YOU SHOULD SHOW BOTH THIS LICENCE & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+
+#
+#
+
+Some scripts use code from ffX:
+
+ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+
+https://github.com/theffxproject
+
+
+Other parts build on the work with quickemu-wrap:
+
+quickemu-mod / quickemu-wrap  >
+
+https://github.com/TuxVinyards/quickemu-mod
+
+
+All scripts from these projects are copyright (c)  Alex Genovese
+
+licence:  GPL3   https://www.gnu.org/licenses 
+
+Any references in qqX to the ffX project imply GPL3 and its transfer between the projects
+
+
+#
+#
+
+
+For any sections of code used directly from the ORIGINAL quickemu project:
+
+MIT License
+
+Copyright (c) 2020 Wimpy's World
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+See https://github.com/quickemu-project/quickemu
+
+
+#
