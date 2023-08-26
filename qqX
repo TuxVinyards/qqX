@@ -65,7 +65,7 @@
 
 # This script:
 
-ModVersion="0.09.00.012"
+ModVersion="0.09.00.014"
 
 # major.minor.point.dev-point.suffix-note   xx.2dp.2dp.3dp.beta-etc  
 # where 1 is first release & 0 indicates dev  eg 0.09.00.001  &  1.01.01
@@ -3662,11 +3662,16 @@ check_for_qqX_updates() {
 
     qqX_LatestRelease="${qqX_LatestRelease//'",'/}"
 
+    qqX_LatestRelease="$(tr -cd '[:graph:]' <<< "$qqX_LatestRelease")"
+
     qqX_LatestTarBall="$(grep -s tarball "/tmp/latest-qqX" )"
 
     qqX_LatestTarBall="${qqX_LatestTarBall/'"tarball_url": "'/}"
 
     qqX_LatestTarBall="${qqX_LatestTarBall//'",'/}"
+
+    qqX_LatestTarBall="$(tr -cd '[:graph:]' <<< "$qqX_LatestTarBall")"
+
 
     IFS='.' read -ra qqX_LatestVer_Arr <<< "$qqX_LatestRelease"
 
@@ -3681,9 +3686,9 @@ check_for_qqX_updates() {
 
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
 
-      qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}"
+      qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}${qqX_LatestVer_Arr[3]}"
 
-      qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}"
+      qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
 
       # echo "latest $qqX_LatestVer_Float  current $qqX_CurrentVer_Float"
     
@@ -4295,7 +4300,9 @@ while true ; do
 
     function_qqX_printf_logo_title  "qqX updater"
 
-    printf "\n\n\n  %s"  "$qqX_LatestTarBall"
+    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"  
+
+    printf "\n\n  %s"  "$qqX_LatestTarBall"
 
     printf "\n\n  Download the tarball to: "
     
@@ -4315,7 +4322,7 @@ while true ; do
 
     fi
 
-    [[ $qqX_LatestTarBall_Folder ]] &&  wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX.$qqX_LatestRelease"
+    [[ $qqX_LatestTarBall_Folder ]] &&  wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX.${qqX_LatestRelease}.tar.gz"
 
     sleep 1
 
