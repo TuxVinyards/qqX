@@ -22,7 +22,9 @@ quickemu quickget X terminal project
 
 - Individual VM screen percentage settings and easy create secondary & shared storage
 
-- Manage multiple snapshots, toggle boot-up & temporary MSRS's
+- Multiple snapshot management, including of shared disks.  
+
+- MSRS controls.
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
