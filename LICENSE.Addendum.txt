@@ -1,7 +1,7 @@
 
 Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-licence:  GPL3   https://www.gnu.org/licenses 
+license:  GPL3   https://www.gnu.org/licenses 
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ Users should install 'qemu' & 'quickemu' separately, as normal.
 
 IF ANY qqX CODE BECOMES USED IN EITHER THE ORIGINAL QUICKEMU PROJECT, OR ANY OTHER PROJECT, 
 
-YOU SHOULD SHOW BOTH THIS LICENCE & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+YOU SHOULD SHOW BOTH THIS LICENSE & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
 
 #
 #
@@ -49,7 +49,7 @@ https://github.com/TuxVinyards/quickemu-mod
 
 All scripts from these projects are copyright (c)  Alex Genovese
 
-licence:  GPL3   https://www.gnu.org/licenses 
+license:  GPL3   https://www.gnu.org/licenses 
 
 Any references in qqX to the ffX project imply GPL3 and its transfer between the projects
 
