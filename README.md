@@ -32,3 +32,6 @@ Download the latest release [here](releases/latest) and run the installer.
 
 qqX will auto-detect if new releases are available & quietly prompt for updates
 
+## Beta notes
+
+The scripts are now stable and polished \@ beta 12.  Testing the updater has to be done on a live public release basis, so early adopters/testers should check back every few days until this is cleared.  The installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw> please ...
