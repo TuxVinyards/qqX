@@ -65,7 +65,7 @@
 
 # This script:
 
-ModVersion="0.09.00.014"
+ModVersion="0.09.00.015"
 
 # major.minor.point.dev-point.suffix-note   xx.2dp.2dp.3dp.beta-etc  
 # where 1 is first release & 0 indicates dev  eg 0.09.00.001  &  1.01.01
@@ -217,6 +217,8 @@ custom_conf_notes () {
     SharedDrive_Conf=\"no-shared\"
 
     Other:
+
+    disk_size=\"128G\"  (or other integer)
 
     cpu_cores=\"x\"  (even integer)
 

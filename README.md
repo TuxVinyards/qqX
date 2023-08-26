@@ -14,7 +14,11 @@ quickemu quickget X terminal project
 
 - Full process controlled wrapping of both Quickemu & Quickget
 
-- Extra diagnostics & functions, easy customising & installation
+- Extra diagnostics & functions, easy customising
+
+- Assisted VM setup & config 
+
+- Guided Desktop installation script complete with update checker
 
 - Individual VM screen percentage settings and easy create secondary & shared storage
 
@@ -34,4 +38,4 @@ qqX will auto-detect if new releases are available & quietly prompt for updates
 
 ## Beta notes
 
-The scripts are now stable and polished \@ beta 12.  Testing the updater has to be done on a live public release basis, so early adopters/testers should check back every few days until this is cleared.  The installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw> please ...
+The scripts have been stable and polished \@ beta 12.  The updater has now been tested on a live public release basis, so very early  beta 12 testers should now update.  The installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw> please ...
