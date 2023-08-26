@@ -6,6 +6,8 @@ quickemu quickget X terminal project
 
 ### The next stage on from quickemu-mod - currently in late beta
 
+![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/0ee973ca-41a4-46e5-80cc-fe5d26a57717)
+
 - Now Desktop Integrated & with added right click qcow2 analysis
 
 - An alternative to quickgui for more advanced users
@@ -19,8 +21,6 @@ quickemu quickget X terminal project
 - Manage multiple snapshots, toggle boot-up & temporary MSRS's
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
-
-![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/0ee973ca-41a4-46e5-80cc-fe5d26a57717)
 
 ![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
 
