@@ -26,9 +26,9 @@ quickemu quickget X terminal project
 
 ## Install
 
-The initial set up should be with the original quickemu as normal.  <https://github.com/quickemu-project/quickemu>
+Start the set up with original quickemu as normal.  <https://github.com/quickemu-project/quickemu>
 
-Download the latest release [here](releases/latest) and run the installer.
+Download the latest qqX release [here](releases/latest) and run the installer.
 
 qqX will auto-detect if new releases are available & quietly prompt for updates
 
