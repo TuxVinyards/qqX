@@ -6,7 +6,7 @@ quickemu quickget X terminal project
 
 ### The next stage on from quickemu-mod - currently in late beta
 
-![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/0ee973ca-41a4-46e5-80cc-fe5d26a57717)
+![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/bfc51cbd-cfbe-4823-9f53-df048e4d33fc)
 
 - Now Desktop Integrated & with added right click qcow2 analysis
 
@@ -28,7 +28,7 @@ quickemu quickget X terminal project
 
 Start the set up with original quickemu as normal.  <https://github.com/quickemu-project/quickemu>
 
-Download the latest qqX release [here](./releases/latest) and run the installer.
+Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
 
 qqX will auto-detect if new releases are available & quietly prompt for updates
 
