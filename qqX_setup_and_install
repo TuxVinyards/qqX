@@ -285,6 +285,8 @@ else
 
     read -rp "  >  "  qqX_Remove
 
+    printf "\n\n"
+
     if [[ $qqX_Remove == "y" ]]; then
 
       [[ $qqX_RemovalTarget ]] && sudo rm "$qqX_RemovalTarget"
@@ -296,6 +298,14 @@ else
       rm "$HOME/.local/share/applications/qqX.desktop" ||  printColor "\n\n  qqX.desktop file not found \n\n"
 
       update-desktop-database  ~/.local/share/applications  ||  printColor "\n\n  XDG desktop utils not available. Try reboot.\n\n"
+
+      printColor "\n\n  Removal processing complete \n\n"
+
+      read -rp "  [enter] to quit  >  "
+
+      printf "\n\n"
+      tput cnorm
+      exit
 
     else
 
@@ -355,13 +365,53 @@ else
     fi
 
 
+
+    if [[ ! -d  "$HOME/VMQs" ]] ; then
+
+      #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
+
+      SkipMkDefDir=
+
+      printColor "\n\n\n  A default VM directory is required >> "  
+
+      printf "\n\n  %s\n\n  The location can be later edited in the qqX general settings file " "$HOME/VMQs"
+
+      printf "\n\n  [enter] make folder   [s] skip \n\n" 
+
+      read -rp "  >  "  SkipMkDefDir
+
+      if [[ ! $SkipMkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+
+    fi
+
+
     if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
 
     #  qqX default location  (has to be slightly opinionated here for the updater to work)  REVIEW  (and at end of script)
 
-    cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
+    SettingsOverwrite=1
 
-    cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
+    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
+
+      SettingsOverwrite=
+
+      printColor "\n\n  Existing settings file found. "   #  TODO   add diff dialog
+
+      printf "\n\n  [o] backup to .old  & overwrite with new  [enter] leave current as it is \n\n"
+
+      read -rp "  >  "  SettingsOverwrite
+
+      printf "\n\n"
+
+    fi
+
+    if [[ $SettingsOverwrite ]]; then
+
+      cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
+
+      cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
+
+    fi
 
     if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]]; then
     
@@ -375,280 +425,290 @@ else
 
 fi
 
+##  DESKTOP LAUNCHER
 
-
-## The name of the terminal emulator is needed   (may also be manually specified at start of script)  
-
-if [[ ! $UserTerm ]]; then
-
-  LIST_start=("$(pwd)"/qqX.system/qqX-termfind.*)     
-  Number_start=${#LIST_start[@]}
-  . "${LIST_start[$Number_start-1]}"
-
-fi
-
-
-## Determine how the interface will look
-
-printf "\033c"
-
-echo
-
-function_qqX_logo_title  "Setting up the desktop:"
-
-printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
-
-if [[ ! $CustomTerminalProfile ]]; then 
-
-  printf "\n\n  Use extra height (%s) to help show multifile output better"  "$Term_Taller"
-
-  printf "\n\n  but be aware this will hide more of the file manager output"
-
-  printf "\n\n  while some menu screens may contain empty space."
-
-fi
-
-printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
-
-printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
-
-printf "\n\n\n"
-
-# REVIEW add W H number entry?
-
-printColor "  [enter] continue at standard height "
-
-[[ ! $CustomTerminalProfile ]] && printf "   [t] extra height   or"
-
-printf "   [q] to exit \n\n"
-
-read -rp "  > "   TerminalHeightChoice
-
-
-if [[ $TerminalHeightChoice == "q" ]]; then
-
-  sleep 0.6 ; exit 
-
-elif [[ $TerminalHeightChoice == "t" ]]; then
-
-  MateTerminalProfile="$MateTerminalProfile_Taller"
-
-  GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
-
-  KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
-
-else
-
-  MateTerminalProfile="$MateTerminalProfile_Standard"
-
-  GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
-
-  KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
-
-fi
-
-echo; echo
-
-
-# Select Icon colour (to go with text shade)
-
-printColor "\n\n  Select Desktop Icon colour "
-
-tput setaf 6
-
-printf " (text colour may be set in the settings file)"   
-
-tput sgr0
-
-printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
-
-read -rp "  >  "  IconSelect
-
-
-if [[ $IconSelect == "b" ]]; then  Icon_Var="blu"
-
-else  Icon_Var="std"; fi
-
-
-
-
-
-## RUN .desktop CREATOR  
-
-
-if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
-
-  printColor "\n\n  XDG desktop not found." 
-
-  UserLand_Name="$(users)"
-
-  if [[ "$(whoami)" == root ]]; then printf "\n\n  User-Interactive Scripts:  Root installation adds complications ... \n\n  Select a UserLand folder (%s) etc\n\n" "$UserLand_Name"
-
-  else printf "\n\n  For menu links, only XDG desktop compliant OS's are supported. \n\n  Running from CLI may be possible.\n\n"
-
-  fi
-
-  No_XDG=1
-
-fi
-
-if [[ ! $(type -p update-desktop-database) ]] && [[ ! $No_XDG ]] ; then
-
-    printColor "\n\n  Incomplete XDG desktop installation. \n\n  Check your distro repository for ""'""desktop-file-utils""'"" \n\n  or see https://www.freedesktop.org/software/desktop-file-utils/releases/ \n\n"
-
-    read -rp "  [q] to quit  or [enter] to install traditional links only " Missing_XDG_Utils
-
-    [[ $Missing_XDG_Utils == "q" ]] && sleep 0.6 && exit
-
-fi
-
-if [[ ! -d  "$HOME/.local/share/applications" ]] && [[ ! $No_XDG ]]; then
-
-  mkdir "$HOME/.local/share/applications"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
-
-fi
-
-if [[ ! -d  "$HOME/VMQs" ]] ; then
-
-  #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
-
-  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" "$HOME/VMQs"
-
-fi
+#  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
 
 XDG_AppFolder="$HOME/.local/share/applications"
 
+XDG_GUI_ItemName="$qqX_XDG_Name.desktop" 
 
-if [[ ! -d $XDG_AppFolder ]]; then
+XDG_GUI_ItemPathName="$XDG_AppFolder/$XDG_GUI_ItemName"  
 
-  printColor "\n\n  ERROR:  The default XDG user desktop folder cannot be created or found\n\n  See https://www.freedesktop.org/wiki/ \n\n"
+SkipMkLauncher=
+
+if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
+
+  printColor "\n  A desktop launcher already exists >> "  
+
+  printf "\n\n  Do you want to reconfigure the settings?" 
+
+  printf "\n\n  [enter] to skip   [r] to reinstall \n\n" 
+
+  read -rp "  >  "  SkipMkLauncher
+
+  if [[ $SkipMkLauncher == "r" ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 ; fi
 
 fi
 
+if [[ ! $SkipMkLauncher ]]; then
 
-if [[ $No_XDG ]]; then  
+  ## The name of the terminal emulator is needed   (may also be manually specified at start of script)  
 
-  printColor "\n\n  An XDG desktop cannot be found.  Type 'qqX' at the command line for starting.\n\n"
+  if [[ ! $UserTerm ]]; then
 
-  sleep 3 ; exit 1
+    LIST_start=("$(pwd)"/qqX.system/qqX-termfind.*)     
+    Number_start=${#LIST_start[@]}
+    . "${LIST_start[$Number_start-1]}"
 
-else
-
-  ## Add Icon to links:  https://askubuntu.com/a/617311   https://people.gnome.org/~bmsmith/build/gosnautilus-203.html   
-
-  #[Desktop Entry]
-  #Type=Link
-  #Name=qqX
-  #Icon=$HOME/.qqX/icons/qqX.std.logo.96.png     
-  #URL=/usr/bin/qqX
-
-  # https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup  # $HOME/.icons ?
-
-  # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#recognized-keys
-
-  # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#exec-variables
-
-  # https://wiki.archlinux.org/index.php/Desktop_entries#Validation   & use folder .local/share/applications
-
-  # https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517222
-
-  # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774 
+  fi
 
 
+  ## Determine how the interface will look
 
-  #  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+  printf "\033c"
+
+  echo
+
+  function_qqX_logo_title  "Setting up the desktop:"
+
+  printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
+
+  if [[ ! $CustomTerminalProfile ]]; then 
+
+    printf "\n\n  Use extra height (%s) to help show multifile output better"  "$Term_Taller"
+
+    printf "\n\n  but be aware this will hide more of the file manager output"
+
+    printf "\n\n  while some menu screens may contain empty space."
+
+  fi
+
+  printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
+
+  printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+
+  printf "\n\n\n"
+
+  # REVIEW add W H number entry?
+
+  printColor "  [enter] continue at standard height "
+
+  [[ ! $CustomTerminalProfile ]] && printf "   [t] extra height   or"
+
+  printf "   [q] to exit \n\n"
+
+  read -rp "  > "   TerminalHeightChoice
 
 
-  XDG_GUI_ItemName="$qqX_XDG_Name.desktop" 
+  if [[ $TerminalHeightChoice == "q" ]]; then
 
-  XDG_GUI_ItemPathName="$XDG_AppFolder/$XDG_GUI_ItemName"   
+    sleep 0.6 ; exit 
+
+  elif [[ $TerminalHeightChoice == "t" ]]; then
+
+    MateTerminalProfile="$MateTerminalProfile_Taller"
+
+    GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
+
+    KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
+
+  else
+
+    MateTerminalProfile="$MateTerminalProfile_Standard"
+
+    GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
+
+    KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
+
+  fi
+
+  echo; echo
 
 
-  [[ -f "$XDG_GUI_ItemPathName" ]]  && rm "$XDG_GUI_ItemPathName"
+  # Select Icon colour (to go with text shade)
 
-  #  Remove any old launcher file & create a new one  
+  printColor "\n\n  Select Desktop Icon colour "
 
-  # NoDisplay: means don't show in the main menu  (Use =false)
+  tput setaf 6
 
-  # Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
+  printf " (text colour may be set in the settings file)"   
+
+  tput sgr0
+
+  printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
+
+  read -rp "  >  "  IconSelect
 
 
-  {
-    echo "[Desktop Entry]"
-    echo "Type=Application"
-    echo "Terminal=false"
+  if [[ $IconSelect == "b" ]]; then  Icon_Var="blu"
 
-    echo "Name=${qqX_XDG_Name} Virtual Machine Launcher" 
+  else  Icon_Var="std"; fi
 
-    echo "NoDisplay=false"
 
-    echo "Comment=qqX - quickemu quickget X terminal project"
 
-    # needs quotes
 
-    # REVIEW 
 
-    
-    if [[ $CustomTerminalProfile ]]; then     
-    
-      echo "Exec=$UserTerm $CustomTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+  ## RUN .desktop CREATOR  
 
-    elif [[ $UserTerm == "mate-terminal" ]]; then
-    
-      echo "Exec=$UserTerm $MateTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
 
-    elif [[ $UserTerm == "gnome-terminal" ]]; then
-    
-      echo "Exec=$UserTerm $GnomeTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+  if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
 
-    elif [[ $UserTerm == "konsole" ]]; then
-    
-      echo "Exec=$UserTerm $KonsoleTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+    printColor "\n\n  XDG desktop not found." 
 
-    else
+    UserLand_Name="$(users)"
 
-      echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
+    if [[ "$(whoami)" == root ]]; then printf "\n\n  User-Interactive Scripts:  Root installation adds complications ... \n\n  Select a UserLand folder (%s) etc\n\n" "$UserLand_Name"
+
+    else printf "\n\n  For menu links, only XDG desktop compliant OS's are supported. \n\n  Running from CLI may be possible.\n\n"
 
     fi
 
-    echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.96.png"
-    
-    echo "Categories=System;Emulator"
+    No_XDG=1
 
-    #https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
+  fi
 
-    # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
+  if [[ ! $(type -p update-desktop-database) ]] && [[ ! $No_XDG ]] ; then
 
-    printf "MimeType=application/x-qemu-disk\n"
+      printColor "\n\n  Incomplete XDG desktop installation. \n\n  Check your distro repository for ""'""desktop-file-utils""'"" \n\n  or see https://www.freedesktop.org/software/desktop-file-utils/releases/ \n\n"
 
-    echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
-    echo "#"
-    echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
+      read -rp "  [q] to quit  or [enter] to install traditional links only " Missing_XDG_Utils
 
-  }  > "$XDG_GUI_ItemPathName"
+      [[ $Missing_XDG_Utils == "q" ]] && sleep 0.6 && exit
 
+  fi
 
-  chmod +x  "$XDG_GUI_ItemPathName"
+  if [[ ! -d  "$HOME/.local/share/applications" ]] && [[ ! $No_XDG ]]; then
 
+    mkdir "$HOME/.local/share/applications"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
 
-  # Useful:   
-
-  # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
-
-  # desktop-file-validate  qqX.desktop 
+  fi
 
 
-  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+  if [[ ! -d $XDG_AppFolder ]]; then
+
+    printColor "\n\n  ERROR:  The default XDG user desktop folder cannot be created or found\n\n  See https://www.freedesktop.org/wiki/ \n\n"
+
+  fi
 
 
-  # Important: 
+  if [[ $No_XDG ]]; then  
 
-  update-desktop-database  "$HOME/.local/share/applications" 
+    printColor "\n\n  An XDG desktop cannot be found.  Type 'qqX' at the command line for starting.\n\n"
 
-  # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
+    sleep 3 ; exit 1
+
+  else
+
+    ## Add Icon to links:  https://askubuntu.com/a/617311   https://people.gnome.org/~bmsmith/build/gosnautilus-203.html   
+
+    #[Desktop Entry]
+    #Type=Link
+    #Name=qqX
+    #Icon=$HOME/.qqX/icons/qqX.std.logo.96.png     
+    #URL=/usr/bin/qqX
+
+    # https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup  # $HOME/.icons ?
+
+    # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#recognized-keys
+
+    # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html#exec-variables
+
+    # https://wiki.archlinux.org/index.php/Desktop_entries#Validation   & use folder .local/share/applications
+
+    # https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517222
+
+    # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774 
 
 
-  #  REVIEW   Different distros have different setups.
+
+    [[ -f "$XDG_GUI_ItemPathName" ]]  && rm "$XDG_GUI_ItemPathName"
+
+    #  Remove any old launcher file & create a new one  
+
+    # NoDisplay: means don't show in the main menu  (Use =false)
+
+    # Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
+
+
+    {
+      echo "[Desktop Entry]"
+      echo "Type=Application"
+      echo "Terminal=false"
+
+      echo "Name=${qqX_XDG_Name} Virtual Machine Launcher" 
+
+      echo "NoDisplay=false"
+
+      echo "Comment=qqX - quickemu quickget X terminal project"
+
+      # needs quotes
+
+      # REVIEW 
+
+      
+      if [[ $CustomTerminalProfile ]]; then     
+      
+        echo "Exec=$UserTerm $CustomTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+
+      elif [[ $UserTerm == "mate-terminal" ]]; then
+      
+        echo "Exec=$UserTerm $MateTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+      elif [[ $UserTerm == "gnome-terminal" ]]; then
+      
+        echo "Exec=$UserTerm $GnomeTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+      elif [[ $UserTerm == "konsole" ]]; then
+      
+        echo "Exec=$UserTerm $KonsoleTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+
+      else
+
+        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
+
+      fi
+
+      echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.96.png"
+      
+      echo "Categories=System;Emulator"
+
+      #https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
+
+      # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
+
+      printf "MimeType=application/x-qemu-disk\n"
+
+      echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
+      echo "#"
+      echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
+
+    }  > "$XDG_GUI_ItemPathName"
+
+
+    chmod +x  "$XDG_GUI_ItemPathName"
+
+
+    # Useful:   
+
+    # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
+
+    # desktop-file-validate  qqX.desktop 
+
+
+    # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+
+
+    # Important: 
+
+    update-desktop-database  "$HOME/.local/share/applications" 
+
+    # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
+
+
+    #  REVIEW   Different distros have different setups.
+
+  fi
 
 fi
 

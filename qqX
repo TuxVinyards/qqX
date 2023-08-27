@@ -65,7 +65,7 @@
 
 # This script:
 
-ModVersion="0.09.00.015"
+ModVersion="0.09.00.016"
 
 # major.minor.point.dev-point.suffix-note   xx.2dp.2dp.3dp.beta-etc  
 # where 1 is first release & 0 indicates dev  eg 0.09.00.001  &  1.01.01
@@ -360,6 +360,11 @@ if [[ $XDG_QcowRightClick ]]; then
 fi
 
 
+#  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
+
+#  TODO  add error handling for settings file errors
+
+
 # Function to create a list of preset VM locations 
 
 function_create_VM_folderList() {
@@ -374,9 +379,17 @@ function_create_VM_folderList() {
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
 
   
-  # set and clear the folder array
+  # set and clear the folder array, current first but don't scan twice
+
+  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
  
-  declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
+    declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
+
+  else
+
+    declare -ga VM_Folder_List=("$Default_VM_Folder")
+
+  fi
 
 
   # shellcheck disable=SC2154
@@ -417,12 +430,12 @@ function_refresh_and_reload_VM_arrays() {
 
   # NB clear extra folders array
 
-  declare -ga Extra_VM_Folder=()
+  Extra_VM_Folder=()
 
 
   # NB clear pre-set folders array 
 
-  declare -gA VM_Array=()
+  VM_Array=()
 
 
   # Re-Read settings file & pre-set folders:
@@ -2846,9 +2859,11 @@ function_VM_array_add_confs () {
 
   ## Adds to VM array & lists, if submitted item has not been already listed 
 
-  # where $1 is 'VM_Path' and  $2 is 'VM_Conf' to be tested against the existing list (non-sparse)
+  #  where $1 is 'VM_Path' and  $2 is 'VM_Conf' to be tested against the existing list (non-sparse)
 
-  #  If initial settings file has populated / part-populated the array then ${VM_Array[0,0]} will be present
+  #  & if the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
+
+  #  TODO  add error handling for settings file errors
 
   if [[ $1 ]]; then
 
@@ -2889,14 +2904,10 @@ function_VM_array_add_confs () {
 
     fi
 
-    if grep -q 'guest_os=' "$TestFolderFile" 2> /dev/null ; then
-
-      # if at the end there is no match found, then add it, if it is valid
+      # if it's the first entry, or at the end there is no match found in the array, then add it
 
       VM_Array[$New_VM_Number,0]="$1" 
       VM_Array[$New_VM_Number,1]="$2" 
-
-    fi
 
   fi
   
@@ -2908,6 +2919,12 @@ function_scan_VM_folderList () {
   ##  Scans of current & listed VM folders for other potential '.conf' files to the VM array
 
   #   Adds via calls to 'function_VM_array_add_confs'
+
+
+  #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
+
+  #  TODO  add error handling for settings file errors
+
 
   i=0
 
@@ -2924,8 +2941,14 @@ function_scan_VM_folderList () {
     if [[ ${Folder_Conf_Array[0]} ]]; then 
 
       for TestFile in "${Folder_Conf_Array[@]}"; do 
-           
-      [[ $TestFile ]] && function_VM_array_add_confs  "$FolderPathName" "$TestFile" 
+
+        # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
+
+        if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
+            
+          function_VM_array_add_confs  "$FolderPathName" "$TestFile" 
+
+        fi
       
       done
 
@@ -2949,21 +2972,21 @@ function_print_conf_array () {
 
   # Print a list of the VM's in the VM array
 
-  VM_List_Num=0
+  i=0
 
-  while [[ ${VM_Array[$VM_List_Num,0]} ]] ; do
+  while [[ ${VM_Array[$i,0]} ]] ; do
 
-    if [[ ! -d "${VM_Array[$VM_List_Num,0]}" ]]; then 
+    if [[ ! -d "${VM_Array[$i,0]}" ]]; then 
 
-      printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$VM_List_Num,0]}"   
+      printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"   
 
-      function_conf_error  "folder $VM_List_Num" 
+      function_conf_error  "folder $i" 
       SelectArrayError=1
       break 
 
     else
 
-      ArrayConf_Item="${VM_Array[$VM_List_Num,0]}/${VM_Array[$VM_List_Num,1]}"
+      ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
 
       if [[ -e "$ArrayConf_Item" ]]; then 
 
@@ -2971,26 +2994,26 @@ function_print_conf_array () {
 
           QcowTarget=
 
-          QcowTarget="$(grep 'disk_img' "$ArrayConf_Item" 2> /dev/null)"
+          QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
 
-          QcowTarget="${QcowTarget/'disk_img='/}"
+          QcowTarget="${QcowTarget/'disk_img='/}"  
 
           QcowTarget="${QcowTarget//'"'/}"
 
-          # Newly downloaded VMs will have a qcow disk path in the .conf file BUT it won't be be there yet, 
-          # not until quickemu has done a first run against the .conf
+          # Newly downloaded VMs will have a qcow disk path in the .conf file 
+          # BUT it won't be be there yet, not until quickemu has done a first run against the .conf
 
-          if [[ ! -e "${VM_Array[$VM_List_Num,0]}/$QcowTarget" ]]; then 
+          if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
 
-            printColor "\n\n %2d  %s  (new)" "$VM_List_Num" "$ArrayConf_Item"
+            printColor "\n\n %2d  %s  (new)" "$i" "$ArrayConf_Item"
 
           else
 
-            printf "\n\n %2d  %s " "$VM_List_Num" "$ArrayConf_Item"
+            printf "\n\n %2d  %s " "$i" "$ArrayConf_Item"
 
-            if [[ "${VM_Array[$VM_List_Num,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$VM_List_Num,1]}" == *'daily'* ]]; then
+            if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
            
-              [[  ! $(du -b -t 500000 "${VM_Array[$VM_List_Num,0]}/$QcowTarget" 2>/dev/null) ]]  &&  printf "(z)"
+              [[  ! $(du -b -t 500000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]  &&  printf "(z)"
 
               #  Live VMs only, as zsync only updates the iso file.  Live VM qcow2 disks are normally only 196k. 
 
@@ -3006,7 +3029,7 @@ function_print_conf_array () {
 
         printf "\n\n  ERROR  %s ' .conf ' not found: \n\n  %s \n\n" "$ModName" "$ArrayConf_Item"
 
-        function_conf_error  "config $VM_List_Num" 
+        function_conf_error  "config $i" 
         SelectArrayError=1
         break
 
@@ -3014,7 +3037,7 @@ function_print_conf_array () {
 
     fi
 
-    ((VM_List_Num+=1))
+    ((i+=1))
 
   done
   
@@ -3975,7 +3998,7 @@ while true ; do
 
         MainMenuChoice="refresh" 
 
-                #declare -p VM_Array
+        #declare -p VM_Array
         #echo    "  main menu loop - after Select_VM run:"
         #read -p "  VM_InstanceName is $VM_InstanceName  ByPass_VM_Array_Loader is $ByPass_VM_Array_Loader  ByPass_VM_Array_Selector is $ByPass_VM_Array_Selector"
         #echo

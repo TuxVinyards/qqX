@@ -50,16 +50,16 @@ Extra_VM_Folder+=("")
 
 # VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="macos-catalina.conf"
 
-# NB associative array & to be set contigiuous, non-sparse
 
+# NB associative array MUST BE set CONTIGIUOUS, non-sparse, no gaps
 
 # ADD here:
 
-VM_Array[0,0]="" ; VM_Array[0,1]=""
+# VM_Array[0,0]="" ; VM_Array[0,1]=""
 
-VM_Array[1,0]="" ; VM_Array[1,1]=""
+# VM_Array[1,0]="" ; VM_Array[1,1]=""
 
-
+# NB  Non-Present entries MUST be COMMENTED OUT with #  or deleted
 
 
 ##  GENERAL COLOR & THEMING  
