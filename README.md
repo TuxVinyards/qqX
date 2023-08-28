@@ -1,10 +1,10 @@
 # qqX
 
-quickemu quickget X terminal project
+The next stage on from quickemu-mod ... Now available
 
-## Powerful text based User Interface for Virtual Machine Management
+## Powerful text based Quickemu Virtual Machine Manager
 
-### The next stage on from quickemu-mod is now in public beta
+### quickemu quickget X terminal project
 
 ![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/bfc51cbd-cfbe-4823-9f53-df048e4d33fc)
 
@@ -36,8 +36,10 @@ Start the set up with original quickemu as normal.  <https://github.com/quickemu
 
 Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
 
-qqX will auto-detect if new releases are available & quietly prompt for updates
+qqX will auto-detect if new releases are available & quietly prompt for updates.
+
+Use the installer to update, reinstall, uninstall or reconfigure.
 
 ## Beta notes
 
-The scripts have been stable and polished since beta 12 and the installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw> please ...
+The scripts have been stable and polished since beta 12 and the installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
