@@ -6,7 +6,7 @@ The next stage on from quickemu-mod ... Now available
 
 ### quickemu quickget X terminal project
 
-![qqX-plank-mate](https://github.com/TuxVinyards/qqX/assets/3956806/bfc51cbd-cfbe-4823-9f53-df048e4d33fc)
+![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
 - Now Desktop Integrated & with added right click qcow2 analysis
 
