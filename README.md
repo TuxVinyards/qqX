@@ -42,4 +42,4 @@ Use the installer to update, reinstall, uninstall or reconfigure.
 
 ## Beta notes
 
-The scripts have been stable and polished since beta 12 and the installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
+The scripts are stable and the installer has been tested on a variety of mainstream distros. Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
