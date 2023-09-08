@@ -17,6 +17,8 @@ Also try re-installs, not only of qqX but of quickemu & qemu ...
 
 Problems with quickemu or quickget should be submitted at https://github.com/quickemu-project/quickemu  Qemu at https://gitlab.com/qemu-project/qemu/-/issues
 
+For advice and discussion try the quickemu  forum at https://discord.gg/sNmz3uw
+
 ### General Description:
 
 Host OS ,  qqX, quickemu &  Qemu versions:
