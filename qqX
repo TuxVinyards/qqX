@@ -65,7 +65,7 @@
 
 # This script:
 
-ModVersion="0.10.00.18"
+ModVersion="0.10.00.19"
 
 # "0.10.0.18"  is temporarilly assigned as  "0.10.00.18" to make sure "0.09.00.016" can read it
 
@@ -4633,7 +4633,7 @@ while true ; do
 
         cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
 
-        exec  "./qqX_setup_and_install"  "Upgrade" 
+        exec  bash -c "./qqX_setup_and_install  Upgrade" 
 
       fi
 
