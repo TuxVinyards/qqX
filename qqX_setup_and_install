@@ -43,7 +43,9 @@
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
 
-# THIS INSTALL SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER  ###
+# THIS INSTALL SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files ###
+
+# $1 as 'Upgrade'  may be supplied to change the menu look (see qqX updater function)
 
 
 # Bash 5.0+     # details: try 'bash -version at the commandline'   (2023: we are now at ver 5 for at least 10 years ...)
@@ -159,7 +161,7 @@ KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-ta
 if [[ ! -d "$(pwd)/qqX.system" ]]; then 
 
   printf  "\n\n  ERROR  qqX install script must be run from inside the original qqX folder \n\n"
-  sleep 5  ; exit 1
+  sleep 8  ; exit 1
 
 fi
 
@@ -226,9 +228,13 @@ echo
 
 function_qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
 
-if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  a standard release of quickemu has been found " 
+if [[ $1 != "Upgrade" ]]; then 
 
-else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu " 
+  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  a standard release of quickemu has been found " 
+
+  else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu " 
+
+  fi
 
 fi  
 
@@ -247,7 +253,11 @@ else
 
   InstallSelect=
 
-  printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME" 
+  if [[ $1 == "Upgrade" ]]; then  printColor  "\n\n  Upgrade the program scripts:"   "$HOME" 
+
+  else  printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME" 
+
+  fi
 
   printf "\n\n   sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
 
@@ -257,7 +267,7 @@ else
   
   printf "   [s] issue sudo commands separately "
 
-  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [r] re-install/upgrade"
+  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [enter] re-install/upgrade"
 
   printf "   [q] to quit \n\n"
 
@@ -360,7 +370,7 @@ else
 
     else 
     
-      printColor "\n\n  ERROR qqX version %s not found. Quit and retry  " "$qqX_Version" ; sleep 2000 
+      printColor "\n\n  ERROR qqX version %s not not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000 
     
     fi
 
@@ -370,17 +380,21 @@ else
 
       #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
 
-      SkipMkDefDir=
+      #  TODO  hide this where possible check settings file for Default folder & if exist
+
+      MkDefDir=
 
       printColor "\n\n\n  A default VM directory is required >> "  
 
       printf "\n\n  %s\n\n  The location can be later edited in the qqX general settings file " "$HOME/VMQs"
 
-      printf "\n\n  [enter] make folder   [s] skip \n\n" 
+      printColor "\n\n  [enter] skip (if already set-up) " 
 
-      read -rp "  >  "  SkipMkDefDir
+      printf "  [m] make folder \n\n" 
 
-      if [[ ! $SkipMkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+      read -rp "  >  "  MkDefDir
+
+      if [[ $MkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
 
     fi
 
@@ -389,29 +403,78 @@ else
 
     #  qqX default location  (has to be slightly opinionated here for the updater to work)  REVIEW  (and at end of script)
 
-    SettingsOverwrite=1
+    # SettingsOverwrite=1
 
-    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
+    if [[ -e "$HOME/.qqX/qqX_settings_IGNORE" ]]; then 
 
-      SettingsOverwrite=
+      # _IGNORE   TEMP  not needed just yet. No new additions @ "0.10.0.18" (initial release beta 18) 
 
-      printColor "\n\n  Existing settings file found. "   #  TODO   add diff dialog
+      #  Work in progress on auto-diff updater   TODO  
 
-      printf "\n\n  [o] backup to .old  & overwrite with new  [enter] leave current as it is \n\n"
+      if  [[ "$(diff --version | head -1)" == *GNU* ]]; then 
+
+        DiffExist="$(diff -q -Z "$HOME/.qqX/qqX_settings" "qqX_settings")"
+
+        if [[ $DiffExist ]]; then
+
+          diff -c --context=0 --color -Z  "$HOME/.qqX/qqX_settings" "qqX_settings" 
+          
+          printf "\n\n%s \n\n" "$DiffExist" > settings.diff."$qqX_Version".log
+
+          diff -c --context=0 -Z  "$HOME/.qqX/qqX_settings" "qqX_settings" >> settings.diff."$qqX_Version".log
+
+          cp "$HOME/.qqX/qqX_settings" "qqX_old.settings"
+
+          printf "\n\n  A differences log has been recorded & along with"
+
+          printf "\n\n  a copy of the old settings has been placed in the release folder"
+
+        else
+
+          # unlikely but possible
+
+          printf "\n\n  Both old and new settings files are the same"
+
+        fi
+
+      fi
+
+      #  REVIEW  add flag detect if new feature or critical settings in this release
+
+      printColor "\n\n  Existing settings file found. "   
+
+      printf "\n\n  [o] overwrite with new  [enter] leave current as it is \n\n"
 
       read -rp "  >  "  SettingsOverwrite
+
+      [[ $SettingsOverwrite != "o" ]] && SettingsOverwrite=
 
       printf "\n\n"
 
     fi
 
-    if [[ $SettingsOverwrite ]]; then
+    if [[ $SettingsOverwrite_IGNORE ]]; then  # _IGNORE   TEMP  not needed just yet.
+
+      if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
+
+        D_Stamp=".""$(date +%a.%d.%b.%G.%H.%M)"
+
+        cp "$HOME/.qqX/qqX_settings" "$HOME/.qqX/qqX_settings.$D_Stamp.old" 
+
+        printf "\n  A time stamped copy of the old settings has been placed in the settings folder \n\n"
+
+      fi
 
       cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
 
       cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
 
+    # else
+
+      #  REVIEW  add an else section here for highlighting possible critical add-on notes and vars 
+
     fi
+        
 
     if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]]; then
     
@@ -439,11 +502,13 @@ SkipMkLauncher=
 
 if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
-  printColor "\n  A desktop launcher already exists >> "  
+  printColor "\n\n  A desktop launcher already exists >> "  
 
-  printf "\n\n  Do you want to reconfigure the settings?" 
+  printf "\n\n  May be skipped, unless changing the icon or similar ..." 
 
-  printf "\n\n  [enter] to skip   [r] to reinstall \n\n" 
+  printColor "\n\n  [enter] to skip   " 
+
+  printf "[r] to reconfigure \n\n"
 
   read -rp "  >  "  SkipMkLauncher
 
@@ -636,7 +701,7 @@ if [[ ! $SkipMkLauncher ]]; then
       echo "Type=Application"
       echo "Terminal=false"
 
-      echo "Name=${qqX_XDG_Name} Virtual Machine Launcher" 
+      echo "Name=${qqX_XDG_Name} Virtual Machine Manager" 
 
       echo "NoDisplay=false"
 

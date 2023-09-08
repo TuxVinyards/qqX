@@ -65,10 +65,22 @@
 
 # This script:
 
-ModVersion="0.09.00.016"
+ModVersion="0.10.00.18"
 
-# major.minor.point.dev-point.suffix-note   xx.2dp.2dp.3dp.beta-etc  
-# where 1 is first release & 0 indicates dev  eg 0.09.00.001  &  1.01.01
+# "0.10.0.18"  is temporarilly assigned as  "0.10.00.18" to make sure "0.09.00.016" can read it
+
+# major.minor.point[.dev-point]  x.x.2dp[.2dp]
+
+
+# @ 2023/09 reduce out a few zeros eg "0.09.00.016" becomes "0.9.0.16"
+
+# where x = any whole number and the last register always being 2dp.
+
+# The 2nd register becomes printf'ed to 2dp for upgrade valuation
+
+# while a single 0 in the third register indicates beta  [with fourth register at 2dp]
+
+
 
 ModName="$(basename "$0")"
 
@@ -228,7 +240,10 @@ custom_conf_notes () {
 
   \n"
 
-  read -rp "  [enter] to continue  >   "
+
+  printColor "  [enter] to edit \n\n"
+
+  read -rp "   >   "
 
 }
 
@@ -358,11 +373,6 @@ if [[ $XDG_QcowRightClick ]]; then
   CurrentFolder="$XDG_QcowRightClick_Conf_Dir"
 
 fi
-
-
-#  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
-
-#  TODO  add error handling for settings file errors
 
 
 # Function to create a list of preset VM locations 
@@ -503,21 +513,21 @@ P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
 if [[ ! $(type -p curl) ]] ; then
   echo
-  echo "  You should have downloader 'curl' installed to run parts of this script ..."
+  echo "  You should have downloader 'curl' installed to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
 if [[ ! $(type -p aria2c) ]]; then
   echo
-  echo "  You should have downloader 'aria2' installed to run parts of this script ..."
+  echo "  You should have downloader 'aria2' installed to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
 if [[ ! $(type -p zsync) ]]; then
   echo
-  echo "  You should have downloader 'zsync' installed to run parts of this script ..."
+  echo "  You should have downloader 'zsync' installed to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
@@ -606,6 +616,39 @@ printColor () {
 }
 
 
+## Analyse Current Version  (Latest version is carried out in the updater function)
+
+IFS='.' read -ra qqX_CurrentVer_Arr <<< "$ModVersion"
+
+# qqX_CurrentVer_Arr[0] remains unpadded  (& to the left of the decimal point)
+
+[[ ${#qqX_CurrentVer_Arr[1]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[1] "%.2d" "${qqX_CurrentVer_Arr[1]}"
+
+[[ ${#qqX_CurrentVer_Arr[2]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[2] "%.2d" "${qqX_CurrentVer_Arr[2]}"
+
+#legacy 3dp pre "0.09.00.017"
+
+[[ ${#qqX_CurrentVer_Arr[3]} -gt 2 ]] && qqX_CurrentVer_Arr[3]="${qqX_CurrentVer_Arr[3]:(-2)}"
+
+[[ ${#qqX_CurrentVer_Arr[3]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[3] "%.2d" "${qqX_CurrentVer_Arr[3]}"
+
+qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
+
+if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then 
+
+  qqX_CurrentReleaseType="beta"
+
+else qqX_CurrentReleaseType="release"
+
+fi
+
+
+## General default title:
+
+qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $ModVersion "
+
+
+
 ## qqX chrome up  ( runs if ModName == qqX [or qqx] )
 
 
@@ -630,11 +673,6 @@ function_qqX_printf_logo() {
 
 
 # Variant on   http://www.figlet.org/  -f mini  (-k)   (c)  Alex Genovese
-
-
-#
-qqX_title="[quickemu quickget X terminal project] - Ver: $ModVersion "
-#
 
 
 function_qqX_logo_title() {
@@ -692,9 +730,9 @@ show_wrap_CLI_usage () {
 
   printf     "\n\n  Or by clicking on an edited .conf file:"
 
-  printf     "\n\n  Edit the first line of the .conf to point to qwrap/qqX instead of quickemu"
+  printf     "\n\n  Edit the first line of the .conf to point to %s instead of quickemu"  "$ModName" 
 
-  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/qwrap --vm  or similar (VM name not needed)"
+  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/%s --vm  or similar (VM name not needed)" "$ModName" 
 
   printf     "\n\n  For more complex CLI usage, try the alternative 'q-mod' script or quickemu itself."
   
@@ -2605,11 +2643,11 @@ function_quick_get_wrap ()  {
 
     printf "\n\n  Quickemu defaults to safe half, minimals ..."
 
-    printf "\n\n  Normal setting should be at least around 2/3rds "
+    printf "\n\n  Normal guest setting should be at least 2/3 to 3/4 of the host."
     
     printf "\n\n  Remember, this is the maximum-allowed number. Be generous as less will actually be used."
     
-    printf "\n\n  Your host system will cope as VT units & CPU microcode will have the final say ...."
+    printf "\n\n  Your host CPU's microcode & virtualization units will have the final say ...."
 
     CoresSetNumber=
 
@@ -2672,9 +2710,11 @@ function_quick_get_wrap ()  {
 
     cat "$New_VM_File"
 
-    printColor "\n\n  [enter] edit the config file in more detail"
+    #  TODO  automatic double entry removal
+
+    printColor "\n\n  [enter] edit the config file in more detail (check for double entries) "
     
-    printf "   [c] continue (with current settings)  [d]  delete - something went wrong ..."
+    printf "   [c] continue (with current settings)  [d]  delete the VM - something went wrong ..."
 
     printf "\n\n"
 
@@ -2691,7 +2731,7 @@ function_quick_get_wrap ()  {
 
     else 
     
-      qmod_edit_settings  "new_conf"
+      qqX_edit_settings  "new_conf"
 
     fi
 
@@ -2817,7 +2857,7 @@ function_conf_error () {
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
-      if [[ $NewSetupFlag ]]; then qmod_edit_settings ; else qmod_edit_settings  "conf" ; fi
+      if [[ $NewSetupFlag ]]; then qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
       
 
     elif [[ $ErrorMenuSelect == "gt" ]]; then 
@@ -2842,11 +2882,11 @@ function_conf_error () {
 
       read -rp "  >  "
     
-      qmod_edit_settings  "conf" 
+      qqX_edit_settings  "conf" 
       
     else 
     
-      qmod_edit_settings
+      qqX_edit_settings
     
     fi
     
@@ -2861,10 +2901,6 @@ function_VM_array_add_confs () {
 
   #  where $1 is 'VM_Path' and  $2 is 'VM_Conf' to be tested against the existing list (non-sparse)
 
-  #  & if the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
-
-  #  TODO  add error handling for settings file errors
-
   if [[ $1 ]]; then
 
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
@@ -2876,11 +2912,11 @@ function_VM_array_add_confs () {
 
     if [[ ! ${VM_Array[0,0]} ]]; then 
     
-      New_VM_Number=0  
+      New_VM_ElementCount=0  
 
     else 
     
-      New_VM_Number="$((${#VM_Array[@]} / 2))" 
+      New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
 
       local i=0
 
@@ -2906,8 +2942,8 @@ function_VM_array_add_confs () {
 
       # if it's the first entry, or at the end there is no match found in the array, then add it
 
-      VM_Array[$New_VM_Number,0]="$1" 
-      VM_Array[$New_VM_Number,1]="$2" 
+      VM_Array[$New_VM_ElementCount,0]="$1" 
+      VM_Array[$New_VM_ElementCount,1]="$2" 
 
   fi
   
@@ -2923,8 +2959,101 @@ function_scan_VM_folderList () {
 
   #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
 
-  #  TODO  add error handling for settings file errors
+  #  Starts by checking for settings file errors
 
+  VM_SettingsError=
+
+  VM_ElementCount=
+
+  VM_ElementCount="${#VM_Array[@]}" 
+
+  if [[ $VM_ElementCount ]]; then 
+
+    while true ; do
+
+      # Settings file checking loop. Runs until either settings file reads correctly or the user quits.
+
+      ## CHECK 1
+
+      #  Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
+
+      [[ "$(( VM_ElementCount % 2 ))" == "1" ]] &&  VM_SettingsError=1 
+
+
+      ## CHECK 2
+
+      if [[ ! $VM_SettingsError ]]; then
+
+        # Check that array is non-sparse & is in pairs & that the elements exist
+
+        # Note that a sparse array will stop listing at the first empty entry
+
+        i=0
+        PairsCount=0
+
+        while [[ ${VM_Array[$i,0]} ]]; do
+
+          ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+
+          if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
+
+            [[ $PairsCount -eq  "$VM_ElementCount" ]] &&  break
+
+            # else carry on interating the array 
+            ((i+=1))  
+            ((PairsCount+=2))  
+            
+          else  
+
+            VM_SettingsError=1
+            printf "\n\n  Array Element(s) Not Found "
+            printf "\n\n  Folder:  %s " "${VM_Array[$i,0]}"
+            printf "\n\n  .conf :  %s " "${VM_Array[$i,1]}"
+            break
+            
+          fi
+          
+        done
+
+      fi
+
+
+      ## CHECK 3
+
+      # If empty array elements were present, the pairs counter won't have incremented fully
+
+      # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
+
+      if [[ $PairsCount != "$VM_ElementCount" ]]; then  
+      
+        VM_SettingsError=1
+
+        printf "\n\n  Empty Array Element(s) Found "
+
+      fi
+
+
+      if [[ $VM_SettingsError ]]; then
+
+        printColor "\n\n  ERROR in VM array general settings"
+
+        printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
+
+        read -rp  "  >  "  VM_SettingsError
+
+        printf "\n\n"
+
+        if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings ; fi
+
+      else 
+
+        break
+
+      fi
+
+    done
+
+  fi
 
   i=0
 
@@ -3113,7 +3242,7 @@ function_Select_VM () {
       ExtraFolderError=
       VM_Selection=
       VM_InstanceName=
-      qmod_edit_settings 
+      qqX_edit_settings 
       return
 
     fi
@@ -3423,7 +3552,7 @@ function_KillPID_Menu() {
 
 }	
 
-qmod_edit_settings() {
+qqX_edit_settings() {
 
   if [[ ! $TextEditor ]]; then
   
@@ -3623,13 +3752,17 @@ function show_quickemu_WRAP_help {
 
   fi
 
-  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
+  printf "\n\n  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"  
 
-  printf "\n\n  Also:  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"  
+  printf "\n\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
 
-  printf "\n\n\n  For interactive menus, start in a folder terminal:  ./%s   or by mouse click"  "$ModName"
+  [[ ! $ModName_qqX ]] &&  printf "\n\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
   
-  printf "\n\n  [enter] to return   [a] qmod API detail   [p] parameters for VM runtime settings \n\n"
+  printf "\n\n  [enter] to return   [a] %s API detail   " "$ModName"
+
+  [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
+
+  printf "\n\n"
 
   read -rp "  >  "  HelpSelect
 
@@ -3689,6 +3822,10 @@ check_for_qqX_updates() {
 
     qqX_LatestRelease="$(tr -cd '[:graph:]' <<< "$qqX_LatestRelease")"
 
+    # std downloads: 
+
+    # eg "tarball_url": "https://api.github.com/repos/TuxVinyards/qqX/tarball/0.09.00.016",
+
     qqX_LatestTarBall="$(grep -s tarball "/tmp/latest-qqX" )"
 
     qqX_LatestTarBall="${qqX_LatestTarBall/'"tarball_url": "'/}"
@@ -3697,26 +3834,69 @@ check_for_qqX_updates() {
 
     qqX_LatestTarBall="$(tr -cd '[:graph:]' <<< "$qqX_LatestTarBall")"
 
+    # assets: 
+    
+    # eg "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz"
+
+    # &  "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz.sha256"
+
+    qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
+
+
+    if [[ "$(grep -s -c "$qqX_Latest_Secure_TarTest" "/tmp/latest-qqX")" == "2" ]] ; then
+
+      qqX_Latest_Secure_TarBall="$qqX_Latest_Secure_TarTest"
+      
+      qqX_Latest_Secure_TarSha="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz.sha256"
+           
+    fi
+
 
     IFS='.' read -ra qqX_LatestVer_Arr <<< "$qqX_LatestRelease"
 
-    IFS='.' read -ra qqX_CurrentVer_Arr <<< "$ModVersion"
+    # Current Version is carried out at the start, in similar way
 
 
-    if [[ "${qqX_LatestVer_Arr[2]}" == "00" ]]; then qqX_LatestReleaseType="beta"
+    # qqX_LatestVer_Arr[0] remains unpadded  (& to the left of the decimal point)
 
-    elif [[ "${qqX_LatestVer_Arr[2]}" == [0-9][0-9] ]] ; then qqX_LatestReleaseType="release"
+    [[ ${#qqX_LatestVer_Arr[1]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[1] "%.2d" "${qqX_LatestVer_Arr[1]}"
 
+    [[ ${#qqX_LatestVer_Arr[2]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[2] "%.2d" "${qqX_LatestVer_Arr[2]}"
+
+    #legacy 3dp pre "0.09.00.017"
+
+    [[ ${#qqX_LatestVer_Arr[3]} -gt 2 ]] && qqX_LatestVer_Arr[3]="${qqX_LatestVer_Arr[3]:(-2)}"
+
+    [[ ${#qqX_LatestVer_Arr[3]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[3] "%.2d" "${qqX_LatestVer_Arr[3]}"
+
+    qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}${qqX_LatestVer_Arr[3]}"
+
+    
+    #echo "latest $qqX_LatestVer_Float  current $qqX_CurrentVer_Float"   
+
+
+    #  Flag up release type.  Also used in qqX general title to show if using beta or release.
+
+    if [[ "${qqX_LatestVer_Arr[3]}" ]] && [[ "${qqX_LatestVer_Arr[2]}" == "00" ]]; then 
+    
+      qqX_LatestReleaseType="beta"
+
+    else qqX_LatestReleaseType="release"
+    
     fi
+    
+    #echo "latest $qqX_LatestReleaseType  current $qqX_CurrentReleaseType"   
+
+
+    #  If current ver is beta OR if beta notifications are requested in the general settings:
+
+    [[ $qqX_CurrentReleaseType == "beta" ]] && Hide_qqX_BetaUpdates=
+
+
+    # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
 
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
-
-      qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}${qqX_LatestVer_Arr[3]}"
-
-      qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
-
-      # echo "latest $qqX_LatestVer_Float  current $qqX_CurrentVer_Float"
-    
+   
       if [[ $(echo "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" | bc  2>/dev/null) == "1" ]]; then 
 
         { printf "\n\n qqX_UpdateAvail=\"1\""   
@@ -3724,6 +3904,14 @@ check_for_qqX_updates() {
           printf "\n\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease" 
 
           printf "\n\n qqX_LatestTarBall=\"%s\""  "$qqX_LatestTarBall" 
+        
+          printf "\n\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall" 
+        
+          printf "\n\n qqX_Latest_Secure_TarSha=\"%s\""  "$qqX_Latest_Secure_TarSha" 
+
+          printf "\n\n qqX_LatestReleaseType=\"%s\""  "$qqX_LatestReleaseType" 
+
+          printf "\n\n qqX_LatestVer_Float=\"%s\""  "$qqX_LatestVer_Float" 
         
         } >> "$qqX_Upd_VarsTmpFile"
 
@@ -4092,7 +4280,7 @@ while true ; do
 
       printColor  "\n\n  [d]   start with default sdl display"
       
-      if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (size determined by Windows & can be useful with updates)" 
+      if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)" 
 
       elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)" 
 
@@ -4256,7 +4444,7 @@ while true ; do
 
     fi
 
-    [[ $qqX_UpdateAvail ]] &&  printColor "  [new] qqX update %s is available "  "$qqX_LatestRelease"
+    [[ $qqX_UpdateAvail ]] &&  printColor "  [new] qqX update: %s %s is available " "$qqX_CurrentReleaseType" "$qqX_LatestRelease"
 
     printf  "  [q]  quit \n\n"
 
@@ -4317,7 +4505,7 @@ while true ; do
 
   elif [[ $MainMenuChoice == "set" ]] ; then
 
-    qmod_edit_settings
+    qqX_edit_settings
 
   elif [[ $MainMenuChoice == "new" ]] ; then
 
@@ -4325,35 +4513,140 @@ while true ; do
 
     function_qqX_printf_logo_title  "qqX updater"
 
-    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"  
+    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    printf "\n\n  %s"  "$qqX_LatestTarBall"
+    if [[ $qqX_LatestTarBall ]] ; then
 
-    printf "\n\n  Download the tarball to: "
-    
-    [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
-    
-    printf "\n\n  [c] Current Folder  %s \n\n"  "$(pwd)"
+      if [[ $qqX_Latest_Secure_TarBall ]]; then printColor "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
 
-    read -rp "  [b]  go back  >  "  qqX_LatestTarBall_Folder
+      else  printColor "\n\n  %s"  "$qqX_LatestTarBall"
+      
+      fi
+
+      AboutRelease="$(grep -s 'body' "/tmp/latest-qqX")"
+
+      AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
+
+      AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
+
+      AboutRelease="${AboutRelease//\"/}"
+
+      AboutRelease="${AboutRelease//'###'/}"
+
+      AboutRelease="${AboutRelease//'##'/}"
+
+      AboutRelease="${AboutRelease//'\n'/}"
+
+      AboutRelease="${AboutRelease//'\r'/}"
+
+      IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
+
+      # declare -p AboutReleaseArray
+
+      for Line in "${AboutReleaseArray[@]}" ; do
+
+        printf "\n\n  %s"  "$Line" 
+
+      done
+
+      printColor "\n\n\n  Secure Download the tarball to: "
+      
+      [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
+
+      if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
+      
+        printColor "\n\n  [enter] Current/Default Folder  %s "  "$(pwd)" 
+
+      else  
+        
+        printf "\n\n  [f] Default VM folder  %s"  "$Default_VM_Folder"
+
+        printColor "\n\n  [enter] Current Folder  %s "  "$(pwd)"  
+
+      fi 
+
+    else
+
+      printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
+
+    fi
+
+    printf "\n\n  or [b] to go back \n\n"
+
+    read -rp "  >  "  qqX_LatestTarBall_Folder
 
     printf "\n\n"
 
     if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads"
 
-    elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)"
+    elif [[ $qqX_LatestTarBall_Folder == "f" ]]; then  qqX_LatestTarBall_Folder="$Default_VM_Folder"
 
-    else qqX_LatestTarBall_Folder=
+    elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder=
+
+    else qqX_LatestTarBall_Folder="$(pwd)"
 
     fi
 
-    [[ $qqX_LatestTarBall_Folder ]] &&  wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX.${qqX_LatestRelease}.tar.gz"
+    if [[ $qqX_LatestTarBall_Folder ]]; then 
 
-    sleep 1
+      if [[ ! -d "$qqX_LatestTarBall_Folder/qqX.releases" ]]; then
+
+        mkdir "$qqX_LatestTarBall_Folder/qqX.releases" ||  printColor "\n\n  ERROR  making qqX.releases folder"
+
+      fi
+
+      qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases"
+
+      ReturnFolder="$(pwd)"
+
+      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  changing to qqX.releases folder"
+
+      if [[ $qqX_Latest_Secure_TarBall ]]; then
+        
+        wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+
+        wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
+
+        SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
+
+        printColor "\n  SHA256 Check: %s "  "$SHA_Check"
+
+        [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
+      
+      else
+
+        wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+
+      fi
+
+      printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
+
+      printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
+
+      read -rp "  >  "  qqX_UpdateExit
+
+      if [[ $qqX_UpdateExit != "r" ]]; then 
+
+        # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
+
+        tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
+
+        cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+
+        exec  "./qqX_setup_and_install"  "Upgrade" 
+
+      fi
+
+    fi
+
+    sleep 0.6
+
+    cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
+
 
   elif [[ $MainMenuChoice == "conf" ]] ; then
 
-    qmod_edit_settings  conf
+    qqX_edit_settings  conf
 
   elif [[ $MainMenuChoice == "gt" ]] ; then
 
