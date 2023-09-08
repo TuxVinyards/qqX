@@ -47,5 +47,3 @@ The scripts are stable and the installer has been tested on a variety of mainstr
 They have been written with plenty of preventative error handling routines. However, as with all software, please remember that standard good practice is to always make backups of anything critical.
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
-
-
