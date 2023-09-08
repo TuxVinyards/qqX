@@ -44,4 +44,8 @@ Use the installer to update, reinstall, uninstall or reconfigure.
 
 The scripts are stable and the installer has been tested on a variety of mainstream distros.
 
+They have been written with plenty of preventative error handling routines. However, as with all software, please remember that standard good practice is to always make backups of anything critical.
+
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
+
+
