@@ -355,8 +355,7 @@ else
 
     fi
 
-    sleep 1
-
+    
     # Make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link   Means copying to qqx will copy to qqX, and vice versa.
 
     # and check that the right version is there:
@@ -366,7 +365,7 @@ else
     #if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$qqX_Version_Installed" == "$qqX_Version" ]] ; then 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
     
-      printColor "\n\n  All good  \n\n" ; sleep 2
+      printColor "\n\n  All good  \n\n" 
 
     else 
     
@@ -588,6 +587,26 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
+  SelectedTerminalProfile=
+
+  if [[ $CustomTerminalProfile ]]; then     
+  
+    SelectedTerminalProfile="$CustomTerminalProfile"
+
+  elif [[ $UserTerm == "mate-terminal" ]]; then
+  
+    SelectedTerminalProfile="$MateTerminalProfile"
+
+  elif [[ $UserTerm == "gnome-terminal" ]]; then
+  
+    SelectedTerminalProfile="$GnomeTerminalProfile"
+
+  elif [[ $UserTerm == "konsole" ]]; then
+  
+    SelectedTerminalProfile="$KonsoleTerminalProfile"
+
+  fi
+
   echo; echo
 
 
@@ -709,24 +728,9 @@ if [[ ! $SkipMkLauncher ]]; then
 
       # needs quotes
 
-      # REVIEW 
-
+      if [[ $SelectedTerminalProfile ]]; then     
       
-      if [[ $CustomTerminalProfile ]]; then     
-      
-        echo "Exec=$UserTerm $CustomTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
-
-      elif [[ $UserTerm == "mate-terminal" ]]; then
-      
-        echo "Exec=$UserTerm $MateTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
-
-      elif [[ $UserTerm == "gnome-terminal" ]]; then
-      
-        echo "Exec=$UserTerm $GnomeTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
-
-      elif [[ $UserTerm == "konsole" ]]; then
-      
-        echo "Exec=$UserTerm $KonsoleTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"' 
+        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
 
       else
 
@@ -778,6 +782,22 @@ if [[ ! $SkipMkLauncher ]]; then
 fi
 
 
+## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
+
+#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
+
+GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
+
+if [[ $GrepExecLine ]]; then
+
+  GrepExecLine="${GrepExecLine/'Exec='/}"
+
+  Start_qqX="${GrepExecLine/'%f'/}"
+
+fi
+
+DontStart_qqX=
+
 printColor  "\n\n  Install process finished:  "
 
 printf "\n\n\n  qqX may be started from the main system menu"
@@ -786,11 +806,23 @@ printf "\n\n  by right clicking on qcow2 files, or straight from the terminal."
 
 printf "\n\n\n  The settings file may be edited both via the internal qqX menu"
 
-printf "\n\n  or before starting at %s"  "$HOME/.qqX/qqX_settings"
+printf "\n\n  or before starting at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
-printColor "\n\n\n  [enter] to close current window and start \n\n "
+[[ $GrepExecLine ]] && printColor "  [enter] to close current window and start"
+
+printf "  [q] to quit  \n\n "
  
-read -rp "  > "
+read -rp "  > "  DontStart_qqX
 
-exit
+if [[ $DontStart_qqX ]]; then
+
+  exit
+
+else
+
+  if [[ $GrepExecLine ]]; then exec bash -c "$Start_qqX"
+
+  else  exit ;  fi
+
+fi
 

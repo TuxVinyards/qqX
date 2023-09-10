@@ -49,11 +49,10 @@
 #  See:  https://github.com/TuxVinyards/qqX  &  https://github.com/TuxVinyards/quickemu-mod
 
 
-##  Bash 5.0+   (2023: we are now at ver 5 for at least 10 years ...) 
+##  Bash 5.0+   (2023: we are now at ver 5 for quite a few years ...) 
 
-#   details: try 'bash -version at the commandline'   
+#   details: try 'bash --version' at the commandline   
 
-#   See http://mywiki.wooledge.org/BashGuide/Practices#Choose_Your_Shell
 
 
 ## ShellCheck global disables:
@@ -65,9 +64,9 @@
 
 # This script:
 
-ModVersion="0.10.00.19"
+ModVersion="0.10.00.20"
 
-# "0.10.0.18"  is temporarilly assigned as  "0.10.00.18" to make sure "0.09.00.016" can read it
+# "0.10.0.20"  is temporarilly assigned as  "0.10.00.20" to make sure "0.09.00.016" can read it
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -81,14 +80,57 @@ ModVersion="0.10.00.19"
 # while a single 0 in the third register indicates beta  [with fourth register at 2dp]
 
 
-
 ModName="$(basename "$0")"
 
 if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi
 
 
+ 
+##  CODING STYLE 
 
-## Make sure shell is set during session to decimal separator of dot 
+#  Variables & Functions:
+
+#  When coding for qqX, aim for clarity and contextual identity.  Variables should normally tend towards 'CamelCase'  
+
+#  & functions should tend towards 'snake_case'.  Emphasis or separation underscoring & caps should be added where needed. 
+
+#  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
+
+
+#  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text. 
+
+
+#  In some places ** quickemu's given variable names ** have to be used. These are generally CAPS and very brief, eg '$QEMU'.
+
+#  Except when working with the .conf file, where quickemu chooses to use lowercase.
+
+#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, eg. the quickemu var '$VERSION'  
+
+#  Likewise care must be taken not to confuse lowercase vars with standard application commands, especially in non-highlighting editors.
+
+
+#  Modern auto-suggesting editors have enabled longer & more helpful VariableNames, with no need to keep typing them.
+
+#  Make use of 'shellcheck' & avoid disables where possible.
+
+
+#  COMMENTS:  Add clarification or explanation to code, especially if the origin or meaning could be difficult to folllow.
+
+#  Also add links to any how-to's that you used.  If you needed to check, then others may do also.  
+
+#  Let others follow what you are/were thinking at the time.  It makes it easier for everyone, especially later on.
+
+
+#  SPACE:  Give your code some room to breathe.  Break it up into logic blocks.  
+
+#  Make it easy to follow & easy to see what is happening. 
+
+
+
+
+## INITIALIZE
+
+# Make sure shell is set during session to decimal separator of dot 
 
 #  LC_ALL=C changes too much, just set the numeric.
 
@@ -117,28 +159,8 @@ if [[ ! -d "/tmp" ]]; then
   exit 1
 fi
 
- 
-##  CODING STYLE of Variables & Functions:
 
-#  When coding for qqX, aim for clarity and contextual identity.  Variables should normally tend towards 'CamelCase'  
-
-#  & functions should tend towards 'snake_case'.  Emphasis or separation underscoring & caps should be added where needed. 
-
-#  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
-
-
-#  In some places ** quickemu's given variable names ** have to be used. These are generally CAPS and very brief, eg '$QEMU'.
-
-#  Except when working with the .conf file, where quickemu chooses to use lowercase.
-
-#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, eg. the quickemu var '$VERSION'  
-
-#  Likewise and especially in non-highlighting editors, care must be taken not to confuse lowercase vars with standard application commands.
-
-#  Add clarifying comments to qqX code if origin or meaning could be difficult to folllow.
-
-
-## Pre-empt some of quickemu's error messages. 
+# Pre-empt some of quickemu's error messages. 
 
 QEMU=$(command -v qemu-system-x86_64)     
 QEMU_IMG=$(command -v qemu-img)
@@ -2276,7 +2298,9 @@ function_quick_get_wrap ()  {
     if [[ $ZsyncDownload ]]; then  printf "\n\n" ; else printColor "  %s \n\n" "$QGW_DownloadName" ; fi
 
 
-    printColor "\n\n  Press [enter] at finish  or  [enter] to STOP ALL current downloads & zsync"
+    printColor "\n\n  Press [enter] at quickget finish (To start your xx virtual machine run:  etc)"
+    
+    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync"
 
     printf "\n\n  Quickemu & downloader output: "
 
@@ -2710,11 +2734,11 @@ function_quick_get_wrap ()  {
 
     cat "$New_VM_File"
 
-    #  TODO  automatic double entry removal
+    #  TODO  automatic double entry removal when VM tune up function gets written, based on this. 
 
-    printColor "\n\n  [enter] edit the config file in more detail (check for double entries) "
+    printColor "\n\n  [enter] edit the config file in more detail (check entries) "
     
-    printf "   [c] continue (with current settings)  [d]  delete the VM - something went wrong ..."
+    printf "\n\n  [c] continue (with current settings)  [d]  delete the VM - something went wrong ..."
 
     printf "\n\n"
 
