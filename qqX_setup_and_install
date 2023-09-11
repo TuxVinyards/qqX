@@ -379,8 +379,6 @@ else
 
       #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
 
-      #  TODO  hide this where possible check settings file for Default folder & if exist
-
       MkDefDir=
 
       printColor "\n\n\n  A default VM directory is required >> "  
@@ -402,11 +400,9 @@ else
 
     #  qqX default location  (has to be slightly opinionated here for the updater to work)  REVIEW  (and at end of script)
 
-    # SettingsOverwrite=1
+    SettingsOverwrite=1
 
-    if [[ -e "$HOME/.qqX/qqX_settings_IGNORE" ]]; then 
-
-      # _IGNORE   TEMP  not needed just yet. No new additions @ "0.10.0.18" (initial release beta 18) 
+    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
 
       #  Work in progress on auto-diff updater   TODO  
 
@@ -427,6 +423,8 @@ else
           printf "\n\n  A differences log has been recorded & along with"
 
           printf "\n\n  a copy of the old settings has been placed in the release folder"
+
+          printColor "\n\n  An auto-diff updater should hopefully be available soon ... "
 
         else
 
@@ -452,7 +450,7 @@ else
 
     fi
 
-    if [[ $SettingsOverwrite_IGNORE ]]; then  # _IGNORE   TEMP  not needed just yet.
+    if [[ $SettingsOverwrite ]]; then  
 
       if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
 
@@ -479,7 +477,17 @@ else
     
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
 
-      sleep 3 ; exit 1
+      [[ ! $(type -p qqx) && ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
+
+      [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
+
+      [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
+
+      printf "\n\n  [enter] to close & investigate \n\n"
+
+      read -rp "  >  "
+
+      exit 1
 
     fi
 

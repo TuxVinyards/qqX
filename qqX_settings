@@ -14,14 +14,14 @@
 # Settings may be opened (hidden or not) and edited from within the scripts via a menu selector.
 
 
-# shellcheck disable=SC2034,SC2154    
+# shellcheck disable=SC2034,SC2154   
 
 
 ## SET THE DEFAULT VM FOLDER, where the Virtual Machines are normally found. 
 
 #  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate. 
 
-Default_VM_Folder="$HOME/VMQs"
+Default_VM_Folder="/media/xxx/Files/VMQs"
 
 
 # ADD any EXTRA FOLDERS or sub folders where VM's may be located
@@ -50,14 +50,16 @@ Extra_VM_Folder+=("")
 
 # VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="macos-catalina.conf"
 
+# NB associative array MUST BE set CONTIGIUOUS, non-sparse
 
-# NB associative array MUST BE set CONTIGIUOUS, non-sparse, no gaps
 
 # ADD here:
 
-# VM_Array[0,0]="" ; VM_Array[0,1]=""
+VM_Array[0,0]="/media/xxx/Files/VMQs" ; VM_Array[0,1]="windows-11.conf"
 
-# VM_Array[1,0]="" ; VM_Array[1,1]=""
+VM_Array[1,0]="/media/xxx/Files/VMQs" ; VM_Array[1,1]="windows-insider.conf"
+
+# VM_Array[2,0]= ; VM_Array[2,1]=
 
 # NB  Non-Present entries MUST be COMMENTED OUT with #  or deleted
 
@@ -163,7 +165,7 @@ KVM_MSR_ModProbeFile=
 #  SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
 
 
-SharedDrive=
+SharedDrive="$Default_VM_Folder/SharedDrive/shared.qcow2"
 
 
 
@@ -180,25 +182,36 @@ ExtraArgs=
 
 ##  EXTRA * quickemu * PARAMETERS to be used at VM run time  
 
-#  Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--full-screen  --status-quo" 
+#  Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--screen 0" 
 
 #  See quickemu --help for full list   NB  not all options can be applicable  CAUTION 
 
 #  Of note:  "--full-screen" only works with spice display ...  &&  will overide --screenpct
+
+#  DUAL DISPLAY  users should set "--screen 0" or "--screen 1" to select the monitor
+
+#  See quickemu project main page for more details: https://github.com/quickemu-project/quickemu
 
 Extra_QE_Params=
 
 
 ##  DEFAULT load up SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Leave blank for none. 
 
-#  From quickemu 4.8 onwards, where value is integer from 25 to 100  & for Linux VM's, SDL only.
+#  From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
 
 #  Extra_QE_Params, not needed.
 
-#  Individual/CUSTOM VM values may also be placed in the .conf file with Custom_SDL_ScreenPercent as ="xx"  
-
-
 Default_SDL_ScreenPercent="68"
+
+
+## Individual SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"  
+
+
+## HEADLESS commands may be set using Extra_QE_Params using "--display none"  BUT
+
+#  to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file 
+
+#  An SSH connection will need to be set.   See: https://github.com/quickemu-project/quickemu#headless
 
 
 

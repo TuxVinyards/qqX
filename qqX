@@ -64,9 +64,9 @@
 
 # This script:
 
-ModVersion="0.10.00.20"
+ModVersion="0.11.00.21"
 
-# "0.10.0.20"  is temporarilly assigned as  "0.10.00.20" to make sure "0.09.00.016" can read it
+# "0.11.0.21"  is temporarilly assigned as  "0.11.00.21" to make sure "0.09.00.016" can read it
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -112,6 +112,11 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  Modern auto-suggesting editors have enabled longer & more helpful VariableNames, with no need to keep typing them.
 
 #  Make use of 'shellcheck' & avoid disables where possible.
+
+
+#  Newer style, more powerful, DOUBLE [[ BRACKETS ]] should be used:
+
+#  if [[ $Foo ]] && [[ ! $Bar ]];   NOT   if [ -n ${Foo} ] && [ -z ${Bar} ]; 
 
 
 #  COMMENTS:  Add clarification or explanation to code, especially if the origin or meaning could be difficult to folllow.
@@ -242,7 +247,9 @@ custom_conf_notes () {
   
     #!/usr/bin/qqX --vm   (qqX direct start)
 
-    Custom_SDL_ScreenPercent=\"xx\" (integer from 25 to 100)
+    Custom_SDL_ScreenPercent=\"xx\" (integer from 25 to 99)
+
+    HeadlessDisplay=\"true\"
 
     SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"
 
@@ -531,25 +538,25 @@ P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 [[ $QG_Version ]] && [[ ! $(type -p "$QG_Version") ]] &&  printf "\n\n  ERROR  quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
 
 
-##  MOD  add checks for 'curl' and 'aria2' 
+##  checks for 'curl' and 'aria2' etc  ( if $1, if command line )
 
 if [[ ! $(type -p curl) ]] ; then
   echo
-  echo "  You should have downloader 'curl' installed to run parts of the quickget script ..."
+  echo "  You need to install 'curl' to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
 if [[ ! $(type -p aria2c) ]]; then
   echo
-  echo "  You should have downloader 'aria2' installed to run parts of the quickget script ..."
+  echo "  You need to install 'aria2' to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
 if [[ ! $(type -p zsync) ]]; then
   echo
-  echo "  You should have downloader 'zsync' installed to run parts of the quickget script ..."
+  echo "  You need to install 'zsync' to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
@@ -1567,7 +1574,7 @@ QE_Ver_Integer=${QE_VerNumber/./}
 
 
 
-##  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 100  & Linux VM's only.
+##  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
 
 #  Runnning this when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
 
@@ -1583,6 +1590,10 @@ function check_screen_percentage {
 
     [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
 
+    eval "$(grep -s HeadlessDisplay "$VM_Conf_File")"
+
+    [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
+
   fi
 
   if [[ ! $SDL_ScreenPercent ]]; then
@@ -1591,11 +1602,19 @@ function check_screen_percentage {
 
   fi
 
-  if [[ $SDL_ScreenPercent ]]; then
+  if [[ $HeadlessDisplay ]]; then
 
+    # NB headless only runs in Spice
+
+    HeadlessCmd=" --display  none"
+
+  fi
+
+  if [[ $SDL_ScreenPercent ]]; then 
+  
     SDL_ScrnPcnt_Error=
 
-    if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 101 )); then
+    if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
       if [[ $QE_Ver_Integer -ge "48" ]]; then 
       
@@ -1605,7 +1624,6 @@ function check_screen_percentage {
 
         printf "\033c"
         printColor "\n\n  ERROR  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
-        sleep 3
         SDL_ScrnPcnt_Error="Quickemu Version"
 
       fi
@@ -1613,8 +1631,7 @@ function check_screen_percentage {
     else
       
       printf "\033c"
-      printColor "\n\n  ERROR  SDL_ScreenPercent = %s  Range is 25 to 100 \n\n "  "$SDL_ScreenPercent"
-      sleep 3
+      printColor "\n\n  ERROR  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
       SDL_ScrnPcnt_Error="Out of Range"
 
     fi
@@ -3113,7 +3130,7 @@ function_scan_VM_folderList () {
   
 
   if [[ ! ${VM_Array[0,0]} ]] ; then
-    function_conf_error  "VM ARRAY - No VMs found?"
+    function_conf_error  "VM ARRAY - No VMs - Is it time to get some distros?  Also check"
     SelectArrayError=1
   fi
 
@@ -4302,19 +4319,21 @@ while true ; do
 
     else
 
-      printColor  "\n\n  [d]   start with default sdl display"
+      printColor  "\n\n  [d]   start with SDL display"
       
       if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)" 
 
       elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)" 
 
-      elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)"  "$SDL_ScreenPercent"
+      elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)    [df] 99%% "  "$SDL_ScreenPercent"
 
       elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (ERROR %s%% %s > See settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
 
       fi
 
-      printColor 	"\n\n  [s]   start with spice display (scaleable) "  
+      if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
+
+      else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
 
     fi
 
@@ -4441,7 +4460,7 @@ while true ; do
     if [[ $ConfSettingsAdjusted ]]; then 
 
       ConfSettingsAdjusted=
-      printf "\n\n  done - no general refresh needed for .conf edits "
+      printf "\n\n  done - general refresh not normally needed for .conf edits (use [vm] if req'd)"
 
     fi
 
@@ -4693,21 +4712,43 @@ while true ; do
     KVM_MSR_selector_LoadHelp=1
     select_msr_config
 
-  elif [[ $MainMenuChoice == "d" ]] ; then 
+  elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
 
     printf "\n\n"
 
-    eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd  $Extra_QE_Params" 
+    if [[ $MainMenuChoice == "df"  ]]; then
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
+
+    else
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+
+    fi
 
     [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
 
     function_KillPID_Menu
         
-  elif  [[ $MainMenuChoice == "s" ]] ; then
+  elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
 
     printf "\n\n"
 
-    eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+    if [[ $HeadlessCmd ]]; then 
+
+      # headless only runs in Spice
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
+
+    elif [[ $MainMenuChoice == "sf" ]]; then
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
+
+    else
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+
+    fi
 
     #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
 
