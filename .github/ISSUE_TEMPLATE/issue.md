@@ -13,7 +13,7 @@ Does it happen to all VM's  & does it happen when you try directly with quickemu
 
 Have you tried different Virtual Machines.  If it only happens  to one VM then re-install the machine or try creating another version on your main host or on another, if you have one.
 
-Also try re-installs, not only of qqX but of quickemu & qemu ...
+Did the problems start when Quickemu or Qemu updated?   Have you tried the reverting back to an older version.?  Notes are in the qqX general settings file ...
 
 Problems with quickemu or quickget should be submitted at https://github.com/quickemu-project/quickemu  Qemu at https://gitlab.com/qemu-project/qemu/-/issues
 
@@ -23,6 +23,6 @@ For advice and discussion try the quickemu  forum at https://discord.gg/sNmz3uw
 
 Host OS ,  qqX, quickemu &  Qemu versions:
 
-### Description of tests made prior to posting:
-
 ### Screenshots & Error messages:
+
+### Description of tests conducted and results:
