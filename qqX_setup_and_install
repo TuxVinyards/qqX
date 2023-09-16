@@ -8,7 +8,14 @@
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-# 	licence:  GPL3   https://www.gnu.org/licenses 
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,11 +29,10 @@
 
 # https://www.gnu.org/licenses 
 
-# IF ANY MODDED CODE BECOMES USED IN THE ORIGINAL QUICKEMU PROJECT,
 
-# OR ANY OTHER PROJECT, YOU SHOULD SHOW BOTH THE LICENCE  
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
 
-# & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
 
 
 ##  qqX - quickemu quickget X terminal project   
@@ -156,7 +162,7 @@ KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-ta
 
 
 
-##  Chrome up the display
+##  Check we are in the right place
 
 if [[ ! -d "$(pwd)/qqX.system" ]]; then 
 
@@ -165,10 +171,21 @@ if [[ ! -d "$(pwd)/qqX.system" ]]; then
 
 fi
 
+#  Chrome up the display
+
 LIST_start=("$(pwd)"/qqX.system/qqX-add-in-boot-level-chrome.*)
 Number_start=${#LIST_start[@]}
 . "${LIST_start[$Number_start-1]}"
 
+# and add in the settings updater
+
+LIST_start=("$(pwd)"/qqX.system/qqX-settings-update-transposer.*)
+Number_start=${#LIST_start[@]}
+. "${LIST_start[$Number_start-1]}"
+
+
+
+## START 
 
 printf "\033c"
 
@@ -398,77 +415,28 @@ else
 
     if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
 
-    #  qqX default location  (has to be slightly opinionated here for the updater to work)  REVIEW  (and at end of script)
+    #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
-    SettingsOverwrite=1
 
     if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
 
-      #  Work in progress on auto-diff updater   TODO  
+      ## Run auto-diff updater 
 
-      if  [[ "$(diff --version | head -1)" == *GNU* ]]; then 
+      Old_SettingsFileFolder="$HOME/.qqX"
 
-        DiffExist="$(diff -q -Z "$HOME/.qqX/qqX_settings" "qqX_settings")"
+      Old_SettingsFile="qqX_settings"
+        
+      Template_SettingsFile="qqX_settings"
+      
+      update_old_settings_file_with_new_options  "$Old_SettingsFile"  "$Template_SettingsFile"  "$Old_SettingsFileFolder"
 
-        if [[ $DiffExist ]]; then
-
-          diff -c --context=0 --color -Z  "$HOME/.qqX/qqX_settings" "qqX_settings" 
-          
-          printf "\n\n%s \n\n" "$DiffExist" > settings.diff."$qqX_Version".log
-
-          diff -c --context=0 -Z  "$HOME/.qqX/qqX_settings" "qqX_settings" >> settings.diff."$qqX_Version".log
-
-          cp "$HOME/.qqX/qqX_settings" "qqX_old.settings"
-
-          printf "\n\n  A differences log has been recorded & along with"
-
-          printf "\n\n  a copy of the old settings has been placed in the release folder"
-
-          printColor "\n\n  An auto-diff updater should hopefully be available soon ... "
-
-        else
-
-          # unlikely but possible
-
-          printf "\n\n  Both old and new settings files are the same"
-
-        fi
-
-      fi
-
-      #  REVIEW  add flag detect if new feature or critical settings in this release
-
-      printColor "\n\n  Existing settings file found. "   
-
-      printf "\n\n  [o] overwrite with new  [enter] leave current as it is \n\n"
-
-      read -rp "  >  "  SettingsOverwrite
-
-      [[ $SettingsOverwrite != "o" ]] && SettingsOverwrite=
-
-      printf "\n\n"
-
-    fi
-
-    if [[ $SettingsOverwrite ]]; then  
-
-      if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
-
-        D_Stamp=".""$(date +%a.%d.%b.%G.%H.%M)"
-
-        cp "$HOME/.qqX/qqX_settings" "$HOME/.qqX/qqX_settings.$D_Stamp.old" 
-
-        printf "\n  A time stamped copy of the old settings has been placed in the settings folder \n\n"
-
-      fi
+    else
 
       cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
 
       cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
 
-    # else
-
-      #  REVIEW  add an else section here for highlighting possible critical add-on notes and vars 
+      printColor "\n\n  Installing settings file and desktop icons \n\n"
 
     fi
         

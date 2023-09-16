@@ -4,7 +4,14 @@
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-# 	licence:  GPL3   https://www.gnu.org/licenses 
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,11 +25,12 @@
 
 # https://www.gnu.org/licenses 
 
-# IF ANY MODDED CODE BECOMES USED IN THE ORIGINAL QUICKEMU PROJECT,
 
-# OR ANY OTHER PROJECT, YOU SHOULD SHOW BOTH THE LICENCE  
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
 
-# & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
 
 
 ##  2023/07  qqX - quickemu quickget X terminal project   

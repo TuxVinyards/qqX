@@ -8,22 +8,26 @@
 
 - Desktop Integrated & with added right click qcow2 analysis
 
-- Full process controlled wrapping of both Quickemu & Quickget
+- Works safely alongside other existing GUI installations
 
-- Extra diagnostics & functions, easy customising
+- Clear fully annotated & Shellcheck linted scripting
 
-- Assisted VM setup & config
+- Full process & version controlled wrapping of both Quickemu & Quickget
 
-- Guided Desktop installation script complete with update checker
+- Extra diagnostics, functions & process logging
 
-- Individual VM screen percentage settings and easy create secondary & shared storage
+- Guided VM download with configuration tune-up
+
+- Guided settings options with settings editor and auto-update checker
+
+- Quick VM screen percentage switching with both default & individual preset options
+
+- Easy secondary & shared storage creation wizard
 
 - Multiple snapshot management, including of shared disks.  
 
-- MSRS controls.
+- Full MSRS controls.
   
-- Selectable Quickemu and Quickget versioning.
-
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
 ![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
@@ -34,22 +38,22 @@ Start the set up with original quickemu as normal.  <https://github.com/quickemu
 
 Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
 
+May be installed alongside any pre-existing quickemu interfacing, such as quickgui or quickemu shortcuts.
+
 `sha256sum -c qqX-x.xx.xx.xx.tar.gz.sha.256`  to check the file.
 
-qqX will auto-detect if new releases are available & quietly prompt for updates.
+qqX will auto-detect if new releases are later available & quietly prompt for updates.
 
 Use the installer to update, reinstall, uninstall or reconfigure.
 
 ## Beta notes
 
-The next stage on from quickemu-mod ... Now available
+*Standard good practice* with any software is to backup anything critical ...
 
-These late beta scripts have been consistently safe & stable. Testing has been carried out on a variety of mainstream distros.  
+Testing has been carried out on a variety of mainstream distros. Only a few small streamlining tasks remain.
 
-Current focus is now on streamlining.  An automated settings file updater is in the works.
+These late beta scripts have been consistently safe & stable.  The release candidate should be available shortly.
 
-The scripts have been written with plenty of preventative error handling routines. 
-
-Feel confident but do remember standard good practice:  with ALL software make backups of anything critical.
+All scripts have been carefully Shellcheck linted & have additional backup and error handling routines.
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>

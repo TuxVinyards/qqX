@@ -44,8 +44,6 @@ printColor () {
 
 	tput setaf "$X_Shade"
 
-	# NB this calls the printf trap function, not the actual command
-
 	# shellcheck disable=SC2059
 
 	printf "$@"

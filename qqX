@@ -2,7 +2,14 @@
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-# 	licence:  GPL3   https://www.gnu.org/licenses 
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,11 +23,11 @@
 
 # https://www.gnu.org/licenses 
 
-# IF ANY MODDED CODE BECOMES USED IN THE ORIGINAL QUICKEMU PROJECT,
 
-# OR ANY OTHER PROJECT, YOU SHOULD SHOW BOTH THE LICENCE  
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
 
-# & CLEAR ATTRIBUTIONS TO THE CODE SECTIONS USED.
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
 
 
 ##  A text menu interface for the 'quickemu' project
@@ -64,9 +71,9 @@
 
 # This script:
 
-ModVersion="0.11.00.21"
+ModVersion="0.12.00.22"
 
-# "0.11.0.21"  is temporarilly assigned as  "0.11.00.21" to make sure "0.09.00.016" can read it
+# "0.11.0.22"  is temporarilly assigned as  "0.11.00.22" to make sure "0.09.00.016" can read it
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -121,14 +128,32 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 #  COMMENTS:  Add clarification or explanation to code, especially if the origin or meaning could be difficult to folllow.
 
-#  Also add links to any how-to's that you used.  If you needed to check, then others may do also.  
+#  Also add links to any how-to's that you used.  If you needed to check, then others may do also. 
 
-#  Let others follow what you are/were thinking at the time.  It makes it easier for everyone, especially later on.
+#  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
+
+#  It makes it easier for everyone, especially later on.
 
 
 #  SPACE:  Give your code some room to breathe.  Break it up into logic blocks.  
 
-#  Make it easy to follow & easy to see what is happening. 
+#  Make it easy to follow & easy to see what is happening.  
+
+
+#  SED & AWK:  commands can very easily finish up as lines of indecipherable hieroglyphics.
+
+#  If you must use them, keep things very simple & explain the sections.  
+
+#  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
+
+
+#  ECHO:  Beyond basic one-liners, the use of printf should generally be preferred.  
+
+#  See https://ss64.com/bash/printf.html
+
+#  However & specifically, echo within the main section of the actual qqX script *must* be avoided
+
+#  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
 
 
 
@@ -2662,13 +2687,13 @@ function_quick_get_wrap ()  {
 
       ThreadsAvailable=$((ThreadsPerCoreAvail*CoresAvail))
 
-      ThreadsSuggested=$(echo "scale=0; ((($ThreadsAvailable*3)/4)+0.5)/1" | bc 2>/dev/null )
+      ThreadsSuggested=$(bc <<< "scale=0; ((($ThreadsAvailable*3)/4)+0.5)/1" 2>/dev/null)
 
       #  Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
 
       [[ "$(( ThreadsSuggested % 2 ))" == "1" ]] && (( ThreadsSuggested +=1 ))
 
-      ThreadsSuggestLower=$(echo "scale=0; ((($ThreadsAvailable*2)/3)+0.5)/1" | bc 2>/dev/null )
+      ThreadsSuggestLower=$(bc <<< "scale=0; ((($ThreadsAvailable*2)/3)+0.5)/1" 2>/dev/null)
 
       [[ "$(( ThreadsSuggestLower % 2 ))" == "1" ]] && (( ThreadsSuggestLower +=1 ))
 
@@ -2750,8 +2775,6 @@ function_quick_get_wrap ()  {
     printColor "  CHECK ME, NOW: \n\n"
 
     cat "$New_VM_File"
-
-    #  TODO  automatic double entry removal when VM tune up function gets written, based on this. 
 
     printColor "\n\n  [enter] edit the config file in more detail (check entries) "
     
@@ -3496,14 +3519,19 @@ function_KillPID_Menu() {
 
     # belt & braces check for the PID:  
 
+    # belt:
+
     #InstancePID="$(pgrep "$VM_InstanceName")"
 
     #echo "PID $InstancePID - VM_InstanceName $VM_InstanceName "
 
-
     # braces: qemu SHOULD write a .pid file while it is running & remove it when not  
     
     # REVIEW  Probably we should assume VM is not running if QEMU's & file is not there as this would indicate QEMU failure
+
+    # Also the belt of pgrep can give truncated output with long VM names
+
+    # Uses quickemu Var Names:
 
     # [[ ! $InstancePID ]] && InstancePID="$(cat "${VMDIR}/${VMNAME}.pid")"
 
@@ -3934,11 +3962,16 @@ check_for_qqX_updates() {
     [[ $qqX_CurrentReleaseType == "beta" ]] && Hide_qqX_BetaUpdates=
 
 
+    #  Also flag up about beta notifications if transitioning from beta to release:
+
+    [[ $qqX_CurrentReleaseType == "beta" ]] && [[ $qqX_LatestReleaseType == "release" ]] && BetaTxReleasePoint=1
+
+
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
 
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
    
-      if [[ $(echo "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" | bc  2>/dev/null) == "1" ]]; then 
+      if [[ $(bc <<< "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" 2>/dev/null) == "1" ]]; then 
 
         { printf "\n\n qqX_UpdateAvail=\"1\""   
         
@@ -3964,7 +3997,7 @@ check_for_qqX_updates() {
 
     fi
 
-    #  REVIEW  dev searches for pre-releases?  Needs 'jq' but for dev probably okay to add this.  Or just leave as UnHide_Beta?
+    #  REVIEW  dev searches for pre-releases?  Needs 'jq' but this is required by quickemu anyway.  Or just leave as UnHide_Beta?
     
     # https://stackoverflow.com/questions/67688662/how-can-i-get-the-latest-pre-release-release-for-my-github-repo-bash
 
@@ -4142,6 +4175,20 @@ if [[ $MultiInstanceCount -gt 1 ]]; then
   printColor "\n\n  WARNING: more than one instance of %s appears to be running "  "$ModName"
 
   printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n\n"
+
+  read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
+
+  [[ $MultiQuit == "q" ]] && exit directly
+
+fi
+
+if [[ "$(pgrep quickgui)" ]] ; then
+
+  printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running " 
+
+  printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"
+  
+  printf "\n\n  Stopping an instance shown as running in QuickGUI may stop an instance started in qqX. \n\n"
 
   read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
 
@@ -4664,6 +4711,13 @@ while true ; do
 
       printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
 
+      if [[ $BetaTxReleasePoint ]]; then 
+      
+        printf "\n\n\n  Transitioning from beta to release ...  If required,"
+        printf "\n\n  Beta Notifications can be turned off in the general settings file"
+
+      fi
+
       printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
 
       read -rp "  >  "  qqX_UpdateExit
@@ -4675,6 +4729,8 @@ while true ; do
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
 
         cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+
+        # move current execution away from this script and to the installer
 
         exec  bash -c "./qqX_setup_and_install  Upgrade" 
 
@@ -4712,49 +4768,75 @@ while true ; do
     KVM_MSR_selector_LoadHelp=1
     select_msr_config
 
+  # REVIEW  adding gtk option ?
+
   elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
 
     printf "\n\n"
 
-    if [[ $MainMenuChoice == "df"  ]]; then
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
+      printColor "  ERROR:  QEMU is already running this machine elsewhere"
+
+      printf "\n\n [enter] to return \n\n"
+
+      read -rp "  >  "
 
     else
 
-      eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+      if [[ $MainMenuChoice == "df"  ]]; then
+
+        eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
+
+      else
+
+        eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+
+      fi
+
+      [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
+
+      function_KillPID_Menu
 
     fi
-
-    [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
-
-    function_KillPID_Menu
         
   elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
 
     printf "\n\n"
 
-    if [[ $HeadlessCmd ]]; then 
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      # headless only runs in Spice
+      printColor "  ERROR:  QEMU is already running this machine elsewhere"
 
-      eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
+      printf "\n\n [enter] to return \n\n"
 
-    elif [[ $MainMenuChoice == "sf" ]]; then
-
-      eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
+      read -rp "  >  "
 
     else
 
-      eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+      if [[ $HeadlessCmd ]]; then 
+
+        # headless only runs in Spice
+
+        eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
+
+      elif [[ $MainMenuChoice == "sf" ]]; then
+
+        eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
+
+      else
+
+        eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+
+      fi
+
+      #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
+
+      [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
+
+      function_KillPID_Menu
 
     fi
-
-    #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
-
-    [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(echo "scale=0; ($P_Kill_WaitSecs+1.5)/2" | bc 2>/dev/null)"
-
-    function_KillPID_Menu
       
   elif  [[ $MainMenuChoice == "q" ]] ; then
 
