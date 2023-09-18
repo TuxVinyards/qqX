@@ -45,7 +45,7 @@ complete with all its components and all its dependancies, as in the instruction
 
 It may be installed alongside any pre-existing quickemu interfacing, such as quickgui or quickemu shortcuts.
 
-Type `sha256sum -c qqX-` "tab-key" `.256`  at the command line, in the release folder, to check the file.
+Type `sha256sum -c qqX-` "tab-key" `.sha256`  at the command line, in the release folder, to check the file.
 
 
 - Make sure that either your existing virtual machines are working, or that a basic Linux distro,
