@@ -34,17 +34,31 @@
 
 ## Install
 
-Start the set up with original quickemu as normal.  <https://github.com/quickemu-project/quickemu>
+- Start by setting up your computer in the normal way, as if you are installing the whole quickemu package, 
 
-Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
+complete with all its components and all its dependancies, as in the instructions on the quickemu-project pages.
 
-May be installed alongside any pre-existing quickemu interfacing, such as quickgui or quickemu shortcuts.
+<https://github.com/quickemu-project/quickemu>
 
-`sha256sum -c qqX-x.xx.xx.xx.tar.gz.sha.256`  to check the file.
 
-qqX will auto-detect if new releases are later available & quietly prompt for updates.
+- Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
+
+It may be installed alongside any pre-existing quickemu interfacing, such as quickgui or quickemu shortcuts.
+
+Type `sha256sum -c qqX-` "tab-key" `.256`  at the command line, in the release folder, to check the file.
+
+
+- Make sure that either your existing virtual machines are working, or that a basic Linux distro,
+
+one that you are familiar with, will download and will set up.  This will tell you if your setup is okay.
+
+When you know that everything is working correctly, you can start exploring ...
+
+
+- qqX will auto-detect if new releases are later available & quietly prompt for updates.
 
 Use the installer to update, reinstall, uninstall or reconfigure.
+
 
 ## Beta notes
 
