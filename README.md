@@ -34,40 +34,39 @@
 
 ## Install
 
-- Start by setting up your computer in the normal way, as if you are installing the whole quickemu package, 
+qqX may be happily installed alongside quickgui or quickemu shortcuts, if present. 
 
-complete with all its components and all its dependancies, as in the instructions on the quickemu-project pages.
+- Start by installing a full normal quickemu setup, if you don't already have a one, complete with all its components and all its dependencies, as in the instructions on the quickemu-project pages. <https://github.com/quickemu-project/quickemu>
 
-<https://github.com/quickemu-project/quickemu>
+- Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest)
 
+  If you download both named files, you may check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
 
-- Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest) and run the installer.
+- Extract the files & run the installer, usually right click, then run as program, or similar. 
 
-It may be installed alongside any pre-existing quickemu interfacing, such as quickgui or quickemu shortcuts.
+  You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, you will need to set them.
 
-Type `sha256sum -c qqX-` "tab-key" `.sha256`  at the command line, in the release folder, to check the file.
+- If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
-
-- Make sure that either your existing virtual machines are working, or that a basic Linux distro,
-
-one that you are familiar with, will download and will set up.  This will tell you if your setup is okay.
+- If this is a new setup, start qqX, check the settings & then install a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.
 
 When you know that everything is working correctly, you can start exploring ...
 
-
-- qqX will auto-detect if new releases are later available & quietly prompt for updates.
+qqX will auto-detect if new releases are later available & quietly prompt for updates.
 
 Use the installer to update, reinstall, uninstall or reconfigure.
 
 
-## Beta notes
+## Release notes
 
 *Standard good practice* with any software is to backup anything critical ...
 
-Testing has been carried out on a variety of mainstream distros. Only a few small streamlining tasks remain.
-
-These late beta scripts have been consistently safe & stable.  The release candidate should be available shortly.
+We are now at the stage of Release Candidate 0. Testing has been carried out on a variety of mainstream distros.   
 
 All scripts have been carefully Shellcheck linted & have additional backup and error handling routines.
+
+The late beta scripts have been consistently safe & stable.  Only a few small streamlining tasks (and a bonus feature :wink:) remain. 
+
+The *full* release candidate should be available shortly. 
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
