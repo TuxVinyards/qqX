@@ -34,9 +34,11 @@
 
 ## Install
 
-qqX may be happily installed alongside quickgui or quickemu shortcuts, if present. 
+qqX may be happily installed alongside quickgui or quickemu shortcuts, if present, but these are not necessary.
 
 - Start by installing a full normal quickemu setup, if you don't already have a one, complete with all its components and all its dependencies, as in the instructions on the quickemu-project pages. <https://github.com/quickemu-project/quickemu>
+  
+  You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
 - Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest)
 
