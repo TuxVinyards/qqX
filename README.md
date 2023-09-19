@@ -44,7 +44,7 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
 - Extract the files & run the installer, usually right click, then run as program, or similar. 
 
-  You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, you will need to set them.
+  You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
