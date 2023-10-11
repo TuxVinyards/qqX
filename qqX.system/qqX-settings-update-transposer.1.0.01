@@ -292,3 +292,6 @@ function  update_old_settings_file_with_new_options {
   
 }
 
+# vim:tabstop=2:shiftwidth=2:expandtab
+
+##

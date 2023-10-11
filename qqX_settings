@@ -24,9 +24,9 @@
 Default_VM_Folder="$HOME/VMQs"
 
 
-# ADD any EXTRA FOLDERS or sub folders where VM's may be located
+# ADD any EXTRA FOLDERS or sub folders where VM's may be located:
 
-# using format Extra_VM_Folder+=("/filepath/folder") in section below:
+# leave blank for none, or set one entry per folder as +=("/filepath/folder") 
 
 Extra_VM_Folder+=("")
 
@@ -37,7 +37,9 @@ Extra_VM_Folder+=("")
 
 ##  ADD SELECTED VM's to show AT THE TOP of the list to the section below:  
 
-# Where [n,0] is the discrete VM folder  &  [n,1] is the .conf file  
+#  Where [n,0] is the discrete VM folder  &  [n,1] is the .conf file  
+
+#  CONTIGIUOUS, non-sparse with non-present VM entries commented out  
 
 #  eg:
 
@@ -46,8 +48,6 @@ Extra_VM_Folder+=("")
 # VM_Array[1,0]="/media/xxx/Storage/VMQs" ; VM_Array[1,1]="windows-insider.conf"
 
 # VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="macos-catalina.conf"
-
-# NB associative array MUST BE set CONTIGIUOUS, non-sparse
 
 
 # ADD here:
@@ -58,7 +58,10 @@ Extra_VM_Folder+=("")
 
 # VM_Array[2,0]= ; VM_Array[2,1]=
 
-# NB  Non-Present entries MUST be COMMENTED OUT with #  or deleted
+
+# MUST BE set as CONTIGIUOUS, non-sparse, no gaps.
+
+# Non-Present VM entries MUST be either COMMENTED OUT with # or deleted
 
 
 ##  GENERAL COLOR & THEMING  
@@ -114,67 +117,13 @@ KVM_MSR_ModProbeFile=
 
 
 
-##  SHARED or SECOND DRIVE  (auto-create in qqX via the utils menu)
-
-#  The Shared drive should be available to all VMs and act as a useful shared resource when in SDL mode.
-
-#  A second drive is a quick way to expand your VM's storage.
-
-
-#  @ 2023/08  Shared & Second Drive creation are available as a simple menu option, in the utils section.
-
-#  Inside a VM, use Gparted, 'Disks' or similar to find, add a system table, format and mount.  
-
-
-#  Experimental. Should work with all OS's but has has not been tested in all:
-
-
-#  For MS Windows, the drive should be set as GPT & formatted as NTFS. The process should carried out by a Linux OS.
-
-
-#  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
-
-#  Any OS older than and including 10.13 Mojave 2018 *might* need a flag IN THE .CONF FILE to stop possible drive conflicts.
-
-#  Quickemu code has the following note: "VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)"
-
-#  Development tests with Mojave show both a Shared NTFS and a Second APFS to be working.
-
-
-#  SET MacLegacyDrive as ="true" to load Second Drive (& not Shared) as 'ide-hd' instead of 'virtio-blk-pci'
-
-#  SharedDrive always loads as 'virtio-blk-pci'  
-
-#  Set SharedDrive_Conf as ="no-shared" to individually stop the Shared Drive from loading
-
-#  See https://en.wikipedia.org/wiki/MacOS_version_history
-
-
-#  Manual edit/creation: "qemu-img create -f qcow2 disk2.qcow2 64G"  or as size required, to create a disk.
-
-#  SET SecondDrive as ="$Default_VM_Folder/My_VM/disk2.qcow2" may be added to the .conf file for a non-shared extra disk drive.
-
-#  Thanks @gnudoc on the quickemu Discord channel for initiating this idea.  
-
-
-#  Give SharedDrive location eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   ExtraArgs are not required.
-
-#  SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
-
-
-SharedDrive=""
-
-
-
 ##  EXTRA * QEMU * ARGS may be added here, if normally required. Also add ad hoc via the main menu.
 
 #  Format = "group quoted" with single-space separated elements eg:  ExtraArgs="-device tpm-tis,tpmdev=tpm0" 
 
 #  See  https://qemu.readthedocs.io/en/latest/system/invocation.html
 
-
 ExtraArgs=
-
 
 
 ##  EXTRA * quickemu * PARAMETERS to be used at VM run time  
@@ -190,6 +139,7 @@ ExtraArgs=
 #  See quickemu project main page for more details: https://github.com/quickemu-project/quickemu
 
 Extra_QE_Params=
+
 
 
 ##  DEFAULT load up SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Leave blank for none. 
@@ -212,6 +162,45 @@ Default_SDL_ScreenPercent="68"
 
 
 
+##  SHARED or SECOND DRIVE  (auto-create in qqX via the utils menu)
+
+#  The Shared drive is a useful when in SDL mode & available to all VMs.
+
+#  A Second drive is a quick way to expand an individual VM's storage.
+
+#  Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount. 
+
+
+#  SET SecondDrive as ="$Default_VM_Folder/My_VM/disk2.qcow2" IN THE .CONF FILE for a non-shared extra disk drive.
+
+#  Give SharedDrive location eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   
+
+SharedDrive=""
+
+
+#  For MS Windows, the drive should be set as GPT & formatted as NTFS. The process should carried out by a Linux OS.
+
+
+#  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
+
+#  Any OS older than and including 10.13 Mojave 2018 *might* need a flag IN THE .CONF FILE to stop possible drive conflicts.
+
+#  Quickemu code has the following note: "VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)"
+
+#  Development tests with Mojave show both a Shared NTFS and a Second APFS to be working.
+
+#  SET MacLegacyDrive as ="true" to load Second Drive (& not Shared) as 'ide-hd' instead of 'virtio-blk-pci'
+
+#  SharedDrive always loads as 'virtio-blk-pci'  
+
+#  See https://en.wikipedia.org/wiki/MacOS_version_history
+
+
+#  SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
+
+
+
+
 ## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
 
 # For VM compatibility reasons, different quickemu/quickget versions maybe be needed.    
@@ -224,20 +213,21 @@ Default_SDL_ScreenPercent="68"
 
 # LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
 
-QE_Version=                   
+QE_Version=                 
 
-QG_Version=                
+QG_Version= 
+
 
 
 ##  qqX UPDATES
 
-#   Checks quietly for new GitHub releases (set =1 to quieten, if not required)
+#   Checks quietly for new GitHub releases (set =1 if not required)
 
 Disable_qqX_upd_Checks=
 
 #   Un Hide beta releases  (when checking is enabled)  Default =1  hide
 
-Hide_qqX_BetaUpdates=
+Hide_qqX_BetaUpdates=1
 
 
 
