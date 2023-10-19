@@ -121,7 +121,7 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  if [[ $Foo ]] && [[ ! $Bar ]];   NOT   if [ -n ${Foo} ] && [ -z ${Bar} ]; 
 
 
-#  COMMENTS:  Add clarification or explanation to code, especially if the origin or meaning could be difficult to folllow.
+#  COMMENTS:  Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
 
 #  Also add links to any how-to's that you used.  If you needed to check, then others may do also. 
 
