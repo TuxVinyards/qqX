@@ -64,6 +64,8 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
   You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
 
+  Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these.
+
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
 - If this is a new setup, start qqX, check the settings & then install a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.

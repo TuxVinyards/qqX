@@ -68,6 +68,13 @@
 #  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard   (default, next to quickemu: qqX_Std_Bin_Dir="/usr/bin")
 
 
+# The start line of "#!/usr/bin/env bash"  can cause problems with bash exec clauses. 
+
+# Some users may need to change the script start lines #!/bin/bash to point to where their bash binary is located.
+
+# The command " type -p bash " will locate this.
+
+
 qqX_Version="$(./qqX --version 2>/dev/null)"
 
 qqX_XDG_Name="qqX"
