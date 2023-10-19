@@ -1,4 +1,4 @@
-#! /bin/bash 
+#!/usr/bin/env bash 
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
 

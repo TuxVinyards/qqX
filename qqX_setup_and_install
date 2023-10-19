@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/usr/bin/env bash
 
 
 ##  TO INSTALL  if your file manager allows: mouse click & run as program 
@@ -68,11 +68,11 @@
 #  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard   (default, next to quickemu: qqX_Std_Bin_Dir="/usr/bin")
 
 
-# The start line of "#!/usr/bin/env bash"  can cause problems with bash exec clauses. 
+# The start line of "#!/usr/bin/env bash" can sometimes cause problems with bash exec clauses. 
 
-# Some users may need to change the script start lines #!/bin/bash to point to where their bash binary is located.
+# Some users may need to change the script start lines to  #!/bin/bash, or other, to point to where their bash binary is located.
 
-# The command " type -p bash " will locate this.
+# The command " type -p bash " should help locate this.
 
 
 qqX_Version="$(./qqX --version 2>/dev/null)"
