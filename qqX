@@ -71,7 +71,7 @@
 
 # This script:
 
-ModVersion="1.0.02"
+ModVersion="1.0.03"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -2543,6 +2543,8 @@ function_quick_get_wrap ()  {
 
   if [[ ! $ZsyncDownload ]]; then
 
+    # folder check
+
     if [[ -d "${QWG_DownLoadFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
 
       New_VM_Folder="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
@@ -2557,6 +2559,8 @@ function_quick_get_wrap ()  {
 
     fi
 
+    #  file check  .conf 
+
     if [[ -f "${QWG_DownLoadFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then 
 
       New_VM_File="${QWG_DownLoadFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf"
@@ -2564,6 +2568,10 @@ function_quick_get_wrap ()  {
     elif [[ -f "${QWG_DownLoadFolder}/${QGW_OS_Arr_NameSelected}.conf" ]]; then 
 
       New_VM_File="${QGW_OS_Arr_NameSelected}.conf"
+
+    elif [[ -f "${QWG_DownLoadFolder}/${New_VM_Folder}.conf" ]]; then 
+
+      New_VM_File="${New_VM_Folder}.conf"
 
     fi
 
