@@ -68,11 +68,17 @@
 #  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard   (default, next to quickemu: qqX_Std_Bin_Dir="/usr/bin")
 
 
-# The start line of "#!/usr/bin/env bash" can sometimes cause problems with bash exec clauses. 
+# Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
 
-# Some users may need to change the script start lines to  #!/bin/bash, or other, to point to where their bash binary is located.
+# It is not a silver bullet & can also cause problems with bash exec clauses ...
 
-# The command " type -p bash " should help locate this.
+# Some users may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
+
+# Only the qqX script needs to be changed. This is easiest if done before running the installer but can also be done afterwards.
+
+# The commands "type -p bash" or "which bash" should help locate this.  
+
+# See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
 
 qqX_Version="$(./qqX --version 2>/dev/null)"
