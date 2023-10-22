@@ -61,12 +61,6 @@
 
 ## qqX STANDARD INSTALLATION (default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx)    
 
-#  Differences may be present in non FHS distros & may need manual installation  (in similar way to manually installing quickemu itself)
-
-#  eg NixOS https://discourse.nixos.org/t/install-executable-at-usr-bin/21756   
-
-#  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard   (default, next to quickemu: qqX_Std_Bin_Dir="/usr/bin")
-
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
 
@@ -74,24 +68,70 @@
 
 # Some users may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
 
-# Only the qqX script needs to be changed. This is easiest if done before running the installer but can also be done afterwards.
+# Only the main qqX script itself should need to be changed. This is easiest if done before running the installer but can also be done afterwards.
 
 # The commands "type -p bash" or "which bash" should help locate this.  
 
 # See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
 
-if [[ "$(type -p bash)" != "/usr/bin/bash" ]]; then 
+#  Differences may be present in non FHS distros & may need special installation 
+
+#  See var 'qqX_Std_Bin_Dir' below  &  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard  
+
+
+# In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID, 
+
+# this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
+
+# See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756 
+
+
+
+if [[ ! -d "/tmp" ]]; then 
+
+  # https://superuser.com/questions/332610/where-is-the-temporary-directory-in-linux#332616
 
   printf "\n\n\n  Please read the notes at the start of this installer script."
 
-  printf "\n\n  The start line to the qqX main script may need to be adjusted."
+  printf "\n\n  \"/tmp\" not located: non Filesystem_Hierarchy_Standard system"
 
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
 
-  read -rp  "  >  "   Bash_FHS_Alert
+  read -rp  "  >  "   FHS_Alert
 
-  [[ $Bash_FHS_Alert ]] &&  exit 
+  [[ $FHS_Alert ]] &&  exit 
+
+fi
+
+
+# Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem 
+
+# will need more adjustments than just this, so flag up for them to read the notes & probably other:
+
+OS_BashLocation="$(type -p bash)"
+
+if [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then 
+
+  printf "\n\n\n  Please read the notes at the start of this installer script."
+
+  if [[ ! $OS_BashLocation ]]; then 
+
+    printf "\n\n  Bash has not been found ....."
+
+  else
+
+    printf "\n\n  The start line to the qqX main script may need to be adjusted."
+
+    printf "\n\n  Bash has been located at %s" "$OS_BashLocation"
+
+  fi
+
+  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+
+  read -rp  "  >  "   FHS_Alert
+
+  [[ $FHS_Alert ]] &&  exit 
 
 fi
 
@@ -100,11 +140,26 @@ qqX_Version="$(./qqX --version 2>/dev/null)"
 
 qqX_XDG_Name="qqX"
 
-qqX_Std_Bin_Dir="/usr/bin"   
+# Default location is next to quickemu in "/usr/bin" but where qqX_Std_Bin_Dir is set to "/bin" to improve portabilty.
+
+# @2023 there is normally a symlink for "/bin" so this will actually install to "/usr/bin" 
+
+# In the same way that the bash shebang itself starts at "/bin" 
+
+# the use of "/bin" allows for other systems that have not adopted or allowed for the newer standard method.
+
+# In ref to https://github.com/TuxVinyards/qqX/issues/1  add a check for unusuals eg. nix/store/uniques etc
+
+Current_qqX_Location="$(type -p qqX)"
+
+if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"
+
+else qqX_Std_Bin_Dir="/bin" ; fi
 
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
 
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
+
 
 
 
