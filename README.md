@@ -86,7 +86,9 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 ### Next release
 
-Beyond point releases, currently addressing portability, I am working on being able to select different qemu machines, set individual custom quickemu scripts & detailed vm specific configurations. This should offer a not only a range of VM specfic fixes, we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
+There are currently a few minor point releases to improve installation on non-standard systems.  
+
+Otherwise work is focussing on being able to select different qemu machines, set individual custom quickemu scripts & detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
 
 ## why 'X'
 
