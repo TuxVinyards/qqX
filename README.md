@@ -4,39 +4,35 @@
 
 ### quickemu quickget X terminal project
 
-![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
-
-- Desktop Integrated & with added right click qcow2 analysis
-
-- Works safely alongside other existing GUI installations
-
-- Clear fully annotated & Shellcheck linted scripting
-
 - Full process & version controlled wrapping of both Quickemu & Quickget
 
-- Extra diagnostics, functions & process logging
+- Desktop Integrated. Works safely alongside other existing GUI installations
 
-- Guided VM download with configuration tune-up
+![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Guided settings options with settings editor and auto-update checker
-
-- Quick VM screen percentage switching with both default & individual preset options
-
-- Easy secondary & shared storage creation wizard
-
-- Multiple snapshot management, including of shared disks.  
-
-- Full MSRS controls.
-
-Release 1.0.01 - Now with:
+Latest Release now with:
 
 - qcow2 repair & resize
 
 - configuration tune-up wizard
-  
+ 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
+- Extra diagnostics, functions & process logging
+
+- Quick VM screen percentage switching with both default & individual preset options
+
+- Guided settings options with settings editor and auto-update checker
+
+- Easy secondary & shared storage creation wizard & right click qcow2 analysis
+
+- Multiple snapshot management, including of shared disks.  
+
 ![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
+
+- Full MSRS controls.
+
+- Clear fully annotated & Shellcheck linted scripting
 
 ## Text Interface
 
@@ -64,7 +60,7 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
   You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
 
-  Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these.
+  Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
@@ -87,6 +83,10 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 qqX always makes backups, as is *standard good practice* with *any* software.
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
+
+### Next release
+
+Beyond point releases, currently addressing portability, I am working on being able to select different qemu machines, set individual custom quickemu scripts & detailed vm specific configurations. This should offer a not only a range of VM specfic fixes, we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
 
 ## why 'X'
 
