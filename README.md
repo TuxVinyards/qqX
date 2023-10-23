@@ -54,17 +54,13 @@ qqX does more than just take the basic quickemu command line and turn it into so
 
 People with less experience may find it better to start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later. Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
 
-## Text Interface
+### The text interface
 
 qqX belongs to the 'less is more' school of thought:
 
 By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
 
-Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's
-
-Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet. Any confident Linux user should find it relatively easy to make simple edits.
-
-## Install
+## How to Install
 
 qqX may be happily installed alongside quickgui or quickemu shortcuts, if present, but these are not necessary.
 
@@ -112,7 +108,13 @@ Otherwise work is focusing on being able to: select different qemu machines, set
 
 Minor pull requests are welcome at this stage.
 
-## why 'X'
+## Bash
+
+Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's
+
+Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet. Any confident Linux user should find it relatively easy to make simple edits.
+
+## why 'X' ?
 
 More technically speaking qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X'
 
