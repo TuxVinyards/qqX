@@ -75,13 +75,13 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
 - Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest)
 
-  If you download both named files, you may check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
-
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
   You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
 
   Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
+
+  The installer requires a default VM folder:
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
@@ -91,7 +91,10 @@ When you know that everything is working correctly, you can start exploring ...
 
 qqX will auto-detect if new releases are later available & quietly prompt for updates.
 
+If you download both named files, you may check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
+
 Use the installer to update, reinstall, uninstall or reconfigure.
+
 
 ## Release notes
 
