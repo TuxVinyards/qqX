@@ -15,16 +15,31 @@ Latest Release now with:
 - qcow2 repair & resize
 
 - configuration tune-up wizard
+
+## Why qqX?
+
+Currently, [quickemu](https://github.com/quickemu-project/quickemu) menu interfaces come in two flavours: qqX & quickgui
+
+However, qqX does more than just create a menu. It gives you more functions and more power. More than quickgui and more than much of command line quickemu. More confident Linux users should quickly find themselves at home.
+
+Maybe start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later?  Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
+
+### The text interface
+
+Less is more:
+
+By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
+
  
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
 - Extra diagnostics, functions & process logging
 
-- Quick VM screen percentage switching with both default & individual preset options
+- Quick screen percentage switching (default & individual)
 
-- Guided settings options with settings editor and auto-update checker
+- Guided settings editor and auto-update checker
 
-- Easy secondary & shared storage creation wizard & right click qcow2 analysis
+- Easy secondary storage creation
 
 - Multiple snapshot management, including of shared disks.  
 
@@ -47,18 +62,6 @@ VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu
 Gnome Boxes (with QEMU) has a wonderfully polished load up interface.  If only qqX looked that good too ... :rofl:  
 
 The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an xml/gnome3/vala expert: <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
-
-## Why qqX?
-
-qqX does more than just take the basic quickemu command line and turn it into something more menu based. It gives you more functions and more power. More confident Linux users should quickly find find themselves at home.
-
-People with less experience may find it better to start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later. Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
-
-### The text interface
-
-qqX belongs to the 'less is more' school of thought:
-
-By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
 
 ## How to Install
 
