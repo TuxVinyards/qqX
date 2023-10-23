@@ -34,15 +34,35 @@ Latest Release now with:
 
 - Clear fully annotated & Shellcheck linted scripting
 
+## Why quickemu?
+
+Quickemu is simply built and easy to use.
+
+It has an active community & is the only virtual machine manager that makes easy work out of running Microsoft Windows.
+
+It's not without its flaws. But its flaws can be fixed & it can be made to work.
+
+VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
+
+Gnome Boxes (with QEMU) has a wonderfully polished load up interface.  If only qqX looked that good too ... :rofl:  
+
+The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an xml/gnome3/vala expert: <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
+
+## Why qqX?
+
+qqX does more than just take the basic quickemu command line and turn it into something more menu based. It gives you more functions and more power. More confident Linux users should quickly find find themselves at home.
+
+People with less experience may find it better to start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later. Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
+
 ## Text Interface
 
 qqX belongs to the 'less is more' school of thought:
 
-The GUI can *look* more polished but by using the same simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface.
+By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
 
-There are none of steep learning curves often involved with a GUI, which allows better community involvement.
+Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's
 
-Bash is a flexible language of which all Linux users should know at least a little. Learning Bash, or improving your knowledge of it, is always time well spent, whilst qqX's use of a clear and well annotated coding style means that even novices should be able to find their feet.
+Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet. Any confident Linux user should find it relatively easy to make simple edits.
 
 ## Install
 
@@ -88,7 +108,9 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 There are currently a few minor point releases to improve installation on non-standard systems.  
 
-Otherwise work is focussing on being able to select different qemu machines, set individual custom quickemu scripts & detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
+Otherwise work is focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
+
+Minor pull requests are welcome at this stage.
 
 ## why 'X'
 
