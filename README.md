@@ -18,9 +18,11 @@ Latest Release now with:
 
 ## Why qqX?
 
-Currently, [quickemu](https://github.com/quickemu-project/quickemu) menu interfaces come in two flavours: qqX & quickgui
+[Quickemu](https://github.com/quickemu-project/quickemu) menu interfaces come in two flavours: quickgui & now qqX
 
-However, qqX does more than just create a menu. It gives you more functions and more power. More than quickgui and more than much of command line quickemu. More confident Linux users should quickly find themselves at home.
+But qqX does more than just create a menu. It gives you more functions and more power. 
+
+More than functions than quickgui and more than much of command line quickemu. More confident Linux users should quickly find themselves at home.
 
 Maybe start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later?  Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
 
