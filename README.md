@@ -55,7 +55,7 @@ By using the same, less sophistcated, simple scripting language as quickemu, we 
 
 Quickemu is simply built and easy to use.
 
-It has an active community & is the only virtual machine manager that makes easy work out of running Microsoft Windows.
+It has an active community & is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
 It's not without its flaws. But its flaws can be fixed & it can be made to work.
 
@@ -63,7 +63,7 @@ VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu
 
 Gnome Boxes (with QEMU) has a wonderfully polished load up interface.  If only qqX looked that good too ... :rofl:  
 
-The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an xml/gnome3/vala expert: <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
+The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
 
 ## How to Install
 
@@ -93,7 +93,7 @@ When you know that everything is working correctly, you can start exploring ...
 
 ### Installation Tips
 
-You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
+You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  Also note the file should already have execution permissions set. If not, use the right click file properties dialog to set them.
 
 If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
 
