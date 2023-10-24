@@ -77,11 +77,9 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
-  You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
-
   Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
 
-  The installer requires a default VM folder:
+The installer requires a default VM folder:
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
@@ -89,11 +87,16 @@ qqX may be happily installed alongside quickgui or quickemu shortcuts, if presen
 
 When you know that everything is working correctly, you can start exploring ...
 
-qqX will auto-detect if new releases are later available & quietly prompt for updates.
+- qqX will auto-detect if new releases are later available & quietly prompt for updates.
 
-If you download both named files, you may check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
+- The installer can be used to update, reinstall, uninstall or reconfigure.
 
-Use the installer to update, reinstall, uninstall or reconfigure.
+### Installation Tips
+
+You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  The file should already have execution permissions set. If not, use the right click, file properties dialog to set them.
+
+If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
+
 
 
 ## Release notes
@@ -110,11 +113,11 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 ### Next release
 
-There are currently a few minor point releases to improve installation on non-standard systems.  
+Minor pull requests are welcome. There are currently a few minor point releases to improve installation on non-standard systems.  
 
-Otherwise work is focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.
+Otherwise work is focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
 
-Minor pull requests are welcome at this stage.
+ 
 
 ## Bash
 
