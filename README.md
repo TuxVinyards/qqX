@@ -10,47 +10,6 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-Latest Release now with:
-
-- qcow2 repair & resize
-
-- configuration tune-up wizard
-
-## Why qqX?
-
-[Quickemu](https://github.com/quickemu-project/quickemu) menu interfaces come in two flavours: quickgui & now qqX
-
-But qqX does more than just create a menu. It gives you more functions and more power. 
-
-More than functions than quickgui and more than much of command line quickemu. More confident Linux users should quickly find themselves at home.
-
-Maybe start with [quickgui](https://github.com/quickemu-project/quickgui) and move to qqX later?  Maybe. But both can be installed, you can have both on your machine at the same time, you can try them both and you can switch between them at will.
-
-### The text interface
-
-Less is more:
-
-By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
-
- 
-![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
-
-- Extra diagnostics, functions & process logging
-
-- Quick screen percentage switching (default & individual)
-
-- Guided settings editor and auto-update checker
-
-- Easy secondary storage creation
-
-- Multiple snapshot management, including of shared disks.  
-
-![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
-
-- Full MSRS controls.
-
-- Clear fully annotated & Shellcheck linted scripting
-
 ## Why quickemu?
 
 Quickemu is simply built and easy to use.
@@ -65,9 +24,53 @@ Gnome Boxes (with QEMU) has a wonderfully polished load up interface.  If only q
 
 The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
 
+
+## Why qqX?
+
+[Quickemu](https://github.com/quickemu-project/quickemu) works on the command line & its menu interface has traditionally been  quickgui.
+
+qqX *now* offers an alternative menu system that has more functions & power. More even than quickemu.
+
+Install qqX on your machine & you can still keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if want to.
+
+Confident Linux users should quickly find themselves at home with qqX but you can switch between them at will.
+
+### Why the text interface?
+
+Less is more:
+
+By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
+
+The Latest Release now has:
+
+- qcow2 repair & resize
+
+- configuration tune-up wizard
+ 
+![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
+
+Plus Includes:
+
+- Quick screen percentage switching (default & individual)
+
+- Easy secondary storage creation
+
+- Multiple snapshot management, including of shared disks.  
+
+![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
+
+- Clear fully annotated & Shellcheck linted scripting
+
+- Extra diagnostics, functions & process logging
+
+- Full MSRS controls.
+
+- Guided settings editor and auto-update checker
+
+
 ## How to Install
 
-qqX may be happily installed alongside quickgui or quickemu shortcuts, if present, but these are not necessary.
+qqX will work quite happily alongside quickgui or quickemu shortcuts. But these are not necessary.
 
 - Start by installing a full normal quickemu setup, if you don't already have a one, complete with all its components and all its dependencies, as in the instructions on the quickemu-project pages. <https://github.com/quickemu-project/quickemu>
   
