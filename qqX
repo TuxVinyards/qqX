@@ -55,6 +55,8 @@
 
 #  See:  https://github.com/TuxVinyards/qqX  &  https://github.com/TuxVinyards/quickemu-mod
 
+#  @2023/10  qmod/qwrap probably to be phased out & focus only on qqX
+
 
 ##  Bash 5.0+   (2023: we are now at ver 5 for quite a few years ...) 
 
@@ -71,7 +73,7 @@
 
 # This script:
 
-ModVersion="1.0.03"
+ModVersion="1.1.01"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -314,9 +316,17 @@ else SettingsName="qmod_settings" ; fi
 
 
 
-if [[ $Conf_TriggerFolder ]] && [[ -e "$Conf_TriggerFolder/${SettingsName}" ]]; then  
+if [[ $ModName_qqX ]]; then 
+
+  [[ -e "$HOME/.qqX/qqX_settings" ]] && Q_Mod_SettingsFile="$HOME/.qqX/qqX_settings"
+
+#
+
+elif [[ $Conf_TriggerFolder ]] && [[ -e "$Conf_TriggerFolder/${SettingsName}" ]]; then  
 
   Q_Mod_SettingsFile="$Conf_TriggerFolder/${SettingsName}"
+
+#
 
 elif [[ -e "$CurrentFolder/${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
 
@@ -327,10 +337,6 @@ elif [[ -e "$CurrentFolder/.${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'
   Q_Mod_SettingsFile="$CurrentFolder/.${SettingsName}"
 
 #  
-
-elif [[ $ModName_qqX ]]; then 
-
-  [[ -e "$HOME/.qqX/qqX_settings" ]] && Q_Mod_SettingsFile="$HOME/.qqX/qqX_settings"
 
 elif [[ -e "$HOME/.qmod_settings" ]] && [[ ! $ModName_qqX ]] ; then  
 
@@ -3048,6 +3054,10 @@ function_print_conf_array () {
 
   i=0
 
+  ListTitleFolder=
+
+  #printf "\n"
+
   while [[ ${VM_Array[$i,0]} ]] ; do
 
     if [[ ! -d "${VM_Array[$i,0]}" ]]; then 
@@ -3062,9 +3072,27 @@ function_print_conf_array () {
 
       ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
 
+      ArrayConf_Item_Listing="${VM_Array[$i,1]}"
+
+      ArrayConf_Item_Listing="${ArrayConf_Item_Listing/'.conf'/}"
+
       if [[ -e "$ArrayConf_Item" ]]; then 
 
         if [[ ! $ByPass_VM_Array_Selector ]]; then
+
+          if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
+
+            ListTitleLine_ItemCount=1
+
+            ListTitleFolder="${VM_Array[$i,0]}"
+
+            printf "\n\n\n  %s: \n\n  " "$ListTitleFolder"
+
+          else 
+
+            ((ListTitleLine_ItemCount+=1))
+
+          fi
 
           QcowTarget=
 
@@ -3079,21 +3107,35 @@ function_print_conf_array () {
 
           if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
 
-            printColor "\n\n %2d  %s  (new)" "$i" "$ArrayConf_Item"
+            ArrayConf_Item_Listing+=" (new)"
+
+            printf "[%d]  " "$i"
+            
+            printColor "%-30s" "$ArrayConf_Item_Listing"
 
           else
 
-            printf "\n\n %2d  %s " "$i" "$ArrayConf_Item"
-
             if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
            
-              [[  ! $(du -b -t 500000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]  &&  printf "(z)"
+              [[  ! $(du -b -t 500000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]  &&  ArrayConf_Item_Listing+=" (z)"
 
               #  Live VMs only, as zsync only updates the iso file.  Live VM qcow2 disks are normally only 196k. 
 
               #  Test ceiling is set at 500k.  REVIEW if problems.
  
             fi
+
+            printf "[%d]  " "$i"
+            
+            printf "%-30s" "$ArrayConf_Item_Listing"
+
+          fi
+
+          if [[ $ListTitleLine_ItemCount == "4" ]]; then
+
+            ListTitleLine_ItemCount=1
+
+            printf "\n\n  "
 
           fi
 
@@ -3167,7 +3209,7 @@ function_Select_VM () {
 
     else
 
-      printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [q] to quit "
+      printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
       printColor "\n\n  [Enter]  to select %s (VM 0)"  "${VM_Array[0,1]}"
 
@@ -3180,6 +3222,17 @@ function_Select_VM () {
 
 
     [[ $VM_Selection == "q" || $VM_Selection == "Q" ]] && echo && exit directly 
+
+
+    if [[ $VM_Selection == "set" ]];then
+
+      VM_Selection=
+      VM_InstanceName=
+      qqX_edit_settings 
+      return
+
+    fi
+
 
     if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
           
@@ -4282,9 +4335,25 @@ show_qmod_title() {
 
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
   
-  #printf "\n"   
+  PWD_Folder="$(pwd)"
 
-  printf "\n\n  Default Folder: %s  Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
+  HideFolderTitleBar=
+
+  for TF in "${Extra_VM_Folder[@]}"; do
+
+    [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
+
+  done
+
+  if [[ ! $HideFolderTitleBar ]]; then  
+  
+    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
+
+  else
+
+    printf "\n"
+
+  fi
 
 }
 
@@ -4693,7 +4762,7 @@ while true ; do
     [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && [[ ! $ShowUtilsMenu ]] && printf  "  [m]  msrs help "
 
 
-    if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  reselect " ; fi
+    if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  SELECT " ; fi
 
     
     if [[ $ShowUtilsMenu ]]; then
@@ -4711,7 +4780,7 @@ while true ; do
       if [[ $SecondDriveArgs ]]; then echo; echo "  SecondDrive: $SecondDrive" ;  fi
 
 
-      if [[ $Default_SDL_ScreenPercent ]]; then echo; echo "  Default_SDL_ScreenPercent: $Default_SDL_ScreenPercent" 
+      if [[ $Default_SDL_ScreenPercent ]]; then echo; echo "  Default_SDL_ScreenPercent: $Default_SDL_ScreenPercent  (Linux Only)" 
 
       else echo; echo "  Default_SDL_ScreenPercent:  not set" ; fi
 
@@ -4737,7 +4806,7 @@ while true ; do
 
     fi
 
-    printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  snapshots "
+    printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
 
     printf "\n"
 
