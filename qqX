@@ -4284,7 +4284,7 @@ show_qmod_title() {
   
   #printf "\n"   
 
-  printf "\n\n  Current Folder: %s \n"  "$(pwd)"
+  printf "\n\n  Default Folder: %s  Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
 
 }
 
