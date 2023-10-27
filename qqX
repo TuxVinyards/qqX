@@ -2308,11 +2308,19 @@ function_quick_get_wrap ()  {
       ;;
 
       h)  
-          printf "\n\n  Once the download and initial setup up has finished, the new folder and .conf file may be easily moved"
-          printf "\n\n  and/or edited before running. Part downloads can usually be re-started, if stopped."
+          printf     "  Once the download and initial setup up has finished, "
+          printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running.\n" 
+
+          printf "\n\n  For new preset folders, edit the main settings.\n" 
+
+          printf "\n\n  Part downloads can usually be re-started, if stopped."
           printf "\n\n  Zsync Iso Updates may leave residual rcksum files, if stopped, and may need removing."
           printf "\n\n  But, if an iso.part file has been started, a restart is possible, after doing a re-sync."
           printf "\n\n  If re-syncing, the rcksum files will be auto-removed."
+
+          show_current_preset_folder_list
+
+          printf "\n\n"
       ;;
 
       *)
@@ -3086,7 +3094,11 @@ function_print_conf_array () {
 
             ListTitleFolder="${VM_Array[$i,0]}"
 
-            printf "\n\n\n  %s: \n\n  " "$ListTitleFolder"
+            #printf "\n\n\n  %s: \n\n  " "$ListTitleFolder"
+            
+            printf "\n\n\n  %-35s" "$ListTitleFolder:"
+
+            ((ListTitleLine_ItemCount+=2))
 
           else 
 
@@ -3127,7 +3139,7 @@ function_print_conf_array () {
 
             printf "[%d]  " "$i"
             
-            printf "%-30s" "$ArrayConf_Item_Listing"
+            printColor "%-30s" "$ArrayConf_Item_Listing"
 
           fi
 
@@ -3211,7 +3223,7 @@ function_Select_VM () {
 
       printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
-      printColor "\n\n  [Enter]  to select %s (VM 0)"  "${VM_Array[0,1]}"
+      printf "\n\n  [Enter]  to select %s (VM 0)"  "${VM_Array[0,1]}"
 
     fi
 
