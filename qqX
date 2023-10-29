@@ -2454,7 +2454,7 @@ function_quick_get_wrap ()  {
 
         # gives some kind of rough indication that work is in progress  (percentages don't seem to be possible)
 
-        printf "  Synchronising  %s "  "$RckDone" 
+        printf "  Comparing images >    %s "  "$RckDone" 
 
         sleep 2
 
@@ -2948,7 +2948,7 @@ function_scan_VM_folderList () {
         # Note that a sparse array will stop listing at the first empty entry
 
         i=0
-        PairsCount=0
+        VM_PairsCount=0
 
         while [[ ${VM_Array[$i,0]} ]]; do
 
@@ -2956,11 +2956,11 @@ function_scan_VM_folderList () {
 
           if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
 
-            [[ $PairsCount -eq  "$VM_ElementCount" ]] &&  break
+            [[ $VM_PairsCount -eq  "$VM_ElementCount" ]] &&  break
 
             # else carry on interating the array 
             ((i+=1))  
-            ((PairsCount+=2))  
+            ((VM_PairsCount+=2))  
             
           else  
 
@@ -2983,7 +2983,7 @@ function_scan_VM_folderList () {
 
       # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
 
-      if [[ $PairsCount != "$VM_ElementCount" ]]; then  
+      if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then  
       
         VM_SettingsError=1
 
@@ -3064,7 +3064,13 @@ function_print_conf_array () {
 
   ListTitleFolder=
 
+  ListTitleLine_ItemCount=0
+
   #printf "\n"
+
+  VM_ElementCount="${#VM_Array[@]}" 
+
+  VM_PairsCount="$((VM_ElementCount/2))"
 
   while [[ ${VM_Array[$i,0]} ]] ; do
 
@@ -3087,22 +3093,20 @@ function_print_conf_array () {
       if [[ -e "$ArrayConf_Item" ]]; then 
 
         if [[ ! $ByPass_VM_Array_Selector ]]; then
-
+                
           if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
 
-            ListTitleLine_ItemCount=1
+            if [[ $ListTitleFolder ]]; then 
+            
+              printf " >>  %s\n\n\n  "  "$ListTitleFolder"
+
+              ListTitleLine_ItemCount=0
+
+            else  printf "\n\n  "
+            
+            fi
 
             ListTitleFolder="${VM_Array[$i,0]}"
-
-            #printf "\n\n\n  %s: \n\n  " "$ListTitleFolder"
-            
-            printf "\n\n\n  %-35s" "$ListTitleFolder:"
-
-            ((ListTitleLine_ItemCount+=2))
-
-          else 
-
-            ((ListTitleLine_ItemCount+=1))
 
           fi
 
@@ -3121,9 +3125,11 @@ function_print_conf_array () {
 
             ArrayConf_Item_Listing+=" (new)"
 
-            printf "[%d]  " "$i"
+            if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
             
-            printColor "%-30s" "$ArrayConf_Item_Listing"
+            printColor "%-29s" "$ArrayConf_Item_Listing"
+
+            ((ListTitleLine_ItemCount+=1))
 
           else
 
@@ -3137,15 +3143,17 @@ function_print_conf_array () {
  
             fi
 
-            printf "[%d]  " "$i"
+            if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
             
-            printColor "%-30s" "$ArrayConf_Item_Listing"
+            printColor "%-29s" "$ArrayConf_Item_Listing"
+
+            ((ListTitleLine_ItemCount+=1))
 
           fi
 
           if [[ $ListTitleLine_ItemCount == "4" ]]; then
 
-            ListTitleLine_ItemCount=1
+            ListTitleLine_ItemCount=0
 
             printf "\n\n  "
 
@@ -3168,6 +3176,8 @@ function_print_conf_array () {
     ((i+=1))
 
   done
+
+  [[ $i == "$VM_PairsCount" ]] && printf " >>  %s"  "$ListTitleFolder"
   
 }
 
@@ -3282,7 +3292,7 @@ function_Select_VM () {
 
     [[ ! $VM_Selection ]] &&  VM_Selection=0  
 
-    printf "\n\n  Selecting instance %s \n\n"  "$VM_Selection"
+    # printf "\n\n  Selecting instance %s \n\n"  "$VM_Selection"
 
     sleep 0.1   # gives background scans a little more time
 
@@ -3290,7 +3300,6 @@ function_Select_VM () {
     VM_Conf_File="${VM_Array[$VM_Selection,1]}"
 
   fi
-
 
   if [[ $SettingsFileAdjusted && $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]]; then
 
@@ -3447,10 +3456,13 @@ drives_and_snapshots() {
     #"$QEMU_IMG" snapshot -l "$Selected_Drive" # make sure there is enough space too
     "$QEMU_IMG" info "$Selected_Drive"
 
+    printf "\n\n  IMPORTANT > The virtual machine must *not* be running & not started elsewhere." 
+
+    [[ $(pgrep kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
   fi
 
 }
-
 
 
 function_KillPID_Menu() {
@@ -4129,23 +4141,25 @@ function_config_tune_up ()  {
   
   printf "\n\n  Your host CPU's microcode & virtualization units will have the final say ...."
 
+  CoresSetNumber=
+  
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
 
-  [[ $ConfLine ]] && printf "\n\n  CURRENT setting:  %s" "$ConfLine"
+  [[ $ConfLine ]] && printf "\n\n  CURRENT setting:  %s" "$ConfLine"     #  TODO   tidy
+ 
+  [[ $ConfLine ]] && printColor "   [c] to use current  "
 
-  CoresSetNumber=
+  if [[ $ThreadsSuggestLower ]]; then printColor "\n\n  [enter] use %s " "$ThreadsSuggestLower"; else  printf "\n\n" ; fi
 
-  printColor "\n\n  Give [integer] to set max (even numbers are usual)  "
+  printColor "  [integer] choose (even numbers are usual)  "
   
-  [[ $ConfLine ]] && printColor "[c] to use current  "
-  
-  printColor "[enter] to use defaults   [q] quit tune-up \n\n"
+  printColor "[d] use defaults   [q] quit tune-up \n\n"  
 
   read -rp  "  >  "  CoresSetNumber
 
   [[ $CoresSetNumber == "q" ]] && return
 
-  if [[ $CoresSetNumber ]] && [[ $(tr -cd "[:digit:]" <<< "$CoresSetNumber") ]]; then
+  if [[ $CoresSetNumber && $(tr -cd "[:digit:]" <<< "$CoresSetNumber") ]]; then
 
     printf "cpu_cores=\"%s\"\n"  "$CoresSetNumber"  >> "$TuneUpTargetDraft"
 
@@ -4153,15 +4167,26 @@ function_config_tune_up ()  {
 
     printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
 
-  fi
+  elif [[ $CoresSetNumber == "d" ]]; then  true 
 
+  else
+
+    if [[ $ThreadsSuggestLower ]]; then  
+    
+      printf "cpu_cores=\"%s\"\n"  "$ThreadsSuggestLower"  >> "$TuneUpTargetDraft"
+
+      printf "\n\n  Max cores set to %s " "$ThreadsSuggestLower"
+
+    fi
+
+  fi
 
 
   RAM_Available="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | tr -cd '[:graph:]' 2>/dev/null)"
 
   printf "\n\n\n"
 
-  [[ $RAM_Available ]] && printColor "  Your host system is showing %sG of RAM  \n\n" "$RAM_Available"
+  [[ $RAM_Available ]] && printColor "  Your host system is showing %sG of RAM  \n\n" "$RAM_Available"  #  TODO   auto ram 2/3 (rounded down)
 
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
 
@@ -4169,7 +4194,7 @@ function_config_tune_up ()  {
 
   printf "\n\n  More can be added if you are not using host RAM for graphics & have a separate graphics card"
   
-  printf "\n\n  Use more than half if your host is to stay quietly in the background."
+  printf "\n\n  Use around half if your host is to only stay quietly in the background."
 
   printf "\n\n  Integer values only.  Use programs such as 'htop' for further tuning."
 
@@ -5390,6 +5415,10 @@ while true ; do
 
     fi
     
+    printf "\n\n  The virtual machine must *not* be running & not started elsewhere." 
+
+    [[ $(pgrep kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
     printf "\n\n  Note: A back-up will be made but all processes will reduce ...  [b] back to menu " 
 
     DiskManage=

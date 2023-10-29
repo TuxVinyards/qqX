@@ -171,9 +171,9 @@ Default_SDL_ScreenPercent="68"
 #  Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount. 
 
 
-#  SET SecondDrive as ="$Default_VM_Folder/My_VM/disk2.qcow2" IN THE .CONF FILE for a non-shared extra disk drive.
+#  SET SecondDrive as RELATIVE to .conf folder as ="My_VM/disk2.qcow2" IN THE .CONF FILE for extra disk drive.
 
-#  Give SharedDrive location eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   
+#  Give SharedDrive *full* location here  eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   
 
 SharedDrive=""
 
