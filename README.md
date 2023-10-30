@@ -62,7 +62,11 @@ Plus:
 
 - Multiple snapshot management, including of shared disks.  
 
+Quick Get multi distro menu:
+
 ![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
+
+Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
 
 - Clear fully annotated & Shellcheck linted scripting
 
