@@ -270,9 +270,9 @@ custom_conf_notes () {
 
   printf "
   
-    #!/usr/bin/qqX --vm               (for qqX direct start)
+    #!/usr/bin/qqX --vm                (for qqX direct start)
 
-    Custom_SDL_ScreenPercent=\"xx\"   (integer from 25 to 99)
+    Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
     HeadlessDisplay=\"true\"
 
     SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"
@@ -280,14 +280,16 @@ custom_conf_notes () {
     MacLegacyDrive=\"true\"
 
     Other:
-    disk_size=\"xxG\"   (integer)
+    disk_size=\"xxG\"   (integer, used once, for first build)
     cpu_cores=\"x\"     (even integer)
     ram=\"xG\"          (integer)
+
+    boot=\"legacy\"     (use bios, not UEFI)
 
     Windows:
     tpm=\"on\"          secureboot=\"on\"
 
-    shift-ctrl-c  to copy ...
+    highlight then shift-ctrl-c  to copy ...
 
   \n"
 
@@ -363,11 +365,16 @@ declare -gA VM_Array=()
 declare -ga Extra_VM_Folder=()
 
 
-# LOAD SETTINGS & Array PRESETS  
+# Clear or set any default variables, if needed.
 
 VM_ExecBoot=
 
 Extra_QE_Params=
+
+VM_Select_ItemsPerLine="4"
+
+
+# LOAD SETTINGS & Array PRESETS  
 
 if [[ -e "$Q_Mod_SettingsFile" ]]; then
 
@@ -3151,7 +3158,9 @@ function_print_conf_array () {
 
           fi
 
-          if [[ $ListTitleLine_ItemCount == "4" ]]; then
+          # move to new line when number of items per line reached  (default 4, see main settings)
+
+          if [[ $ListTitleLine_ItemCount == "$VM_Select_ItemsPerLine" ]]; then
 
             ListTitleLine_ItemCount=0
 
@@ -4007,8 +4016,10 @@ function_config_tune_up ()  {
   printColor "\n\n\n  CHECK ME: \n\n"
 
   cat "$TuneUpTmpCopy"
+
+  printColor "\n\n  All changes made here, may be reversed:"
     
-  printf "\n  This .conf file has now been date recorded & placed as a back-up in the Distro Folder\n"
+  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
   [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
 
@@ -4126,34 +4137,41 @@ function_config_tune_up ()  {
 
 
   [[ $ThreadsAvailable ]] && printColor "\n\n  You have %s 'cores' available  (actual cores, or cores x threads) " "$ThreadsAvailable"
-
-  [[ $ThreadsSuggested ]] && printf "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
-
-  printColor "\n\n  All available 'cores x threads' may be allocated, esp. if running the VM full screen"
-
-  printf "\n\n  BUT if using 'big LITTLE'  CPU's you *may* need to use a lower figure."   # REVIEW 
-
-  printf "\n\n  Quickemu defaults to safe half, minimals ..."
-
-  printf "\n\n  Normal guest setting should be at least 2/3 to 3/4 of the host."
+ 
+  printf "\n\n  Normal guest setting should be around 2/3 to 3/4 of the host's."
   
-  printf "\n\n  Remember, this is the maximum-allowed number. Be generous as less will actually be used."
+  printf "\n\n  All available 'cores x threads' can be allocated, esp. if running the VM full screen"
+
+  printf "\n\n  Possibly, if using 'big LITTLE'  CPU's you *may* need to use a lower figure."   
+
+  printf "\n\n  Quickemu defaults to safe half, minimals. Be generous as less will actually be used."
   
-  printf "\n\n  Your host CPU's microcode & virtualization units will have the final say ...."
+  # printf "\n\n  Remember, this is the 'maximum-allowed' number"
+  
+  printf "\n\n  And CPU virtualizing units will always protect the host ...."
+
+  [[ $ThreadsSuggested ]] && printColor "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
+
 
   CoresSetNumber=
   
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
 
-  [[ $ConfLine ]] && printf "\n\n  CURRENT setting:  %s" "$ConfLine"     #  TODO   tidy
+  if [[ $ConfLine ]]; then 
+  
+    printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
+
+    CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
  
-  [[ $ConfLine ]] && printColor "   [c] to use current  "
+    [[ $CurrentCores != "$ThreadsSuggestLower"  ]] && printColor "   [c] to use current  "
+
+  fi
 
   if [[ $ThreadsSuggestLower ]]; then printColor "\n\n  [enter] use %s " "$ThreadsSuggestLower"; else  printf "\n\n" ; fi
 
   printColor "  [integer] choose (even numbers are usual)  "
   
-  printColor "[d] use defaults   [q] quit tune-up \n\n"  
+  printColor "[d] use quickemu defaults   [q] quit tune-up \n\n"  
 
   read -rp  "  >  "  CoresSetNumber
 
@@ -4184,32 +4202,54 @@ function_config_tune_up ()  {
 
   RAM_Available="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | tr -cd '[:graph:]' 2>/dev/null)"
 
-  printf "\n\n\n"
+  Shared_RAM_Allocated="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f4 | tr -cd '[:graph:]' 2>/dev/null)"
 
-  [[ $RAM_Available ]] && printColor "  Your host system is showing %sG of RAM  \n\n" "$RAM_Available"  #  TODO   auto ram 2/3 (rounded down)
+  printf "\n\n\n"
 
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
 
   printf "\n\n  Quickemu will default to half, even quarter minimals ..."
 
-  printf "\n\n  More can be added if you are not using host RAM for graphics & have a separate graphics card"
-  
   printf "\n\n  Use around half if your host is to only stay quietly in the background."
 
+  [[ $Shared_RAM_Allocated ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
+  
   printf "\n\n  Integer values only.  Use programs such as 'htop' for further tuning."
+
+  if [[ $RAM_Available ]]; then
+  
+    printColor "\n\n  Your host system is showing %sG of RAM " "$RAM_Available"  
+    
+    [[ $Shared_RAM_Allocated ]] &&  printColor "of which %sG is allocated to graphics" "$Shared_RAM_Allocated"
+ 
+    # suggest ram 2/3 (rounded down)
+
+    Suggested_RAM="$(bc <<< "scale=3; (($RAM_Available-($Shared_RAM_Allocated/2))/3*2) - 0.5")"
+
+    Suggested_RAM="$(bc <<< "scale=0; $Suggested_RAM /1" )"
+
+    printf "\n\n  Suggested RAM = %sG"  "$Suggested_RAM"
+
+  fi
 
   ConfLine="$(grep -s 'ram=' "$TuneUpTmpCopy")"
 
-  [[ $ConfLine ]] && printf "\n\n  CURRENT setting:  %s" "$ConfLine"
+  if [[ $ConfLine ]]; then 
+  
+    printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
+
+    CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
+ 
+    [[ $CurrentCores != "$Suggested_RAM"  ]] && printColor "   [c] to use current  "
+
+  fi
+
 
   RAM_SetNumber=
 
-  printColor "\n\n  Give [integer] to allocate    "
-
-  [[ $ConfLine ]] && printColor "[c] to use current  "
-  
-  printColor "[enter] to use defaults  [q] quit tune-up \n\n"
-
+  printColor "\n\n  [enter] use %s   [integer] choose   " "$Suggested_RAM"
+ 
+  printColor "[d] to use quickemu defaults  [q] quit tune-up \n\n"
 
   read -rp  "  >  "  RAM_SetNumber
 
@@ -4221,9 +4261,15 @@ function_config_tune_up ()  {
 
     printf "ram=\"%s\"\n"  "$RAM_SetNumber"  >> "$TuneUpTargetDraft"
 
+  elif [[ $RAM_SetNumber == "d" ]]; then true
+
   elif [[ $RAM_SetNumber == "c" ]]; then
 
     printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+
+  else
+
+    [[ $Suggested_RAM ]] &&  printf "ram=\"%s\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
 
   fi
 

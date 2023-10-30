@@ -73,6 +73,13 @@ X_Shade="3"
 #  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 
 
+##  VM Selector:  
+
+#   Normally the first opening menu, used to select VM's.  Recommended use = 1 if few VMs. Otherwise = 4 per line. 
+
+VM_Select_ItemsPerLine="4"
+
+
 ##  TEXT EDITOR  
 
 #  Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor eg. gedit, pluma ... 
