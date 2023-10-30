@@ -42,7 +42,7 @@ By using the same, less sophistcated, simple scripting language as quickemu, we 
 
 ### Work continues
 
-Release 1.1.01 improves the front end machine selector & makes clearer folder organisation: 
+Release 1.1.01 improves the front end machine selector & makes clearer folder organisation:
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
@@ -120,7 +120,7 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 There have been a few minor point releases to improve installation on non-standard systems.  
 
-Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders & improving the tune up auto guidance.
+Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders (takes effect on next update) & improving the tune up auto guidance.
 
 Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
 
