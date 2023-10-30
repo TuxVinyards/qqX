@@ -3858,7 +3858,7 @@ check_for_qqX_updates() {
   
   if [[ $qqX_LatestRelease ]]; then
 
-    # should normally be the case, if an internet connection was existant
+    # should normally be the case, if internet connection is up
 
     qqX_LatestRelease="${qqX_LatestRelease/'"tag_name": "'/}"
 
@@ -5228,11 +5228,15 @@ while true ; do
 
       fi
 
-      qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases"
+      qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
+
+      # each release to its own folder makes things tidier
+
+      mkdir -p "$qqX_LatestTarBall_Folder"
 
       ReturnFolder="$(pwd)"
 
-      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  changing to qqX.releases folder"
+      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         

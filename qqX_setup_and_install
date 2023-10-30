@@ -479,6 +479,8 @@ else
 
       #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
 
+      #  TODO  for qqX add some kind of detection to find if this is an update, then if exist, auto skip 
+
       MkDefDir=
 
       printColor "\n\n\n  A default VM directory is required >> "  
