@@ -40,7 +40,13 @@ Less is more:
 
 By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
 
-The Latest Release now has:
+### Work continues
+
+Release 1.1.01 improves the front end machine selector & makes clearer folder organisation: 
+
+![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
+
+Earlier releases have added:
 
 - qcow2 repair & resize
 
@@ -48,9 +54,7 @@ The Latest Release now has:
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
-Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders & improving the tune up auto guidance.
-
-Plus Includes:
+Plus:
 
 - Quick screen percentage switching (default & individual)
 
