@@ -24,7 +24,6 @@ Gnome Boxes (with QEMU) has a wonderfully polished load up interface.  If only q
 
 The problems with Gnome Boxes are the problems. When it's working it's great. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
 
-
 ## Why qqX?
 
 [Quickemu](https://github.com/quickemu-project/quickemu) works on the command line & its menu interface has traditionally been  quickgui.
@@ -46,8 +45,10 @@ The Latest Release now has:
 - qcow2 repair & resize
 
 - configuration tune-up wizard
- 
+
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
+
+Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders & improving the tune up auto guidance.
 
 Plus Includes:
 
@@ -66,7 +67,6 @@ Plus Includes:
 - Full MSRS controls.
 
 - Guided settings editor and auto-update checker
-
 
 ## How to Install
 
@@ -100,8 +100,6 @@ You can also open a terminal in the release folder & type `./qqX_setup_and_insta
 
 If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
 
-
-
 ## Release notes
 
 Now in official release. Testing has been carried out on a variety of mainstream distros.
@@ -114,13 +112,21 @@ qqX always makes backups, as is *standard good practice* with *any* software.
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
+### Changes
+
+There have been a few minor point releases to improve installation on non-standard systems.  
+
+Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders & improving the tune up auto guidance.
+
+Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
+
+Minor pull requests are welcome.
+
 ### Next release
 
-Minor pull requests are welcome. There are currently a few minor point releases to improve installation on non-standard systems.  
+Work is now focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
 
-Otherwise work is focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
-
- 
+But not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
 
 ## Bash
 
