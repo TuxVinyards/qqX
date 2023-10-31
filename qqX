@@ -1,5 +1,10 @@
 #!/bin/bash 
 
+# NB Avoid use of "#!/usr/bin/env bash" in this script as it will mask process names & inhibit process controls.
+
+# See notes in the Setup & Install script 
+
+
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
 
@@ -73,7 +78,7 @@
 
 # This script:
 
-ModVersion="1.1.01"
+ModVersion="1.1.02"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -2442,15 +2447,20 @@ function_quick_get_wrap ()  {
 
     sleep 2
 
-    if [[ $Zsync_Updatable_ISO ]]; then 
 
-      while [[ ! $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; do  sleep 2 ; done
-        
-    fi
+    # load the zsync function  but omit check "if [[ $ZsyncDownload ]]" as quickget could change 
 
     function show_rcksum_progress {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
+
+      if [[ $RckFile ]]; then 
+
+        LastZsync="0" 
+
+        date +%s > "$VM_InstanceName/zsync.date.txt"
+
+      fi
 
       while [[ -e "$RckFile" ]]; do
         
@@ -2470,7 +2480,6 @@ function_quick_get_wrap ()  {
       done
       
     }
-
 
 
     while true ; do
@@ -2621,7 +2630,7 @@ function_quick_get_wrap ()  {
 
     else  
     
-      printf "\n\n  Hopefully all completed  ..." 
+      printf "\n\n  End of Quickget/Zsync process ..." 
 
       # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
           
@@ -2716,10 +2725,6 @@ function_quick_get_wrap ()  {
 
   
   if [[ $Zsync_Updatable_ISO ]]; then 
-
-    LastZsync="0"
-
-    date +%s > "$VM_InstanceName/zsync.date.txt"
 
     SettingsFileAdjusted=
 
@@ -4204,6 +4209,22 @@ function_config_tune_up ()  {
 
   Shared_RAM_Allocated="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f4 | tr -cd '[:graph:]' 2>/dev/null)"
 
+  # @2023/11 free --mega  fails in Manjaro ( & arch ?)
+
+  if [[ ! $RAM_Available ]]; then
+
+    RAM_Available="$(grep MemTotal /proc/meminfo | cut -d':' -f2 | tr -cd '[:digit:]' 2>/dev/null)"
+
+    RAM_Available="$(bc <<< "scale=1; $RAM_Available/999999" 2>/dev/null)"
+
+    SharedRAM_NotFound=1
+
+  else 
+
+    SharedRAM_NotFound=
+
+  fi
+
   printf "\n\n\n"
 
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
@@ -4212,19 +4233,23 @@ function_config_tune_up ()  {
 
   printf "\n\n  Use around half if your host is to only stay quietly in the background."
 
-  [[ $Shared_RAM_Allocated ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
+  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Deduct about half of shared RAM, used for graphics"
   
   printf "\n\n  Integer values only.  Use programs such as 'htop' for further tuning."
 
   if [[ $RAM_Available ]]; then
   
-    printColor "\n\n  Your host system is showing %sG of RAM " "$RAM_Available"  
+    printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"  
     
     [[ $Shared_RAM_Allocated ]] &&  printColor "of which %sG is allocated to graphics" "$Shared_RAM_Allocated"
  
+    [[ $SharedRAM_NotFound ]] &&  printColor "of which some *may* be allocated to graphics" "$Shared_RAM_Allocated"
+ 
     # suggest ram 2/3 (rounded down)
 
-    Suggested_RAM="$(bc <<< "scale=3; (($RAM_Available-($Shared_RAM_Allocated/2))/3*2) - 0.5")"
+    if [[ $Shared_RAM_Allocated ]]; then Suggested_RAM="$(bc <<< "scale=3; (($RAM_Available-($Shared_RAM_Allocated/2))/3*2) - 0.5")"
+
+    else  Suggested_RAM="$(bc <<< "scale=3; ($RAM_Available/3*2) - 0.5")" ; fi
 
     Suggested_RAM="$(bc <<< "scale=0; $Suggested_RAM /1" )"
 
@@ -4940,9 +4965,9 @@ while true ; do
 
           #  older than 6hrs (in epoch seconds)
 
-          if [[ $LastZsync -gt 21600 ]]; then  printColor "   [z] run a quick zsync iso update - last run %d hrs ago"  "$((LastZsync/3600))"
+          if [[ $LastZsync -gt 21600 ]]; then  printColor "   [z] run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
 
-          else  printf "   [z] run a quick zsync iso update - last run %d hrs ago"  "$((LastZsync/3600))"
+          else  printf "   [z] run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
           
           fi
 
