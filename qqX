@@ -4204,12 +4204,21 @@ function_config_tune_up ()  {
 
   fi
 
+  SharedRAM_NotFound=
+  RAM_Available=
+  Shared_RAM_Mb=
 
-  RAM_Available="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | tr -cd '[:graph:]' 2>/dev/null)"
+  printf "\n\n\n  Memory showing: \n\n"
 
-  Shared_RAM_Allocated="$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f4 | tr -cd '[:graph:]' 2>/dev/null)"
+  free --si -h  
 
-  # @2023/11 free --mega  fails in Manjaro ( & arch ?)
+  RAM_Available="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2)"
+
+  if [[ "$RAM_Available" == *G* ]]; then  RAM_Available="$( cut -d'G' -f1  <<< "$RAM_Available" | tr -cd '[:graph:]' 2>/dev/null)"
+
+  else  RAM_Available=  ; fi
+  
+  # @2023/11 free --mega  can fail in Manjaro ( & arch ?) at the command prompt at least  (interactive)
 
   if [[ ! $RAM_Available ]]; then
 
@@ -4221,9 +4230,24 @@ function_config_tune_up ()  {
 
   else 
 
-    SharedRAM_NotFound=
+    Shared_RAM_Allocated="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2 | cut -d'G' -f4 | tr -cd '[:graph:]' 2>/dev/null)"
+
+    if [[ "$Shared_RAM_Allocated" == *M* ]]; then 
+
+      Shared_RAM_Allocated="$(cut -d'M' -f1 <<< "$Shared_RAM_Allocated")"
+
+      Shared_RAM_Mb="$Shared_RAM_Allocated"
+
+      if [[ $(bc <<< "$Shared_RAM_Allocated < 500") == 1 ]]; then Shared_RAM_Allocated=
+
+      else Shared_RAM_Allocated="1" ; fi
+
+      [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
+
+    fi
 
   fi
+
 
   printf "\n\n\n"
 
@@ -4241,9 +4265,11 @@ function_config_tune_up ()  {
   
     printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"  
     
-    [[ $Shared_RAM_Allocated ]] &&  printColor "of which %sG is allocated to graphics" "$Shared_RAM_Allocated"
+    if [[ $Shared_RAM_Allocated ]]; then printColor "of which %sG is possibly allocated to graphics" "$Shared_RAM_Allocated"
  
-    [[ $SharedRAM_NotFound ]] &&  printColor "of which some *may* be allocated to graphics" "$Shared_RAM_Allocated"
+    elif [[ $Shared_RAM_Mb ]]; then printColor "of which %sM *may* be allocated to graphics" "$Shared_RAM_Mb"
+ 
+    elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
  
     # suggest ram 2/3 (rounded down)
 
@@ -5235,6 +5261,7 @@ while true ; do
 
     printf "\n\n"
 
+
     if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads"
 
     elif [[ $qqX_LatestTarBall_Folder == "f" ]]; then  qqX_LatestTarBall_Folder="$Default_VM_Folder"
@@ -5245,74 +5272,70 @@ while true ; do
 
     fi
 
-    if [[ $qqX_LatestTarBall_Folder ]]; then 
+    # each release to its own folder makes things tidier
 
-      if [[ ! -d "$qqX_LatestTarBall_Folder/qqX.releases" ]]; then
+    qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
 
-        mkdir "$qqX_LatestTarBall_Folder/qqX.releases" ||  printColor "\n\n  ERROR  making qqX.releases folder"
+    mkdir -p "$qqX_LatestTarBall_Folder"
 
-      fi
 
-      qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
+    # record where to come back to, when done
 
-      # each release to its own folder makes things tidier
+    ReturnFolder="$(pwd)"
 
-      mkdir -p "$qqX_LatestTarBall_Folder"
 
-      ReturnFolder="$(pwd)"
+    cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
 
-      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
 
-      if [[ $qqX_Latest_Secure_TarBall ]]; then
-        
-        wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
-
-        wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
-
-        SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
-
-        printColor "\n  SHA256 Check: %s "  "$SHA_Check"
-
-        [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
+    if [[ $qqX_Latest_Secure_TarBall ]]; then
       
-      else
+      wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
 
-        wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+      wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
 
-      fi
+      SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
 
-      printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
+      printColor "\n  SHA256 Check: %s "  "$SHA_Check"
 
-      if [[ $BetaTxReleasePoint ]]; then 
-      
-        printf "\n\n\n  Transitioning from beta to release ...  If required,"
-        printf "\n\n  Beta Notifications can be turned off in the general settings file"
+      [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
+    
+    else
 
-      fi
-
-      printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
-
-      read -rp "  >  "  qqX_UpdateExit
-
-      if [[ $qqX_UpdateExit != "r" ]]; then 
-
-        # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
-
-        tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
-
-        cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
-
-        # move current execution away from this script and to the installer
-
-        exec  bash -c "./qqX_setup_and_install  Upgrade" 
-
-      fi
+      wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
 
     fi
 
-    sleep 0.6
+    printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
 
-    cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
+    if [[ $BetaTxReleasePoint ]]; then 
+    
+      printf "\n\n\n  Transitioning from beta to release ...  If required,"
+      printf "\n\n  Beta Notifications can be turned off in the general settings file"
+
+    fi
+
+    printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
+
+    read -rp "  >  "  qqX_UpdateExit
+
+    if [[ $qqX_UpdateExit != "r" ]]; then 
+
+      # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
+
+      tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
+
+      cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+
+      # move current execution away from this script and to the installer
+
+      exec  bash -c "./qqX_setup_and_install  Upgrade" 
+
+    fi
+
+
+  sleep 0.6
+
+  cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
 
 
   elif [[ $MainMenuChoice == "conf" ]] ; then
@@ -5490,7 +5513,7 @@ while true ; do
 
     fi
     
-    printf "\n\n  The virtual machine must *not* be running & not started elsewhere." 
+    printf "\n\n  The virtual machine must not be running & *not* started elsewhere." 
 
     [[ $(pgrep kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
 
