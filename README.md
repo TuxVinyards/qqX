@@ -46,6 +46,10 @@ Release 1.1.01 improves the front end machine selector & makes clearer folder or
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
+Release 1.1.03 adds a few tweaks to the main menu & adds a gtk display option :
+
+![qqX-main-113](https://github.com/TuxVinyards/qqX/assets/3956806/bb5db28d-9105-46e4-9ac2-c6cf4e57a951)
+
 Earlier releases have added:
 
 - qcow2 repair & resize
