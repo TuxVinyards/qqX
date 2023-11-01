@@ -30,7 +30,7 @@ The problems with Gnome Boxes are the problems. When it's working it's great. Bu
 
 qqX *now* offers an alternative menu system that has more functions & power. More even than quickemu.
 
-Install qqX on your machine & you can still keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if want to.
+Install qqX on your machine & you can still keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to.
 
 Confident Linux users should quickly find themselves at home with qqX but you can switch between them at will.
 
