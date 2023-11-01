@@ -78,7 +78,7 @@
 
 # This script:
 
-ModVersion="1.1.02"
+ModVersion="1.1.03"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -3540,6 +3540,8 @@ function_KillPID_Menu() {
     fi
 
     printf "\n\n"
+    tput cnorm
+
   fi
 
   # return to menu requires VM to be shutdown first
@@ -4844,7 +4846,7 @@ while true ; do
 
       else
 
-        printf "\n\n    %s is now shut down" "$VM_InstanceName" 
+        printf "\n    %s   >   is now shut down \n" "$VM_InstanceName" 
 
         if [[ -s "$QemuErrorLog" ]]; then printf "\n\n" ; cat "$QemuErrorLog" ; fi
 
@@ -4891,15 +4893,18 @@ while true ; do
 
   if [[ ! $MainMenuChoice ]]; then
 
-    printf  "\n\n"
-
-    [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && [[ ! $ShowUtilsMenu ]] && printf  "  [m]  msrs help "
-
+    printf  "\n"
 
     if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  SELECT " ; fi
 
+    [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && [[ ! $ShowUtilsMenu ]] && printf  "  [m]  msrs help "
+
     
-    if [[ $ShowUtilsMenu ]]; then
+    if [[ ! $ShowUtilsMenu ]]; then
+
+      printf  "  [u]  show utils & technical"
+
+    else
 
       printf "   [del] delete selected VM"
 
@@ -4934,11 +4939,8 @@ while true ; do
 
       printf "\n"
 
-    else
-
-      printf  "  [u]  show utils & technical"
-
     fi
+
 
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
 
@@ -4965,6 +4967,8 @@ while true ; do
       if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
 
       else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
+
+      printColor "\n\n  [g]   start with GTK display"
 
     fi
 
@@ -5369,13 +5373,33 @@ while true ; do
 
   # REVIEW  adding gtk option ?
 
+  elif [[ $MainMenuChoice == "g" ]] ; then 
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+
+      printf "\n\n [enter] to return \n\n"
+
+      read -rp "  >  "
+
+    else
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
+
+      function_KillPID_Menu
+
+    fi
+        
   elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
 
     printf "\n\n"
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU is already running this machine elsewhere"
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
 
       printf "\n\n [enter] to return \n\n"
 
@@ -5405,7 +5429,7 @@ while true ; do
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU is already running this machine elsewhere"
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
 
       printf "\n\n [enter] to return \n\n"
 
