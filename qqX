@@ -3697,7 +3697,7 @@ function_delete_Selected_VM () {
 
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
 
-    printColor "\n\n  Params VM Name & VM config file (NO PATH) must be given \n\n " 
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
 
     sleep 2 ;  return
 
@@ -3705,9 +3705,9 @@ function_delete_Selected_VM () {
 
     if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
 
-      printColor "\n\n  Params VM Name & VM config file (NO PATH) must be given \n\n " 
+      printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
 
-      printColor "\n\n  Params VM Name / VM config file  NOT FOUND  \n\n " 
+      printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
 
       sleep 2 ;  return
 
@@ -3717,15 +3717,19 @@ function_delete_Selected_VM () {
 
     printColor "\n\n  Folder: %s " "$1"
   
-    printColor " & %s to be deleted?"  "$2"
+    printColor "  & file: %s  to be deleted?"  "$2"
+  
+    printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
 
-    printf "\n\n Folder content: \n\n "
+    printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+
+    printf "\n\n  Folder content: \n\n"
 
     ls "$1"
 
     if [[ $TrashingAvailable ]]; then 
 
-      printColor "\n\n  [enter] safely move things to the trash bin"  
+      printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
       
       printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
 
