@@ -1646,9 +1646,15 @@ QG_VerNumber="$(quickget "--version")"
 
 QE_VerNumber="$VERSION"
 
-# Also create integer version number which is easy to process eg 4.8 becomes 48 & makes possible tests such as if [[ -gt 48 ]] 
 
-QE_Ver_Integer=${QE_VerNumber/./}
+
+##  Also create integer version number which is easy to process eg 4.8 becomes 48 & makes possible tests such as if [[ -gt 48 ]] 
+
+QE_Ver_Integer=${QE_VerNumber//./}
+
+#  BUT as release 4.9 went into two parts, with the second being released as 4.9.1   >  491
+
+#  AND as  4.9.1  added non-local ssh porting too  >  REVIEW  usage in script &  whether something else is needed
 
 
 
