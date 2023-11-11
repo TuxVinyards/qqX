@@ -1971,7 +1971,7 @@ function_quick_get_wrap ()  {
   done
 
 
-  if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
+  if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
 
     QGW_OS_Arr_NameSelected="$Zsync_OS_Name"
 
@@ -2143,7 +2143,7 @@ function_quick_get_wrap ()  {
   printColor  "\n\n  Selected =   %s "  "$QGW_DownloadSelection"
 
 
-  if [[ $Zsync_Updatable_ISO ]]; then
+  if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
 
     if [[ ! $Zsync_OS_Name || ! $Zsync_Release_Name  ]]; then
 
@@ -2198,9 +2198,10 @@ function_quick_get_wrap ()  {
   }
 
 
-  if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then 
+  if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then 
 
       QWG_DownLoadFolder="$VM_Conf_Dir"
+      ZsyncDownload=1
 
   else
 
@@ -2222,7 +2223,7 @@ function_quick_get_wrap ()  {
 
     # If not sync updating, list other copies of similar VM's in the target folder
 
-    if [[ ! $Zsync_Updatable_ISO ]]; then
+    if [[ ! $ZsyncDownload ]]; then
 
       SimilarVMs=
       SimilarVM_ShorterCheck=
@@ -2231,7 +2232,7 @@ function_quick_get_wrap ()  {
 
       if [[ -e "$QWG_DownLoadFolder/$QGW_DownloadName" ]]; then
 
-        printColor "\n\n  ERROR?  VM's is already present? "
+        printColor "\n\n  ERROR?  VM is already present? "
 
         printf "\n\n  %s / %s "    "$QWG_DownLoadFolder" "$QGW_DownloadName"
 
@@ -2290,7 +2291,7 @@ function_quick_get_wrap ()  {
     
     fi
     
-    if [[ ! $Zsync_Updatable_ISO ]]; then
+    if [[ ! $ZsyncDownload ]]; then
 
       if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
 
@@ -2374,7 +2375,7 @@ function_quick_get_wrap ()  {
     
     cd "$QWG_DownLoadFolder"  ||  function_conf_error  "FOLDER not accessible: $QWG_DownLoadFolder"
 
-    if [[ $Zsync_Updatable_ISO ]]; then
+    if [[ $ZsyncDownload ]]; then
 
       printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that %s will remove."  "$ModName"
 
@@ -2414,11 +2415,8 @@ function_quick_get_wrap ()  {
     # clear any accidental initial double pressing of the enter key
 
 		read -r -t 0.2  
-
 		read -r -t 0.2  
-
 		read -r -t 0.2 		
-    
 
 
     printColor "\n\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
@@ -2449,31 +2447,26 @@ function_quick_get_wrap ()  {
 
     printf "\n\n\n\n\n"
 
-    #  move the cursor   "\e[1A\r"  "\e[2K\r"  etc    See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-
     printf "\e[3A\r"
 
-    sleep 2
+    #  make line spaces then move the cursor up from the bottom     
+    
+    # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc 
 
 
-    # load the zsync function  but omit check "if [[ $ZsyncDownload ]]" as quickget could change 
+
+    ## load the zsync function, in all cases. Omit check "if [[ $ZsyncDownload ]]" as quickget could change  REVIEW 
 
     function show_rcksum_progress {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
 
-      if [[ $RckFile ]]; then 
+      LastZsync="0" 
 
-        LastZsync="0" 
-
-        date +%s > "$VM_InstanceName/zsync.date.txt"
-
-      fi
+      date +%s > "$VM_InstanceName/zsync.date.txt"
 
       while [[ -e "$RckFile" ]]; do
         
-        RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
-
         RckDone="$(du -a "$RckFile" 2> /dev/null)"
         RckDone="${RckDone/"$RckFile"/}"
 
@@ -2489,22 +2482,45 @@ function_quick_get_wrap ()  {
       
     }
 
+    # wait for background things to start happening
+    
+    sleep 4   
 
     while true ; do
 
-      if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then 
-      
-        show_rcksum_progress &
-       
-      fi
-     
       mapfile -t  Jobs_Arr <<< "$(jobs -p)"
 
+      sleep 2
 
-      # waits here for an [enter] to finish :
+      [[ ${Jobs_Arr[*]} ]] && break
+
+    done
+
+
+    while true ; do    
+
+      if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then  show_rcksum_progress &
+
+      elif [[ $ZsyncDownload ]]; then 
+
+        if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
+        
+          printf "\n  Comparing images \n\n" 
+
+          LastZsync="0" 
+
+          date +%s > "$VM_InstanceName/zsync.date.txt"
+
+        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
+
+        fi
+       
+      fi
+
+      ##  WAITS HERE for an [enter] to finish, or stop  ##
 
       read -r 
-
+     
 
       for Jobs_PID in "${Jobs_Arr[@]}" ; do
 
@@ -2622,7 +2638,7 @@ function_quick_get_wrap ()  {
 
     if [[ $QGW_DownloadStopped ]]; then 
     
-      printf "\n\n  Download Stopped > Residual files may be present"
+      printf "\n  Download Stopped > Residual files may be present"
       printf "\n\n  Removal of any residual files & folders has to be completed manually"
 
       if [[ $Zsync_Updatable_ISO ]]; then
@@ -2638,7 +2654,7 @@ function_quick_get_wrap ()  {
 
     else  
     
-      printf "\n\n  End of Quickget/Zsync process ..." 
+      printf "\n  End of Quickget processes ..." 
 
       # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
           
@@ -2732,7 +2748,7 @@ function_quick_get_wrap ()  {
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget-Wrap Working Directory NOT FOUND ," ; fi
 
   
-  if [[ $Zsync_Updatable_ISO ]]; then 
+  if [[ $MainMenuZsync ]] && [[ $ZsyncDownload ]]; then 
 
     SettingsFileAdjusted=
 
@@ -2765,6 +2781,15 @@ function_conf_error () {
 
   NewSetupFlag=
 
+  # clear any accidental initial double pressing of the enter key caused during error
+
+  read -r -t 0.2  
+  read -r -t 0.2  
+  read -r -t 0.2  
+  read -r -t 0.2 	
+  read -r -t 0.2  
+  read -r -t 0.2 	
+
   printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
 
   if [[ $1 ]] ; then printf "\n\n  Check %s settings, location & content ... "  "$1"
@@ -2781,23 +2806,15 @@ function_conf_error () {
 
     printf "  [enter] to view/edit settings file \n\n"
 
-  elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) ]]; then 
+  elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
 
-    printColor "\n  CHECK ME, NOW: \n\n"
+    printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
 
     cat "$VM_Conf_File"
 
     NewSetupFlag=1
 
-    printColor "\n\n  NEW SETUP: " 
-
-    printf "\n\n  The main qcow2 disk will NOW be created ..."
-     
-    if [[ "$VM_InstanceName" =~ 'windows' ]]; then 
-    
-      printf "\n\n  fixed_iso=\"windows-xx/virtio-win-0.1.225.iso\" may be added for display drivers & guest additions "
-
-    fi
+    # printf "\n\n  Continue to the next menu to create the qcow2 disk ..."
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     
@@ -2853,13 +2870,13 @@ function_conf_error () {
 
       NewSetupFlag=
 
-      printf "\n\n  Remember, if not set, to enable starting via %s from the .conf file:"  "$ModName"
+      #printf "\n\n  Remember, if not set, to enable starting via %s from the .conf file:"  "$ModName"
 
-      printf "\n\n  #!/usr/bin/quickemu --vm   should become   #!/usr/bin/%s --vm  " "$ModName"
+      #printf "\n\n  #!/usr/bin/quickemu --vm   should become   #!/usr/bin/%s --vm  " "$ModName"
 
-      printColor "\n\n  [enter] to continue \n\n"
+      #printColor "\n\n  [enter] to continue \n\n"
 
-      read -rp "  >  "
+      #read -rp "  >  "
     
       qqX_edit_settings  "conf" 
       
@@ -5022,7 +5039,7 @@ while true ; do
 
         zsync_quickget_code_snippets_in_a_way_that_shows_them_as_formatted_notes () {
 
-          ## dev notes in formatted display, not for running
+          ## DEV NOTES in formatted display, NOT FOR RUNNING
 
           # FROM:  function get_ubuntu in quickget (original, ver 4.8)  
 
