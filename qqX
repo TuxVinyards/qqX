@@ -2312,10 +2312,12 @@ function_quick_get_wrap ()  {
         QGW_List_NumSelected=
         QGW_OS_Arr_NameSelected=
         QGW_Release_Arr_NameSelected=
+        Zsync_OS_Name=
+        Zsync_Release_Name=
         QGW_DownloadStart=
         QGW_DownloadSelection=
 
-        function_quick_get_wrap
+        if [[ $MainMenuZsync ]]; then MainMenuZsync= ; else function_quick_get_wrap ; fi
 
         break
       ;;
@@ -5367,6 +5369,8 @@ while true ; do
   elif [[ $MainMenuChoice == "z" ]] ; then
 
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
+
+      MainMenuZsync=1
 
       function_quick_get_wrap
 
