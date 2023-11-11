@@ -128,6 +128,8 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 There have been a few minor point releases to improve installation on non-standard systems.  
 
+Release 1.1.04 amends handling of the new 3 dot quickemu release number and corrects the running of quickget when a zsync live distro had been previously selected.
+
 Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders (takes effect on next update) & improving the tune up auto guidance.
 
 Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
