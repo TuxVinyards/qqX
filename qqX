@@ -5094,6 +5094,9 @@ while true ; do
 
         Zsync_Updatable_ISO=1
 
+        # zero main menu flag that sets only if updater run from main 
+        MainMenuZsync=
+
       fi
 
     else 
