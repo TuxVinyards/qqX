@@ -2,6 +2,14 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
+qqX is safe but not infallible. Use the Github **clone** button for the latest bug fixes ...
+
+Please remember that by using this software YOU become part of the community. Please report unnoticed errors!
+
+There is currently a bug with first time creation of snapshots.  Fix to be released shortly.  Use standard quickemu method for now, for first snapshot.  There was also an unnoticed bug with with the config wizard not adding 'G' to ram= line which caused new distros to fail to start in both quickemu & qqX. 
+
+Your help at making this software better is appreciated.
+
 ### quickemu quickget X terminal project
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
@@ -89,6 +97,10 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
 - Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest)
+
+  qqX is safe but not infallible. Use the Github **clone** button for the latest bug fixes ...
+
+  Please remember that by using this software YOU become part of the community. Please report unnoticed errors.
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
