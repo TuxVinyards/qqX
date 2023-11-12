@@ -4341,7 +4341,7 @@ function_config_tune_up ()  {
 
   if [[ $RAM_SetNumber ]] && [[ $(tr -cd "[:digit:]" <<< "$RAM_SetNumber") ]]; then
 
-    printf "ram=\"%s\"\n"  "$RAM_SetNumber"  >> "$TuneUpTargetDraft"
+    printf "ram=\"%sG\"\n"  "$RAM_SetNumber"  >> "$TuneUpTargetDraft"
 
   elif [[ $RAM_SetNumber == "d" ]]; then true
 
@@ -4351,7 +4351,7 @@ function_config_tune_up ()  {
 
   else
 
-    [[ $Suggested_RAM ]] &&  printf "ram=\"%s\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
+    [[ $Suggested_RAM ]] &&  printf "ram=G\"%s\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
 
   fi
 
