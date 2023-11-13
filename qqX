@@ -292,7 +292,8 @@ custom_conf_notes () {
     boot=\"legacy\"     (use bios, not UEFI)
 
     Windows:
-    tpm=\"on\"          secureboot=\"on\"
+    tpm=\"on\"          secureboot=\"off\"
+    gl=\"off\"          (scaleable SDL, easier restarts)
 
     highlight then shift-ctrl-c  to copy ...
 
@@ -3431,6 +3432,9 @@ drives_and_snapshots() {
   #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select' 
 
   Selected_Drive=
+  Selected_DriveName=
+
+  find_main_drive
 
   if [[ $SecondDriveArgs ]]; then
 
@@ -3489,17 +3493,27 @@ drives_and_snapshots() {
 
     esac
 
-    printf "\033c"
-    printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
+  else
 
-    #"$QEMU_IMG" snapshot -l "$Selected_Drive" # make sure there is enough space too
-    "$QEMU_IMG" info "$Selected_Drive"
-
-    printf "\n\n  IMPORTANT > The virtual machine must *not* be running & not started elsewhere." 
-
-    [[ $(pgrep kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+    Selected_Drive="$MainDrive" 
+    Selected_DriveName="Main Drive"
 
   fi
+
+    printf "\033c"
+    printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
+   
+    "$QEMU_IMG" info "$Selected_Drive"
+
+    if [[ $1 == "select" ]] ; then
+
+      printf "\n\n  IMPORTANT > The virtual machine must *not* be running & not started elsewhere." 
+
+      # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+
+      [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
+    fi
 
 }
 
@@ -4351,7 +4365,7 @@ function_config_tune_up ()  {
 
   else
 
-    [[ $Suggested_RAM ]] &&  printf "ram=G\"%s\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
+    [[ $Suggested_RAM ]] &&  printf "ram=\"%sG\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
 
   fi
 
@@ -4368,6 +4382,7 @@ function_config_tune_up ()  {
     && [[ "$Line" != 'cpu_cores='* ]] && [[ "$Line" != 'ram='* ]] && [[ "$Line" != '#tpm='* ]]  && [[ "$Line" != 'tpm='* ]] \
     && [[ "$Line" != *'cureboot='* ]]; then
 
+      [[ "$Line" == '# Secure Boot'* ]] && printf "\n" >> "$TuneUpTargetDraft"
       printf "%s\n" "$Line" >> "$TuneUpTargetDraft" 
 
     fi
@@ -4398,21 +4413,22 @@ function_config_tune_up ()  {
 
       printf "\n\n  Software TPM should be set as \"on\" until at least the registration process is complete"
 
-      printf "\n\n   but seems to be better set to \"off\" at later stages"
+      printf "\n\n  but can be set to \"off\" at later stages. Lines may commented-out with a \"#\" \n"
+      
+      ConfLine="$(grep -s '# Secure Boot' "$TuneUpTmpCopy")"
 
-      printf "\n\n  Default is \"off\" so alternatively, lines may commented-out with a \"#\" \n"
+      if [[ ! $ConfLine ]]; then  
+      
+        printf "\n\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft"
 
-      {   printf "\n# Secure Boot, if it was needed, may need switching off after initial setup.\n"  
+      fi
 
-          printf "\ntpm=\"on\"\n" 
+      {   printf "\ntpm=\"on\"" 
+
+          printf "\nsecureboot=\"off\"\n\n"
       
       }   >> "$TuneUpTargetDraft"
 
-      if [[ $NewFileTuneUp ]]; then printf "secureboot=\"on\"\n"  >> "$TuneUpTargetDraft"
-
-      else printf "#secureboot=\"on\"\n"  >> "$TuneUpTargetDraft"
-      
-      fi
 
     elif [[ $guest_os == "macos" ]]; then 
 
@@ -4463,6 +4479,8 @@ function_config_tune_up ()  {
       printColor "\n\n  Undoing changes to config file \n\n"
 
       cat "$TuneUpTargetFile"
+
+      printf "\n\n"
 
       read -rp "  [enter] to continue  >  "
 
@@ -5004,7 +5022,7 @@ while true ; do
     printf "\n"
 
 
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
+    printf  "\n\n  [gt]  quickget a new distro   [i]  show main drive info "
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
     
@@ -5573,7 +5591,9 @@ while true ; do
     
     printf "\n\n  The virtual machine must not be running & *not* started elsewhere." 
 
-    [[ $(pgrep kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+
+    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
 
     printf "\n\n  Note: A back-up will be made but all processes will reduce ...  [b] back to menu " 
 
@@ -5689,14 +5709,14 @@ while true ; do
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then
 
-  drives_and_snapshots  select
+    drives_and_snapshots  select
 
-  printColor "\n\n  [enter] date.time title  "
-  printf "  [text input] descriptor   [b] back to menu " 
-  SnapTitle=
-  printf "\n\n"
-  read -rp "  >  "  SnapTitle
-  printf "\n\n"	
+    printColor "\n\n  [enter] date.time title  "
+    printf "  [text input] descriptor   [b] back to menu " 
+    SnapTitle=
+    printf "\n\n"
+    read -rp "  >  "  SnapTitle
+    printf "\n\n"	
 
     [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%R)"
     
@@ -5705,7 +5725,7 @@ while true ; do
       # remove spaces, make title dot separated, as easier to IFS
       SnapTitle="${SnapTitle// /.}"
 
-      "$QEMU_IMG" snapshot -q -c "$SnapTitle" "$Selected_Drive" 
+      "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
 
       "$QEMU_IMG" info "$Selected_Drive"
 
