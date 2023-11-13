@@ -4,9 +4,11 @@
 
 qqX is safe but not infallible. Use the Github **clone** button for the latest bug fixes ...
 
-Please remember that by using this software YOU become part of the community. Please report unnoticed errors!
+The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to ram= line which caused new distros to fail to start in both quickemu & qqX ...  
 
-There is currently a bug with first time creation of snapshots.  Fix to be released shortly.  Use standard quickemu method for now, for first snapshot.  There was also an unnoticed bug with with the config wizard not adding 'G' to ram= line which caused new distros to fail to start in both quickemu & qqX. 
+But just to be extra safe, while we are at Release 1.1.05, an extra layer of qemu-img disk health checks has now been added to the disk info function. Give it a try.
+
+Please remember that by using this software YOU become part of the community. Please report unnoticed errors!
 
 Your help at making this software better is appreciated.
 
@@ -96,9 +98,9 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- Download the latest qqX release [here](https://github.com/TuxVinyards/qqX/releases/latest)
+- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **clone** button.
 
-  qqX is safe but not infallible. Use the Github **clone** button for the latest bug fixes ...
+  qqX is safe but not infallible. Also use the Github clone button for the latest bug fixes ...
 
   Please remember that by using this software YOU become part of the community. Please report unnoticed errors.
 
@@ -146,7 +148,7 @@ Release 1.1.01 improves the front end machine selector & makes clearer folder or
 
 Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
 
-Minor pull requests are welcome.
+Minor pull requests are welcome as are issues. If qqX is not working, then say so.
 
 ### Next release
 
