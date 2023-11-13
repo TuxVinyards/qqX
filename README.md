@@ -2,9 +2,9 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-qqX is safe but not infallible. Use the Github **clone** button for the latest bug fixes ...
+Use the Github **clone** button for the latest bug fixes ...
 
-The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to ram= line which caused new distros to fail to start in both quickemu & qqX ...  
+The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to the ram= line which caused new distros to fail to start in both quickemu & qqX
 
 But just to be extra safe, while we are at Release 1.1.05, an extra layer of qemu-img disk health checks has now been added to the disk info function. Give it a try.
 
