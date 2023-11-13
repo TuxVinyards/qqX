@@ -100,7 +100,7 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 
 - The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **clone** button.
 
-  qqX is safe but not infallible. Also use the Github clone button for the latest bug fixes ...
+  Also use the Github clone button for the latest bug fixes. qqX is safe but not infallible ....
 
   Please remember that by using this software YOU become part of the community. Please report unnoticed errors.
 
@@ -111,6 +111,8 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 The installer requires a default VM folder:
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
+
+  ![copy location](https://github.com/TuxVinyards/qqX/assets/3956806/13ca993f-34aa-477a-878c-b859e5725c97)
 
 - If this is a new setup, start qqX, check the settings & then install a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.
 
