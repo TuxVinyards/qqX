@@ -8,8 +8,6 @@ The recent bug that stopped the creation of first time snapshots has now been fi
 
 But just to be extra safe, while we are at Release 1.1.05, an extra layer of qemu-img disk health checks has now been added to the disk info function. Give it a try.
 
-Please remember that by using this software YOU become part of the community. Please report unnoticed errors!
-
 Your help at making this software better is appreciated.
 
 ### quickemu quickget X terminal project
