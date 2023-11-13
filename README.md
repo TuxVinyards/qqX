@@ -98,11 +98,9 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **clone** button.
+- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **clone** button. Also use the Github clone button for the latest bug fixes ....
 
-  Also use the Github clone button for the latest bug fixes. qqX is safe but not infallible ....
-
-  Please remember that by using this software YOU become part of the community. Please report unnoticed errors.
+  Please report unnoticed errors. By using this software YOU become a valued member of the community.
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
