@@ -216,7 +216,9 @@ SharedDrive=""
 
 # These should all generally be workable. Also different get/emu release/custom versions should be usable together as well. 
 
-# Suggested name format 'quickemu-42' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
+# A general structure similar to quickemu 4.4 onwards is probably needed. Note that quickget will use quickemu to obtain a version number.
+
+# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
 
 # LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
 

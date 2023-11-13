@@ -1648,18 +1648,11 @@ QG_VerNumber="$(quickget "--version")"
 QE_VerNumber="$VERSION"
 
 
-
-##  Also create integer version number which is easy to process eg 4.8 becomes 48 & makes possible tests such as if [[ -gt 48 ]] 
-
-QE_Ver_Integer=${QE_VerNumber//./}
-
-#  BUT as release 4.9 went into two parts, with the second being released as 4.9.1   >  491
-
-#  AND as  4.9.1  added non-local ssh porting too  >  REVIEW  usage in script &  whether something else is needed
-
-
-
 ##  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
+
+#  But check the to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
+
+#  REVIEW  make sure the tmp files are reading the right version before qqX machine swap edition is released
 
 #  Runnning this when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
 
@@ -1701,22 +1694,24 @@ function check_screen_percentage {
 
     if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
-      if [[ $QE_Ver_Integer -ge "48" ]]; then 
-      
-        SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
+      if [[ -e "/tmp/qmod-case-temp" ]]; then 
 
-      else
+        if grep -q -e 'screenpct' "/tmp/qmod-case-temp" ; then 
+        
+          SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
 
-        printf "\033c"
-        printColor "\n\n  ERROR  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
-        SDL_ScrnPcnt_Error="Quickemu Version"
+        else
+
+          printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
+          SDL_ScrnPcnt_Error="> not possible with this qe-version"
+
+        fi
 
       fi
 
     else
       
-      printf "\033c"
-      printColor "\n\n  ERROR  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
+      printColor "\n\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
       SDL_ScrnPcnt_Error="Out of Range"
 
     fi
@@ -1781,7 +1776,7 @@ function set_drive_paths {
 
     elif [[ $SecondDrive ]]; then 
       
-      printf "\n\n ERROR SecondDrive NOT found"
+      printf "\n\n ERROR SecondDrive NOT found (.conf file)"
 
       printf "\n\n  %s \n\n"  "$SecondDrive"
 
@@ -1818,7 +1813,7 @@ function set_drive_paths {
 
     elif [[ $SharedDrive ]]; then 
 
-      printf "\n\n ERROR SharedDrive NOT found"
+      printf "\n\n ERROR SharedDrive NOT found (main settings)"
 
       printf "\n\n  %s \n\n"  "$SharedDrive"
 
@@ -5007,7 +5002,7 @@ while true ; do
 
       elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)    [df] 99%% "  "$SDL_ScreenPercent"
 
-      elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (ERROR %s%% %s > See settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
+      elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
 
       fi
 
