@@ -3431,33 +3431,57 @@ drives_and_snapshots() {
 
   find_main_drive
 
+  set_drive_paths
+
   if [[ $SecondDriveArgs ]]; then
 
     printColor "\n  Second Drive: \n\n"
-    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; fi
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
 
     if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+
+    check_disk_is_okay "$SecondDrive"
+    printf "  Health Status:  %s"  "$DiskChkStatus"
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    printf "\n\n"
 
   fi
 
   if [[ $SharedDriveArgs ]]; then
 
     printColor "\n  Shared Drive: \n\n"
-    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; fi
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
 
     if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
 
+    check_disk_is_okay "$SharedDrive"
+    printf "  Health Status:  %s"  "$DiskChkStatus"
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    printf "\n\n"
   fi
 
-  if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n  Main Drive: \n\n"
-  
-  else printColor "\n  One Main Drive: \n\n"
-  
+  if [[ ! -e $MainDrive ]]; then
+
+    printColor "\n\n  NO MAIN DRIVE  (yet) \n\n"
+
+  else
+
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n\n  Main Drive: \n\n"
+    
+    else printColor "\n\n  One Main Drive: \n\n"
+    
+    fi
+
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
+
+    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+
+    check_disk_is_okay "$MainDrive"
+    printf "  Health Status:  %s"  "$DiskChkStatus"
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    printf "\n\n"
+
   fi
-
-  if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; fi
-
-  if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
 
   if [[ $1 == "select" ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
 
@@ -3495,20 +3519,25 @@ drives_and_snapshots() {
 
   fi
 
-    printf "\033c"
+  if [[ $1 == "select" ]] ; then
+
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
    
     "$QEMU_IMG" info "$Selected_Drive"
 
-    if [[ $1 == "select" ]] ; then
+    check_disk_is_okay "$Selected_Drive"
 
-      printf "\n\n  IMPORTANT > The virtual machine must *not* be running & not started elsewhere." 
+    printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
 
-      # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
 
-      [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+    printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
 
-    fi
+    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+
+    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
+  fi
 
 }
 
@@ -4744,6 +4773,8 @@ function check_disk_is_okay {
 
     "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
 
+    # Note "Okay"  is used as a flag  > caution if changing
+
     case "$?" in 
 
       0) DiskChkStatus="Okay" ;;
@@ -5017,7 +5048,7 @@ while true ; do
     printf "\n"
 
 
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show main drive info "
+    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
     
@@ -5535,6 +5566,8 @@ while true ; do
     check_disk_is_okay "$Selected_Drive"
 
     printf "\n\n  Status:  %s"  "$DiskChkStatus"
+
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
 
     DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep 'virtual size:')"
 
