@@ -120,7 +120,7 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 #  Modern editors, such as VS Code or Sublime have auto-suggesting which enables longer & more helpful VariableNames.
 
-#  Make use of 'shellcheck' & avoid disables where possible.  
+#  Make use of 'shellcheck' & avoid disables where possible.  The VS Code shellcheck extension works well, if set to check-on-save.
 
 
 #  Newer style, more powerful, DOUBLE [[ BRACKETS ]] should be used:
@@ -293,7 +293,7 @@ custom_conf_notes () {
 
     Windows:
     tpm=\"on\"          secureboot=\"off\"
-    gl=\"off\"          (scaleable SDL, easier restarts)
+    gl=\"off\"          (scaleable SDL, easier restarts) (?)
 
     highlight then shift-ctrl-c  to copy ...
 
@@ -3442,7 +3442,7 @@ drives_and_snapshots() {
 
     check_disk_is_okay "$SecondDrive"
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
 
   fi
@@ -3456,7 +3456,7 @@ drives_and_snapshots() {
 
     check_disk_is_okay "$SharedDrive"
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
   fi
 
@@ -3478,7 +3478,7 @@ drives_and_snapshots() {
 
     check_disk_is_okay "$MainDrive"
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
 
   fi
@@ -3529,7 +3529,7 @@ drives_and_snapshots() {
 
     printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
 
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
 
     printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
 
@@ -4358,9 +4358,9 @@ function_config_tune_up ()  {
   
     printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
 
-    CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
+    Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
  
-    [[ $CurrentCores != "$Suggested_RAM"  ]] && printColor "   [c] to use current  "
+    [[ $Current_RAM != "$Suggested_RAM"  ]] && printColor "   [c] to use current  "
 
   fi
 
