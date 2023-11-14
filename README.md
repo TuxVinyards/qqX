@@ -2,7 +2,7 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Use the Github **code/clone** button for the latest bug fixes ...
+Use the Github **code/clone** button for the latest tweaks & bug fixes ...
 
 The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to the ram= line which caused new distros to fail to start in both quickemu & qqX
 
