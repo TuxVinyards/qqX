@@ -295,13 +295,11 @@ custom_conf_notes () {
     tpm=\"on\"          secureboot=\"off\"
     gl=\"off\"          (scaleable SDL, easier restarts) (?)
 
+    Difficult booting: 
+    boot=\"legacy\"  &  gl=\"off\"  may help ...
+
     highlight then shift-ctrl-c  to copy ...
-
   \n"
-
-  printColor "  [enter] to edit \n\n"
-
-  read -rp "   >   "
 
 }
 
@@ -3709,15 +3707,44 @@ qqX_edit_settings() {
 
     if [[ $1 == "conf" ]]; then
 
-      custom_conf_notes
+      printf "\n\n"
 
-      "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  2> /dev/null 
+      cat "$VM_Conf_Dir/$VM_Conf_File"
 
-      ConfSettingsAdjusted=1
+      while true ; do
+
+        printColor "\n\n  [enter] to edit   [r] config reminder notes   [b] go back"
+        printf "\n\n"
+
+        read -rp "  >  "   ConfEdit_Select
+
+        if [[ $ConfEdit_Select == "r" ]] ; then
+
+          custom_conf_notes
+
+        elif [[ $ConfEdit_Select == "b" ]] ; then
+
+          break
+
+        else
+
+          "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  2> /dev/null 
+
+          ConfSettingsAdjusted=1
+
+          break
+
+        fi
+
+      done
 
     elif [[ $1 == "new_conf" ]]; then
 
       custom_conf_notes
+
+      printColor "  [enter] to edit \n\n"
+
+      read -rp "   >   "
 
       "$TextEditor" "$New_VM_File"  2> /dev/null     
       
