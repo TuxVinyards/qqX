@@ -1611,6 +1611,8 @@ function quickemu {
       # In the modded version, functions such as snapshots no longer exit. We need to make sure that 
       # unless flagged to do so, quickemu doesn't carry on to run the vm boot
 
+      printf "" > "/tmp/qqX_echo_output.log"
+      
       source "/tmp/qmod-boot-temp" 
 
       VM_ExecBoot=
