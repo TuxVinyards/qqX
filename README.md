@@ -4,11 +4,15 @@
 
 Use the Github **code/clone** button for the latest tweaks & bug fixes ...
 
-The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to the ram= line which caused new distros to fail to start in both quickemu & qqX
+The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to the ram= line which caused new distros to fail to start in both quickemu & qqX  
 
-But just to be extra safe, while we are at Release 1.1.05, an extra layer of qemu-img disk health checks has now been added to the disk info function. Give it a try.
+Changes to qemu-img and its reporting on disksizes caused a few math headaches. Thats now fixed too.
 
-Your help at making this software better is appreciated.
+Release 1.2.01 is a number boost to reflect all the recent tweaks and fixes. 
+
+Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Disks can go wrong. Picture of it working lower down, in the release notes section 👍 Give it a try.
+
+Your help at making this software better is always appreciated.
 
 ### quickemu quickget X terminal project
 
@@ -153,6 +157,10 @@ Minor pull requests are welcome as are issues. If qqX is not working, then say s
 Work is now focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
 
 But not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
+
+Note the disk health checker doing its thing, in the snap below.  Clusters repaired too ...  👍
+
+![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
 
 ## Bash
 
