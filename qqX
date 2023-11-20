@@ -5598,9 +5598,9 @@ while true ; do
 
     [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
 
-    DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep 'virtual size:')"
+    DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
 
-    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep 'disk size:')"
+    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
 
     DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
 
@@ -5635,6 +5635,8 @@ while true ; do
       printColor " ERROR insufficient space on host drive"
     
     else
+
+      printf "\n\n"
 
       if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
       
