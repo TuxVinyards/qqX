@@ -8,7 +8,7 @@ The recent bug that stopped the creation of first time snapshots has now been fi
 
 Changes to qemu-img and its reporting on disksizes caused a few math headaches. Thats now fixed too.
 
-Release 1.2.01 is a number boost to reflect all the recent tweaks and fixes. 
+Release 1.2.01 is a number boost to reflect all the recent tweaks and fixes.
 
 Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Disks can go wrong. Picture of it working lower down, in the release notes section 👍 Give it a try.
 
@@ -40,11 +40,13 @@ The problems with Gnome Boxes are the problems. When it's working it's great. Bu
 
 [Quickemu](https://github.com/quickemu-project/quickemu) works on the command line & its menu interface has traditionally been  quickgui.
 
-qqX *now* offers an alternative menu system that has more functions & power. More even than quickemu.
+qqX offers an alternative menu system that has far more functions & power. More even than quickemu.
 
-Install qqX on your machine & you can still keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to.
+It has an easy installation. No additional software or dependancies are required.
 
-Confident Linux users should quickly find themselves at home with qqX but you can switch between them at will.
+You can also keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to, and can switch between them at will.
+
+Confident Linux users should quickly find themselves at home.
 
 ### Why the text interface?
 
@@ -100,9 +102,9 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **clone** button. Also use the Github clone button for the latest bug fixes ....
+- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the latest bug fixes ....
 
-  Please report unnoticed errors. By using this software YOU become a valued member of the community.
+  No other software, support structures or dependancies are required.
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
@@ -128,17 +130,15 @@ You can also open a terminal in the release folder & type `./qqX_setup_and_insta
 
 If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
 
+Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community & can help make this software better for others.
+
 ## Release notes
 
-Now in official release. Testing has been carried out on a variety of mainstream distros.
-
-Both the release candidate & the beta versions have been consistently safe & stable.
+Testing has been carried out on a variety of mainstream distros.
 
 All scripts have been carefully Shellcheck linted & have full error handling routines.
 
 qqX always makes backups, as is *standard good practice* with *any* software.
-
-Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 ### Changes
 
@@ -150,7 +150,7 @@ Release 1.1.01 improves the front end machine selector & makes clearer folder or
 
 Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
 
-Minor pull requests are welcome as are issues. If qqX is not working, then say so.
+Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
 
 ### Next release
 
@@ -161,6 +161,8 @@ But not forgetting some of the new pull requests making their way into quickemu 
 Note the disk health checker doing its thing, in the snap below.  Clusters repaired too ...  👍
 
 ![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
+
+Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 ## Bash
 
