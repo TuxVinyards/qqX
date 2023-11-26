@@ -104,19 +104,19 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 
 - The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the latest bug fixes ....
 
-  No other software, support structures or dependancies are required.
+  No other software, support structures or dependancies are needed.
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
   Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
 
-The installer requires a default VM folder:
+The installer does requires a default VM folder:
 
 - If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
 
   ![copy location](https://github.com/TuxVinyards/qqX/assets/3956806/13ca993f-34aa-477a-878c-b859e5725c97)
 
-- If this is a new setup, start qqX, check the settings & then install a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.
+- If this is a new setup, one will be created in your Home folder, next to Downloads & Videos. If you wish to move or rename this, create a new folder using your file manager, start qqX & edit the settings to point to it. The old one may then be removed. When you are ready, start by installing a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.
 
 When you know that everything is working correctly, you can start exploring ...
 
@@ -129,6 +129,10 @@ When you know that everything is working correctly, you can start exploring ...
 You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  Also note the file should already have execution permissions set. If not, use the right click file properties dialog to set them.
 
 If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
+
+All folders can be easily moved around, but make sure that they have their .conf file next to them.
+
+Multiple folders can help organise your distros. You can edit which VMs to show first in the general settings.
 
 Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community & can help make this software better for others.
 
