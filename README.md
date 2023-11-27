@@ -2,17 +2,17 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Use the Github **code/clone** button for the latest tweaks & bug fixes ...
+Use the Github **code/clone** button for the very latest tweaks & bug fixes:
 
-The recent bug that stopped the creation of first time snapshots has now been fixed.  The same with the bug in the config wizard not adding 'G' to the ram= line which caused new distros to fail to start in both quickemu & qqX  
+Qemu-img changing its disksize reporting has been sorted.
 
-Changes to qemu-img and its reporting on disksizes caused a few math headaches. Thats now fixed too.
+Release 1.2.01 is a number boost to reflect other recent changes:
 
-Release 1.2.01 is a number boost to reflect all the recent tweaks and fixes.
+Creation of first time snapshots has now been fixed.  
 
-Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Disks can go wrong. Picture of it working lower down, in the release notes section 👍 Give it a try.
+Same with no-start new distros from the config wizard not adding 'G' to the ram= line.  
 
-Your help at making this software better is always appreciated.
+Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Picture of it working lower down, in the release notes section.  Disks can go wrong. 👍 Give it a try.
 
 ### quickemu quickget X terminal project
 
@@ -86,9 +86,9 @@ Quick Get multi distro menu:
 
 Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
 
-- Clear fully annotated & Shellcheck linted scripting
+- Clear fully annotated and Shellcheck linted scripting
 
-- Extra diagnostics, functions & process logging
+- Extra process logging and diagnostics
 
 - Full MSRS controls.
 
@@ -112,11 +112,15 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 
 The installer does requires a default VM folder:
 
-- If you have existing virtual machines, start qqX and edit the settings file to point to where they are.
+- If you have existing *quickemu* virtual machines, start qqX and edit the settings file to point to where they are.
 
   ![copy location](https://github.com/TuxVinyards/qqX/assets/3956806/13ca993f-34aa-477a-878c-b859e5725c97)
 
-- If this is a new setup, one will be created in your Home folder, next to Downloads & Videos. If you wish to move or rename this, create a new folder using your file manager, start qqX & edit the settings to point to it. The old one may then be removed. When you are ready, start by installing a basic Linux distro, one that you are familiar with perhaps, which will tell you if your setup is okay.
+- 'VMQs' will be created in your Home folder, next to Downloads & Videos, if requested.
+
+- The default folder may be moved or renamed using your file manager. Start qqX and edit the settings to point to it.
+
+- If this is a new setup, installing a basic Linux distro, one that you are familiar with perhaps, will tell you if your setup is okay.
 
 When you know that everything is working correctly, you can start exploring ...
 
@@ -128,13 +132,13 @@ When you know that everything is working correctly, you can start exploring ...
 
 You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  Also note the file should already have execution permissions set. If not, use the right click file properties dialog to set them.
 
-If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder & typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
+If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder and typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
 
 All folders can be easily moved around, but make sure that they have their .conf file next to them.
 
 Multiple folders can help organise your distros. You can edit which VMs to show first in the general settings.
 
-Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community & can help make this software better for others.
+Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community and can help make this software better for others.
 
 ## Release notes
 
@@ -146,25 +150,37 @@ qqX always makes backups, as is *standard good practice* with *any* software.
 
 ### Changes
 
+Other than in the news section:
+
 There have been a few minor point releases to improve installation on non-standard systems.  
 
-Release 1.1.04 amends handling of the new 3 dot quickemu release number and corrects the running of quickget when a zsync live distro had been previously selected.
+Handling of the new 3 dot quickemu release number has been sorted.
 
-Release 1.1.01 improves the front end machine selector & makes clearer folder organisation.  There are also a few 'under the hood' changes like tidying updates into their own specific folders (takes effect on next update) & improving the tune up auto guidance.
+Running of quickget when a zsync live distro had been previously selected has been fixed.
 
-Crucially too, GitHub wise, the way qqX picks up the settings file has been changed. This now makes it much easier for forks and branches to be tested & developed. :rocket:
+Updates are now tidied into their own specific folders
+
+Tune up auto guidance has been improved.
+
+The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested & developed. :rocket:
 
 Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
 
 ### Next release
 
-Work is now focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations. This should offer not only a range of VM specfic fixes; we should also be able to achieve on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
+Work is now focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations.
 
-But not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
+This should offer an improvement in VM specfic tweakabilities.
 
-Note the disk health checker doing its thing, in the snap below.  Clusters repaired too ...  👍
+It should also offer on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
+
+Note the disk health checker doing its thing, in the version 2 snap below.  Clusters repaired too ...  👍
 
 ![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
+
+Also not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
+
+Conversion between gnome boxes and quickemu is currently on the the todo list for version 2.2 (?)
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
