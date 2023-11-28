@@ -3426,6 +3426,11 @@ drives_and_snapshots() {
 
   #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select' 
 
+
+  #  $2 is for disk utility to hide the message to use the disk utility
+
+  [[ $1 == "as_disk_util" ]] && printColor "\n\n  Internal ERROR: disk uitilty needs two args \n\n"  && sleep 100
+
   Selected_Drive=
   Selected_DriveName=
 
@@ -3440,9 +3445,11 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
 
-    check_disk_is_okay "$SecondDrive"
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo ; else check_disk_is_okay "$SecondDrive" ; fi
+
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
 
   fi
@@ -3454,9 +3461,11 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
 
-    check_disk_is_okay "$SharedDrive"
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
+
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
   fi
 
@@ -3476,9 +3485,11 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
 
-    check_disk_is_okay "$MainDrive"
-    printf "  Health Status:  %s"  "$DiskChkStatus"
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo ; else check_disk_is_okay "$MainDrive" ; fi
+
+    printf " Health Status:  %s"  "$DiskChkStatus"
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
 
   fi
@@ -3519,7 +3530,7 @@ drives_and_snapshots() {
 
   fi
 
-  if [[ $1 == "select" ]] ; then
+  if [[ $1 == "select" ]] && [[ -e "$Selected_Drive" ]] ; then
 
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
    
@@ -3527,11 +3538,15 @@ drives_and_snapshots() {
 
     check_disk_is_okay "$Selected_Drive"
 
-    printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
+    if [[ $2 != "as_disk_util" ]]; then
 
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+      printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
 
-    printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
+      if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+
+      printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
+
+    fi
 
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
 
@@ -4093,7 +4108,7 @@ function_config_tune_up ()  {
 
   TuneUpTargetFile="$1" 
   TuneUpDistroFolder="$2"
-  TuneUpDate="$(date +%b%d.%R)"
+  TuneUpDate="$(date +%b%d.%H.%M)"
 
   if [[ ! -e $TuneUpTargetFile ]]; then 
     printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
@@ -4784,6 +4799,12 @@ fi
 
 function check_disk_is_okay {
 
+  local PrintErrors=
+
+  for CheckArg in "$@" ; do 
+    if [[ $CheckArg == "PrintErrors" ]]; then PrintErrors=1 ; shift ; fi
+  done
+
   if [[ $1 && ! $2 ]]; then
 
     DiskCheckFolderName="$(dirname "$1")"
@@ -4796,13 +4817,22 @@ function check_disk_is_okay {
 
   fi
 
+  DiskChkExitCode=
+  DiskChkStatus=
+
   if [[ -e "$DiskCheckFolderName/$DiskCheck_Disk" ]]; then
 
-    # won't exist if new (or named differently REVIEW )
+    # Disk won't exist if new (or named differently REVIEW )
 
-    "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
+    # Qemu-img with '-q' only outputs if error & on outputs on stderr   The exit status remains separately recorded.
 
-    # Note "Okay"  is used as a flag  > caution if changing
+    if [[ $PrintErrors ]]; then  "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
+
+    else "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"  2>/dev/null ; fi
+
+    # Note "Okay"  is also used as a flag  > caution if changing   # REVIEW  could also be flagged using:
+
+    # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)" 
 
     case "$?" in 
 
@@ -5033,9 +5063,9 @@ while true ; do
       printf "   [tune] config tune-up wizard"
 
 
-      printf  "\n\n  [xa]  add extra qemu args   [m] msrs help   [2] create a second  [3] a shared  > virtual hard-drive"
+      printf  "\n\n  [xa]  edit extra qemu args   [m] msrs help   [2] create a second  [3] a shared  > virtual hard-drive"
     
-      printf "\n\n  [hdw]  Add current config to this VM's Virtual Hardware Record   [disk]  Resize or Repair existing drives"
+      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record   [disk]  Resize or Repair existing drives"
     
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
 
@@ -5588,73 +5618,83 @@ while true ; do
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
-    drives_and_snapshots  select
+    drives_and_snapshots  select  as_disk_util
 
-    printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
+    if [[ ! -e "$Selected_Drive" ]]; then
 
-    check_disk_is_okay "$Selected_Drive"
+      printf "\n\n  [b] go back to main menu"
 
-    printf "\n\n  Status:  %s"  "$DiskChkStatus"
-
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
-
-    DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
-
-    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
-
-    DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
-
-    DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
-
-    printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
-
-    printf "\n\n  Correction is advised if the content exceeds the theoretical envelope"
-
-    if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
-
-      printColor "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
-
-      [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
-      
-    fi
-
-    # Check there is disk free space to make a backup  
-
-    if [[ "$DiskSize_Occupied" == *'MiB'* ]]; then DiskSize_GiB_OnDisk="1"
-
-    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" ; fi
-
-    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
-
-    DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
-
-    printf "\n\n"
-
-    if [[ $(bc <<< "$DiskSize_GiB_OnDisk < $DiskFreeGiB_OnHost") == "0" ]]; then
-
-      printColor " ERROR insufficient space on host drive"
-    
     else
 
-      printf "\n\n"
+      printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
 
-      if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
-      
-      elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
+      check_disk_is_okay  "$Selected_Drive" 
 
-      else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
+      if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n\n  Status:  %s"  "$DiskChkStatus" ; fi
+
+      [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+
+      DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
+
+      DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
+
+      DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
+
+      DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
+
+      if [[ $DiskChkStatus == "Okay" ]]; then
+
+        printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
+
+        printf "\n\n  Correction is advised if the content exceeds the theoretical envelope"
 
       fi
 
+      if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
+
+        printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
+
+        [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
+        
+      fi
+
+      # Check there is disk free space to make a backup  
+
+      if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
+
+      else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" ; fi
+
+      DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+
+      DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
+
+      if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
+
+        printColor "\n\n  WARNING: insufficient or very low space on host drive"
+      
+      else
+
+        printf "\n\n\n"
+
+        if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
+        
+        elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
+
+        else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
+
+        fi
+
+      fi
+      
+      printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
+
+      # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+
+      [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
+      printf "\n\n  A back-up will be made. All processes will remove any snapshots ...  [b] back to menu " 
+
     fi
-    
-    printf "\n\n  The virtual machine must not be running & *not* started elsewhere." 
-
-    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-
-    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-
-    printf "\n\n  Note: A back-up will be made but all processes will reduce ...  [b] back to menu " 
 
     DiskManage=
     printf "\n\n"
@@ -5679,7 +5719,7 @@ while true ; do
 
       fi
 
-      DiskDate="$(date +%b%d.%R)"
+      DiskDate="$(date +%b%d.%H.%M)"
 
       DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
     
@@ -5777,7 +5817,7 @@ while true ; do
     read -rp "  >  "  SnapTitle
     printf "\n\n"	
 
-    [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%R)"
+    [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
     
     if [[ $SnapTitle != "b" ]]; then 
     
