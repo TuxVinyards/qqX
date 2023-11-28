@@ -102,13 +102,13 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the latest bug fixes ....
+- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the very latest tweaks and bug fixes.
 
   No other software, support structures or dependancies are needed.
 
 - Extract the files & run the installer, usually right click, then run as program, or similar.
 
-  Further notes are in the installer script itself. Users of Non-Filesystem_Hierarchy_Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
+  Further notes are in the installer script itself. Users of Non Filesystem Hierarchy Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
 
 The installer does requires a default VM folder:
 
@@ -124,9 +124,9 @@ The installer does requires a default VM folder:
 
 When you know that everything is working correctly, you can start exploring ...
 
-- qqX will auto-detect if new releases are later available & quietly prompt for updates.
+- An auto-detector will tell you when new qqX releases are available.
 
-- The installer can be used to update, reinstall, uninstall or reconfigure.
+- The qqX installer can be used to update, reinstall, uninstall or reconfigure.
 
 ### Installation Tips
 
