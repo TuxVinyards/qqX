@@ -5040,7 +5040,7 @@ while true ; do
 
       printf "   [del] delete selected VM"
 
-      printColor  "    [u]   hide utils & technical"
+      printColor  "    [u]   hide utils & technical \n"
 
       printf "\n"
 
@@ -5056,23 +5056,25 @@ while true ; do
       else echo; echo "  Default_SDL_ScreenPercent:  not set" ; fi
 
 
+      printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
+
+      printf "\n\n  [2] create a second  [3] a shared  > virtual hard-drive \n"
+
+
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
 
       else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi
 
-      printf "   [tune] config tune-up wizard"
+      printf  "   [xa]  edit extra qemu args  "
 
-
-      printf  "\n\n  [xa]  edit extra qemu args   [m] msrs help   [2] create a second  [3] a shared  > virtual hard-drive"
     
-      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record   [disk]  Resize or Repair existing drives"
+      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
     
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
 
       printf "\n"
 
     fi
-
 
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
 
