@@ -440,7 +440,7 @@ if [[ $XDG_QcowRightClick ]]; then
 fi
 
 
-# Function to create a list of preset VM locations 
+# Create a list of preset VM locations 
 
 function_create_VM_folderList() {
 
