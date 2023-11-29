@@ -1324,7 +1324,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
 
     { printf "\n#  qqX:  This file is NOT used by quickemu to run the VM but it will run it if the script is placed"
 
-      printf "\n\n#  in the calling folder, where the .conf file is located, and it is given execute permission ...\n\n"
+      printf "\n\n#  in the calling folder, where the .conf file is located, and if it is given execute permission ...\n\n"
     
     } >> "${VMDIR}/${VMNAME}.sh"
 
@@ -1409,7 +1409,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
 
           printf "\n\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
 
-          printf "\n\nin the calling folder, where the .conf file is located, and it is given execute permission ..."
+          printf "\n\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
 
         elif [[ "$Line" == *'/usr/bin/env bas'* ]]; then true
 
