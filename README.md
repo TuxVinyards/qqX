@@ -144,7 +144,7 @@ Please report any unnoticed errors. Also any difficulties you may have encounter
 
 ### Updating
 
-Make sure to use the installer script so that new features get added to your settings file. 
+Make sure to use the installer script so that new features get added to your settings file.
 
 All locations and preferences will be kept.
 
