@@ -2,7 +2,9 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Use the Github **code/clone** button for the very latest tweaks & bug fixes:
+Use the Github **code/clone** button for the very latest tweaks & bug fixes.
+
+Make sure to use the installer script for adding new features to your settings file.
 
 Qemu-img changing its disksize reporting has been sorted.
 
@@ -140,6 +142,12 @@ Multiple folders can help organise your distros. You can edit which VMs to show 
 
 Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community and can help make this software better for others.
 
+### Updating
+
+Make sure to use the installer script so that new features get added to your settings file. 
+
+All locations and preferences will be kept.
+
 ## Release notes
 
 Testing has been carried out on a variety of mainstream distros.
@@ -183,6 +191,16 @@ Also not forgetting some of the new pull requests making their way into quickemu
 Conversion between gnome boxes and quickemu is currently on the the todo list for version 2.2 (?)
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
+
+## Development
+
+You can easily run any new version of qqX directly from the working folder when making clones of the repo to your local machine.  By default, this will pick up the main settings file at `~/.qqX` and automatically locate all your current VMs.
+
+qqX has several layers of backup and fail safe, however do backup critical VMs if tinkering with these systems.
+
+You are recommended to place any development changes to the settings file into a single block so that they can be easily pasted back after carrying out release upgrades to your main qqX installation.
+
+Whilst the release installer will automatically backup your settings file, part of the update procedure is the removal of obsolete and unneeded lines. This will cause a temporary removal of any changes that you may have made.
 
 ## Bash
 
