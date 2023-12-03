@@ -5417,7 +5417,7 @@ while true ; do
 
       done
 
-      printColor "\n\n\n  Secure Download the tarball to: "
+      printColor "\n\n\n  Secure download the tarball neatly into its own sub-folder at: "
       
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
