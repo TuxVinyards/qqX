@@ -4368,9 +4368,9 @@ function_config_tune_up ()  {
 
   printf "\n\n  Quickemu will default to half, even quarter minimals ..."
 
-  printf "\n\n  Use around half if your host is to only stay quietly in the background."
+  printf "\n\n  For full screen VM, suggest RAM of around 2/3 total, round up/down to expected guest/host demand"
 
-  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Deduct about half of shared RAM, used for graphics"
+  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
   
   printf "\n\n  Integer values only.  Use programs such as 'htop' for further tuning."
 
@@ -4384,15 +4384,21 @@ function_config_tune_up ()  {
  
     elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
  
-    # suggest ram 2/3 (rounded down)
+    # suggest ram 2/3 plus half of shared graphics, if applicable,  rounded slightly down
 
     if [[ $Shared_RAM_Allocated ]]; then Suggested_RAM="$(bc <<< "scale=3; (($RAM_Available-($Shared_RAM_Allocated/2))/3*2) - 0.5")"
 
     else  Suggested_RAM="$(bc <<< "scale=3; ($RAM_Available/3*2) - 0.5")" ; fi
 
-    Suggested_RAM="$(bc <<< "scale=0; $Suggested_RAM /1" )"
+    printf "\n\n  Suggested RAM = %sG"  "$Suggested_RAM"        # raw
 
-    printf "\n\n  Suggested RAM = %sG"  "$Suggested_RAM"
+    printf -v Suggested_RAM_PF  "%.0f" "$Suggested_RAM"         # rounded up/down
+
+    Suggested_RAM="$(bc <<< "scale=0; $Suggested_RAM /1" )"     # rounded down
+
+    printf "\n\n  Suggested RAM (lower)  = %sG"  "$Suggested_RAM"
+
+    printf "\n\n  Suggested RAM (higher) = %sG"  "$Suggested_RAM_PF"
 
   fi
 
@@ -4404,14 +4410,14 @@ function_config_tune_up ()  {
 
     Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
  
-    [[ $Current_RAM != "$Suggested_RAM"  ]] && printColor "   [c] to use current  "
+    [[ $Current_RAM != "$Suggested_RAM_PF"  ]] && printColor "   [c] to use current  "
 
   fi
 
 
   RAM_SetNumber=
 
-  printColor "\n\n  [enter] use %s   [integer] choose   " "$Suggested_RAM"
+  printColor "\n\n  [enter] use %s   [integer] choose   " "$Suggested_RAM_PF"
  
   printColor "[d] to use quickemu defaults  [q] quit tune-up \n\n"
 
@@ -4433,7 +4439,7 @@ function_config_tune_up ()  {
 
   else
 
-    [[ $Suggested_RAM ]] &&  printf "ram=\"%sG\"\n"  "$Suggested_RAM"  >> "$TuneUpTargetDraft" 
+    [[ $Suggested_RAM_PF ]] &&  printf "ram=\"%sG\"\n"  "$Suggested_RAM_PF"  >> "$TuneUpTargetDraft" 
 
   fi
 
