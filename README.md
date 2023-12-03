@@ -4,6 +4,8 @@
 
 Use the Github **code/clone** button for the very latest tweaks & bug fixes.
 
+For updates, use the release downloader to neatly and securely place the tarball into its own release sub-folder.
+
 Make sure to use the installer script for adding new features to your settings file.
 
 Qemu-img changing its disksize reporting has been sorted.
