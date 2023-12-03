@@ -5494,9 +5494,13 @@ while true ; do
     if [[ $BetaTxReleasePoint ]]; then 
     
       printf "\n\n\n  Transitioning from beta to release ...  If required,"
-      printf "\n\n  Beta Notifications can be turned off in the general settings file"
+      printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
 
     fi
+
+    printColor "\n\n Use the installer script to quickly refresh and add new features to your settings file."
+
+    printf "\n\n  All option settings, locations and preferences will be kept."
 
     printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
 
