@@ -8,7 +8,7 @@ Make sure to use the installer script for adding new features to your settings f
 
 Qemu-img changing its disksize reporting has been sorted.
 
-Release 1.2.01 is a number boost to reflect other recent changes:
+Release 1.2.01 and 1.3.01 are both number boosts to reflect cumulative changes:
 
 Creation of first time snapshots has now been fixed.  
 
