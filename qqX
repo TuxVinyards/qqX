@@ -76,6 +76,12 @@
 #  shellcheck disable=SC2242
 
 
+##  Dev: set =1 to stop screen clears (and pause 1 sec), for easier fault tracing
+#   Set =integer for add longer pauses, "0.2" etc for less.
+
+NoClear=
+
+
 # This script:
 
 ModVersion="1.2.01"
@@ -176,6 +182,37 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 export "LC_NUMERIC=C"
 
 export "LC_COLLATE=C"
+
+
+if  [[ $NoClear ]]; then 
+
+	printf () {
+
+		# shellcheck disable=SC2199
+		# checks for occurence of the clearing pattern within the parameter text, treating the text as a single string
+
+		if [[ "$@" ==  '\033c'* ]]; then
+
+			# shellcheck disable=SC2124
+			# see http://www.tldp.org/LDP/abs/html/internalvariables.html#APPREF
+			# and http://mywiki.wooledge.org/BashGuide/Parameters#Special_Parameters_and_Variables
+
+			PFtext="$@"
+			PFtext=${PFtext//'\033c'/}			# remove all escape clears from the printf instruction
+      command echo
+      command echo "  ***************************************************************************"
+      sleep "$NoClear"
+			command printf "$PFtext"
+    else
+
+      # let all other printf commands through
+      command printf "$@"
+
+    fi
+
+	}
+
+fi
 
 
 if ! tput -V | grep -q ncurses 2> /dev/null; then
