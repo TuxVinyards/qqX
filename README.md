@@ -22,11 +22,11 @@ Several pre-release backportings from the development branch are now available.
 
 ## Why quickemu?
 
-Quickemu is simply built and easy to use.
+[Quickemu](https://github.com/quickemu-project/quickemu) is simply built and easy to use.
 
-It has an active community & is the only virtual machine manager that makes easy work of running Microsoft Windows.
+It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
-It's not without its flaws. But its flaws can be fixed & it can be made to work.
+It's not without its flaws. But its flaws can be fixed and it can be made to work.
 
 VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
 
@@ -36,13 +36,13 @@ The problems with Gnome Boxes are the problems. When it's working it's great. Bu
 
 ## Why qqX?
 
-[Quickemu](https://github.com/quickemu-project/quickemu) works on the command line & its menu interface has traditionally been  quickgui.
-
 qqX offers an alternative menu system that has far more functions & power. More even than quickemu.
 
 It has an easy installation. No additional software or dependancies are required.
 
-You can also keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to, and can switch between them at will.
+Quickemu works on the command line & its menu interface has traditionally been quickgui.
+
+You can keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to, and you can switch between them at will.
 
 Confident Linux users should quickly find themselves at home.
 
