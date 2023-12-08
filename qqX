@@ -4394,7 +4394,6 @@ function_config_tune_up ()  {
 
   fi
 
-
   printf "\n\n\n"
 
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
@@ -4405,10 +4404,10 @@ function_config_tune_up ()  {
 
   [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
   
-  printf "\n\n  Integer values only.  Use programs such as 'htop' for further tuning."
+  printf "\n\n  Integer values only. Possibly reduce if high quotas present.  \n\n  Use programs such as 'htop' for further tuning."
 
   if [[ $RAM_Available ]]; then
-  
+ 
     printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"  
     
     if [[ $Shared_RAM_Allocated ]]; then printColor "of which %sG is possibly allocated to graphics" "$Shared_RAM_Allocated"
@@ -4417,21 +4416,25 @@ function_config_tune_up ()  {
  
     elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
  
-    # suggest ram 2/3 plus half of shared graphics, if applicable,  rounded slightly down
+    # suggest around 2/3 of RAM (using around half of shared graphics) rounded as applicable
 
-    if [[ $Shared_RAM_Allocated ]]; then Suggested_RAM="$(bc <<< "scale=3; (($RAM_Available-($Shared_RAM_Allocated/2))/3*2) - 0.5")"
+    if [[ $Shared_RAM_Allocated ]]; then  RAM_ForCalcs="$(bc <<< "scale=3; ($RAM_Available-($Shared_RAM_Allocated/2))/1" )"
 
-    else  Suggested_RAM="$(bc <<< "scale=3; ($RAM_Available/3*2) - 0.5")" ; fi
+    else RAM_ForCalcs="$RAM_Available"
+    
+    fi
 
-    printf "\n\n  Suggested RAM = %sG"  "$Suggested_RAM"        # raw
+    RAM_Suggested_Lower="$(bc <<< "scale=3; (($RAM_ForCalcs /100)*55) /1" )"
 
-    printf -v Suggested_RAM_PF  "%.0f" "$Suggested_RAM"         # rounded up/down
+    RAM_Suggested_Higher="$(bc <<< "scale=3; (($RAM_ForCalcs /100)*65) /1" )"
 
-    Suggested_RAM="$(bc <<< "scale=0; $Suggested_RAM /1" )"     # rounded down
+    printf -v RAM_Suggested_Lower  "%.0f" "$RAM_Suggested_Lower"           # rounded up/down
 
-    printf "\n\n  Suggested RAM (lower)  = %sG"  "$Suggested_RAM"
+    printf -v RAM_Suggested_Higher  "%.0f" "$RAM_Suggested_Higher"         # rounded up/down
 
-    printf "\n\n  Suggested RAM (higher) = %sG"  "$Suggested_RAM_PF"
+    printf "\n\n  Suggested RAM (lower)  = %sG"  "$RAM_Suggested_Lower"
+
+    printf "\n\n  Suggested RAM (higher) = %sG"  "$RAM_Suggested_Higher"
 
   fi
 
@@ -4443,14 +4446,14 @@ function_config_tune_up ()  {
 
     Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
  
-    [[ $Current_RAM != "$Suggested_RAM_PF"  ]] && printColor "   [c] to use current  "
+    [[ $Current_RAM != "$RAM_Suggested_Higher"  ]] && printColor "   [c] to use current  "
 
   fi
 
 
   RAM_SetNumber=
 
-  printColor "\n\n  [enter] use %s   [integer] choose   " "$Suggested_RAM_PF"
+  printColor "\n\n  [enter] use %s   [integer] choose   " "$RAM_Suggested_Higher"
  
   printColor "[d] to use quickemu defaults  [q] quit tune-up \n\n"
 
@@ -4472,7 +4475,7 @@ function_config_tune_up ()  {
 
   else
 
-    [[ $Suggested_RAM_PF ]] &&  printf "ram=\"%sG\"\n"  "$Suggested_RAM_PF"  >> "$TuneUpTargetDraft" 
+    [[ $RAM_Suggested_Higher ]] &&  printf "ram=\"%sG\"\n"  "$RAM_Suggested_Higher"  >> "$TuneUpTargetDraft" 
 
   fi
 
