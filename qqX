@@ -5079,21 +5079,9 @@ while true ; do
 
       printf "   [del] delete selected VM"
 
-      printColor  "    [u]   hide utils & technical \n"
+      printColor  "    [u]   hide utils & technical"
 
       printf "\n"
-
-      if [[ $Q_Mod_SettingsFile ]] ; then echo; echo "  Using settings file $Q_Mod_SettingsFile" ;  fi
-
-      if [[ $SharedDriveArgs ]]; then echo; echo "  SharedDrive: $SharedDrive" ;  fi
-
-      if [[ $SecondDriveArgs ]]; then echo; echo "  SecondDrive: $SecondDrive" ;  fi
-
-
-      if [[ $Default_SDL_ScreenPercent ]]; then echo; echo "  Default_SDL_ScreenPercent: $Default_SDL_ScreenPercent  (Linux Only)" 
-
-      else echo; echo "  Default_SDL_ScreenPercent:  not set" ; fi
-
 
       printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
 
