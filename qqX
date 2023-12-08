@@ -235,23 +235,6 @@ if [[ ! -d "/tmp" ]]; then
 fi
 
 
-# Pre-empt some of quickemu's error messages. And @ 2023/10  add in experimental qemu-system options. (work in progress)   TODO 
-
-if [[ $QEMU_Default_SystemType ]]; then QEMU=$(command -v "$QEMU_Default_SystemType")
-
-else QEMU=$(command -v qemu-system-x86_64) ; fi    
-
-QEMU_IMG=$(command -v qemu-img)
-
-QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-
-if [[ ! $QEMU ]] || [[ ! $QEMU_IMG ]]; then
-  printf "\n\n QEMU not found. Check installations of qemu and qemu-img"
-  printf "\n\n If using the quickemu packaging this should normally have been installed."
-  sleep 5
-  exit 1
-fi
-
 
 if [[ $1 == "XDG" ]]; then 
 
@@ -749,6 +732,52 @@ if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]];
 else qqX_CurrentReleaseType="release"
 
 fi
+
+
+# Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
+
+# Sets defaults, if not given in main settings. But also for later, so systems can be swapped out.
+
+[[ ! $QEMU_Default_SystemType ]] &&  QEMU_Default_SystemType="qemu-system-x86_64"
+
+[[ ! $QEMU_Default_MachineType ]] &&  QEMU_Default_MachineType="q35"
+
+QEMU="$(type -p "$QEMU_Default_SystemType")"
+
+QEMU_IMG="$(type -p qemu-img)"
+   
+
+function qemu_version_check {
+
+  if [[ ! $QEMU ]] || [[ ! $QEMU_IMG ]]; then
+
+    printColor "\n\n QEMU not found. Check installations of qemu and qemu-img"
+    printf "\n\n If using the quickemu packaging this should normally have been installed.\n\n"
+    sleep 1
+    return
+
+  fi
+
+  QEMU_VER_LONG=$( "$QEMU" -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 )
+
+  QEMU_VER_SHORT="${QEMU_VER_LONG//./}"
+
+  QEMU_VER_SHORT="${QEMU_VER_SHORT:0:2}"
+
+  if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="61"
+
+  elif [[ $QEMU_VER_SHORT -lt 60 ]]; then
+
+    printf "\n\n QEMU 6.0.0 or newer is required. Current version is: %s"  "$QEMU_VER_LONG"
+    printf "\n\n Use overide in main settings to handle future errors from changes to Qemu numbering format\n\n"
+    sleep 1
+
+  fi
+
+}
+
+qemu_version_check
+
 
 
 ## General default title:
@@ -1469,20 +1498,6 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
     } >> "$QemuArgsFile"
 
 
-    ## Tested adding this from quickemu (with correction) for the '(c)' in the MacOS command:
-
-    # The OSK parameter contains parenthesis, they need to be escaped in the shell
-    # scripts. The vendor name, Quickemu Project, contains a space. It needs to be
-    # double-quoted.
-    #SHELL_ARGS="${args[*]}"
-    ##SHELL_ARGS="${SHELL_ARGS//\(/\\(}"  # code error here but in practice, in quickemu, it somehow works ...  REVIEW 
-    #SHELL_ARGS="${SHELL_ARGS//(/\\(}"
-    #SHELL_ARGS="${SHELL_ARGS//)/\\)}"
-    #SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
-
-    ## Not needed here.  Use args mod in the above for-loop instead.
-
-
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
 
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
@@ -1491,39 +1506,14 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
 
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
 
-
-    ## @ 2023/10  add in (experimental) Qemu system options  (work in progress)  TODO 
-
-    if grep -q -s 'QEMU_SystemType=' "$VM_Conf_File" ; then
-
-      eval "$(grep -s 'QEMU_SystemType=' "$VM_Conf_File")"
-
-      [[ $QEMU_SystemType ]] && QEMU="$QEMU_SystemType" 
-
-    elif [[ $QEMU_Default_SystemType ]]; then  
-
-      QEMU="$QEMU_Variant"
-
-    fi
-
             
     ## call QEMU  (with any extras, if present)
 
-    #  Remove '-D' switch error log  https://qemu.readthedocs.io/en/latest/system/invocation.html  > problematic
+    # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
 
     QemuErrorLog="${VMDIR}/${VMNAME}.qemu.error.log"
   
-    #"$QEMU  ${args[*]} $ExtraArgs  $SharedDriveArgs  $SecondDriveArgs"  2> "$QemuErrorLog" &  
-
-    #"$QEMU  ${SHELL_ARGS[@]}  $ExtraArgs  $SharedDriveArgs  $SecondDriveArgs"  2> "$QemuErrorLog" &  
-    
-    #"$QEMU  ${args[@]}  $ExtraArgs"  2> "$QemuErrorLog" &  
-
-    # This one:
-
     eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
-
-    # Control happens in 'function_KillPID_Menu'
 
   fi
   
@@ -5329,7 +5319,7 @@ while true ; do
 
     fi
 
-    printf  "  [q]  quit \n\n"
+    printf  "  [q]   quit \n\n"
 
     read -rp "  >  "  MainMenuChoice
 

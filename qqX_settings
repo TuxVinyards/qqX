@@ -103,6 +103,12 @@ FileManager=
 P_Kill_WaitSecs="6"
 
 
+##  Overide to handle future quickemu errors from changes to Qemu numbering format
+
+#   Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
+
+QemuShortVerOveride=
+
 
 ## EXTRA OPTIONS 
 
