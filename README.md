@@ -40,17 +40,17 @@ qqX offers an alternative menu system that has far more functions & power. More 
 
 It has an easy installation. No additional software or dependancies are required.
 
-Quickemu works on the command line & its menu interface has traditionally been quickgui.
+Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-You can keep the simplicity of [quickgui](https://github.com/quickemu-project/quickgui) if you want to, and you can switch between them at will.
-
-Confident Linux users should quickly find themselves at home.
+Worry not if [quickgui](https://github.com/quickemu-project/quickgui) is already installed on your system ... qqX is fully compatible and you can easily switch between the two.
 
 ### Why the text interface?
 
 Less is more:
 
 By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
+
+Confident Linux users should quickly find themselves at home.
 
 ### Work continues
 
@@ -110,7 +110,7 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 
   Further notes are in the installer script itself. Users of Non Filesystem Hierarchy Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
 
-The installer does requires a default VM folder:
+The installer does require a default VM folder:
 
 - If you have existing *quickemu* virtual machines, start qqX and edit the settings file to point to where they are.
 
