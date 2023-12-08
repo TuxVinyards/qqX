@@ -5157,8 +5157,17 @@ while true ; do
 
     printf "\n"
 
-
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
+
+    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then printColor "  [ql]  show qemu error log"
+
+    elif [[ $FileManager ]]; then 
+
+      if [[ $(type -p "$FileManager") ]]; then printf "   [f]  open VM folder in file manager"
+    
+      else  printColor "   [set]  ERROR file manager not found" ; fi
+
+    fi
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
     
@@ -5380,6 +5389,22 @@ while true ; do
   elif [[ $MainMenuChoice == "set" ]] ; then
 
     qqX_edit_settings
+
+  elif [[ $MainMenuChoice == "ql" ]] ; then
+
+    printf "\n\n"
+
+    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  cat "$QemuErrorLog"
+
+    else  printf "\n\n  No qemu errors were present on the last VM load ...  ?? " ; fi
+
+    printf "\n\n  [enter] to return \n\n"
+
+    read -rp "  >  "
+
+  elif [[ $MainMenuChoice == "f" ]] ; then
+
+    "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"
 
   elif [[ $MainMenuChoice == "dl" ]] ; then
 

@@ -87,11 +87,20 @@ VM_Select_ItemsPerLine="4"
 TextEditor=
 
 
+##  File Manager:
+
+#  Allows opening of the VM folder into new window, to view log files and contents (distro behaviour may vary)
+
+#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  Leave blank if not known. xdg-mime query default inode/directory may help.
+
+FileManager=
+
+
 ##  Time adjuster for pkill display. Adds a delay to allow background processes time to output to screen before showing kill dialog.
 
-#  Normal recommended integer = 10 to 20 secs   Adjust if your guest/host combo's find this too fast or slow.
+#  Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
 
-P_Kill_WaitSecs="10"
+P_Kill_WaitSecs="6"
 
 
 
