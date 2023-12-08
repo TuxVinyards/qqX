@@ -170,7 +170,9 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 # Make sure shell is set during session to decimal separator of dot 
 
-#  LC_ALL=C changes too much, just set the numeric.
+#  If LC_ALL=C changes too much, just set the numeric.   
+
+#  This may upset some input/output filters ....    CAUTION   (adjust in main settings)
 
 #  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
 
@@ -178,10 +180,14 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 #  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
 
+if [[ $AllowMoreLocale ]]; then
 
-export "LC_NUMERIC=C"
+  export "LC_NUMERIC=C"
+  export "LC_COLLATE=C"
 
-export "LC_COLLATE=C"
+else  export "LC_ALL=C"
+
+fi
 
 
 if  [[ $NoClear ]]; then 

@@ -212,11 +212,11 @@ SharedDrive=""
 
 # For VM compatibility reasons, different quickemu/quickget versions maybe be needed.    
 
-# D/L with 'wget  https://github.com/quickemu-project/quickemu/archive/refs/tags/4.7.zip' etc from a terminal opened in the target folder
+# D/L at:  https://github.com/quickemu-project/quickemu/releases  
 
-# These should all generally be workable. Also different get/emu release/custom versions should be usable together as well. 
+# Generally, different quickget/quickemu release/custom versions should be mix/matchable.  However, a structure
 
-# A general structure similar to quickemu 4.4 onwards is probably needed. Note that quickget will use quickemu to obtain a version number.
+# similar to quickemu 4.4 onwards is probably needed.  Also note that quickget will use quickemu to obtain a version number.
 
 # Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
 
@@ -238,6 +238,15 @@ Disable_qqX_upd_Checks=
 
 Hide_qqX_BetaUpdates=1
 
+
+
+## LOCALE
+
+#  Setting to =1  will increase the use of more locale-centric language/typeface features 
+
+#  BUT this may upset some input/output filters ....    CAUTION
+
+AllowMoreLocale=
 
 
 ## End of Settings
