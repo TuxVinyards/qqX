@@ -5272,7 +5272,7 @@ while true ; do
 
     fi
     
-    printf  "\n\n  [h]  show help & info   [set] open settings file in text editor   [conf] open .conf file"
+    printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] open .conf file"
 
     if [[ $ConfSettingsAdjusted ]]; then 
 
@@ -5310,7 +5310,7 @@ while true ; do
 
     else
 
-      [[ $qqX_UpdateAvail ]] &&  printColor "  [new] qqX update: %s %s is available " "$qqX_CurrentReleaseType" "$qqX_LatestRelease"
+      [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_CurrentReleaseType" "$qqX_LatestRelease"
 
     fi
 
@@ -5375,7 +5375,7 @@ while true ; do
 
     qqX_edit_settings
 
-  elif [[ $MainMenuChoice == "new" ]] ; then
+  elif [[ $MainMenuChoice == "dl" ]] ; then
 
     printf "\033c \n\n"
 
@@ -5385,11 +5385,13 @@ while true ; do
 
     if [[ $qqX_LatestTarBall ]] ; then
 
-      if [[ $qqX_Latest_Secure_TarBall ]]; then printColor "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
+      if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
 
-      else  printColor "\n\n  %s"  "$qqX_LatestTarBall"
+      else  printf "\n\n  %s"  "$qqX_LatestTarBall"
       
       fi
+
+      printf "\n"
 
       AboutRelease="$(grep -s 'body' "/tmp/latest-qqX")"
 
@@ -5399,9 +5401,9 @@ while true ; do
 
       AboutRelease="${AboutRelease//\"/}"
 
-      AboutRelease="${AboutRelease//'###'/}"
+      AboutRelease="${AboutRelease//'### '/}"
 
-      AboutRelease="${AboutRelease//'##'/}"
+      AboutRelease="${AboutRelease//'## '/}"
 
       AboutRelease="${AboutRelease//'\n'/}"
 
@@ -5413,24 +5415,23 @@ while true ; do
 
       for Line in "${AboutReleaseArray[@]}" ; do
 
-        printf "\n\n  %s"  "$Line" 
+        printColor "\n\n  %s"  "$Line" 
 
       done
 
-      printColor "\n\n\n  Secure download the tarball neatly into its own sub-folder at: "
+      printf "\n\n\n  Neatly download the release into its own sub-folder at: "
       
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
       
-        printColor "\n\n  [enter] Current/Default Folder  %s "  "$(pwd)" 
+        printColor "\n\n  [enter] Current/Default Folder  %s "  "$Default_VM_Folder" 
 
       else  
+
+        printf "\n\n  [c] Current Folder  %s "  "$(pwd)"  
         
-        printf "\n\n  [f] Default VM folder  %s"  "$Default_VM_Folder"
-
-        printColor "\n\n  [enter] Current Folder  %s "  "$(pwd)"  
-
+        printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
       fi 
 
     else
@@ -5448,11 +5449,11 @@ while true ; do
 
     if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads"
 
-    elif [[ $qqX_LatestTarBall_Folder == "f" ]]; then  qqX_LatestTarBall_Folder="$Default_VM_Folder"
+    elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)"
 
     elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder=
 
-    else qqX_LatestTarBall_Folder="$(pwd)"
+    else qqX_LatestTarBall_Folder="$Default_VM_Folder"
 
     fi
 
