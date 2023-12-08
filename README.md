@@ -2,21 +2,15 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Use the Github **code/clone** button for the very latest tweaks & bug fixes.
+Release 1.2.01 and 1.3.01 are both number boosts to reflect cumulative changes.
 
-For updates, use the release downloader to neatly and securely place the tarball into its own release sub-folder.
+The program's built-in downloader will neatly place releases into their own special sub-folder.
 
-Make sure to use the installer script for adding new features to your settings file.
+- Use the Github **code/clone** button for the very latest tweaks & bug fixes.
 
-Qemu-img changing its disksize reporting has been sorted.
+Several pre-release backportings from the development branch are now available.
 
-Release 1.2.01 and 1.3.01 are both number boosts to reflect cumulative changes:
-
-Creation of first time snapshots has now been fixed.  
-
-Same with no-start new distros from the config wizard not adding 'G' to the ram= line.  
-
-Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Picture of it working lower down, in the release notes section.  Disks can go wrong. 👍 Give it a try.
+- Make sure to use the installer script which will add needed features to your settings file.
 
 ### quickemu quickget X terminal project
 
@@ -75,6 +69,8 @@ Earlier releases have added:
 - configuration tune-up wizard
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
+
+Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Picture of it working lower down, in the release notes section.  Disks can go wrong. 👍 Give it a try.
 
 Plus:
 
@@ -172,21 +168,31 @@ Updates are now tidied into their own specific folders
 
 Tune up auto guidance has been improved.
 
+Qemu-img changing its disksize reporting has been sorted.
+
+Creation of first time snapshots has now been fixed.  
+
+Same with no-start new distros from the config wizard not adding 'G' to the ram= line.  
+
 The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested & developed. :rocket:
 
 Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
 
 ### Next release
 
-Work is now focusing on being able to: select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations.
+Work has been focusing on being able to select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations.
 
-This should offer an improvement in VM specfic tweakabilities.
+The ability to have on the fly switching from x86 to, for example aarch64 raspi3b, and others is workable but simpler methods are required, so that we don't take things outside the scope of the project.
 
-It should also offer on the fly switching from x86 to, for example aarch64 raspi3b, and a host of others.  Expect a 'dev' branch to be released shortly.
+Several spin off features are now being backported instead. 
+
+A version 2 with machine swaps are being temporarily moved to the back burner until the backporting is complete.
 
 Note the disk health checker doing its thing, in the version 2 snap below.  Clusters repaired too ...  👍
 
 ![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
+
+Being able to autoinstall from any given random non-quickget ISO is on the wish list.
 
 Also not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
 
