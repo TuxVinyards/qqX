@@ -36,7 +36,7 @@ The problems with Gnome Boxes are the problems. When it's working it's great. Bu
 
 ## Why qqX?
 
-qqX offers an alternative menu system that has far more functions & power. More even than quickemu.
+qqX offers an alternative menu system that has far more power and many more functions. More even than quickemu.
 
 It has an easy installation. No additional software or dependancies are required.
 
