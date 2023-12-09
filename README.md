@@ -8,9 +8,9 @@ The program's built-in downloader will neatly place releases into their own spec
 
 - Use the Github **code/clone** button for the very latest tweaks & bug fixes.
 
-Several pre-release backportings from the development branch are now available.
+  Several pre-release backportings from the development branch are now available.
 
-- Make sure to use the installer script which will add needed features to your settings file.
+  Make sure to use the installer script which will add needed features to your settings file.
 
 ### quickemu quickget X terminal project
 
@@ -48,7 +48,7 @@ Worry not if [quickgui](https://github.com/quickemu-project/quickgui) is already
 
 Less is more:
 
-By using the same, less sophistcated, simple scripting language as quickemu, we can achieve complete script handling and far easier modding. qqX can beyond being a simple front-end that is restricted to the basic quickemu API.
+By using the same, less sophistcated, simple scripting language as quickemu, we can achieve complete script handling and far easier modding. qqX goes beyond being a simple front-end that is restricted to the basic quickemu API.
 
 Anything within quickemu can be pulled, shaped and improved. There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
