@@ -48,7 +48,9 @@ Worry not if [quickgui](https://github.com/quickemu-project/quickgui) is already
 
 Less is more:
 
-By using the same, less sophistcated, simple scripting language as quickemu, we can achieve far easier modding, editing & interaction ...  and thus a much more powerful interface. The qqX project benefits directly from all the quickemu community activity.
+By using the same, less sophistcated, simple scripting language as quickemu, we can achieve complete script handling and far easier modding. qqX can beyond being a simple front-end that is restricted to the basic quickemu API.
+
+Anything within quickemu can be pulled, shaped and improved. There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
 Confident Linux users should quickly find themselves at home.
 
@@ -174,19 +176,19 @@ Creation of first time snapshots has now been fixed.
 
 Same with no-start new distros from the config wizard not adding 'G' to the ram= line.  
 
-The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested & developed. :rocket:
+The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested and developed. :rocket:
 
 Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
 
 ### Next release
 
-Work has been focusing on being able to select different qemu machines, set individual custom quickemu scripts & set detailed vm specific configurations.
+Work has been focusing on being able to select different qemu machines, set individual custom quickemu scripts and set detailed vm specific configurations.
 
 The ability to have on the fly switching from x86 to, for example aarch64 raspi3b, and others is workable but simpler methods are required, so that we don't take things outside the scope of the project.
 
-Several spin off features are now being backported instead. 
+Several spin off features are now being backported instead.
 
-A version 2 with machine swaps are being temporarily moved to the back burner until the backporting is complete.
+A version 2 with machine swaps is being temporarily moved to the back burner until the backporting is complete.
 
 Note the disk health checker doing its thing, in the version 2 snap below.  Clusters repaired too ...  👍
 
