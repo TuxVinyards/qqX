@@ -4829,6 +4829,8 @@ MultiInstanceCount="$(pgrep -c "$ModName")"
 
 if [[ $MultiInstanceCount -gt 1 ]]; then 
 
+  tput sc
+
   printColor "\n\n  WARNING: more than one instance of %s appears to be running "  "$ModName"
 
   printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n\n"
@@ -4837,6 +4839,10 @@ if [[ $MultiInstanceCount -gt 1 ]]; then
 
   [[ $MultiQuit == "q" ]] && exit directly
 
+  tput rc ; tput ed
+
+  #  clear back the last lines to sc (set cursor)
+  
 fi
 
 if [[ "$(pgrep quickgui)" ]] ; then
