@@ -1303,6 +1303,9 @@ if [[ ! $(type -p "$QuickEmuSource") ]] ; then
 
 fi
 
+# Ignore first bits, bash check & locale preamble etc.  
+
+# QE starts into setting out the functions almost straight away.  
 
 QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QuickEmuSource" | cut -d ':' -f 1)
 
@@ -1319,20 +1322,30 @@ tail +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp
 source "/tmp/qmod-functions-temp" 
 
 
-# Quickemu Variables (set & clear)
+## Quickemu Variables (set & clear)
+
+#  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
 QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
 
 QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
 
 tail +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
+  
+# BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
 
-source "/tmp/qmod-qe-all-vars-temp"
+# with QEMU_IMG checker which has been replaced (at the start of qqX)
+
+# and the 3 strangely & unexplainedly read-only vars which need special treatment ...
+
+SpecialVarCheckArr=("LAUNCHER" "DISK_MIN_SIZE" "VERSION")
 
 
-# quickemu_vars have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
+# Separate the re-writeable vars   
 
-# create function to refresh the rewritables
+# NB not all vars are listed by the quickemu script ...  
+
+# Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
 
 QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
 
@@ -1340,17 +1353,29 @@ QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" 
 
 head -"$QE_rw_Vars_StartPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
 
-function clear_quickemu_vars {
 
-  source "/tmp/qmod-qe-rw-vars-temp"
+function clear_and_load_quickemu_vars {
+
+  source  "/tmp/qmod-qe-rw-vars-temp"
+
+  for SpecialLine in "${SpecialVarCheckArr[@]}"; do
+
+    SpecialLine="$(grep "${SpecialLine}=" "/tmp/qmod-qe-all-vars-temp")"
+
+    SpecialLine="${SpecialLine/'readonly '/}"
+
+    eval "$SpecialLine"
+
+  done
 
 }
 
-clear_quickemu_vars
+# just loads the vars here, but make this as a function so they can be re-sourced later too
+
+clear_and_load_quickemu_vars
 
 
-
-## Overwrite Original Functions Source, as required
+## OVERWRITE Original Functions Source, as required
 
 declare -f vm_boot  >  "/tmp/qmod-function-vm_boot-orig-temp"
 
@@ -1565,7 +1590,7 @@ function quickemu {
 
   # plus quickemu_vars have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
-  clear_quickemu_vars
+  clear_and_load_quickemu_vars
 
 
   ## Do a first check for amy qwrap internal commands 
