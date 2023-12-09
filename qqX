@@ -585,7 +585,7 @@ ExtraSetArgs="$ExtraArgs"
 
 #  Add default values, if none supplied
 
-[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="20"
+[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="6"
 
 P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
