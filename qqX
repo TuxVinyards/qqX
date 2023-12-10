@@ -84,7 +84,7 @@ NoClear=
 
 # This script:
 
-ModVersion="1.4.0.01"
+ModVersion="1.4.0.04"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -4981,6 +4981,8 @@ filter_and_flag_qemu_errors () {
         if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorExists= ; return ; fi
       done
     fi
+
+  else  QemuErrorExists=
     
   fi
 

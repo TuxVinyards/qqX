@@ -230,13 +230,13 @@ SharedDrive=""
 
 # @ 2023/12 Defaults: 
 
-# QemuErrorFilter=("gl_version 46")
+# QemuErrorFilter=("gl_version 46" "signal 15 from pid")
 
 # QemuErrorFilter+=("") 
 
 # New values may be added to the checking array here, double quote, space separated:
 
-QemuErrorFilter=("gl_version 46")
+QemuErrorFilter=("gl_version 46" "signal 15 from pid")
 
 
 
