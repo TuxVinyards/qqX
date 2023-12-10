@@ -1375,30 +1375,67 @@ function clear_and_load_quickemu_vars {
 clear_and_load_quickemu_vars
 
 
-## OVERWRITE Original Functions Source, as required
+  ## OVERWRITE ORIGINAL Functions Source, as required
 
-declare -f vm_boot  >  "/tmp/qmod-function-vm_boot-orig-temp"
+  declare -f vm_boot  >  "/tmp/qmod-function-vm_boot-orig-temp"
 
-# shellcheck disable=SC2016
+  # shellcheck disable=SC2016
 
-#QE_qemuCallPoint=$(grep -n -m 1 -e '${QEMU} "${args' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
+  QE_args_DeclarePoint=$(grep -n -m 1 -e 'local args=()' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
 
-QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
+  QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-orig-temp")
 
-QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-orig-temp")
+  QE_vm_bootCutOff=$((QE_vm_bootLength-QE_args_DeclarePoint+1))
 
-QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
+  #echo "QE_args_DeclarePoint  $QE_args_DeclarePoint  QE_vm_bootLength  $QE_vm_bootLength  QE_vm_bootCutOff  $QE_vm_bootCutOff"
 
-#echo "QE_qemuCallPoint  $QE_qemuCallPoint  QE_vm_bootLength  $QE_vm_bootLength  QE_vm_bootCutOff  $QE_vm_bootCutOff  "
+  head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-orig-temp"  >  "/tmp/qmod-function-vm_boot-interim-temp"
 
-declare -f vm_boot  | head -n -"$QE_vm_bootCutOff"  >  "/tmp/qmod-function-vm_boot-temp"
+
+# add-in CUSTOM VARS here, as replacement values, using same method as for the final boot section
+
+# no indent on 'cat' & EOV lines or it fails:
+
+cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
+
+    # Overide the quickemu default
+
+    [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
+
+    if [[ $QEMU_Default_SystemType ]]; then 
+    
+      printf "\n\n  QEMU_SystemType =  %s   QEMU_MachineType =  %s " "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile" 
+
+    fi
+
+EOV
+
+# no indent on 'cat' & EOV or it fails
+
+  # then continue with the remainder
+
+  tail +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
+
+
+  # shellcheck disable=SC2016
+
+  QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
+
+  QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-interim-temp")
+
+
+  QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
+
+  head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-interim-temp" >  "/tmp/qmod-function-vm_boot-new-temp"
+
+
 
 
 ## ADD-IN extra code  ( place between the first EOF line & the brace that closes the tail trimmed boot function, just before the second EOF)
 
 # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     ( NB use escape EOF, not quotes )
 
-cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
+cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     #  REVIEW can patching in $WinHyperV_RC  & creating a RC reader function be done here ??
 
@@ -1455,7 +1492,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
       # add extra spaces
       args[i]=" $a"
 
-      # add quotes
+      # add quotes - REVIEW ?? should be quoted, theoretically, but runs counter to quickemu
       # if [[ "$a" != -* ]]; then [[ "$a" != \'* ]] && args[i]='"'"$a"'"' ; fi
 
       ((i+=1))
@@ -1464,9 +1501,6 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-temp"
 
 
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt" 
-
-    # echo "${args[*]}" >> "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt" 
-
 
     [[ $ExtraArgs ]] && printf "\n\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
 
@@ -1546,14 +1580,14 @@ EOF
 
 ## Now add the modded boot code as the new function 'vm_boot'
 
-source "/tmp/qmod-function-vm_boot-temp"
+source "/tmp/qmod-function-vm_boot-new-temp"
 
 
 ## Add in the standard parameter cases 
 
 tail +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
 
-# note ' case' with space or grep picks up "Lowercase" on line 3
+# note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
 
 QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
 

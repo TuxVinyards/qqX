@@ -242,6 +242,19 @@ QE_Version=
 QG_Version= 
 
 
+## QEMU VERSION
+
+# Hardcoded quickemu default is 'qemu-system-x86_64' with machine 'q35'
+
+# For unexpected QEMU changes, system may be set here, if required.
+
+# At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options  
+
+QEMU_Default_SystemType=
+
+QEMU_Default_MachineType=  
+
+
 
 ##  qqX UPDATES
 
