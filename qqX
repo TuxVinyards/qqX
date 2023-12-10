@@ -4968,7 +4968,26 @@ function check_disk_is_okay {
 
 }
 
-# MAIN MENU  (select VM then choose actions to do)
+## filter for 'errors' that changes in QEMU might throw up and that we want to ignore  (see main settings)
+
+filter_and_flag_qemu_errors () {
+
+  if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
+
+    QemuErrorExists=1
+
+    if [[ "${QemuErrorFilter[*]}" ]]; then
+      for ErrChk in "${QemuErrorFilter[@]}"; do
+        if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorExists= ; return ; fi
+      done
+    fi
+    
+  fi
+
+}
+
+
+## MAIN MENU  (select VM then choose actions to do)
 
 while true ; do
 
@@ -5215,7 +5234,9 @@ while true ; do
 
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
-    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then printColor "  [ql]  show qemu error log"
+    filter_and_flag_qemu_errors
+
+    if [[ $QemuErrorExists ]] ; then printColor "  [ql]  show qemu error log"
 
     elif [[ $FileManager ]]; then 
 

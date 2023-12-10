@@ -100,6 +100,8 @@ FileManager=
 
 #  Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
 
+#  Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.2 on ... 
+
 P_Kill_WaitSecs="6"
 
 
@@ -220,6 +222,21 @@ SharedDrive=""
 
 #  SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
 
+
+
+## QEMU ERROR FILTER 
+
+# Add here any 'errors' that changes in QEMU might throw up and that we want to ignore 
+
+# @ 2023/12 Defaults: 
+
+# QemuErrorFilter=("gl_version 46")
+
+# QemuErrorFilter+=("") 
+
+# New values may be added to the checking array here, double quote, space separated:
+
+QemuErrorFilter=("gl_version 46")
 
 
 
