@@ -8,9 +8,17 @@ The program's built-in downloader will neatly place releases into their own spec
 
 - Use the Github **code/clone** button for the very latest tweaks & bug fixes.
 
-  Several pre-release backportings from the development branch are now available.
+  Several pre-release backportings from the development branch have been recently added.
+
+  Plus 7 more commits @ Dec 10  which now form **beta 1.4.0.04**
+
+  *This pre-release appears* ***very stable*** but as it has had quite a lot of under the hood changes, use caution.
+  
+  And possibly expect a couple of new smaller features to be added over the next few days too, before finalising (?)
 
   Make sure to use the installer script which will add needed features to your settings file.
+
+  For non-beta, download from the release page.  Also see the release notes towards end of this page.
 
 ### quickemu quickget X terminal project
 
