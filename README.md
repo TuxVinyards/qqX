@@ -10,11 +10,11 @@ The program's built-in downloader will neatly place releases into their own spec
 
   Several pre-release backportings from the development branch have been recently added.
 
-  Plus 7 more commits @ Dec 10  which now form **beta 1.4.0.04**
+  Plus 7 more commits @ Dec 10  which are now shaping out **beta 1.4.0.04**
 
   There have been quite a lot of under the hood changes but *this pre-release appears* ***very stable***.
   
-  Upd. @ Dec 15: Expect a couple of smaller features to be added over the next few days however, before finalising.
+  @ Dec 15, still a couple of smaller commits to be added over the next few days before finalising.
 
   Make sure to use the installer script which will add needed features to your settings file.
 
