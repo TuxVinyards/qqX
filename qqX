@@ -2876,12 +2876,12 @@ function_conf_error () {
 
   # clear any accidental initial double pressing of the enter key caused during error
 
-  read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.2 	
-  read -r -t 0.2  
-  read -r -t 0.2 	
+  read -r -t 0.1  
+  read -r -t 0.1  
+  read -r -t 0.1  
+  read -r -t 0.1	
+  read -r -t 0.1  
+  read -r -t 0.1 	
 
 
   printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
@@ -2900,6 +2900,7 @@ function_conf_error () {
 
     printf "  [enter] to view/edit settings file \n\n"
 
+
   elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
 
     printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
@@ -2908,17 +2909,30 @@ function_conf_error () {
 
     NewSetupFlag=1
 
-    # printf "\n\n  Continue to the next menu to create the qcow2 disk ..."
-
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     
     printColor "\n\n  [c] continue  (with current settings) looks okay "
 
     printf "\\n\n  [e] to edit %s general settings   [q] to quit \n\n"   "$ModName"
+
+    
+  elif [[ $1 == "folder" ]] ; then 
+
+    FolderConfigFlag=1
+
+    printf "\n  Folder config ERROR: "
+
+    printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
+    
+    printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
+
+    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit %s general settings " "$ModName"
+    
+    printf "\n\n  [q] to quit \n\n"   
     
   else   
   
-    printColor "\n\n  [Enter] to edit %s settings"  "$ModName" 
+    printColor "\n\n  [Enter] to edit %s general settings"  "$ModName" 
 
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
 
@@ -2941,14 +2955,11 @@ function_conf_error () {
     SelectArrayError=
     IgnoreFolderCheck=1
 
-    if [[ $ErrorMenuSelect == "c" ]]; then 
-
-      true
+    if [[ $ErrorMenuSelect == "c" ]]; then  true
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
-      if [[ $NewSetupFlag ]]; then qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
-      
+      if [[ $NewSetupFlag || $FolderConfigFlag ]]; then qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
 
     elif [[ $ErrorMenuSelect == "gt" ]]; then 
 
@@ -2960,23 +2971,13 @@ function_conf_error () {
  
   else  
   
-    if [[ $NewSetupFlag ]]; then 
+    if [[ $NewSetupFlag || $FolderConfigFlag ]]; then 
 
       NewSetupFlag=
-
-      #printf "\n\n  Remember, if not set, to enable starting via %s from the .conf file:"  "$ModName"
-
-      #printf "\n\n  #!/usr/bin/quickemu --vm   should become   #!/usr/bin/%s --vm  " "$ModName"
-
-      #printColor "\n\n  [enter] to continue \n\n"
-
-      #read -rp "  >  "
-    
+      FolderConfigFlag=
       qqX_edit_settings  "conf" 
       
-    else 
-    
-      qqX_edit_settings
+    else  qqX_edit_settings
     
     fi
     
@@ -3126,6 +3127,10 @@ function_scan_VM_folderList () {
       if [[ $VM_SettingsError ]]; then
 
         printColor "\n\n  ERROR in VM array general settings"
+
+        printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
+        
+        printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
 
         printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
 
