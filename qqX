@@ -3371,7 +3371,13 @@ function_Select_VM () {
 
       printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
-      printf "\n\n  [Enter]  to select %s (VM 0)"  "${VM_Array[0,1]}"
+      VM_Array_NameZero="${VM_Array[0,1]}"
+
+      VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
+
+      printColor "\n\n  [Enter]  "
+      
+      printf "%s  "  "${VM_Array_NameZero^^}"
 
     fi
 
