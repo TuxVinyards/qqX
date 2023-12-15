@@ -12,9 +12,9 @@ The program's built-in downloader will neatly place releases into their own spec
 
   Plus 7 more commits @ Dec 10  which now form **beta 1.4.0.04**
 
-  *This pre-release appears* ***very stable*** but as it has had quite a lot of under the hood changes, use caution.
+  There have been quite a lot of under the hood changes but *this pre-release appears* ***very stable***.
   
-  And possibly expect a couple of new smaller features to be added over the next few days too, before finalising (?)
+  Upd. @ Dec 15: Expect a couple of smaller features to be added over the next few days however, before finalising.
 
   Make sure to use the installer script which will add needed features to your settings file.
 
