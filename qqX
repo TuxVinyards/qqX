@@ -320,8 +320,8 @@ ExtraSetArgs="$ExtraArgs"
 P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
 #   Check custom QE & QG, plus set the 'quickget' version
-[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10
-[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10
+[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n  ERROR  custom quickemu not found \n  Re-check Installation &/or Installation instructions \n"  && sleep 10
+[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n  ERROR  custom quickget not found \n  Re-check Installation &/or Installation instructions \n"   && sleep 10
 QG_FilePathDefault="$(type -p quickget)"
 
 function quickget {
@@ -385,7 +385,7 @@ else
   fi
 fi
 
-printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
+printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n"  > "/tmp/qqX_nohup.txt"
 ##  START of new functions that may be used by the menu system (or by Mod API)
 #  GENERAL COLOR & THEMING   (see settings)
 [[ ! $X_Shade ]] &&  X_Shade="3"
@@ -864,9 +864,9 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ $SharedDriveArgs ]] && printf "\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
     [[ $SecondDriveArgs ]] && printf "\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
     if [[ $tpm == "on" ]]; then
-      printf "\n  Secure Boot:  %s \n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
     else
-      printf "\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
       printf "\n"  >> "$QemuArgsFile"
     if [[ $VerboseArgs ]]; then
@@ -890,7 +890,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
         else  printf "\n$Line"
         fi
       done
-      printf "\n"
+      printf "\n\n"
     } >> "$QemuArgsFile"
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
@@ -1145,10 +1145,10 @@ print_quickget_choices () {
 function_quick_get_wrap ()  {
   printf "\033c"
   if [[ $ModName_qqX ]]; then  function_qqX_printf_logo_title "$ModVersion"
-  else  printColor "\n\n  %s  ver %s"  "$ModName"  "$ModVersion"
+  else  printColor "\n  %s  ver %s"  "$ModName"  "$ModVersion"
   fi
   # shellcheck disable=SC2154
-  printf "  Wrapping quickget version %s  (needs internet, including for some menu items & for tests) \n\n\n" "$QG_VerNumber"
+  printf "  Wrapping quickget version %s  (needs internet, including for some menu items & for tests) \n\n" "$QG_VerNumber"
   tput sc
   echo
   echo "  Checking connections ..." ; echo
@@ -1179,7 +1179,7 @@ function_quick_get_wrap ()  {
     QGW_OS_ListString="${QGW_OS_ListRaw/'- Operating Systems: '/}"
     read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
     print_quickget_choices  "QGW_OS_Array"
-    printColor "\n\n\n  Give list NUMBER of OS name to select for download or to browse OS website  [b] to go back \n\n"
+    printColor "\n\n  Give list NUMBER of OS name to select for download or to browse OS website  [b] to go back \n"
     read -rp "  >  "  QGW_List_NumSelected
     if [[ $QGW_List_NumSelected == "b" ]]; then
       QGW_List_NumSelected=
@@ -1188,7 +1188,7 @@ function_quick_get_wrap ()  {
       [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_OS_Array[@]}"
       QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
       QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
-      printColor  "\n\n  Selected = %s "  "$QGW_OS_Arr_NameSelected"
+      printColor  "\n  Selected = %s "  "$QGW_OS_Arr_NameSelected"
       # OS HOME PAGES  could be pulled in variable quality from the download URL
       # However, and while, some of @zen0bit's and others work is available (@dec19/2023)
       # some is not  >  https://github.com/quickemu-project/quickemu/pull/864
@@ -1199,7 +1199,7 @@ function_quick_get_wrap ()  {
         printColor "Checking ...."
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
         QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
-        QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+        QGW_OS_HomePage="${QGW_OS_HomePage//'\"'/}"
         [[ $QGW_OS_HomePage ]] &&  printf "\n  HomePage = %s"  "$QGW_OS_HomePage"
         if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
         else printf " (site down or bad link)" ; printColor " ??" ; fi
@@ -1211,17 +1211,17 @@ function_quick_get_wrap ()  {
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
     while true ; do
       if [[ ! ${QGW_Releases_Array[*]} ]] ; then
-        printColor "\n\n  Quickemu or internet ERROR, no releases found "
+        printColor "\n  Quickemu or internet ERROR, no releases found "
       elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then
-        printColor "\n\n  [enter] to continue, only one current release found "
+        printColor "\n  [enter] to continue, only one current release found "
     else
       printf "\n"
       print_quickget_choices  "QGW_Releases_Array"
-        printColor "\n\n  Give LIST number of Release"
+        printColor "\n  Give LIST number of Release"
       fi
       if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then printf "\n  [w] to open listed web page with %s"  "$WebBrowser"
       else printf "\n" ; fi
-      printf "  [b] to go back \n\n"
+      printf "  [b] to go back \n"
       read -rp "  >  "  QGW_List_NumSelected
       if [[ $QGW_List_NumSelected == "b" ]]; then
         QGW_List_NumSelected=
@@ -1240,7 +1240,7 @@ function_quick_get_wrap ()  {
         break
       fi
     done
-    printColor  "\n\n  Selected = %s %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
+    printColor  "\n  Selected = %s %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
     #
     QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
     QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
@@ -1287,11 +1287,11 @@ function_quick_get_wrap ()  {
     QGW_Download_BadLink=
     if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
       if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n" ; fi
-      printf "  Checking download sources ... \n\n"
+      printf "  Checking download sources ... \n"
       quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
       cat "/tmp/qqX_get.test.iso.url.log"
       if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then
-        printColor "  ERROR  Bad link or server down ... \n\n"
+        printColor "  ERROR  Bad link or server down ... \n"
         QGW_Download_BadLink=1
       fi
     else printf "\n"
@@ -1371,14 +1371,14 @@ function_quick_get_wrap ()  {
       fi
     fi
     if [[ $QGW_Download_BadLink ]]; then
-      printColor "\n\n  [enter]  re-test the download link "
+      printColor "\n  [enter]  re-test the download link "
     else
       if [[ $QGW_OverWriteAllow ]];then
-        printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_DownLoadFolder"
+        printColor  "\n\n  Installation target folder:  %s"  "$QWG_DownLoadFolder"
         show_current_preset_folder_list
-        printf  "\n\n  [enter] Start the download  "
+        printf  "\n  [enter] Start the download  "
         printColor " ?? BACKUP > "
-      else  printColor  "\n\n  [enter] Start the download  "
+      else  printColor  "\n  [enter] Start the download  "
       fi
       if [[ ! $ZsyncDownload ]]; then
         if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
@@ -1386,7 +1386,7 @@ function_quick_get_wrap ()  {
         fi
       fi
     fi
-    printf " [h] help  [b] go back \n\n\n"
+    printf " [h] help  [b] go back \n\n"
     read -rp "  >  " QGW_DownloadStart
     printf "\n"
 
@@ -1421,7 +1421,7 @@ function_quick_get_wrap ()  {
         else
           if [[ $QGW_OverWrite ]]; then
             printf "  RECONFIRMATION is required  >>  %s"  "$QGW_DownloadName"
-            printColor " \n\n  ** may install with some kind of NAMING variance **  \n\n"
+            printColor " \n  ** may install with some kind of NAMING variance **  \n"
             QGW_OverWriteAllow=1
           else
             QGW_DownloadStart="start"
@@ -1461,8 +1461,8 @@ function_quick_get_wrap ()  {
     read -r -t 0.2
     read -r -t 0.2
     read -r -t 0.2
-    printColor "\n\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
-    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
+    printColor "\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
+    printColor "\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
     printf "\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
     printf "\n  Quickemu & downloader output: "
     ## Although quickget will run as a background process, quickget will then go on to run aria2 etc
@@ -2135,9 +2135,9 @@ qqX_edit_settings() {
     fi
   fi
   if [[ ! $(type -p "$TextEditor") ]]; then
-    printColor "\n\n  Unable to open settings.  Default or basic text editor not found."
+    printColor "\n  Unable to open settings.  Default or basic text editor not found."
     printf "\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
-    printf "\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
+    printf "\n  Settings location:  %s  \n  [enter] to return \n"  "$Q_Mod_SettingsFile"
     read -rp "  >  "
   else
     # Run the editor:
@@ -3007,9 +3007,9 @@ while true ; do
   elif [[ $MainMenuChoice == "dl" ]] ; then
     printf "\033c \n"
     function_qqX_printf_logo_title  "qqX updater"
-    printf "\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
+    printf "\n  https://github.com/TuxVinyards/qqX/releases/latest"
     if [[ ! $qqX_LatestTarBall ]] ; then
-      printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
+      printColor "\n  ERROR  No latest release found.  Reload & retry ..."
     else
       if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n  %s"  "$qqX_Latest_Secure_TarBall"
       else  printf "\n  %s"  "$qqX_LatestTarBall"
@@ -3024,9 +3024,9 @@ while true ; do
       AboutRelease="${AboutRelease//'\n'/}"
       AboutRelease="${AboutRelease//'\r'/}"
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
-      for Line in "${AboutReleaseArray[@]}" ; do  printColor "\n\n  %s"  "$Line"  ; done
+      for Line in "${AboutReleaseArray[@]}" ; do  printColor "\n  %s"  "$Line"  ; done
     fi
-    printf "\n\n"
+    printf "\n"
     while true ; do
       printf "  Neatly download the release into its own sub-folder at: "
       [[ -d "$HOME/Downloads" ]] && printf "\n  [d] Downloads folder  %s"  "$HOME/Downloads"
@@ -3038,7 +3038,7 @@ while true ; do
       fi
       printf "\n"
       [[ $WebBrowser ]] && printColor "  [w] to open qqX web page with %s"  "$WebBrowser"
-      printf "   or [b] to go back \n\n"
+      printf "   or [b] to go back \n"
     read -rp "  >  "  qqX_LatestTarBall_Folder
     printf "\n"
       if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
@@ -3086,7 +3086,7 @@ while true ; do
       exec  bash -c "./qqX_setup_and_install  Upgrade"
     fi
   sleep 0.6
-  cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
+  cd "$ReturnFolder"  || printColor "\n  ERROR  returning from qqX.releases folder"
     fi
   elif [[ $MainMenuChoice == "conf" ]] ; then
     qqX_edit_settings  conf
