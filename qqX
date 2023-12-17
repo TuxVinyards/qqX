@@ -3780,13 +3780,13 @@ qqX_edit_settings() {
   
     DefaultTextEditor="$(xdg-mime query default text/plain)"
 
-    EditorTest="${DefaultTextEditor/\/.desktop//}"
+    EditorTest="${DefaultTextEditor/.desktop/}"
 
     EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
 
     if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then
 
-      TextEditor="${DefaultTextEditor/.desktop/}"
+      TextEditor="$EditorTest"
 
     elif [[ $(type -p gedit) ]] ; then 
 
@@ -3808,16 +3808,19 @@ qqX_edit_settings() {
 
   fi
 
-  if [[ $(type -p "$TextEditor") ]]; then 
+  if [[ ! $(type -p "$TextEditor") ]]; then 
+
+    printColor "\n\n  Unable to find a default or basic text editor \n\n "
+
+    printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
+
+    printf "\n\n  Settings location:  %s  \n\n"  "$Q_Mod_SettingsFile"
+
+    read -rp "  [enter] to return >  "
+
+  else
 
     # Run the editor: 
-
-    # Note, these commands can throw a complaint if 'xapps' has not not been installed.
-    
-    # But works okay...  YMMV    Use: 2>/dev/null
-
-    # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
-
 
     if [[ $1 == "conf" ]]; then
 
@@ -3880,15 +3883,9 @@ qqX_edit_settings() {
      
     fi
 
-  else
-
-    printColor "\n\n  Unable to find a default or basic text editor \n\n "
-
-    printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
-
-    printf "\n\n  Settings location:  %s  \n\n"  "$Q_Mod_SettingsFile"
-
-    read -rp "  [enter] to return >  "
+    # Note, these commands can throw a complaint if 'xapps' has not not been installed.
+    # But they otherwise work. Quieten with '2>/dev/null' ...
+    # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
 
   fi
 
