@@ -181,6 +181,7 @@ if [[ $1 != "Upgrade" ]]; then
   else
     printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu "
   fi
+fi
 
 fi
 
