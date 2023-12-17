@@ -91,16 +91,35 @@ TextEditor=
 
 #  Allows opening of the VM folder into new window, to view log files and contents (distro behaviour may vary)
 
-#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  Leave blank if not known. xdg-mime query default inode/directory may help.
+#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  if  menu options are not showing. 
+
+#  Terminal command  'xdg-mime query default inode/directory' may help.
+
+#  May be left blank, if not known. Popular names (above) will be auto-checked by default.   
 
 FileManager=
+
+
+##  Web Browser:
+
+#  Allows opening of VM homepages and other URL's  (distro behaviour may vary).
+
+#  Known issue  https://discourse.ubuntu.com/t/firefox-snap-testing-2021-2022/24663/93
+
+#  Give quoted name eg  firefox, google-chrome, etc  if  menu options are not showing.  
+
+#  Terminal command 'xdg-settings get default-web-browser' may help.
+
+#  May be left blank, if not known. Popular names (above) will be auto-checked by default.   
+
+WebBrowser=
 
 
 ##  Time adjuster for pkill display. Adds a delay to allow background processes time to output to screen before showing kill dialog.
 
 #  Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
 
-#  Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.2 on ... 
+#  Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ... 
 
 P_Kill_WaitSecs="6"
 
