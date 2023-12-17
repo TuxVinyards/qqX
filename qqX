@@ -3810,13 +3810,13 @@ qqX_edit_settings() {
 
   if [[ ! $(type -p "$TextEditor") ]]; then 
 
-    printColor "\n\n  Unable to find a default or basic text editor \n\n "
+    printColor "\n\n  Unable to open settings.  Default or basic text editor not found."
 
     printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
 
-    printf "\n\n  Settings location:  %s  \n\n"  "$Q_Mod_SettingsFile"
+    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
 
-    read -rp "  [enter] to return >  "
+    read -rp "  >  "
 
   else
 
