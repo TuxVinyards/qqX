@@ -1,320 +1,168 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
+#   licence:  GPL3   https://www.gnu.org/licenses
 
-# 	licence:  GPL3   https://www.gnu.org/licenses 
-
-
-## Settings file for qqX - quickemu quickget X terminal project 
-
+## Settings file for qqX - quickemu quickget X terminal project
 # qqX installer will create a hidden folder at $HOME to also contain the desktop icons & will place the settings here.
-
 # Usually ctrl-h to unhide/hide in the files in the file manager
-
 # Settings may be opened (hidden or not) and edited from within the scripts via a menu selector.
+# shellcheck disable=SC2034,SC2154
 
-
-# shellcheck disable=SC2034,SC2154   
-
-
-## SET THE DEFAULT VM FOLDER, where the Virtual Machines are normally found. 
-
-#  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate. 
-
+## SET THE DEFAULT VM FOLDER, where the Virtual Machines are normally found.
+#  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate.
 Default_VM_Folder="$HOME/VMQs"
 
-
 # ADD any EXTRA FOLDERS or sub folders where VM's may be located:
-
-# leave blank for none, or set one entry per folder as +=("/filepath/folder") 
-
+# leave blank for none, or set one entry per folder as +=("/filepath/folder")
+Extra_VM_Folder+=("")
+Extra_VM_Folder+=("")
 Extra_VM_Folder+=("")
 
-Extra_VM_Folder+=("")
-
-Extra_VM_Folder+=("")
-
-
-##  ADD SELECTED VM's to show AT THE TOP of the list to the section below:  
-
-#  Where [n,0] is the discrete VM folder  &  [n,1] is the .conf file  
-
-#  CONTIGIUOUS, non-sparse with non-present VM entries commented out  
-
+##  ADD SELECTED VM's to show AT THE TOP of the list to the section below:
+#  Where [n,0] is the discrete VM folder  &  [n,1] is the .conf file
+#  CONTIGIUOUS, non-sparse with non-present VM entries commented out
 #  eg:
-
 # VM_Array[0,0]="/media/xxx/Storage/VMQs" ; VM_Array[0,1]="windows-11.conf"
-
 # VM_Array[1,0]="/media/xxx/Storage/VMQs" ; VM_Array[1,1]="windows-insider.conf"
-
 # VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="macos-catalina.conf"
-
-
 # ADD here:
-
 # VM_Array[0,0]="$Default_VM_Folder" ; VM_Array[0,1]=""
-
 # VM_Array[1,0]="$Default_VM_Folder" ; VM_Array[1,1]=""
-
 # VM_Array[2,0]= ; VM_Array[2,1]=
-
-
 # MUST BE set as CONTIGIUOUS, non-sparse, no gaps.
-
 # Non-Present VM entries MUST be either COMMENTED OUT with # or deleted
 
-
-##  GENERAL COLOR & THEMING  
-
-X_Shade="3" 
-
+##  GENERAL COLOR & THEMING
+X_Shade="3"
 #  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1
-
 #  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 
-
-##  VM Selector:  
-
-#   Normally the first opening menu, used to select VM's.  Recommended use = 1 if few VMs. Otherwise = 4 per line. 
-
+##  VM Selector:
+#   Normally the first opening menu, used to select VM's.  Recommended use = 1 if few VMs. Otherwise = 4 per line.
 VM_Select_ItemsPerLine="4"
 
-
-##  TEXT EDITOR  
-
-#  Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor eg. gedit, pluma ... 
-
+##  TEXT EDITOR
+#  Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor eg. gedit, pluma ...
 TextEditor=
 
-
 ##  File Manager:
-
 #  Allows opening of the VM folder into new window, to view log files and contents (distro behaviour may vary)
-
-#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  if  menu options are not showing. 
-
+#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  if  menu options are not showing.
 #  XDG default is checked first, then popular names (above).  Terminal command  'xdg-mime query default inode/directory' may help.
-
 #  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
-
 FileManager=
 
-
 ##  Web Browser:
-
 #  Allows opening of VM homepages and other URL's  (distro behaviour may vary).
-
 #  Known issue  https://discourse.ubuntu.com/t/firefox-snap-testing-2021-2022/24663/93
-
-#  Give quoted name eg  firefox, google-chrome, falkon etc  if  menu options are not showing.  
-
+#  Give quoted name eg  firefox, google-chrome, falkon etc  if  menu options are not showing.
 #  XDG default is checked first, then popular names (above).  Terminal command 'xdg-settings get default-web-browser' may help.
-
 #  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
-
 WebBrowser=
 
-
 ##  Time adjuster for pkill display. Adds a delay to allow background processes time to output to screen before showing kill dialog.
-
 #  Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
-
-#  Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ... 
-
+#  Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ...
 P_Kill_WaitSecs="6"
 
-
 ##  Overide to handle future quickemu errors from changes to Qemu numbering format
-
 #   Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
-
 QemuShortVerOveride=
 
+## EXTRA OPTIONS
+#  Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.
+#  Set blank for log file only. In menu toggle also available. (A log file is always outputted to the VM's main folder)
+VerboseArgs=
 
-## EXTRA OPTIONS 
-
-#  Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.  
-
-#  Set blank for log file only. In menu toggle also available. (A log file is always outputted to the VM's main folder) 
-
-VerboseArgs= 
-
-
-#  Set =1 for more prompting.  Standard prompting will be less active in warning situations.  
-
+#  Set =1 for more prompting.  Standard prompting will be less active in warning situations.
 #  Setting MSR_Warnings to =1 will unhide minor warnings on the standard (non technical) interface
-
 MSR_Warnings=
-
 Verbose_MSR_dialog=
 
-
-
-## File for default KVM behaviour for unhandled machine-specific registers. 
-
-#  Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently. 
-
+## File for default KVM behaviour for unhandled machine-specific registers.
+#  Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently.
 #  quickemu / qwrap / qqX  default is "/etc/modprobe.d/kvm-quickemu.conf"
-
 KVM_MSR_ModProbeFile=
 
-
-
 ##  EXTRA * QEMU * ARGS may be added here, if normally required. Also add ad hoc via the main menu.
-
-#  Format = "group quoted" with single-space separated elements eg:  ExtraArgs="-device tpm-tis,tpmdev=tpm0" 
-
+#  Format = "group quoted" with single-space separated elements eg:  ExtraArgs="-device tpm-tis,tpmdev=tpm0"
 #  See  https://qemu.readthedocs.io/en/latest/system/invocation.html
-
 ExtraArgs=
 
-
-##  EXTRA * quickemu * PARAMETERS to be used at VM run time  
-
-#  Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--screen 0" 
-
-#  See quickemu --help for full list   NB  not all options can be applicable  CAUTION 
-
+##  EXTRA * quickemu * PARAMETERS to be used at VM run time
+#  Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--screen 0"
+#  See quickemu --help for full list   NB  not all options can be applicable  CAUTION
 #  Of note:  "--full-screen" only works with spice display ...  &&  will overide --screenpct
-
 #  DUAL DISPLAY  users should set "--screen 0" or "--screen 1" to select the monitor
-
 #  See quickemu project main page for more details: https://github.com/quickemu-project/quickemu
-
 Extra_QE_Params=
 
-
-
-##  DEFAULT load up SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Leave blank for none. 
-
+##  DEFAULT load up SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Leave blank for none.
 #  From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
-
 #  Extra_QE_Params, not needed.
-
 Default_SDL_ScreenPercent="68"
 
-
-## Individual SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"  
-
+## Individual SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"
 
 ## HEADLESS commands may be set using Extra_QE_Params using "--display none"  BUT
-
-#  to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file 
-
+#  to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file
 #  An SSH connection will need to be set.   See: https://github.com/quickemu-project/quickemu#headless
 
-
-
 ##  SHARED or SECOND DRIVE  (auto-create in qqX via the utils menu)
-
 #  The Shared drive is a useful when in SDL mode & available to all VMs.
-
 #  A Second drive is a quick way to expand an individual VM's storage.
-
-#  Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount. 
-
-
+#  Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount.
 #  SET SecondDrive as RELATIVE to .conf folder as ="My_VM/disk2.qcow2" IN THE .CONF FILE for extra disk drive.
-
-#  Give SharedDrive *full* location here  eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   
-
+#  Give SharedDrive *full* location here  eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"
 SharedDrive=""
 
-
 #  For MS Windows, the drive should be set as GPT & formatted as NTFS. The process should carried out by a Linux OS.
-
-
-#  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
-
+#  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release"
 #  Any OS older than and including 10.13 Mojave 2018 *might* need a flag IN THE .CONF FILE to stop possible drive conflicts.
-
 #  Quickemu code has the following note: "VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)"
-
 #  Development tests with Mojave show both a Shared NTFS and a Second APFS to be working.
-
 #  SET MacLegacyDrive as ="true" to load Second Drive (& not Shared) as 'ide-hd' instead of 'virtio-blk-pci'
-
-#  SharedDrive always loads as 'virtio-blk-pci'  
-
+#  SharedDrive always loads as 'virtio-blk-pci'
 #  See https://en.wikipedia.org/wiki/MacOS_version_history
-
-
 #  SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
 
-
-
-## QEMU ERROR FILTER 
-
-# Add here any 'errors' that changes in QEMU might throw up and that we want to ignore 
-
-# @ 2023/12 Defaults: 
-
+## QEMU ERROR FILTER
+# Add here any 'errors' that changes in QEMU might throw up and that we want to ignore
+# @ 2023/12 Defaults:
 # QemuErrorFilter=("gl_version 46" "signal 15 from pid")
-
-# QemuErrorFilter+=("") 
-
+# QemuErrorFilter+=("")
 # New values may be added to the checking array here, double quote, space separated:
-
 QemuErrorFilter=("gl_version 46" "signal 15 from pid")
 
-
-
 ## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
-
-# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.    
-
-# D/L at:  https://github.com/quickemu-project/quickemu/releases  
-
+# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.
+# D/L at:  https://github.com/quickemu-project/quickemu/releases
 # Generally, different quickget/quickemu release/custom versions should be mix/matchable.  However, a structure
-
 # similar to quickemu 4.4 onwards is probably needed.  Also note that quickget will use quickemu to obtain a version number.
-
 # Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
-
-# LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
-
-QE_Version=                 
-
-QG_Version= 
-
+# LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42"
+QE_Version=
+QG_Version=
 
 ## QEMU VERSION
-
 # Hardcoded quickemu default is 'qemu-system-x86_64' with machine 'q35'
-
 # For unexpected QEMU changes, system may be set here, if required.
-
-# At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options  
-
+# At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options
 QEMU_Default_SystemType=
-
-QEMU_Default_MachineType=  
-
-
+QEMU_Default_MachineType=
 
 ##  qqX UPDATES
-
 #   Checks quietly for new GitHub releases (set =1 if not required)
-
 Disable_qqX_upd_Checks=
-
 #   Un Hide beta releases  (when checking is enabled)  Default =1  hide
-
 Hide_qqX_BetaUpdates=1
 
-
-
 ## LOCALE
-
-#  Setting to =1  will increase the use of more locale-centric language/typeface features 
-
+#  Setting to =1  will increase the use of more locale-centric language/typeface features
 #  BUT this may upset some input/output filters ....    CAUTION
-
 AllowMoreLocale=
 
-
 ## End of Settings
-
 # https://code.visualstudio.com/
-
 # vim:tabstop=2:shiftwidth=2:expandtab
