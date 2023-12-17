@@ -306,9 +306,7 @@ else
       read -rp "  >  "
       exit 1
     fi
-
   fi
-
 fi
 
 ##  DESKTOP LAUNCHER
@@ -486,7 +484,6 @@ if [[ ! $SkipMkLauncher ]]; then
     # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
     #  REVIEW   Different distros have different setups.
   fi
-
 fi
 
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
