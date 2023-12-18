@@ -84,7 +84,7 @@ NoClear=
 
 # This script:
 
-ModVersion="1.4.0.04"
+ModVersion="1.4.0.05"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -675,6 +675,7 @@ if [[ ! $WebBrowser ]]; then
 
 fi
 
+printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
 
 
 ##  START of new functions that may be used by the menu system (or by Mod API)
@@ -5520,7 +5521,11 @@ while true ; do
 
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    if [[ $qqX_LatestTarBall ]] ; then
+    if [[ ! $qqX_LatestTarBall ]] ; then
+
+      printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
+
+    else 
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
 
@@ -5531,32 +5536,25 @@ while true ; do
       printf "\n"
 
       AboutRelease="$(grep -s 'body' "/tmp/latest-qqX")"
-
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
-
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
-
       AboutRelease="${AboutRelease//\"/}"
-
       AboutRelease="${AboutRelease//'### '/}"
-
       AboutRelease="${AboutRelease//'## '/}"
-
       AboutRelease="${AboutRelease//'\n'/}"
-
       AboutRelease="${AboutRelease//'\r'/}"
 
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
 
-      # declare -p AboutReleaseArray
+      for Line in "${AboutReleaseArray[@]}" ; do  printColor "\n\n  %s"  "$Line"  ; done
 
-      for Line in "${AboutReleaseArray[@]}" ; do
+    fi
 
-        printColor "\n\n  %s"  "$Line" 
+    printf "\n\n\n"
 
-      done
+    while true ; do
 
-      printf "\n\n\n  Neatly download the release into its own sub-folder at: "
+      printf "  Neatly download the release into its own sub-folder at: "
       
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
@@ -5569,100 +5567,115 @@ while true ; do
         printf "\n\n  [c] Current Folder  %s "  "$(pwd)"  
         
         printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
+
       fi 
 
+      printf "\n\n"
+
+      [[ $WebBrowser ]] && printColor "  [w] to open qqX web page in %s"  "$WebBrowser"
+
+      printf "   or [b] to go back \n\n"
+
+      read -rp "  >  "  qqX_LatestTarBall_Folder
+
+      printf "\n\n"
+
+
+      if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
+
+      elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
+
+      elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
+     
+        nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
+
+        # https://unix.stackexchange.com/questions/103483/opening-firefox-from-terminal#103486
+
+        # > "/tmp/qqX_nohup.txt" handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc ....
+
+      elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
+
+      else qqX_LatestTarBall_Folder="$Default_VM_Folder" ; break
+
+      fi
+
+    done
+
+    if [[ $qqX_NoReleaseDL ]]; then 
+
+      qqX_NoReleaseDL=
+
     else
 
-      printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
+      # each release to its own folder makes things tidier
 
-    fi
+      qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
 
-    printf "\n\n  or [b] to go back \n\n"
-
-    read -rp "  >  "  qqX_LatestTarBall_Folder
-
-    printf "\n\n"
+      mkdir -p "$qqX_LatestTarBall_Folder"
 
 
-    if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads"
+      # record where to come back to, when done
 
-    elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)"
-
-    elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder=
-
-    else qqX_LatestTarBall_Folder="$Default_VM_Folder"
-
-    fi
-
-    # each release to its own folder makes things tidier
-
-    qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
-
-    mkdir -p "$qqX_LatestTarBall_Folder"
+      ReturnFolder="$(pwd)"
 
 
-    # record where to come back to, when done
-
-    ReturnFolder="$(pwd)"
+      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
 
 
-    cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
+      if [[ $qqX_Latest_Secure_TarBall ]]; then
+        
+        wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
 
+        wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
 
-    if [[ $qqX_Latest_Secure_TarBall ]]; then
+        SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
+
+        printColor "\n  SHA256 Check: %s "  "$SHA_Check"
+
+        [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
       
-      wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+      else
 
-      wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
+        wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
 
-      SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
+      fi
 
-      printColor "\n  SHA256 Check: %s "  "$SHA_Check"
+      printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
 
-      [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
-    
-    else
+      if [[ $BetaTxReleasePoint ]]; then 
+      
+        printf "\n\n\n  Transitioning from beta to release ...  If required,"
+        printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
 
-      wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+      fi
 
-    fi
+      printColor "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
 
-    printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
+      printf "\n\n  All option settings, locations and preferences will be kept."
 
-    if [[ $BetaTxReleasePoint ]]; then 
-    
-      printf "\n\n\n  Transitioning from beta to release ...  If required,"
-      printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
+      printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
 
-    fi
+      read -rp "  >  "  qqX_UpdateExit
 
-    printColor "\n\n Use the installer script to quickly refresh and add new features to your settings file."
+      if [[ $qqX_UpdateExit != "r" ]]; then 
 
-    printf "\n\n  All option settings, locations and preferences will be kept."
+        # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
 
-    printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
+        tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
 
-    read -rp "  >  "  qqX_UpdateExit
+        cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
 
-    if [[ $qqX_UpdateExit != "r" ]]; then 
+        # move current execution away from this script and to the installer
 
-      # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
+        exec  bash -c "./qqX_setup_and_install  Upgrade" 
 
-      tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
+      fi
 
-      cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+      sleep 0.6
 
-      # move current execution away from this script and to the installer
-
-      exec  bash -c "./qqX_setup_and_install  Upgrade" 
+      cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
 
     fi
-
-
-  sleep 0.6
-
-  cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
-
 
   elif [[ $MainMenuChoice == "conf" ]] ; then
 

@@ -106,7 +106,7 @@ FileManager=
 
 #  Known issue  https://discourse.ubuntu.com/t/firefox-snap-testing-2021-2022/24663/93
 
-#  Give quoted name eg  firefox, google-chrome, etc  if  menu options are not showing.  
+#  Give quoted name eg  firefox, google-chrome, falkon etc  if  menu options are not showing.  
 
 #  Terminal command 'xdg-settings get default-web-browser' may help.
 
