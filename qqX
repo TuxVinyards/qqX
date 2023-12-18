@@ -122,7 +122,6 @@ if ! tput -V | grep -q ncurses 2> /dev/null; then
   sleep 5
   exit 1
 fi
-
 if [[ ! -d "/tmp" ]]; then
   printf "\n\n  Check for your OS >  \n\n  A directory '/tmp' should be present. A symbolic link may be needed. "
   printf "\n\n  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard"
@@ -345,14 +344,12 @@ if [[ ! $(type -p curl) ]] ; then
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
-
 if [[ ! $(type -p aria2c) ]]; then
   echo
   echo "  You need to install 'aria2' to run parts of the quickget script ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
-
 if [[ ! $(type -p zsync) ]]; then
   echo
   echo "  You need to install 'zsync' to run parts of the quickget script ..."
