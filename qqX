@@ -5511,7 +5511,11 @@ while true ; do
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
-    "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"
+    nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
+
+    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
+    
+    #  As from 'WebBrowser' section and handling of firefox etc
 
   elif [[ $MainMenuChoice == "dl" ]] ; then
 
