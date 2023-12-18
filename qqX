@@ -3876,7 +3876,7 @@ qqX_edit_settings() {
 
         else
 
-          "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  2> /dev/null 
+          nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
 
           ConfSettingsAdjusted=1
 
@@ -3894,15 +3894,15 @@ qqX_edit_settings() {
 
       read -rp "   >   "
 
-      "$TextEditor" "$New_VM_File"  2> /dev/null     
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"     
       
     elif [[ $1 == "tune-up" ]]; then
 
-      "$TextEditor" "$TuneUpTargetDraft"  2> /dev/null 
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft"  
 
     else 
 
-      "$TextEditor" "$Q_Mod_SettingsFile"  2> /dev/null 
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$Q_Mod_SettingsFile"  
 
       SettingsFileAdjusted=1
 
@@ -3915,8 +3915,12 @@ qqX_edit_settings() {
     fi
 
     # Note, these commands can throw a complaint if 'xapps' has not not been installed.
-    # But they otherwise work. Quieten with '2>/dev/null' ...
     # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
+
+    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of gtk2 and gtk3 etc ....  
+    #  As from 'WebBrowser' section and handling of firefox etc
+
+    # NB  don't set to run in background, as the web browser does, as qqX needs to take the new settings 
 
   fi
 
