@@ -591,24 +591,34 @@ P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
 
 
-#   Check and set the 'quickget' version, which is used in isolated wrapping mode.
+#   Check custom QE & QG, plus set the 'quickget' version
 
-#   Quickemu gets absorb wrapped & uses the internal var "$VERSION" as its ref, so use that.
+[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
 
-[[ $QE_Version ]] && [[ ! $(type -p "$QE_Version") ]] &&  printf "\n\n  ERROR  quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
+[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
 
-[[ $QG_Version ]] && [[ ! $(type -p "$QG_Version") ]] &&  printf "\n\n  ERROR  quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
+QG_FilePathDefault="$(type -p quickget)"
 
 
 function quickget {
 
   # finds the right version for the standard 'quickget' call 
+  # which is only used in simple API wrapping mode, for now ...
+  # quick*emu* is later and is more complex
 
-  # quickemu is later as more complex
+  if [[ $QG_Version ]]; then  
+  
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
+    
+    else  eval command "$QG_Version" " $*" ; fi
 
-  if [[ $QG_Version ]]; then  eval command "$QG_Version" " $*"
+  else 
 
-  else eval command quickget " $*" ; fi
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
+  
+    else eval command quickget " $*" ; fi
+
+  fi
   
 }
 
