@@ -93,9 +93,9 @@ TextEditor=
 
 #  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  if  menu options are not showing. 
 
-#  Terminal command  'xdg-mime query default inode/directory' may help.
+#  XDG default is checked first, then popular names (above).  Terminal command  'xdg-mime query default inode/directory' may help.
 
-#  May be left blank, if not known. Popular names (above) will be auto-checked by default.   
+#  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
 
 FileManager=
 
@@ -108,9 +108,9 @@ FileManager=
 
 #  Give quoted name eg  firefox, google-chrome, falkon etc  if  menu options are not showing.  
 
-#  Terminal command 'xdg-settings get default-web-browser' may help.
+#  XDG default is checked first, then popular names (above).  Terminal command 'xdg-settings get default-web-browser' may help.
 
-#  May be left blank, if not known. Popular names (above) will be auto-checked by default.   
+#  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
 
 WebBrowser=
 
