@@ -2031,9 +2031,11 @@ print_quickget_choices () {
 
   declare -n QGW_List_ArrName="$1"
 
-  if [[ $2 ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="6"; fi
+  if [[ $2 ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
   QGW_List_ArrNum=0
+
+  QGW_List_ArrNum_Last="${#QGW_List_ArrName[@]}"
 
   QGW_List_DisplayNum=1
 
@@ -2041,7 +2043,7 @@ print_quickget_choices () {
 
   for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
 
-    printf "  %2d)  %-18s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
+    printf "  %2d)  %-16s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
 
     ((QGW_List_ArrNum+=1))
 
@@ -2049,7 +2051,13 @@ print_quickget_choices () {
 
     ((QGW_List_NewLineCounter+=1))
 
-    [[ $QGW_List_NewLineCounter == "$QGW_List_NewLinePoint" ]] &&  QGW_List_NewLineCounter=1   &&  printf "\n\n"
+    if [[ $QGW_List_NewLineCounter == "$QGW_List_NewLinePoint" ]];  then
+    
+      QGW_List_NewLineCounter=1   # reset counter
+      
+      [[ $QGW_List_ArrNum != $QGW_List_ArrNum_Last ]] &&  printf "\n\n"
+
+    fi
 
   done
 
@@ -2060,22 +2068,15 @@ function_quick_get_wrap ()  {
 
   printf "\033c"
 
-  if [[ $ModName_qqX ]]; then 
+  if [[ $ModName_qqX ]]; then  function_qqX_printf_logo_title "$ModVersion"
 
-    # printf "\n"
-  
-    function_qqX_printf_logo_title "$ModVersion"
-
-  else 
-  
-    printColor "\n\n  %s  ver %s"  "$ModName"  "$ModVersion"
+  else  printColor "\n\n  %s  ver %s"  "$ModName"  "$ModVersion"
 
   fi
-
   
   # shellcheck disable=SC2154
 
-  printf "  Wrapping quickget version %s  (needs internet, including some selectors) \n\n\n" "$QG_VerNumber"
+  printf "  Wrapping quickget version %s  (needs internet, including for some release selectors) \n\n\n" "$QG_VerNumber"
  
   tput sc
   echo 
@@ -2086,25 +2087,17 @@ function_quick_get_wrap ()  {
 
   while [[ ! $InternetUp ]]; do   
 
-    if  ( ping -w 2  1.1.1.1 | grep -q ttl ) 2> /dev/null ; then
+    if wget -q -T1 -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
 
-      InternetUp=1
+    elif wget -q -T2 -t2 --spider cloudflare.com  2> /dev/null ; then InternetUp=1
 
-    elif wget -q -T2 -t2 --spider 1.1.1.1  2> /dev/null ; then
-    
-      InternetUp=1
+    elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
 
-    elif wget -q -T2 -t2 --spider cloudflare.com  2> /dev/null ; then
+    elif  ( ping -w 2  1.1.1.1 | grep -q ttl ) 2> /dev/null ; then InternetUp=1
 
-      InternetUp=1
+    elif ( ping -w 2  8.8.8.8  | grep -q ttl ) 2> /dev/null ; then InternetUp=1  
 
-    elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then
-
-      InternetUp=1
-
-    elif ( ping -w 2  8.8.8.8  | grep -q ttl ) 2> /dev/null ; then
-
-      InternetUp=1    
+    # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
       
     else
 
@@ -2143,7 +2136,7 @@ function_quick_get_wrap ()  {
 
     print_quickget_choices  "QGW_OS_Array"
 
-    printColor "\n\n\n  Give list NUMBER of OS name to select for download  [b] to go back \n\n"    
+    printColor "\n\n\n  Give list NUMBER of OS name to select for download or to browse OS website  [b] to go back \n\n"    
 
     read -rp "  >  "  QGW_List_NumSelected
 
@@ -2164,9 +2157,40 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s "  "$QGW_OS_Arr_NameSelected"
 
+      # OS HOME PAGES  could be pulled in variable quality from the download URL
+
+      # However, and while, some of @zen0bit's and others work is available (@dec19/2023)
+      # some is not  >  https://github.com/quickemu-project/quickemu/pull/864
+
+      # So, just grep quickget source instead. And is probably just as quick, or quicker ...
+
+      quickget "filepath"  
+
+      if grep -q -s 'os_homepages' "$QG_FilePath" ; then 
+
+        QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
+
+        QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
+
+        QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+
+        [[ $QGW_OS_HomePage ]] &&  printf "\n\n  OS_HomePage = %s"  "$QGW_OS_HomePage"
+
+        if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
+
+        else printf " (site down or bad link)" ; printColor " ??" ; fi
+
+      fi
+
+      #  TODO   check/say if it's active  &&  if possible  API web search bangs for home
+
+      # Also show download url(s) from get os function  ?  first URL after the grep line number   
+      
+      # (needs release names)  OR use quickget -t etc 
+
+     
     fi
 
-    #
 
     QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
 
@@ -2174,22 +2198,33 @@ function_quick_get_wrap ()  {
 
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
+    while true ; do
 
-    if [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then
+      if [[ ! ${QGW_Releases_Array[*]} ]] ; then
 
-    printf "\n\n  Only one current release found: "
+        printColor "\n\n  Quickemu or internet ERROR, no releases found "
+     
+      elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then
 
-    QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
+        printColor "\n\n  [enter] to continue, only one current release found "
 
-    else
+      else
 
-      printf "\n\n"
+        printf "\n\n"
 
-      print_quickget_choices  "QGW_Releases_Array"
+        print_quickget_choices  "QGW_Releases_Array"
+        
+        printColor "\n\n  Give LIST number of Release"   
 
-      printColor "\n\n  Give LIST number of Release   [b] to go back \n\n"     
+      fi  
 
-      read -rp "  >  "  QGW_List_NumSelected    
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
+
+      else printf "\n\n" ; fi
+
+      printf "  [b] to go back \n\n"   
+
+      read -rp "  >  "  QGW_List_NumSelected   
 
       if [[ $QGW_List_NumSelected == "b" ]]; then 
 
@@ -2199,7 +2234,13 @@ function_quick_get_wrap ()  {
       
         function_quick_get_wrap
 
-      else
+        break
+
+      elif [[ $QGW_List_NumSelected == "w" ]]; then 
+
+        nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "$QGW_OS_HomePage"  & 
+
+      elif [[ $QGW_List_NumSelected ]]; then 
 
         [[ $QGW_List_NumSelected -gt "${#QGW_Releases_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Releases_Array[@]}"
 
@@ -2207,9 +2248,18 @@ function_quick_get_wrap ()  {
 
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
 
+        break
+
+      else 
+
+        QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
+      
+        break
+
       fi
 
-    fi
+    done
+
 
     printColor  "\n\n  Selected = %s %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
@@ -2455,7 +2505,7 @@ function_quick_get_wrap ()  {
 
     fi
     
-    printColor "[h] help  [b] go back \n\n\n"
+    printf " [h] help  [b] go back \n\n\n"
 
     read -rp "  >  " QGW_DownloadStart
 
