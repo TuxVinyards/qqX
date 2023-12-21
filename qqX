@@ -2166,7 +2166,7 @@ function_quick_get_wrap ()  {
 
       quickget "filepath"  
 
-      if grep -q -s 'os_homepages' "$QG_FilePath" ; then 
+      if grep -q -s 'os_homepage' "$QG_FilePath" ; then 
 
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
 
@@ -2182,12 +2182,7 @@ function_quick_get_wrap ()  {
 
       fi
 
-      #  TODO   check/say if it's active  &&  if possible  API web search bangs for home
-
-      # Also show download url(s) from get os function  ?  first URL after the grep line number   
-      
-      # (needs release names)  OR use quickget -t etc 
-
+      # REVIEW possible API web search bangs for homepage ?
      
     fi
 
@@ -2479,6 +2474,15 @@ function_quick_get_wrap ()  {
       fi
 
     fi
+
+
+
+      # Also show download url(s) from get os function  ?  first URL after the grep line number   
+      
+      # (needs release names)  OR use quickget -t etc 
+
+      #  TODO   check links before download
+
 
 
     if [[ $QGW_OverWriteAllow ]];then  
