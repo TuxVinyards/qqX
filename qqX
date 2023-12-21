@@ -2076,7 +2076,7 @@ function_quick_get_wrap ()  {
   
   # shellcheck disable=SC2154
 
-  printf "  Wrapping quickget version %s  (needs internet, including for some release selectors) \n\n\n" "$QG_VerNumber"
+  printf "  Wrapping quickget version %s  (needs internet, including for some menu items & for tests) \n\n\n" "$QG_VerNumber"
  
   tput sc
   echo 
@@ -2155,7 +2155,7 @@ function_quick_get_wrap ()  {
 
       QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
 
-      printColor  "\n\n  Selected = %s "  "$QGW_OS_Arr_NameSelected"
+      printColor  "\n\n  Selected = %s ...."  "$QGW_OS_Arr_NameSelected"
 
       # OS HOME PAGES  could be pulled in variable quality from the download URL
 
@@ -2174,7 +2174,7 @@ function_quick_get_wrap ()  {
 
         QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
 
-        [[ $QGW_OS_HomePage ]] &&  printf "\n\n  OS_HomePage = %s"  "$QGW_OS_HomePage"
+        [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
 
         if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
 
@@ -2256,7 +2256,7 @@ function_quick_get_wrap ()  {
     done
 
 
-    printColor  "\n\n  Selected = %s %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
+    printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
     #
 
@@ -2339,8 +2339,38 @@ function_quick_get_wrap ()  {
 
   fi 
   
-  printColor  "\n\n  Selected =   %s "  "$QGW_DownloadSelection"
 
+  # TEST DOWNLOAD URL is correct and is good to go
+
+  function_test_iso_url () {
+
+    QGW_Download_BadLink=
+
+    if grep -q -s -e '--test-iso-url' "$QG_FilePath" ; then
+
+      if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
+
+      quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
+
+      cat "/tmp/qqX_get.test.iso.url.log"
+
+      if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then
+
+        printColor "  ERROR  Bad link or server down ... \n\n"
+
+        QGW_Download_BadLink=1
+    
+      fi
+
+    else printf "\n\n"
+
+    fi
+
+    printColor  "  Selected = %s "  "$QGW_DownloadSelection"
+
+  }
+
+  function_test_iso_url
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
 
@@ -2412,7 +2442,8 @@ function_quick_get_wrap ()  {
 
   fi
 
-  #####  Start Download  ####
+  
+  # READY TO START DOWNLOAD 
 
   QGW_OverWriteAllow=
   
@@ -2476,34 +2507,33 @@ function_quick_get_wrap ()  {
     fi
 
 
+    if [[ $QGW_Download_BadLink ]]; then
 
-      # Also show download url(s) from get os function  ?  first URL after the grep line number   
+      printColor "\n\n  [enter]  re-test the download link "
+
+    else
+
+      if [[ $QGW_OverWriteAllow ]];then  
+
+        printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_DownLoadFolder"
+        
+        show_current_preset_folder_list
       
-      # (needs release names)  OR use quickget -t etc 
+        printf  "\n\n  [enter] Start the download  "
 
-      #  TODO   check links before download
-
-
-
-    if [[ $QGW_OverWriteAllow ]];then  
-
-      printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_DownLoadFolder"
+        printColor " ?? BACKUP > " 
       
-      show_current_preset_folder_list
-    
-      printf  "\n\n  [enter] Start the download  "
+      else  printColor  "\n\n  [enter] Start the download  " 
+      
+      fi
+      
+      if [[ ! $ZsyncDownload ]]; then
 
-      printColor " ?? BACKUP > " 
-    
-    else  printColor  "\n\n  [enter] Start the download  " 
-    
-    fi
-    
-    if [[ ! $ZsyncDownload ]]; then
+        if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
 
-      if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
+        else printColor "[number] select a different (preset or current) folder  "
 
-      else printColor "[number] select a different (preset or current) folder  "
+        fi
 
       fi
 
@@ -2513,9 +2543,9 @@ function_quick_get_wrap ()  {
 
     read -rp "  >  " QGW_DownloadStart
 
-     printf "\n"
+    printf "\n"
 
-     case "$QGW_DownloadStart" in
+    case "$QGW_DownloadStart" in
 
       b)
         QGW_List_NumSelected=
@@ -2525,6 +2555,7 @@ function_quick_get_wrap ()  {
         Zsync_Release_Name=
         QGW_DownloadStart=
         QGW_DownloadSelection=
+        QGW_Download_BadLink=
 
         if [[ $MainMenuZsync ]]; then MainMenuZsync= ; else function_quick_get_wrap ; fi
 
@@ -2553,18 +2584,24 @@ function_quick_get_wrap ()  {
       ;;
 
       *)
-        if [[ $QGW_OverWrite ]]; then 
-
-          printf "  RECONFIRMATION is required  >>  %s"  "$QGW_DownloadName"
-
-          printColor " \n\n  ** may install with some kind of NAMING variance **  \n\n"
-
-          QGW_OverWriteAllow=1
+        if [[ $QGW_Download_BadLink ]]; then  QGW_BadLink_ReTest=1 ; function_test_iso_url
 
         else
 
-          QGW_DownloadStart="start"
-          break
+          if [[ $QGW_OverWrite ]]; then 
+
+            printf "  RECONFIRMATION is required  >>  %s"  "$QGW_DownloadName"
+
+            printColor " \n\n  ** may install with some kind of NAMING variance **  \n\n"
+
+            QGW_OverWriteAllow=1
+
+          else
+
+            QGW_DownloadStart="start"
+            break
+
+          fi
 
         fi
       ;;
@@ -2572,6 +2609,7 @@ function_quick_get_wrap ()  {
     esac
 
     [[ ! $QWG_DownLoadFolder ]] &&  QWG_DownLoadFolder="$Default_VM_Folder" 
+
 
   done
 
@@ -2629,7 +2667,9 @@ function_quick_get_wrap ()  {
 
     printColor "\n\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
     
-    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync"
+    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
+
+    printf "\n\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
 
     printf "\n\n  Quickemu & downloader output: "
 
@@ -2648,7 +2688,7 @@ function_quick_get_wrap ()  {
    
   
    
-    # QUICKGET RUNS FIRST, in the background, then it starts a downloader 
+    # QUICKGET RUNS FIRST, in the background, THEN it starts a separate downloader  eg wget or aria2
 
     quickget "$QGW_DownloadSelection" &  
 
