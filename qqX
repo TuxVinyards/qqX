@@ -2055,7 +2055,7 @@ print_quickget_choices () {
     
       QGW_List_NewLineCounter=1   # reset counter
       
-      [[ $QGW_List_ArrNum != $QGW_List_ArrNum_Last ]] &&  printf "\n\n"
+      [[ $QGW_List_ArrNum != "$QGW_List_ArrNum_Last" ]] &&  printf "\n\n"
 
     fi
 
