@@ -2027,9 +2027,11 @@ print_quickget_choices () {
 
   # listing function for use inside 'function_quick_get_wrap'
 
-  # adapted with $2 as number per line
+  # adapted with $2 as number per line   ( REVIEW )
 
   declare -n QGW_List_ArrName="$1"
+
+  QGW_List_Arr_ItemLength=16
 
   if [[ $2 ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
@@ -2043,7 +2045,18 @@ print_quickget_choices () {
 
   for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
 
-    printf "  %2d)  %-16s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
+    if [[ "${#QGW_List_Arr_Item}" -gt "$QGW_List_Arr_ItemLength" ]]; then 
+
+      ((QGW_List_NewLinePoint-=1))
+      ((QGW_List_Arr_ItemLength+=4))
+      
+    fi
+
+  done
+
+  for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
+
+    printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
 
     ((QGW_List_ArrNum+=1))
 
@@ -2164,9 +2177,11 @@ function_quick_get_wrap ()  {
 
       # So, just grep quickget source instead. And is probably just as quick, or quicker ...
 
+      # Also add check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
+
       quickget "filepath"  
 
-      if grep -q -s 'os_homepage' "$QG_FilePath" ; then 
+      if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36 37 38 39' "$QG_FilePath" ; then 
 
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
 
