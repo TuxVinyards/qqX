@@ -2,23 +2,11 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Release 1.2.01 and 1.3.01 are both number boosts to reflect cumulative changes.
+- The program's built-in downloader will neatly place releases into their own special sub-folder.
 
-The program's built-in downloader will neatly place releases into their own special sub-folder.
+New releases 1.4.1 :christmas_tree: has lots of minor improvements plus now features URL checking and a neat no-hang browser opening for OS Home Pages in quickget. Also includes several under the hood changes in readiness for release 1.5 in the new year.
 
-- Use the Github **code/clone** button for the very latest tweaks & bug fixes.
-
-  Several pre-release backportings from the development branch have been recently added.
-
-  Plus 7 more commits @ Dec 10  which are now shaping out **beta 1.4.0.04**
-
-  There have been quite a lot of under the hood changes but *this pre-release appears* ***very stable***.
-  
-  @ Dec 15, still a couple of smaller commits to be added over the next few days before finalising.
-
-  Make sure to use the installer script which will add needed features to your settings file.
-
-  For non-beta, download from the release page.  Also see the release notes towards end of this page.
+- Use the Github **code/clone** button for the latest tweaks & bug fixes (if needed).
 
 ### quickemu quickget X terminal project
 
