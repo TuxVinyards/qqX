@@ -8,6 +8,8 @@ New releases 1.4.1 :christmas_tree: has lots of minor improvements plus now feat
 
 - Use the Github **code/clone** button for the latest tweaks & bug fixes (if needed).
 
+The installer script will update the settings file with the new feature options.
+
 ### quickemu quickget X terminal project
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
