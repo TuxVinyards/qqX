@@ -44,7 +44,7 @@ Worry not if [quickgui](https://github.com/quickemu-project/quickgui) is already
 
 Less is more:
 
-By using the same, less sophistcated, popular scripting language as quickemu, we can achieve complete script handling and far easier modding. qqX goes beyond being a simple front-end that is restricted to the basic quickemu API.
+By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding. qqX goes beyond being a simple front-end that is restricted to the basic quickemu API.
 
 Anything within quickemu can be easily pulled, shaped and improved. There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
