@@ -2031,7 +2031,7 @@ print_quickget_choices () {
 
   declare -n QGW_List_ArrName="$1"
 
-  QGW_List_Arr_ItemLength=16
+  QGW_List_Arr_ItemLength=15
 
   if [[ $2 ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
@@ -2048,7 +2048,7 @@ print_quickget_choices () {
     if [[ "${#QGW_List_Arr_Item}" -gt "$QGW_List_Arr_ItemLength" ]]; then 
 
       ((QGW_List_NewLinePoint-=1))
-      ((QGW_List_Arr_ItemLength+=4))
+      ((QGW_List_Arr_ItemLength+=3))
       
     fi
 
@@ -2232,9 +2232,11 @@ function_quick_get_wrap ()  {
 
       else printf "\n\n" ; fi
 
+
       printf "  [b] to go back \n\n"   
 
-      read -rp "  >  "  QGW_List_NumSelected   
+      read -rp "  >  "  QGW_List_NumSelected  
+
 
       if [[ $QGW_List_NumSelected == "b" ]]; then 
 
@@ -2361,7 +2363,7 @@ function_quick_get_wrap ()  {
 
     QGW_Download_BadLink=
 
-    if grep -q -s -e '--test-iso-url' "$QG_FilePath" ; then
+    if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36 37 38 39' "$QG_FilePath"; then
 
       if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
 
