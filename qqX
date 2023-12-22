@@ -2168,7 +2168,7 @@ function_quick_get_wrap ()  {
 
       QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
 
-      printColor  "\n\n  Selected = %s ...."  "$QGW_OS_Arr_NameSelected"
+      printColor  "\n\n  Selected = %s  "  "$QGW_OS_Arr_NameSelected"
 
       # OS HOME PAGES  could be pulled in variable quality from the download URL
 
@@ -2182,6 +2182,8 @@ function_quick_get_wrap ()  {
       quickget "filepath"  
 
       if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
+
+        printColor "Checking ...."
 
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
 
@@ -2366,6 +2368,8 @@ function_quick_get_wrap ()  {
     if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
 
       if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
+
+      printf "  Checking download sources ... \n\n"
 
       quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
 
