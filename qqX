@@ -320,8 +320,8 @@ ExtraSetArgs="$ExtraArgs"
 P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
 #   Check custom QE & QG, plus set the 'quickget' version
-[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10
-[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10
+[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10
+[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10
 QG_FilePathDefault="$(type -p quickget)"
 
 function quickget {
@@ -628,7 +628,7 @@ show_kvm_sudo_security_note () {
   printColor "\n  For session adjustments %s requires 'sudo' permissions to echo true or false to 'ignore_msrs'" "$ModName"
   printf   "\n  This allows you to create a temporary MSRS status that may be changed at any time,"
   printf   "\n  allowing you to match the selected guest VM that you want to run."
-  printf "\n\n  Linux distros don't *seem* to be affected when set as true \n  but KVM does have a default of false ..."
+  printf "\n  Linux distros don't *seem* to be affected when set as true \n  but KVM does have a default of false ..."
   printColor "\n\n  If you have concerns about this script, or about giving elevated permissions, "
   printf   "\n  then the script should be checked or you should issue these commands manually:"
   printf   "\n\n  Use shift-crtl-c (or your distros variant) to copy the displayed sudo command, then"
@@ -864,11 +864,11 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ $SharedDriveArgs ]] && printf "\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
     [[ $SecondDriveArgs ]] && printf "\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
     if [[ $tpm == "on" ]]; then
-      printf "\n\n  Secure Boot:  %s \n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+      printf "\n  Secure Boot:  %s \n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
     else
-      printf "\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+      printf "\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
-      printf "\n\n"  >> "$QemuArgsFile"
+      printf "\n"  >> "$QemuArgsFile"
     if [[ $VerboseArgs ]]; then
       # hold the launch till we have checked the config
       BreakAtVerboseArgs=
@@ -882,15 +882,15 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     { printf "\nQUICKEMU SCREEN OUTPUT & other ...  \n"
       for Line in "${QE_echo_Arr[@]}"; do
         if [[ "$Line" == *'-name'* ]]; then
-          printf "\n\n$Line"
-          printf "\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
+          printf "\n$Line"
+          printf "\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
           printf "\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
         elif [[ "$Line" == *'/usr/bin/env bas'* ]]; then true
         elif [[ ! "$(tr -cd '[:print:]' <<< "$Line")" ]]; then true
         else  printf "\n$Line"
         fi
       done
-      printf "\n\n"
+      printf "\n"
     } >> "$QemuArgsFile"
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
@@ -1137,7 +1137,7 @@ print_quickget_choices () {
     ((QGW_List_NewLineCounter+=1))
     if [[ $QGW_List_NewLineCounter == "$QGW_List_NewLinePoint" ]];  then
       QGW_List_NewLineCounter=1   # reset counter
-      [[ $QGW_List_ArrNum != "$QGW_List_ArrNum_Last" ]] &&  printf "\n\n"
+      [[ $QGW_List_ArrNum != "$QGW_List_ArrNum_Last" ]] &&  printf "\n"
     fi
   done
 }
@@ -1200,7 +1200,7 @@ function_quick_get_wrap ()  {
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
         QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
         QGW_OS_HomePage="${QGW_OS_HomePage//'\"'/}"
-        [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+        [[ $QGW_OS_HomePage ]] &&  printf "\n  HomePage = %s"  "$QGW_OS_HomePage"
         if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
         else printf " (site down or bad link)" ; printColor " ??" ; fi
     fi
@@ -1219,8 +1219,8 @@ function_quick_get_wrap ()  {
       print_quickget_choices  "QGW_Releases_Array"
         printColor "\n\n  Give LIST number of Release"
       fi
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
-      else printf "\n\n" ; fi
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then printf "\n  [w] to open listed web page with %s"  "$WebBrowser"
+      else printf "\n" ; fi
       printf "  [b] to go back \n\n"
       read -rp "  >  "  QGW_List_NumSelected
       if [[ $QGW_List_NumSelected == "b" ]]; then
@@ -1286,7 +1286,7 @@ function_quick_get_wrap ()  {
   function_test_iso_url () {
     QGW_Download_BadLink=
     if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
-      if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
+      if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n" ; fi
       printf "  Checking download sources ... \n\n"
       quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
       cat "/tmp/qqX_get.test.iso.url.log"
@@ -1294,7 +1294,7 @@ function_quick_get_wrap ()  {
         printColor "  ERROR  Bad link or server down ... \n\n"
         QGW_Download_BadLink=1
       fi
-    else printf "\n\n"
+    else printf "\n"
     fi
     printColor  "  Selected = %s "  "$QGW_DownloadSelection"
   }
@@ -1334,7 +1334,7 @@ function_quick_get_wrap ()  {
       ZsyncDownload=1
   else
     show_current_preset_folder_list
-    printf "\n\n"
+    printf "\n"
     QWG_DownLoadFolder="$Default_VM_Folder"
   fi
   # READY TO START DOWNLOAD
@@ -1407,14 +1407,14 @@ function_quick_get_wrap ()  {
       ;;
       h)
         printf     "  Once the download and initial setup up has finished, "
-        printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running.\n"
-        printf "\n\n  For new preset folders, edit the main settings.\n"
-        printf "\n\n  Part downloads can usually be re-started, if stopped."
-        printf "\n\n  Zsync Iso Updates may leave residual rcksum files, if stopped, and may need removing."
-        printf "\n\n  But, if an iso.part file has been started, a restart is possible, after doing a re-sync."
-        printf "\n\n  If re-syncing, the rcksum files will be auto-removed."
+        printf "\n  the new folder and .conf file may be easily moved and/or edited before running.\n"
+        printf "\n  For new preset folders, edit the main settings.\n"
+        printf "\n  Part downloads can usually be re-started, if stopped."
+        printf "\n  Zsync Iso Updates may leave residual rcksum files, if stopped, and may need removing."
+        printf "\n  But, if an iso.part file has been started, a restart is possible, after doing a re-sync."
+        printf "\n  If re-syncing, the rcksum files will be auto-removed."
         show_current_preset_folder_list
-        printf "\n\n"
+        printf "\n"
       ;;
       *)
         if [[ $QGW_Download_BadLink ]]; then  QGW_BadLink_ReTest=1 ; function_test_iso_url
@@ -1463,8 +1463,8 @@ function_quick_get_wrap ()  {
     read -r -t 0.2
     printColor "\n\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
     printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
-    printf "\n\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
-    printf "\n\n  Quickemu & downloader output: "
+    printf "\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
+    printf "\n  Quickemu & downloader output: "
     ## Although quickget will run as a background process, quickget will then go on to run aria2 etc
     #  but as even further into the background. The download programs will grab the cursor in order to report progress
     #  and as this will compete with read & keyboard input we are limited to using [enter] ....
@@ -1472,7 +1472,7 @@ function_quick_get_wrap ()  {
     #  eg 26102 pts/1    S+     0:11 python3 /usr/bin/macrecovery --board-id Mac-00BE6ED71E35EB86 --mlb 00000000000000000 --os-type default --basename Recover
     # QUICKGET RUNS FIRST, in the background, THEN it starts a separate downloader  eg wget or aria2
     quickget "$QGW_DownloadSelection" &
-    printf "\n\n\n"
+    printf "\n\n"
     printf "\e[3A\r"
     #  make line spaces then move the cursor up from the bottom
     # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc
@@ -1601,7 +1601,7 @@ function_quick_get_wrap ()  {
       printColor "\n  [d] delete the folder"
       [[ $New_VM_File ]] && printColor " and .conf"
       printf "  [enter] to retain & continue "
-      printf "\n\n"
+      printf "\n"
       read -rp "  >  "    QGW_FolderDelete
       if [[ $QGW_FolderDelete == "d" ]]; then
         printf "\n  Folder/file being deleted ... "
@@ -1656,7 +1656,7 @@ function_conf_error () {
     printColor "\n  CHECK ME, NOW: \n"    #  REVIEW
     cat "$VM_Conf_File"
     NewSetupFlag=1
-    printf "\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
+    printf "\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     printColor "\n  [c] continue  (with current settings) looks okay "
     printf "\\n  [e] to edit %s general settings   [q] to quit \n"   "$ModName"
   elif [[ $1 == "folder" ]] ; then
@@ -1892,11 +1892,11 @@ function_Select_VM () {
     VM_Conf_File=
     function_print_conf_array
     if [[ $DefaultFolderError || $ExtraFolderError ]]; then
-      printf "\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
+      printf "\n  Settings file: %s" "$Q_Mod_SettingsFile"
       [[ $DefaultFolderError ]] && printf "\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit "
       [[ $ExtraFolderError ]] && printf "\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
     else
-      printf "\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
+      printf "\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
       VM_Array_NameZero="${VM_Array[0,1]}"
       VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
       printColor "\n  [Enter]  "
@@ -2136,8 +2136,8 @@ qqX_edit_settings() {
   fi
   if [[ ! $(type -p "$TextEditor") ]]; then
     printColor "\n\n  Unable to open settings.  Default or basic text editor not found."
-    printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
-    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
+    printf "\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
+    printf "\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
     read -rp "  >  "
   else
     # Run the editor:
@@ -2236,12 +2236,12 @@ function show_quickemu_WRAP_help {
   if [[ $ModName_qqX ]]; then
     printf "\n"
     function_qqX_printf_logo_title  "$qqX_title"
-    printf "\n\n  %s is currently wrapping: QEMU %s  quickemu %s  &  quickget %s"  "$ModName" "$QEMU_VER_LONG" "$QE_VerNumber"  "$QG_VerNumber"
+    printf "\n  %s is currently wrapping: QEMU %s  quickemu %s  &  quickget %s"  "$ModName" "$QEMU_VER_LONG" "$QE_VerNumber"  "$QG_VerNumber"
   else
     printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion"
   fi
   printf "\n  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"
-  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"
+  printf "\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"
   [[ ! $ModName_qqX ]] &&  printf "\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
   printf "\n  [enter] to return   [a] %s API detail   " "$ModName"
   [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
@@ -2249,7 +2249,7 @@ function show_quickemu_WRAP_help {
   read -rp "  >  "  HelpSelect
   if [[ $HelpSelect == "a" ]]; then
     show_wrap_CLI_usage
-    printf "\n\n"
+    printf "\n"
     read -rp  "  [enter] to return >  "
   elif [[ $HelpSelect == "p" ]]; then
     printf "\n  Extra quickemu parameters for qmod API & qmod settings."
@@ -2445,7 +2445,7 @@ function_config_tune_up ()  {
   SharedRAM_NotFound=
   RAM_Available=
   Shared_RAM_Mb=
-  printf "\n\n  Memory showing: \n"
+  printf "\n  Memory showing: \n"
   free --si -h
   RAM_Available="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2)"
   if [[ "$RAM_Available" == *G* ]]; then  RAM_Available="$( cut -d'G' -f1  <<< "$RAM_Available" | tr -cd '[:graph:]' 2>/dev/null)"
@@ -2465,7 +2465,7 @@ function_config_tune_up ()  {
       [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
     fi
   fi
-  printf "\n\n"
+  printf "\n"
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
   printf "\n  Quickemu will default to half, even quarter minimals ..."
   printf "\n  For full screen VM, suggest RAM of around 2/3 total, round up/down to expected guest/host demand"
@@ -3007,12 +3007,12 @@ while true ; do
   elif [[ $MainMenuChoice == "dl" ]] ; then
     printf "\033c \n"
     function_qqX_printf_logo_title  "qqX updater"
-    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
+    printf "\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
     if [[ ! $qqX_LatestTarBall ]] ; then
       printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
     else
-      if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
-      else  printf "\n\n  %s"  "$qqX_LatestTarBall"
+      if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n  %s"  "$qqX_Latest_Secure_TarBall"
+      else  printf "\n  %s"  "$qqX_LatestTarBall"
       fi
       printf "\n"
       AboutRelease="$(grep -s 'body' "/tmp/latest-qqX")"
@@ -3026,21 +3026,21 @@ while true ; do
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
       for Line in "${AboutReleaseArray[@]}" ; do  printColor "\n\n  %s"  "$Line"  ; done
     fi
-    printf "\n\n\n"
+    printf "\n\n"
     while true ; do
       printf "  Neatly download the release into its own sub-folder at: "
-      [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
+      [[ -d "$HOME/Downloads" ]] && printf "\n  [d] Downloads folder  %s"  "$HOME/Downloads"
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then
         printColor "\n  [enter] Current/Default Folder  %s "  "$Default_VM_Folder"
       else
         printf "\n  [c] Current Folder  %s "  "$(pwd)"
         printColor "\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
       fi
-      printf "\n\n"
+      printf "\n"
       [[ $WebBrowser ]] && printColor "  [w] to open qqX web page with %s"  "$WebBrowser"
       printf "   or [b] to go back \n\n"
     read -rp "  >  "  qqX_LatestTarBall_Folder
-    printf "\n\n"
+    printf "\n"
       if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
       elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then
@@ -3071,12 +3071,12 @@ while true ; do
     fi
     printColor "\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
     if [[ $BetaTxReleasePoint ]]; then
-      printf "\n\n  Transitioning from beta to release ...  If required,"
+      printf "\n  Transitioning from beta to release ...  If required,"
       printf "\n  Beta Notifications can be turned off in the general settings file \n"
     fi
     printColor "\n Use the installer script to quickly refresh and add new features to your settings file."
     printf "\n  All option settings, locations and preferences will be kept."
-    printf "\n\n  [enter] to run the installer script   [r] to return to main menu \n"
+    printf "\n  [enter] to run the installer script   [r] to return to main menu \n"
     read -rp "  >  "  qqX_UpdateExit
     if [[ $qqX_UpdateExit != "r" ]]; then
       # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
@@ -3188,7 +3188,7 @@ while true ; do
       if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
         printColor "\n  WARNING: insufficient or very low space on host drive"
       else
-        printf "\n\n"
+        printf "\n"
         if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
         elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
         else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
@@ -3388,7 +3388,7 @@ while true ; do
     else
       [[ $MainMenuChoice == "2" ]] && printColor "\n  Create a SECOND virtual hard-drive for this VM instance:"
       [[ $MainMenuChoice == "3" ]] && printColor "\n  Create a SHARED virtual hard-drive for this VM instance:"
-      printf "\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that"
+      printf "\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that"
       printf "\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
       printf "\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
       printf "\n  It is easier make them larger now than to resize later ... "
