@@ -78,11 +78,8 @@ qqX_XDG_Name="qqX"
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  add a check for unusuals eg. nix/store/uniques etc
 Current_qqX_Location="$(type -p qqX)"
 
-if [[ $Current_qqX_Location ]]; then
-  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"
-else
-  qqX_Std_Bin_Dir="/bin"
-fi
+if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"
+else qqX_Std_Bin_Dir="/bin" ; fi
 
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"
@@ -175,15 +172,9 @@ echo
 function_qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
 
 if [[ $1 != "Upgrade" ]]; then
-
-  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then
-    printf "\n  a standard release of quickemu has been found "
-  else
-    printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu "
+  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  a standard release of quickemu has been found "
+  else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu "
   fi
-
-fi
-
 fi
 
 # REVIEW  add quickemu release/version checking ?
@@ -195,10 +186,8 @@ if [[ ! -e "qqX_settings" ]] || [[ ! -e "qqX" ]] || [[ ! -d  "qqX.system" ]]; th
 else
   InstallSelect=
 
-  if [[ $1 == "Upgrade" ]]; then
-    printColor  "\n\n  Upgrade the program scripts:"   "$HOME"
-  else
-    printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME"
+  if [[ $1 == "Upgrade" ]]; then  printColor  "\n\n  Upgrade the program scripts:"   "$HOME"
+  else  printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME"
   fi
 
   printf "\n\n   sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
@@ -260,7 +249,6 @@ else
     # and check that the right version is there:
     #qqX_Version_Installed="$(qqX --version 2>/dev/null)"
     #if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$qqX_Version_Installed" == "$qqX_Version" ]] ; then
-
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then
       printColor "\n\n  All good  \n\n"
     else
@@ -276,16 +264,9 @@ else
       printColor "\n\n  [enter] skip (if already set-up) "
       printf "  [m] make folder \n\n"
       read -rp "  >  "  MkDefDir
-
-      if [[ $MkDefDir ]]; then
-        mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n"
-      fi
+      if [[ $MkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
     fi
-
-    if [[ ! -d "$HOME/.qqX" ]]; then
-      mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n"
-    fi
-
+    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi
     #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW
     if [[ -e "$HOME/.qqX/qqX_settings" ]]; then
       ## Run auto-diff updater
@@ -314,15 +295,10 @@ else
 fi
 
 ##  DESKTOP LAUNCHER
-
 #  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html
-
 XDG_AppFolder="$HOME/.local/share/applications"
-
 XDG_GUI_ItemName="$qqX_XDG_Name.desktop"
-
 XDG_GUI_ItemPathName="$XDG_AppFolder/$XDG_GUI_ItemName"
-
 SkipMkLauncher=
 
 if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
@@ -332,12 +308,7 @@ if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
   printf "[r] to reconfigure \n\n"
   read -rp "  >  "  SkipMkLauncher
 
-  if [[ $SkipMkLauncher == "r" ]]; then
-    SkipMkLauncher=
-  else
-    SkipMkLauncher=1
-  fi
-
+  if [[ $SkipMkLauncher == "r" ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 ; fi
 fi
 
 if [[ ! $SkipMkLauncher ]]; then
@@ -400,12 +371,8 @@ if [[ ! $SkipMkLauncher ]]; then
   tput sgr0
   printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
   read -rp "  >  "  IconSelect
-
-  if [[ $IconSelect == "b" ]]; then
-    Icon_Var="blu"
-  else
-    Icon_Var="std"
-  fi
+  if [[ $IconSelect == "b" ]]; then  Icon_Var="blu"
+  else  Icon_Var="std"; fi
 
   ## RUN .desktop CREATOR
   if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
@@ -513,11 +480,6 @@ read -rp "  > "  DontStart_qqX
 if [[ $DontStart_qqX ]]; then
   exit
 else
-
-  if [[ $GrepExecLine ]]; then
-    exec bash -c "$Start_qqX"
-  else
-    exit
-  fi
-
+  if [[ $GrepExecLine ]]; then exec bash -c "$Start_qqX"
+  else  exit ;  fi
 fi

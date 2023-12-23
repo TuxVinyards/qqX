@@ -1199,7 +1199,7 @@ function_quick_get_wrap ()  {
         printColor "Checking ...."
         QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
         QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
-        QGW_OS_HomePage="${QGW_OS_HomePage//'\"'/}"
+        QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
         [[ $QGW_OS_HomePage ]] &&  printf "\n  HomePage = %s"  "$QGW_OS_HomePage"
         if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
         else printf " (site down or bad link)" ; printColor " ??" ; fi
