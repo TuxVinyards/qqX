@@ -118,13 +118,13 @@ if  [[ $NoClear ]]; then
 fi
 
 if ! tput -V | grep -q ncurses 2> /dev/null; then
-  printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
+  printf "\n  Check for your OS >  \n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
   sleep 5
   exit 1
 fi
 if [[ ! -d "/tmp" ]]; then
-  printf "\n\n  Check for your OS >  \n\n  A directory '/tmp' should be present. A symbolic link may be needed. "
-  printf "\n\n  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard"
+  printf "\n  Check for your OS >  \n  A directory '/tmp' should be present. A symbolic link may be needed. "
+  printf "\n  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard"
   sleep 5
   exit 1
 fi
@@ -147,7 +147,7 @@ if [[ $1 == "XDG" ]]; then
   else
     shift
     # set to $HOME folder and flag to run the VM selector
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found "
+    cd "$HOME"  || printf "\n XDG .desktop starter  >  HOME Folder not found "
     CurrentFolder="$HOME"
     XDG_GeneralDesktopStart=1
   fi
@@ -163,7 +163,7 @@ fi
 
 # INDIVIDUAL SETTINGS:
 custom_conf_notes () {
-  printColor "\n\n  qqX .conf reminders:"
+  printColor "\n  qqX .conf reminders:"
   printf "
     #!/usr/bin/qqX --vm                (for qqX direct start)
     Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
@@ -227,7 +227,7 @@ if [[ -e "$Q_Mod_SettingsFile" ]]; then
   # shellcheck disable=SC1090
   if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
 else
-  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10
+  printf "\n  ERROR with settings file detection \n  Re-check Installation &/or Installation instructions \n" ; sleep 10
 fi
 
 # Intepret the settings:
@@ -235,10 +235,10 @@ function_xdg_start_folder () {
   # For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
   #  Also can be called (belt & braces) at the other command line $1 trap towards end of script ...  REVIEW
   if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
-    cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found "
+    cd "$Default_VM_Folder"  || printf "\n XDG .desktop starter  >  Default_VM_Folder not found "
     CurrentFolder="$Default_VM_Folder"
   else
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found "
+    cd "$HOME"  || printf "\n XDG .desktop starter  >  HOME Folder not found "
     CurrentFolder="$HOME"
   fi
 }
@@ -250,8 +250,8 @@ if [[ $XDG_QcowRightClick ]]; then
   XDG_QcowRightClick_DiskName="$(basename "$1")"
   XDG_QcowRightClick_VM_Dir_Name="$(basename "$XDG_QcowRightClick_Conf_Dir")"
   # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
-  cd "$XDG_QcowRightClick_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found "
-  cd ..  || printf "\n\n XDG .desktop starter  >  Disk's root Folder not found "
+  cd "$XDG_QcowRightClick_Conf_Dir" || printf "\n XDG .desktop starter  >  Disk's start Folder not found "
+  cd ..  || printf "\n XDG .desktop starter  >  Disk's root Folder not found "
   CurrentFolder="$XDG_QcowRightClick_Conf_Dir"
 fi
 
@@ -261,7 +261,7 @@ function_create_VM_folderList() {
   ExtraFolderError=
   # Make sure that 'Default_VM_Folder' has a value and it exists
   [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
-  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
+  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n  Settings ERROR:  Default Folder NOT found \n" ; sleep 2 ; DefaultFolderError=1 ; fi
   # set and clear the folder array, current first but don't scan twice
   if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
     declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
@@ -275,7 +275,7 @@ function_create_VM_folderList() {
       # if .conf targeted start, then no need to print this,
       # unless re-selecting, in which case the error flag will create a later highlight.
       if [[ ! $Conf_TriggerFolder ]]; then
-        printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF"
+        printf "\n  Settings ERROR:\n  Extra Folder %s NOT found \n"  "$xF"
         sleep 2
       fi
       ExtraFolderError=1
@@ -453,8 +453,8 @@ QEMU_IMG="$(type -p qemu-img)"
 
 function qemu_version_check {
   if [[ ! $QEMU ]] || [[ ! $QEMU_IMG ]]; then
-    printColor "\n\n QEMU not found. Check installations of qemu and qemu-img"
-    printf "\n\n If using the quickemu packaging this should normally have been installed.\n\n"
+    printColor "\n QEMU not found. Check installations of qemu and qemu-img"
+    printf "\n If using the quickemu packaging this should normally have been installed.\n"
     sleep 1
     return
   fi
@@ -463,8 +463,8 @@ function qemu_version_check {
   QEMU_VER_SHORT="${QEMU_VER_SHORT:0:2}"
   if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="61"
   elif [[ $QEMU_VER_SHORT -lt 60 ]]; then
-    printf "\n\n QEMU 6.0.0 or newer is required. Current version is: %s"  "$QEMU_VER_LONG"
-    printf "\n\n Use overide in main settings to handle future errors from changes to Qemu numbering format\n\n"
+    printf "\n QEMU 6.0.0 or newer is required. Current version is: %s"  "$QEMU_VER_LONG"
+    printf "\n Use overide in main settings to handle future errors from changes to Qemu numbering format\n"
     sleep 1
   fi
 }
@@ -514,16 +514,16 @@ function_qqX_printf_logo_title() {
 }
 
 show_wrap_CLI_usage () {
-  printColor  "\n  Command line Usage %s:  \n\n"    "$ModName"
+  printColor  "\n  Command line Usage %s:  \n"    "$ModName"
   printf     "  Either plain %s  or  with parameters  --vm  [path/to/vms-folder/]vm-name.conf   " "$ModName"
-  printf     "\n\n  Scripts not located in /usr/bin should be in the VMs folder or a path should be supplied. "
-  printf     "\n\n  Start non /usr/bin with './' eg:  ./%s "  "$ModName"
-  printf     "\n\n  Or by clicking on an edited .conf file:"
-  printf     "\n\n  Edit the first line of the .conf to point to %s instead of quickemu"  "$ModName"
-  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/%s --vm  or similar (VM name not needed)" "$ModName"
-  printf     "\n\n  For more complex CLI usage, try the alternative 'q-mod' script or quickemu itself."
-  printf     "\n\n  @ 2023/08 qqX will now issue short version numbers on 'qqX --version' "
-  #printf     "\n\n"
+  printf     "\n  Scripts not located in /usr/bin should be in the VMs folder or a path should be supplied. "
+  printf     "\n  Start non /usr/bin with './' eg:  ./%s "  "$ModName"
+  printf     "\n  Or by clicking on an edited .conf file:"
+  printf     "\n  Edit the first line of the .conf to point to %s instead of quickemu"  "$ModName"
+  printf     "\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/%s --vm  or similar (VM name not needed)" "$ModName"
+  printf     "\n  For more complex CLI usage, try the alternative 'q-mod' script or quickemu itself."
+  printf     "\n  @ 2023/08 qqX will now issue short version numbers on 'qqX --version' "
+  #printf     "\n"
 }
 
 function exit {
@@ -533,10 +533,10 @@ function exit {
     tput cnorm
     command exit
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
-    printf "\n\n"
-    printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n\n"
+    printf "\n"
+    printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n"
     read -rp  "  >  "  -t 30  ExitTrap
-    [[ $ExitTrap == "h" ]] &&  printf "\n\n  Holding terminal open  [Enter] to quit  \n\n"  && read -rp "  >  "
+    [[ $ExitTrap == "h" ]] &&  printf "\n  Holding terminal open  [Enter] to quit  \n"  && read -rp "  >  "
     tput cnorm
     # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
     command exit "$@"
@@ -587,28 +587,28 @@ toggle_msr_defaults () {
   Verbose_MSR_dialog=1
   # https://www.linux-kvm.org/page/Category:Docs
   if [[ ! -d /etc/modprobe.d ]]; then
-    printf "\n  ERROR! /etc/modprobe.d was not found. \n\n  See notes, it may be possible to manually create modprobe.d/kvm-quickemu.conf \n\n"
+    printf "\n  ERROR! /etc/modprobe.d was not found. \n  See notes, it may be possible to manually create modprobe.d/kvm-quickemu.conf \n"
   else
-    printColor "\n\n  Configure default, boot-up, KVM behaviour "
+    printColor "\n  Configure default, boot-up, KVM behaviour "
     printf "for unhandled machine-specific registers"
-    printf "\n\n  Normal setting is N (don't ignore) but Windows and MacOS require Y (true) 'ignore' "
+    printf "\n  Normal setting is N (don't ignore) but Windows and MacOS require Y (true) 'ignore' "
     function_find_kvm_msr_default_and_status
-    printf "\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
+    printf "\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
     [[ ! $KVM_MSR_ModProbeFile ]] && KVM_MSR_ModProbeFile="/etc/modprobe.d/kvm-quickemu.conf"
     if [[ ! -e "$KVM_MSR_ModProbeFile" ]]; then
-      printf "\n\n  \'%s\'  needs to be created "  "$KVM_MSR_ModProbeFile"
+      printf "\n  \'%s\'  needs to be created "  "$KVM_MSR_ModProbeFile"
     fi
-    printf "\n\n  [y] to set Y  [n] to set N  [b] to go back \n\n"
+    printf "\n  [y] to set Y  [n] to set N  [b] to go back \n"
     read -rp  "  > "  Set_MSR_defaults
     # set .conf file content & update initramfs in all kernels (y/n or none)
     if [[ $Set_MSR_defaults == "y" ]]; then
-      printf "\n\n  Updating 'initramfs' may take a moment or two ... \n\n"
+      printf "\n  Updating 'initramfs' may take a moment or two ... \n"
       # As per Martin's solution in original quickemu, needs 'tee' to get this to work,
       # but route tee's stdout to null to tidy the screen
       echo "options kvm ignore_msrs=Y" | sudo tee "$KVM_MSR_ModProbeFile" 1> /dev/null
       sudo update-initramfs -k all -u
     elif [[ $Set_MSR_defaults == "n" ]]; then
-      printf "\n\n  Updating 'initramfs' may take a moment or two ... \n\n"
+      printf "\n  Updating 'initramfs' may take a moment or two ... \n"
       echo "options kvm ignore_msrs=N" | sudo tee "$KVM_MSR_ModProbeFile" 1> /dev/null
       sudo update-initramfs -k all -u
     fi
@@ -617,26 +617,26 @@ toggle_msr_defaults () {
 
 show_kvm_msr_general_note () {
   printColor "\n  If you mainly use Windows or Mac VM's then a file '.../modprobe.d/kvm-quickemu.conf' "
-  printf   "\n\n  can be created to modify the boot up settings. %s has a new built in function"  "$ModName"
-  printf   "\n\n  that can set this up & also allows for future adjustments may be made."
-  printf   "\n\n  Or it may be carried out manually...  See settings, script & further notes for details."
-  printColor "\n\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
-  printf "\n\n  Windows or MacOS should be set to 'Y' "
+  printf   "\n  can be created to modify the boot up settings. %s has a new built in function"  "$ModName"
+  printf   "\n  that can set this up & also allows for future adjustments may be made."
+  printf   "\n  Or it may be carried out manually...  See settings, script & further notes for details."
+  printColor "\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
+  printf "\n  Windows or MacOS should be set to 'Y' "
 }
 
 show_kvm_sudo_security_note () {
-  printColor "\n\n  For session adjustments %s requires 'sudo' permissions to echo true or false to 'ignore_msrs'" "$ModName"
-  printf   "\n\n  This allows you to create a temporary MSRS status that may be changed at any time,"
-  printf   "\n\n  allowing you to match the selected guest VM that you want to run."
-  printf "\n\n\n  Linux distros don't *seem* to be affected when set as true \n\n  but KVM does have a default of false ..."
-  printColor "\n\n\n  If you have concerns about this script, or about giving elevated permissions, "
-  printf   "\n\n  then the script should be checked or you should issue these commands manually:"
-  printf   "\n\n\n  Use shift-crtl-c (or your distros variant) to copy the displayed sudo command, then"
-  printf   "\n\n  open a side terminal & use shift-crtl-v to paste it.  In this way, elevated permissions"
-  printf   "\n\n  will only exist in the side terminal & will cease as soon as it is closed."
-  printf   "\n\n\n  Run the command & close the terminal."
-  printf   "\n\n  Return to %s & select 'leave as ...'  The msrs settings will auto-update. "   "$ModName"
-  printf   "\n\n"
+  printColor "\n  For session adjustments %s requires 'sudo' permissions to echo true or false to 'ignore_msrs'" "$ModName"
+  printf   "\n  This allows you to create a temporary MSRS status that may be changed at any time,"
+  printf   "\n  allowing you to match the selected guest VM that you want to run."
+  printf "\n\n  Linux distros don't *seem* to be affected when set as true \n  but KVM does have a default of false ..."
+  printColor "\n\n  If you have concerns about this script, or about giving elevated permissions, "
+  printf   "\n  then the script should be checked or you should issue these commands manually:"
+  printf   "\n\n  Use shift-crtl-c (or your distros variant) to copy the displayed sudo command, then"
+  printf   "\n  open a side terminal & use shift-crtl-v to paste it.  In this way, elevated permissions"
+  printf   "\n  will only exist in the side terminal & will cease as soon as it is closed."
+  printf   "\n\n  Run the command & close the terminal."
+  printf   "\n  Return to %s & select 'leave as ...'  The msrs settings will auto-update. "   "$ModName"
+  printf   "\n"
 }
 
 select_msr_config () {
@@ -654,22 +654,22 @@ select_msr_config () {
   [[ $KVM_MSR_selector_LoadHelp ]] && show_kvm_msr_general_note
   while true ; do
     if [[ $MSR_offer == "Y" ]]; then
-      printf "\n\n  Sudo command to set as Y:  echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-      printColor "\n\n  [y] to set session to Y "
+      printf "\n  Sudo command to set as Y:  echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
+      printColor "\n  [y] to set session to Y "
       printf "  [enter]  leave as N"
     elif [[ $MSR_offer == "neutral" ]]; then
-      printf "\n\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-      printf "\n\n  [n] to set session to N "
+      printf "\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
+      printf "\n  [n] to set session to N "
       printColor "  [enter]  leave as Y"
     else
-      printf "\n\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-      printColor "\n\n  [n] to set session to N "
+      printf "\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
+      printColor "\n  [n] to set session to N "
       printf "  [enter]  leave as Y"
     fi
     if [[ $KVM_MSR_selector == "h" ]] || [[ $KVM_MSR_selector_LoadHelp ]] ; then
       if [[ $FurtherNoteFlag ]]; then FurtherNoteFlag= ; else  printf "   [f] see further notes" ; fi
-      printf "   [d] to set the defaults (on boot up) \n\n"
-    else  printf "   [h] see help  \n\n"
+      printf "   [d] to set the defaults (on boot up) \n"
+    else  printf "   [h] see help  \n"
     fi
     read -rp "  >  "  KVM_MSR_selector
     printf "\n"
@@ -681,7 +681,7 @@ select_msr_config () {
       [[ $KVM_MSR_selector == "y" ]] &&  echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs  1> /dev/null
       [[ $KVM_MSR_selector == "n" ]] &&  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs  1> /dev/null
       print_kvm_status
-      printColor "\n\n\n  [enter]  to return \n\n"
+      printColor "\n\n  [enter]  to return \n"
       read -rp  "  > "
       break
     fi
@@ -690,7 +690,7 @@ select_msr_config () {
       if [[ $Set_MSR_defaults == "b" ]]; then
         Set_MSR_defaults=
         print_kvm_status
-        printColor "\n\n\n  Make TEMPORARY setting adjustments to MSRS ?"
+        printColor "\n\n  Make TEMPORARY setting adjustments to MSRS ?"
       else
         function_find_kvm_msr_default_and_status
         break
@@ -712,7 +712,7 @@ msrs_conflict_check_resolver() {
     # usual system default = N
     if [[ "$VM_InstanceName" == *windows*  ]] ||  [[ "$VM_InstanceName" == *macos*  ]] ; then
       [[ ! $ByPass_VM_Array_Selector ]] && printf "\033c"
-      printColor "\n\n  Selected: %s "  "$VM_InstanceName"
+      printColor "\n  Selected: %s "  "$VM_InstanceName"
       printf " 'ignore_msrs' is set & is recommended for Windows and Mac"
       MSR_offer="Y"
       select_msr_config
@@ -723,8 +723,8 @@ msrs_conflict_check_resolver() {
     #  Status = Y  &  which is only recommended for Windows & Mac
     if [[ "$VM_InstanceName" != *windows*  ]] &&  [[ "$VM_InstanceName" != *macos*  ]] ; then
       [[ ! $ByPass_VM_Array_Selector ]] && printf "\033c"
-      printColor "\n\n  Selected: %s "  "$VM_InstanceName"
-      printf "\n\n 'ignore_msrs' is set:  can be okay for other OS's but is normally used only with Windows and Mac"
+      printColor "\n  Selected: %s "  "$VM_InstanceName"
+      printf "\n 'ignore_msrs' is set:  can be okay for other OS's but is normally used only with Windows and Mac"
       MSR_offer="N"
       select_msr_config
       function_find_kvm_msr_default_and_status
@@ -744,8 +744,8 @@ msrs_conflict_check_resolver() {
 if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="/usr/bin/quickemu" ; fi
 # shellcheck disable=SC2154
 if [[ ! $(type -p "$QuickEmuSource") ]] ; then
-  printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
-  printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s \n\n"  "$QuickEmuSource"
+  printf "\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
+  printColor  "\n  ERROR  Settings or Installation FilePath:\n  %s \n"  "$QuickEmuSource"
   exit  hold
 fi
 
@@ -806,7 +806,7 @@ cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
     # Overide the quickemu default
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType"
     if [[ $QEMU_Default_SystemType ]]; then
-      printf "\n\n  QEMU_SystemType =  %s   QEMU_MachineType =  %s " "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile"
+      printf "\n  QEMU_SystemType =  %s   QEMU_MachineType =  %s " "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile"
     fi
 EOV
 
@@ -832,19 +832,19 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
     # Using $VERSION $VMDIR and other internal quickemu variables  & adding the qqX extra args:
     { printf "\n#  qqX:  This file is NOT used by quickemu to run the VM but it will run it if the script is placed"
-      printf "\n\n#  in the calling folder, where the .conf file is located, and if it is given execute permission ...\n\n"
+      printf "\n#  in the calling folder, where the .conf file is located, and if it is given execute permission ...\n"
     } >> "${VMDIR}/${VMNAME}.sh"
     echo "${QEMU}" "${SHELL_ARGS}${ExtraArgs}${SharedDriveArgs}${SecondDriveArgs}" >> "${VMDIR}/${VMNAME}.sh"
     [[ "$(sed --version | head -1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
-    printf "\n\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
-    printf "\n\n  QuickEmu:  %s" "$VERSION"  >> "$QemuArgsFile"
-    printf "\n\n  %s:       %s" "$ModName" "$ModVersion" >> "$QemuArgsFile"
-    printf "\n\n  Date:      %s \n" "$(date)" >> "$QemuArgsFile"
+    printf "\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
+    printf "\n  QuickEmu:  %s" "$VERSION"  >> "$QemuArgsFile"
+    printf "\n  %s:       %s" "$ModName" "$ModVersion" >> "$QemuArgsFile"
+    printf "\n  Date:      %s \n" "$(date)" >> "$QemuArgsFile"
     i=0
     while [[ "${args[i]}" ]]; do
       a="${args[i]}"
-      if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
+      if [[ "$a" == -dev* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile"
       elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile"
       else printf " %s" "$a" >> "$QemuArgsFile"
       fi
@@ -860,41 +860,41 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
       ((i+=1))
     done
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt"
-    [[ $ExtraArgs ]] && printf "\n\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
-    [[ $SharedDriveArgs ]] && printf "\n\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
-    [[ $SecondDriveArgs ]] && printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
+    [[ $ExtraArgs ]] && printf "\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
+    [[ $SharedDriveArgs ]] && printf "\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
+    [[ $SecondDriveArgs ]] && printf "\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
     if [[ $tpm == "on" ]]; then
-      printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  %s \n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
     else
-      printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
-      printf "\n\n\n"  >> "$QemuArgsFile"
+      printf "\n\n"  >> "$QemuArgsFile"
     if [[ $VerboseArgs ]]; then
       # hold the launch till we have checked the config
       BreakAtVerboseArgs=
       cat "$QemuArgsFile"
-      printColor "  [enter] to continue  [b] to go back \n\n"
+      printColor "  [enter] to continue  [b] to go back \n"
       read -rp " >  " BreakAtVerboseArgs
-      printf "\n\n"
+      printf "\n"
       [[ $BreakAtVerboseArgs == "b" ]]  && return
     fi
     mapfile -t QE_echo_Arr < "/tmp/qqX_echo_output.log"
     { printf "\nQUICKEMU SCREEN OUTPUT & other ...  \n"
       for Line in "${QE_echo_Arr[@]}"; do
         if [[ "$Line" == *'-name'* ]]; then
-          printf "\n\n\n$Line"
-          printf "\n\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
-          printf "\n\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
+          printf "\n\n$Line"
+          printf "\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
+          printf "\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
         elif [[ "$Line" == *'/usr/bin/env bas'* ]]; then true
         elif [[ ! "$(tr -cd '[:print:]' <<< "$Line")" ]]; then true
-        else  printf "\n\n$Line"
+        else  printf "\n$Line"
         fi
       done
-      printf "\n\n\n\n"
+      printf "\n\n"
     } >> "$QemuArgsFile"
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
-    [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
+    [[ ! -e "$QemuArgsFile" ]] && printColor "\n  ERROR QemuArgsFile %s failed to create \n"  "$QemuArgsFile" && sleep 3 && exit 1
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
     ## call QEMU  (with any extras, if present)
     # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
@@ -987,7 +987,7 @@ function quickemu {
       VM_ExecBoot=
     fi
   else
-    printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
+    printColor "\n ERROR %s restart needed \n"  "$ModName"
     sleep 5
   fi
 }
@@ -1028,12 +1028,12 @@ function check_screen_percentage {
         if grep -q -e 'screenpct' "/tmp/qmod-case-temp" ; then
           SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
         else
-          printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
+          printColor "\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n "
           SDL_ScrnPcnt_Error="> not possible with this qe-version"
         fi
       fi
     else
-      printColor "\n\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
+      printColor "\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n "  "$SDL_ScreenPercent"
       SDL_ScrnPcnt_Error="Out of Range"
     fi
   fi
@@ -1067,8 +1067,8 @@ function set_drive_paths {
     if [[ -e "$SecondDrive" ]]; then
       SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"
     elif [[ $SecondDrive ]]; then
-      printf "\n\n ERROR SecondDrive NOT found (.conf file)"
-      printf "\n\n  %s \n\n"  "$SecondDrive"
+      printf "\n ERROR SecondDrive NOT found (.conf file)"
+      printf "\n  %s \n"  "$SecondDrive"
       sleep 1.4
     fi
   fi
@@ -1086,8 +1086,8 @@ function set_drive_paths {
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
       SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"
     elif [[ $SharedDrive ]]; then
-      printf "\n\n ERROR SharedDrive NOT found (main settings)"
-      printf "\n\n  %s \n\n"  "$SharedDrive"
+      printf "\n ERROR SharedDrive NOT found (main settings)"
+      printf "\n  %s \n"  "$SharedDrive"
       sleep 1.4
     fi
   fi
@@ -1162,8 +1162,8 @@ function_quick_get_wrap ()  {
     elif ( ping -w 2  8.8.8.8  | grep -q ttl ) 2> /dev/null ; then InternetUp=1
     # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
     else
-      printColor "\n\n  INTERNET CONNECTION NOT FOUND. Check settings and equipment \n\n"
-      printf "\n\n  [enter] to re-test,  [i] ignore, continue anyway  [b] back to main menu"
+      printColor "\n  INTERNET CONNECTION NOT FOUND. Check settings and equipment \n"
+      printf "\n  [enter] to re-test,  [i] ignore, continue anyway  [b] back to main menu"
       read -rp "   >  "   Test_Internet
       echo
       [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="b"  && break
@@ -1215,7 +1215,7 @@ function_quick_get_wrap ()  {
       elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then
         printColor "\n\n  [enter] to continue, only one current release found "
     else
-      printf "\n\n"
+      printf "\n"
       print_quickget_choices  "QGW_Releases_Array"
         printColor "\n\n  Give LIST number of Release"
       fi
@@ -1248,14 +1248,14 @@ function_quick_get_wrap ()  {
     if [[ $QGW_Editions_ListTest ]]; then
       read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
       if [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
-      printf "\n\n  Only one current edition found: "
+      printf "\n  Only one current edition found: "
       QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
       else
-        printf "\n\n"
+        printf "\n"
         print_quickget_choices  "QGW_Editions_Array"
-        printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"
+        printColor "\n  Give LIST number of Edition   [b] to go back \n"
         if [[ $QGW_OS_Arr_NameSelected == "fedora" ]]  && [[ $QGW_Release_Arr_NameSelected == "33" ]] || [[ $QGW_Release_Arr_NameSelected == "34" ]]; then
-          printf "  Note: Fedora 33 i3 and Fedora 34 Cinnamon are not possible \n\n"
+          printf "  Note: Fedora 33 i3 and Fedora 34 Cinnamon are not possible \n"
         fi
         read -rp "  >  "  QGW_List_NumSelected
         if [[ $QGW_List_NumSelected == "b" ]]; then
@@ -1271,7 +1271,7 @@ function_quick_get_wrap ()  {
       fi
     else
       QGW_Edition_Arr_NameSelected=
-      printf "\n\n  Further selection not available"
+      printf "\n  Further selection not available"
     fi
   fi
   QGW_DownloadSelection="$QGW_OS_Arr_NameSelected  $QGW_Release_Arr_NameSelected  $QGW_Edition_Arr_NameSelected"
@@ -1302,12 +1302,12 @@ function_quick_get_wrap ()  {
   function_test_iso_url
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
     if [[ ! $Zsync_OS_Name || ! $Zsync_Release_Name  ]]; then
-      printColor "\n\n  ERROR  Variables for OS Name &/or Release NOT found \n\n"
+      printColor "\n  ERROR  Variables for OS Name &/or Release NOT found \n"
     else
-      printf "\n\n  Updating the live boot development iso with any changes"
-      printColor "\n\n  May take a while to synchronise"
+      printf "\n  Updating the live boot development iso with any changes"
+      printColor "\n  May take a while to synchronise"
       [[ $LastZsync -gt 200000 ]] && printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
-      printf "\n\n"
+      printf "\n"
       ZsyncDownload=1
     fi
   elif [[ "$QGW_DownloadSelection" == *'ubuntu'* ]] && [[ "$QGW_DownloadSelection" == *'daily'* ]]; then
@@ -1321,9 +1321,9 @@ function_quick_get_wrap ()  {
     i=0
     printf "\n"
     while [[ ${VM_Folder_List[i]} ]]; do
-      if [[ $i -eq 0 ]]; then printf "\n\n  [0]  %s (current)"  "${VM_Folder_List[i]}"
-      elif [[ $i -eq 1 ]]; then printf "\n\n  [1]  %s (default)"  "${VM_Folder_List[i]}"
-      else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+      if [[ $i -eq 0 ]]; then printf "\n  [0]  %s (current)"  "${VM_Folder_List[i]}"
+      elif [[ $i -eq 1 ]]; then printf "\n  [1]  %s (default)"  "${VM_Folder_List[i]}"
+      else printf "\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
       ((i +=1))
     done
@@ -1334,7 +1334,7 @@ function_quick_get_wrap ()  {
       ZsyncDownload=1
   else
     show_current_preset_folder_list
-    printf "\n\n\n"
+    printf "\n\n"
     QWG_DownLoadFolder="$Default_VM_Folder"
   fi
   # READY TO START DOWNLOAD
@@ -1348,8 +1348,8 @@ function_quick_get_wrap ()  {
       QGW_OverWrite=
       DailyVMsPresent=
       if [[ -e "$QWG_DownLoadFolder/$QGW_DownloadName" ]]; then
-        printColor "\n\n  ERROR?  VM is already present? "
-        printf "\n\n  %s / %s "    "$QWG_DownLoadFolder" "$QGW_DownloadName"
+        printColor "\n  ERROR?  VM is already present? "
+        printf "\n  %s / %s "    "$QWG_DownLoadFolder" "$QGW_DownloadName"
         [[ ! $QGW_OverWriteAllow ]] && QGW_OverWrite=1
       else
         declare -a SimilarVM_Arr
@@ -1363,7 +1363,7 @@ function_quick_get_wrap ()  {
           for DailyCheckVM in "${SimilarVM_Arr[@]}" ; do
             [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1
           done
-          printColor "\n\n   %s  >>  Similar VM's are present: \n\n"  "$QGW_DownloadName"
+          printColor "\n   %s  >>  Similar VM's are present: \n"  "$QGW_DownloadName"
           print_quickget_choices  "SimilarVM_Arr" 3
           # Request second confirmation, if similar && if daily live, as daily live can be from different download name
           [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWrite=1
@@ -1439,7 +1439,7 @@ function_quick_get_wrap ()  {
     cd "$QWG_DownLoadFolder"  ||  function_conf_error  "FOLDER not accessible: $QWG_DownLoadFolder"
     if [[ $ZsyncDownload ]]; then
       printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that %s will remove."  "$ModName"
-      printf "\n\n  To resume stopped downloads, any .iso.part files should be retained."
+      printf "\n  To resume stopped downloads, any .iso.part files should be retained."
       # https://bugs.launchpad.net/ubuntu/+source/zsync/+bug/477551
 
       function remove_old_rcksum_files {
@@ -1454,9 +1454,9 @@ function_quick_get_wrap ()  {
       remove_old_rcksum_files
     else
       printf "\n  Once a download and initial setup up has finished, the new folder and .conf file may be easily moved"
-      printf "\n\n  and/or edited before running. Part downloads can usually be re-started, if stopped >> "
+      printf "\n  and/or edited before running. Part downloads can usually be re-started, if stopped >> "
     fi
-    if [[ $ZsyncDownload ]]; then  printf "\n\n" ; else printColor "  %s \n\n" "$QGW_DownloadName" ; fi
+    if [[ $ZsyncDownload ]]; then  printf "\n" ; else printColor "  %s \n" "$QGW_DownloadName" ; fi
     # clear any accidental initial double pressing of the enter key
     read -r -t 0.2
     read -r -t 0.2
@@ -1472,7 +1472,7 @@ function_quick_get_wrap ()  {
     #  eg 26102 pts/1    S+     0:11 python3 /usr/bin/macrecovery --board-id Mac-00BE6ED71E35EB86 --mlb 00000000000000000 --os-type default --basename Recover
     # QUICKGET RUNS FIRST, in the background, THEN it starts a separate downloader  eg wget or aria2
     quickget "$QGW_DownloadSelection" &
-    printf "\n\n\n\n\n"
+    printf "\n\n\n"
     printf "\e[3A\r"
     #  make line spaces then move the cursor up from the bottom
     # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc
@@ -1503,10 +1503,10 @@ function_quick_get_wrap ()  {
       if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then  show_rcksum_progress &
       elif [[ $ZsyncDownload ]]; then
         if [[ $(pgrep zsync 2>/dev/null) ]] ; then
-          printf "\n  Comparing images \n\n"
+          printf "\n  Comparing images \n"
           LastZsync="0"
           date +%s > "$VM_InstanceName/zsync.date.txt"
-        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n"
+        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n"
         fi
       fi
       ##  WAITS HERE for an [enter] to finish, or stop  ##
@@ -1523,7 +1523,7 @@ function_quick_get_wrap ()  {
         P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2> /dev/null)"
         if [[ "$P3_MacOS_Cmd" == *'/usr/bin/macrecovery'* ]]; then
           kill "$P3_PID" 2> /dev/null
-          printColor "\n\nStopped \n\n"
+          printColor "\nStopped \n"
           QGW_DownloadStopped=1
           break
         fi
@@ -1570,20 +1570,20 @@ function_quick_get_wrap ()  {
   if  [[ $ZsyncDownload ]]; then
     if [[ $QGW_DownloadStopped ]]; then
       printf "\n  Download Stopped > Residual files may be present"
-      printf "\n\n  Removal of any residual files & folders has to be completed manually"
+      printf "\n  Removal of any residual files & folders has to be completed manually"
       if [[ $Zsync_Updatable_ISO ]]; then
-        printf "\n\n  Part downloads can usually be re-started if the .iso.part file is retained."
+        printf "\n  Part downloads can usually be re-started if the .iso.part file is retained."
       else
-        printf "\n\n  Part downloads can usually be re-started if the folder is retained."
-        printf "\n\n  Dev downloads usually undergo some kind of NAMING variance"
+        printf "\n  Part downloads can usually be re-started if the folder is retained."
+        printf "\n  Dev downloads usually undergo some kind of NAMING variance"
       fi
     else
       printf "\n  End of Quickget processes ..."
       # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
       # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism?
       if [[ ! $Zsync_Updatable_ISO ]]; then
-        printf "\n\n  as Dev downloads usually undergo some kind of NAMING variance"
-        printf "\n\n  checking of files & folders should to be completed manually"
+        printf "\n  as Dev downloads usually undergo some kind of NAMING variance"
+        printf "\n  checking of files & folders should to be completed manually"
       fi
     fi
     ZsyncDownload=
@@ -1592,16 +1592,16 @@ function_quick_get_wrap ()  {
     [[ $New_VM_File ]] && printColor "\n  .conf file created:  %s "  "$(basename "$New_VM_File")"
     if [[ ! $New_VM_File ]] || [[ $QGW_DownloadStopped ]]; then
       if [[ $QGW_DownloadStopped ]]; then
-        printf "\n\n  Download Stopped > Residual files are present"
-        printf "\n\n  Part downloads can usually be re-started if the folder is retained."
+        printf "\n  Download Stopped > Residual files are present"
+        printf "\n  Part downloads can usually be re-started if the folder is retained."
       fi
-      [[ ! $New_VM_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >"
-      printColor "\n\n  Folder contents: \n\n"
+      [[ ! $New_VM_File ]] && printf "\n  As there is no .conf file, there may have been an ERROR >"
+      printColor "\n  Folder contents: \n"
       ls "$New_VM_Folder"
-      printColor "\n\n  [d] delete the folder"
+      printColor "\n  [d] delete the folder"
       [[ $New_VM_File ]] && printColor " and .conf"
       printf "  [enter] to retain & continue "
-      printf "\n\n\n"
+      printf "\n\n"
       read -rp "  >  "    QGW_FolderDelete
       if [[ $QGW_FolderDelete == "d" ]]; then
         printf "\n  Folder/file being deleted ... "
@@ -1618,7 +1618,7 @@ function_quick_get_wrap ()  {
   elif [[ $QGW_FolderDelete == "d" ]]; then
     sleep 1.4
   else
-    printColor "\n\n  [enter] to return or continue \n\n"
+    printColor "\n  [enter] to return or continue \n"
     read -rp "  > "
   fi
   # return back to any working directory if one had already been set  ( REVIEW is this right in all cases?)
@@ -1645,35 +1645,35 @@ function_conf_error () {
   read -r -t 0.1
   read -r -t 0.1
   read -r -t 0.1
-  printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
-  if [[ $1 ]] ; then printf "\n\n  Check %s settings, location & content ... "  "$1"
-  else printf "\n\n  Check the settings and re-run this script ... " ; fi
-  printf "\n\n  Settings file:  %s \n\n" "$Q_Mod_SettingsFile"
+  printf "\n  %s Settings, VM folder & conf file(s)"  "$ModName"
+  if [[ $1 ]] ; then printf "\n  Check %s settings, location & content ... "  "$1"
+  else printf "\n  Check the settings and re-run this script ... " ; fi
+  printf "\n  Settings file:  %s \n" "$Q_Mod_SettingsFile"
   if [[ "$1" == *'COMMAND'* ]]; then
-    printColor "\n\n  [q] to quit "
-    printf "  [enter] to view/edit settings file \n\n"
+    printColor "\n  [q] to quit "
+    printf "  [enter] to view/edit settings file \n"
   elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then
-    printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW
+    printColor "\n  CHECK ME, NOW: \n"    #  REVIEW
     cat "$VM_Conf_File"
     NewSetupFlag=1
-    printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
-    printColor "\n\n  [c] continue  (with current settings) looks okay "
-    printf "\\n\n  [e] to edit %s general settings   [q] to quit \n\n"   "$ModName"
+    printf "\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
+    printColor "\n  [c] continue  (with current settings) looks okay "
+    printf "\\n  [e] to edit %s general settings   [q] to quit \n"   "$ModName"
   elif [[ $1 == "folder" ]] ; then
     FolderConfigFlag=1
     printf "\n  Folder config ERROR: "
-    printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
-    printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
-    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit %s general settings " "$ModName"
-    printf "\n\n  [q] to quit \n\n"
+    printf "\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
+    printf "\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
+    printColor "\n\n  [enter] to edit the .conf file   [e]  edit %s general settings " "$ModName"
+    printf "\n  [q] to quit \n"
   else
-    printColor "\n\n  [Enter] to edit %s general settings"  "$ModName"
+    printColor "\n  [Enter] to edit %s general settings"  "$ModName"
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
-    printColor "  [q] to quit \n\n"
+    printColor "  [q] to quit \n"
   fi
   read -rp "  >  "   ErrorMenuSelect
   if [[ $ErrorMenuSelect == "q" ]]; then
-    printf "\n\n"; command exit
+    printf "\n"; command exit
   elif [[ $ErrorMenuSelect == "tune" ]]; then
     function_config_tune_up  "$VM_Conf_File" "$VM_InstanceName"
   elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then
@@ -1755,9 +1755,9 @@ function_scan_VM_folderList () {
             ((VM_PairsCount+=2))
           else
             VM_SettingsError=1
-            printf "\n\n  Array Element(s) Not Found "
-            printf "\n\n  Folder:  %s " "${VM_Array[$i,0]}"
-            printf "\n\n  .conf :  %s " "${VM_Array[$i,1]}"
+            printf "\n  Array Element(s) Not Found "
+            printf "\n  Folder:  %s " "${VM_Array[$i,0]}"
+            printf "\n  .conf :  %s " "${VM_Array[$i,1]}"
             break
           fi
         done
@@ -1767,15 +1767,15 @@ function_scan_VM_folderList () {
       # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly.
       if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then
         VM_SettingsError=1
-        printf "\n\n  Empty Array Element(s) Found "
+        printf "\n  Empty Array Element(s) Found "
       fi
       if [[ $VM_SettingsError ]]; then
-        printColor "\n\n  ERROR in VM array general settings"
-        printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
-        printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
-        printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
+        printColor "\n  ERROR in VM array general settings"
+        printf "\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
+        printf "\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
+        printf "\n  [enter] to open settings editor  [q] to quit \n"
         read -rp  "  >  "  VM_SettingsError
-        printf "\n\n"
+        printf "\n"
         if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings ; fi
       else
         break
@@ -1815,7 +1815,7 @@ function_print_conf_array () {
   VM_PairsCount="$((VM_ElementCount/2))"
   while [[ ${VM_Array[$i,0]} ]] ; do
     if [[ ! -d "${VM_Array[$i,0]}" ]]; then
-      printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"
+      printf "\n  ERROR  %s folder not found: \n  %s \n" "$ModName" "${VM_Array[$i,0]}"
       function_conf_error  "folder $i"
       SelectArrayError=1
       break
@@ -1827,9 +1827,9 @@ function_print_conf_array () {
         if [[ ! $ByPass_VM_Array_Selector ]]; then
           if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
             if [[ $ListTitleFolder ]]; then
-              printf " >>  %s\n\n\n  "  "$ListTitleFolder"
+              printf " >>  %s\n\n  "  "$ListTitleFolder"
               ListTitleLine_ItemCount=0
-            else  printf "\n\n  "
+            else  printf "\n  "
             fi
             ListTitleFolder="${VM_Array[$i,0]}"
           fi
@@ -1857,11 +1857,11 @@ function_print_conf_array () {
           # move to new line when number of items per line reached  (default 4, see main settings)
           if [[ $ListTitleLine_ItemCount == "$VM_Select_ItemsPerLine" ]]; then
             ListTitleLine_ItemCount=0
-            printf "\n\n  "
+            printf "\n  "
           fi
         fi
       else
-        printf "\n\n  ERROR  %s ' .conf ' not found: \n\n  %s \n\n" "$ModName" "$ArrayConf_Item"
+        printf "\n  ERROR  %s ' .conf ' not found: \n  %s \n" "$ModName" "$ArrayConf_Item"
         function_conf_error  "config $i"
         SelectArrayError=1
         break
@@ -1876,7 +1876,7 @@ function_Select_VM () {
   SelectArrayError=
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
     # if reselecting & the array is already loaded (which it should be ...)
-    # printf "\n\n  ByPassing VM Loader ... "
+    # printf "\n  ByPassing VM Loader ... "
     ByPass_VM_Array_Loader=
   else
     # Re-scan folders as something new may have been added
@@ -1884,7 +1884,7 @@ function_Select_VM () {
     function_VM_array_add_confs
   fi
   if [[ $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]] ; then
-    # printf "\n\n  ByPassing VM Selector ... "
+    # printf "\n  ByPassing VM Selector ... "
     true
   else
     VM_Selection=
@@ -1892,17 +1892,17 @@ function_Select_VM () {
     VM_Conf_File=
     function_print_conf_array
     if [[ $DefaultFolderError || $ExtraFolderError ]]; then
-      printf "\n\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
-      [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit "
-      [[ $ExtraFolderError ]] && printf "\n\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
+      printf "\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
+      [[ $DefaultFolderError ]] && printf "\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit "
+      [[ $ExtraFolderError ]] && printf "\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
     else
-      printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
+      printf "\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
       VM_Array_NameZero="${VM_Array[0,1]}"
       VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
-      printColor "\n\n  [Enter]  "
+      printColor "\n  [Enter]  "
       printf "%s  "  "${VM_Array_NameZero^^}"
     fi
-    printf "\n\n"
+    printf "\n"
     read -rp  "   >  "  VM_Selection
     [[ $VM_Selection == "q" || $VM_Selection == "Q" ]] && echo && exit directly
     if [[ $VM_Selection == "set" ]];then
@@ -1921,7 +1921,7 @@ function_Select_VM () {
     fi
     if [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
       if [[ $VM_Selection == "GT" ]]; then
-        printColor "\n\n  CAPS LOCK should be unset \n\n"
+        printColor "\n  CAPS LOCK should be unset \n"
         read -rp "  [enter] to continue  >  "
       fi
       VM_Selection=
@@ -1932,7 +1932,7 @@ function_Select_VM () {
       return
     fi
     [[ ! $VM_Selection ]] &&  VM_Selection=0
-    # printf "\n\n  Selecting instance %s \n\n"  "$VM_Selection"
+    # printf "\n  Selecting instance %s \n"  "$VM_Selection"
     sleep 0.1   # gives background scans a little more time
     VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
     VM_Conf_File="${VM_Array[$VM_Selection,1]}"
@@ -1944,7 +1944,7 @@ function_Select_VM () {
     ## Check file/folder exists and that we are where we need to be
     [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder"  && SelectArrayError=1
     # change directory to where the VM is
-    ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1
+    ! cd "$VM_Conf_Dir"  &&  printColor "\n  ERROR  .conf  folder switching \n" && sleep 5 && exit 1
     [[ ! -e "$VM_Conf_File" ]] &&  function_conf_error  ".conf file" && SelectArrayError=1
     # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder
     VM_InstanceName="${VM_Conf_File/.conf}"
@@ -1979,51 +1979,51 @@ drives_and_snapshots() {
   #  also start accessing qemu-img directly instead of going round the houses with with quickemu calls
   #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select'
   #  $2 is for disk utility to hide the message to use the disk utility
-  [[ $1 == "as_disk_util" ]] && printColor "\n\n  Internal ERROR: disk uitilty needs two args \n\n"  && sleep 100
+  [[ $1 == "as_disk_util" ]] && printColor "\n  Internal ERROR: disk uitilty needs two args \n"  && sleep 100
   Selected_Drive=
   Selected_DriveName=
   find_main_drive
   set_drive_paths
   if [[ $SecondDriveArgs ]]; then
-    printColor "\n  Second Drive: \n\n"
+    printColor "\n  Second Drive: \n"
     if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
-    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n" ; fi
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo ; else check_disk_is_okay "$SecondDrive" ; fi
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-    printf "\n\n"
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n"
   fi
   if [[ $SharedDriveArgs ]]; then
-    printColor "\n  Shared Drive: \n\n"
+    printColor "\n  Shared Drive: \n"
     if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
-    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n" ; fi
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-    printf "\n\n"
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n"
   fi
   if [[ ! -e $MainDrive ]]; then
-    printColor "\n\n  NO MAIN DRIVE  (yet) \n\n"
+    printColor "\n  NO MAIN DRIVE  (yet) \n"
   else
-    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n\n  Main Drive: \n\n"
-    else printColor "\n\n  One Main Drive: \n\n"
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n  Main Drive: \n"
+    else printColor "\n  One Main Drive: \n"
     fi
     if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
-    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n" ; fi
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo ; else check_disk_is_okay "$MainDrive" ; fi
     printf " Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-    printf "\n\n"
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n"
   fi
   if [[ $1 == "select" ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
     printColor "\n  SELECT:  [enter]  Main Drive (or back to main menu)"
     [[ $SecondDriveArgs ]] && printColor "   [2]  Second Drive"
     [[ $SharedDriveArgs ]] && printColor "   [3]  Shared Drive"
     [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "  (scroll to view)"
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "   Selected_Drive
     case "$Selected_Drive" in
       2)  Selected_Drive="$SecondDrive"
@@ -2041,16 +2041,16 @@ drives_and_snapshots() {
     Selected_DriveName="Main Drive"
   fi
   if [[ $1 == "select" ]] && [[ -e "$Selected_Drive" ]] ; then
-    printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
+    printColor "\n Selected Drive = %s \n"  "$Selected_DriveName"
     "$QEMU_IMG" info "$Selected_Drive"
     check_disk_is_okay "$Selected_Drive"
     if [[ $2 != "as_disk_util" ]]; then
-      printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
-      if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-      printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere."
+      printf "\n  Health Status:  %s"  "$DiskChkStatus"
+      if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n  See qqX [disk] utility for repairs" ; fi
+      printf "\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere."
     fi
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+    [[ $(pgrep -x kvm) ]] &&  printColor "\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
   fi
 }
 
@@ -2084,20 +2084,20 @@ function_KillPID_Menu() {
       SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
       printColor " [r] reload Spicy window (if closed)"
     fi
-    printf "\n\n"
+    printf "\n"
     tput cnorm
   fi
   # return to menu requires VM to be shutdown first
   while true ; do
     read -rp  "  >  " -t 1  KillPID_Menu
     if [[ $KillPID_Menu == "k" ]]; then
-      printf "\n\n"
+      printf "\n"
       if [[ $( ps -p "$InstancePID" --no-headers ) ]]; then
         [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
         kill "$InstancePID" 2>/dev/null &
       fi
       sleep 3
-      printf "\n\n"
+      printf "\n"
       tput cnorm
       break
     elif [[ $KillPID_Menu == "r" ]]; then
@@ -2142,11 +2142,11 @@ qqX_edit_settings() {
   else
     # Run the editor:
     if [[ $1 == "conf" ]]; then
-      printf "\n\n"
+      printf "\n"
       cat "$VM_Conf_Dir/$VM_Conf_File"
       while true ; do
-        printColor "\n\n  [enter] to edit   [r] config reminder notes   [b] go back"
-        printf "\n\n"
+        printColor "\n  [enter] to edit   [r] config reminder notes   [b] go back"
+        printf "\n"
         read -rp "  >  "   ConfEdit_Select
         if [[ $ConfEdit_Select == "r" ]] ; then
           custom_conf_notes
@@ -2160,7 +2160,7 @@ qqX_edit_settings() {
       done
     elif [[ $1 == "new_conf" ]]; then
       custom_conf_notes
-      printColor "  [enter] to edit \n\n"
+      printColor "  [enter] to edit \n"
       read -rp "   >   "
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"
     elif [[ $1 == "tune-up" ]]; then
@@ -2183,32 +2183,32 @@ qqX_edit_settings() {
 function_delete_Selected_VM () {
   if [[ ! $1 && ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
-    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n "
+    printColor "\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n "
     sleep 2 ;  return
   else
     if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
-      printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n "
-      printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n "
+      printColor "\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n "
+      printColor "\n  Internal Params: VM Name / VM config file  NOT FOUND  \n "
       sleep 2 ;  return
     fi
     if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
-    printColor "\n\n  Folder: %s " "$1"
+    printColor "\n  Folder: %s " "$1"
     printColor "  & file: %s  to be deleted?"  "$2"
-    printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
-    printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
-    printf "\n\n  Folder content: \n\n"
+    printf  "\n  To delete a VM, removal of the above folder/file is sufficient."
+    printf "\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+    printf "\n  Folder content: \n"
     ls "$1"
     if [[ $TrashingAvailable ]]; then
-      printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"
-      printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
+      printColor "\n  [enter] safely move the folder & file to the recoverable trash bin"
+      printf "\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
     else
-      printColor "\n\n  [enter] use the file manager to move things the trash bin "
-      printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
+      printColor "\n  [enter] use the file manager to move things the trash bin "
+      printf "\n  [y] yes, PERMANENTLY, I have back-ups ..."
     fi
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "   Delete_VM_Option
     if [[ $Delete_VM_Option == "y" ]]; then
-      printf "\n\n  Folder & .conf file being deleted ... \n\n"
+      printf "\n  Folder & .conf file being deleted ... \n"
       rm -f -r "$1"
       echo
       rm -f "$2"
@@ -2219,11 +2219,11 @@ function_delete_Selected_VM () {
         gio trash "$1"
         gio trash "$2"
       else
-        printf "\n\n  NOT deleted ... \n\n"
+        printf "\n  NOT deleted ... \n"
       fi
     fi
     sleep 1.4
-    printColor "\n\n  [enter] to return or continue \n\n"
+    printColor "\n  [enter] to return or continue \n"
     read -rp "  > "
     VM_InstanceName="$VM_InstanceName"" - Deleted >> ReSelect"
     SettingsFileAdjusted=1
@@ -2236,24 +2236,24 @@ function show_quickemu_WRAP_help {
   if [[ $ModName_qqX ]]; then
     printf "\n"
     function_qqX_printf_logo_title  "$qqX_title"
-    printf "\n\n\n  %s is currently wrapping: QEMU %s  quickemu %s  &  quickget %s"  "$ModName" "$QEMU_VER_LONG" "$QE_VerNumber"  "$QG_VerNumber"
+    printf "\n\n  %s is currently wrapping: QEMU %s  quickemu %s  &  quickget %s"  "$ModName" "$QEMU_VER_LONG" "$QE_VerNumber"  "$QG_VerNumber"
   else
-    printColor "\n\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion"
+    printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion"
   fi
-  printf "\n\n  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"
-  printf "\n\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"
-  [[ ! $ModName_qqX ]] &&  printf "\n\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
-  printf "\n\n  [enter] to return   [a] %s API detail   " "$ModName"
+  printf "\n  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"
+  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"
+  [[ ! $ModName_qqX ]] &&  printf "\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
+  printf "\n  [enter] to return   [a] %s API detail   " "$ModName"
   [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
-  printf "\n\n"
+  printf "\n"
   read -rp "  >  "  HelpSelect
   if [[ $HelpSelect == "a" ]]; then
     show_wrap_CLI_usage
-    printf "\n\n\n"
+    printf "\n\n"
     read -rp  "  [enter] to return >  "
   elif [[ $HelpSelect == "p" ]]; then
-    printf "\n\n  Extra quickemu parameters for qmod API & qmod settings."
-    printf "\n\n  NB  not all options can be applicable  CAUTION \n\n"
+    printf "\n  Extra quickemu parameters for qmod API & qmod settings."
+    printf "\n  NB  not all options can be applicable  CAUTION \n"
     NoExit=1
     echo
     usage | tail +6
@@ -2315,16 +2315,16 @@ check_for_qqX_updates() {
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
       if [[ $(bc <<< "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" 2>/dev/null) == "1" ]]; then
-        { printf "\n\n qqX_UpdateAvail=\"1\""
-          printf "\n\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease"
-          printf "\n\n qqX_LatestTarBall=\"%s\""  "$qqX_LatestTarBall"
-          printf "\n\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall"
-          printf "\n\n qqX_Latest_Secure_TarSha=\"%s\""  "$qqX_Latest_Secure_TarSha"
-          printf "\n\n qqX_LatestReleaseType=\"%s\""  "$qqX_LatestReleaseType"
-          printf "\n\n qqX_LatestVer_Float=\"%s\""  "$qqX_LatestVer_Float"
+        { printf "\n qqX_UpdateAvail=\"1\""
+          printf "\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease"
+          printf "\n qqX_LatestTarBall=\"%s\""  "$qqX_LatestTarBall"
+          printf "\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall"
+          printf "\n qqX_Latest_Secure_TarSha=\"%s\""  "$qqX_Latest_Secure_TarSha"
+          printf "\n qqX_LatestReleaseType=\"%s\""  "$qqX_LatestReleaseType"
+          printf "\n qqX_LatestVer_Float=\"%s\""  "$qqX_LatestVer_Float"
         } >> "$qqX_Upd_VarsTmpFile"
       else
-        printf "\n\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
+        printf "\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
       fi
     fi
     #  REVIEW  dev searches for pre-releases?  Needs 'jq' but this is required by quickemu anyway.  Or just leave as UnHide_Beta?
@@ -2339,11 +2339,11 @@ function_config_tune_up ()  {
   TuneUpDistroFolder="$2"
   TuneUpDate="$(date +%b%d.%H.%M)"
   if [[ ! -e $TuneUpTargetFile ]]; then
-    printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
+    printColor "\n  Internal ERROR  tune up .conf file not found \n  %s \n"
     sleep 100
   fi
   if [[ ! -d $TuneUpDistroFolder ]]; then
-    printColor "\n\n  Internal ERROR  tune up DistroFolder not found \n\n  %s \n\n"
+    printColor "\n  Internal ERROR  tune up DistroFolder not found \n  %s \n"
     sleep 100
   fi
   TuneUpOldFile="$TuneUpDistroFolder/OldConfig.$TuneUpDate.conf"
@@ -2351,11 +2351,11 @@ function_config_tune_up ()  {
   TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
   TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
-  printColor "\n\n\n  CHECK ME: \n\n"
+  printColor "\n\n  CHECK ME: \n"
   cat "$TuneUpTmpCopy"
-  printColor "\n\n  All changes made here, may be reversed:"
-  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
-  [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
+  printColor "\n  All changes made here, may be reversed:"
+  printf "\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
+  [[ $NewFileTuneUp ]] && printf "\n  So far, so good  >  "
   # check starter
   ConfLine="$(grep '#!/usr/bin' "$TuneUpTmpCopy")"
   ConfPointer="${ConfLine/"#!/usr/bin/"/}"
@@ -2363,30 +2363,30 @@ function_config_tune_up ()  {
   ConfPointer="${ConfPointer// /}"
   if [[ ! $ConfLine ]]; then
     # some kind of line is needed
-    printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft"
+    printf "#!/usr/bin/%s --vm \n" "$ModName"  > "$TuneUpTargetDraft"
   elif [[ $ConfPointer != "$ModName" ]]; then
-    printColor "\n\n  The start line may be edited to point to %s"  "$ModName"
+    printColor "\n  The start line may be edited to point to %s"  "$ModName"
     ConfEdit_Qstart=
-    printf "\n\n  Change the start line to point to %s ?"  "$ModName"
-    printf "\n\n  [enter] yes, go for it    [no] maybe not ...  [q] quit tune-up \n\n"
+    printf "\n  Change the start line to point to %s ?"  "$ModName"
+    printf "\n  [enter] yes, go for it    [no] maybe not ...  [q] quit tune-up \n"
     read -rp "  >  "  ConfEdit_Qstart
     [[ $ConfEdit_Qstart == "q" ]] && return
-    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft"
+    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/%s --vm \n" "$ModName"  > "$TuneUpTargetDraft"
     else printf "%s\n" "$ConfLine" > "$TuneUpTargetDraft"
     fi
   else
-    printf "%s\n\n" "$ConfLine" > "$TuneUpTargetDraft"
+    printf "%s\n" "$ConfLine" > "$TuneUpTargetDraft"
   fi
   # disk size  (for existing installs use the 'disk' util)
   ConfLine="$(grep -s 'disk_size' "$TuneUpTmpCopy")"
   if [[ $NewFileTuneUp ]]; then
     ConfEdit_DiskSize=
-    printColor "\n\n  Suggest adding disk_size=\"64G\" or higher if expecting to create snapshots: "
-    printf "\n\n  qcow2 disks auto-compress & will normally occupy much less space"
-    printColor "\n\n  & an empty disk only takes up 196k."
-    printf "\n\n  It is easier make them larger now than to resize later ... "
-    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   [no] leave as possibly sub-minimal  [q] quit tune-up "
-    printf "\n\n"
+    printColor "\n  Suggest adding disk_size=\"64G\" or higher if expecting to create snapshots: "
+    printf "\n  qcow2 disks auto-compress & will normally occupy much less space"
+    printColor "\n  & an empty disk only takes up 196k."
+    printf "\n  It is easier make them larger now than to resize later ... "
+    printf  "\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   [no] leave as possibly sub-minimal  [q] quit tune-up "
+    printf "\n"
     read -rp  "  >  "  ConfEdit_DiskSize
     [[ $ConfEdit_DiskSize == "q" ]] && return
     [[ ! $ConfEdit_DiskSize ]]  && ConfEdit_DiskSize="128"
@@ -2411,24 +2411,24 @@ function_config_tune_up ()  {
     ThreadsSuggestLower=$(bc <<< "scale=0; ((($ThreadsAvailable*2)/3)+0.5)/1" 2>/dev/null)
     [[ "$(( ThreadsSuggestLower % 2 ))" == "1" ]] && (( ThreadsSuggestLower +=1 ))
   fi
-  [[ $ThreadsAvailable ]] && printColor "\n\n  You have %s 'cores' available  (actual cores, or cores x threads) " "$ThreadsAvailable"
-  printf "\n\n  Normal guest setting should be around 2/3 to 3/4 of the host's."
-  printf "\n\n  All available 'cores x threads' can be allocated, esp. if running the VM full screen"
-  printf "\n\n  Possibly, if using 'big LITTLE'  CPU's you *may* need to use a lower figure."
-  printf "\n\n  Quickemu defaults to safe half, minimals. Be generous as less will actually be used."
-  # printf "\n\n  Remember, this is the 'maximum-allowed' number"
-  printf "\n\n  And CPU virtualizing units will always protect the host ...."
-  [[ $ThreadsSuggested ]] && printColor "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
+  [[ $ThreadsAvailable ]] && printColor "\n  You have %s 'cores' available  (actual cores, or cores x threads) " "$ThreadsAvailable"
+  printf "\n  Normal guest setting should be around 2/3 to 3/4 of the host's."
+  printf "\n  All available 'cores x threads' can be allocated, esp. if running the VM full screen"
+  printf "\n  Possibly, if using 'big LITTLE'  CPU's you *may* need to use a lower figure."
+  printf "\n  Quickemu defaults to safe half, minimals. Be generous as less will actually be used."
+  # printf "\n  Remember, this is the 'maximum-allowed' number"
+  printf "\n  And CPU virtualizing units will always protect the host ...."
+  [[ $ThreadsSuggested ]] && printColor "\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
   CoresSetNumber=
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
   if [[ $ConfLine ]]; then
-    printf "\n\n  CURRENT setting:  %s" "$ConfLine"
+    printf "\n  CURRENT setting:  %s" "$ConfLine"
     CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
     [[ $CurrentCores != "$ThreadsSuggestLower"  ]] && printColor "   [c] to use current  "
   fi
-  if [[ $ThreadsSuggestLower ]]; then printColor "\n\n  [enter] use %s " "$ThreadsSuggestLower"; else  printf "\n\n" ; fi
+  if [[ $ThreadsSuggestLower ]]; then printColor "\n  [enter] use %s " "$ThreadsSuggestLower"; else  printf "\n" ; fi
   printColor "  [integer] choose (even numbers are usual)  "
-  printColor "[d] use quickemu defaults   [q] quit tune-up \n\n"
+  printColor "[d] use quickemu defaults   [q] quit tune-up \n"
   read -rp  "  >  "  CoresSetNumber
   [[ $CoresSetNumber == "q" ]] && return
   if [[ $CoresSetNumber && $(tr -cd "[:digit:]" <<< "$CoresSetNumber") ]]; then
@@ -2439,13 +2439,13 @@ function_config_tune_up ()  {
   else
     if [[ $ThreadsSuggestLower ]]; then
       printf "cpu_cores=\"%s\"\n"  "$ThreadsSuggestLower"  >> "$TuneUpTargetDraft"
-      printf "\n\n  Max cores set to %s " "$ThreadsSuggestLower"
+      printf "\n  Max cores set to %s " "$ThreadsSuggestLower"
     fi
   fi
   SharedRAM_NotFound=
   RAM_Available=
   Shared_RAM_Mb=
-  printf "\n\n\n  Memory showing: \n\n"
+  printf "\n\n  Memory showing: \n"
   free --si -h
   RAM_Available="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2)"
   if [[ "$RAM_Available" == *G* ]]; then  RAM_Available="$( cut -d'G' -f1  <<< "$RAM_Available" | tr -cd '[:graph:]' 2>/dev/null)"
@@ -2465,14 +2465,14 @@ function_config_tune_up ()  {
       [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
     fi
   fi
-  printf "\n\n\n"
+  printf "\n\n"
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
-  printf "\n\n  Quickemu will default to half, even quarter minimals ..."
-  printf "\n\n  For full screen VM, suggest RAM of around 2/3 total, round up/down to expected guest/host demand"
-  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
-  printf "\n\n  Integer values only. Possibly reduce if high quotas present.  \n\n  Use programs such as 'htop' for further tuning."
+  printf "\n  Quickemu will default to half, even quarter minimals ..."
+  printf "\n  For full screen VM, suggest RAM of around 2/3 total, round up/down to expected guest/host demand"
+  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n  Add about half of shared RAM, used for graphics"
+  printf "\n  Integer values only. Possibly reduce if high quotas present.  \n  Use programs such as 'htop' for further tuning."
   if [[ $RAM_Available ]]; then
-    printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"
+    printColor "\n  Your host system is showing %sG of RAM, " "$RAM_Available"
     if [[ $Shared_RAM_Allocated ]]; then printColor "of which %sG is possibly allocated to graphics" "$Shared_RAM_Allocated"
     elif [[ $Shared_RAM_Mb ]]; then printColor "of which %sM *may* be allocated to graphics" "$Shared_RAM_Mb"
     elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
@@ -2484,20 +2484,20 @@ function_config_tune_up ()  {
     RAM_Suggested_Higher="$(bc <<< "scale=3; (($RAM_ForCalcs /100)*65) /1" )"
     printf -v RAM_Suggested_Lower  "%.0f" "$RAM_Suggested_Lower"           # rounded up/down
     printf -v RAM_Suggested_Higher  "%.0f" "$RAM_Suggested_Higher"         # rounded up/down
-    printf "\n\n  Suggested RAM (lower)  = %sG"  "$RAM_Suggested_Lower"
-    printf "\n\n  Suggested RAM (higher) = %sG"  "$RAM_Suggested_Higher"
+    printf "\n  Suggested RAM (lower)  = %sG"  "$RAM_Suggested_Lower"
+    printf "\n  Suggested RAM (higher) = %sG"  "$RAM_Suggested_Higher"
   fi
   ConfLine="$(grep -s 'ram=' "$TuneUpTmpCopy")"
   if [[ $ConfLine ]]; then
-    printf "\n\n  CURRENT setting:  %s" "$ConfLine"
+    printf "\n  CURRENT setting:  %s" "$ConfLine"
     Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
     [[ $Current_RAM != "$RAM_Suggested_Higher"  ]] && printColor "   [c] to use current  "
   fi
   RAM_SetNumber=
-  printColor "\n\n  [enter] use %s   [integer] choose   " "$RAM_Suggested_Higher"
-  printColor "[d] to use quickemu defaults  [q] quit tune-up \n\n"
+  printColor "\n  [enter] use %s   [integer] choose   " "$RAM_Suggested_Higher"
+  printColor "[d] to use quickemu defaults  [q] quit tune-up \n"
   read -rp  "  >  "  RAM_SetNumber
-  printf "\n\n"
+  printf "\n"
   [[ $RAM_SetNumber == "q" ]] && return
   if [[ $RAM_SetNumber ]] && [[ $(tr -cd "[:digit:]" <<< "$RAM_SetNumber") ]]; then
     printf "ram=\"%sG\"\n"  "$RAM_SetNumber"  >> "$TuneUpTargetDraft"
@@ -2522,47 +2522,47 @@ function_config_tune_up ()  {
   guest_os=
   ConfLine="$(grep -s 'guest_os=' "$TuneUpTmpCopy")"
   if [[ ! $ConfLine ]]; then
-    printColor "\n\n  WARNING  a line 'guest_os=\"xxx\"' should be present"
-    printf "\n\n  This should be added manually, where  =\"linux\"  \"windows\"  or \"macos\" are valid options"
-    printf "\n\n  Re-run this checker after the guest_os line has been added"
+    printColor "\n  WARNING  a line 'guest_os=\"xxx\"' should be present"
+    printf "\n  This should be added manually, where  =\"linux\"  \"windows\"  or \"macos\" are valid options"
+    printf "\n  Re-run this checker after the guest_os line has been added"
   else
     eval "$ConfLine"
     if [[ $guest_os == "windows" ]]; then
-      printColor "\n\n Windows: "
-      printf "\n\n  Software TPM should be set as \"on\" until at least the registration process is complete"
-      printf "\n\n  but can be set to \"off\" at later stages. Lines may commented-out with a \"#\" \n"
+      printColor "\n Windows: "
+      printf "\n  Software TPM should be set as \"on\" until at least the registration process is complete"
+      printf "\n  but can be set to \"off\" at later stages. Lines may commented-out with a \"#\" \n"
       ConfLine="$(grep -s '# Secure Boot' "$TuneUpTmpCopy")"
       if [[ ! $ConfLine ]]; then
-        printf "\n\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft"
+        printf "\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft"
       fi
       {   printf "\ntpm=\"on\""
-          printf "\nsecureboot=\"off\"\n\n"
+          printf "\nsecureboot=\"off\"\n"
       }   >> "$TuneUpTargetDraft"
     elif [[ $guest_os == "macos" ]]; then
       ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
       if [[ ! $ConfLine ]]; then
-        printColor "\n\n  WARNING a line:  macos_release=\"catalina\" or similar should be present"
-        printf "\n\n  This instructs Quickemu how to optimise & should be added manually.\n"
+        printColor "\n  WARNING a line:  macos_release=\"catalina\" or similar should be present"
+        printf "\n  This instructs Quickemu how to optimise & should be added manually.\n"
         printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft"
       fi
     fi
   fi
   while true; do
-    printColor "\n\n  CHECK ME: \n\n"
+    printColor "\n  CHECK ME: \n"
     cat "$TuneUpTargetDraft"
     TuneUpConfConfirm=
-    printColor "\n\n  [enter] all good, continue    [r] revert back to the old config"
-    printf "\n\n  [e]  edit the config file in more detail   "
+    printColor "\n  [enter] all good, continue    [r] revert back to the old config"
+    printf "\n  [e]  edit the config file in more detail   "
     [[ $NewFileTuneUp ]] && printf "[d]  delete the VM - something went wrong ..."
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "   TuneUpConfConfirm
     if [[ $TuneUpConfConfirm == "e" ]]; then
       printf "\n# To restore use name:   %s \n" "$TuneUpTargetFile" >> "$TuneUpOldFile"
       qqX_edit_settings  "tune-up"
     elif [[ $TuneUpConfConfirm == "r" ]]; then
-      printColor "\n\n  Undoing changes to config file \n\n"
+      printColor "\n  Undoing changes to config file \n"
       cat "$TuneUpTargetFile"
-      printf "\n\n"
+      printf "\n"
       read -rp "  [enter] to continue  >  "
       break
     elif [[ $NewFileTuneUp ]] && [[ $TuneUpConfConfirm == "d" ]]; then
@@ -2578,8 +2578,8 @@ function_config_tune_up ()  {
 
 show_qmod_title() {
   if [[ $ModName_qqX ]]; then printf "\n" ; function_qqX_printf_logo_title  "$qqX_title" ;  printf "\n"
-  else printColor "\n\n  Quickemu Mod - Virtual Machine Launcher  Wrap Version %s"  "$ModVersion" ; fi
-  printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
+  else printColor "\n  Quickemu Mod - Virtual Machine Launcher  Wrap Version %s"  "$ModVersion" ; fi
+  printf "\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
   PWD_Folder="$(pwd)"
   HideFolderTitleBar=
@@ -2587,7 +2587,7 @@ show_qmod_title() {
     [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
   done
   if [[ ! $HideFolderTitleBar ]]; then
-    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
+    printf "\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
   else
     printf "\n"
   fi
@@ -2630,7 +2630,7 @@ if [[ $1 ]]; then
   elif [[ $XDG_StartVariant ]]; then
     echo
     function_qqX_logo
-    printColor "\n\n  %s  not understood \n\n  Or non valid file type %s \n\n"  "$1 "  "$XDG_MimeType"
+    printColor "\n  %s  not understood \n  Or non valid file type %s \n"  "$1 "  "$XDG_MimeType"
     sleep 5
   elif [[ "$1" == *'vm' ]] && [[ "$2" == *'.conf' ]]; then
     # conforms to  -vm | --vm  file.conf
@@ -2639,21 +2639,21 @@ if [[ $1 ]]; then
     shift $#
   else
     show_wrap_CLI_usage
-    printf "\n\n"
+    printf "\n"
     exit directly
   fi
   if [[ ! $VM_Conf_Dir ]]; then
     VM_Conf_Dir="$CurrentFolder"
   else
     if [[ ! -e  "$VM_Conf_Dir"  ]]; then
-      printColor "\n\n  %s  not found "  "$VM_Conf_Dir "
+      printColor "\n  %s  not found "  "$VM_Conf_Dir "
       function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
     else
       cd "$VM_Conf_Dir"  || function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
     fi
   fi
   if [[ ! -e "$VM_Conf_Dir/$VM_Conf_File" ]]; then
-    printColor "\n\n  %s  not found "  "$VM_Conf_File"
+    printColor "\n  %s  not found "  "$VM_Conf_File"
     function_conf_error  "Q-wrap COMMAND LINE .Conf Instruction,"
   fi
   # Selection now made, but array must still be loaded as may be needed for reselecting later ...
@@ -2668,8 +2668,8 @@ MultiInstanceCount="$(pgrep -c "$ModName")"
 
 if [[ $MultiInstanceCount -gt 1 ]]; then
   tput sc
-  printColor "\n\n  WARNING: more than one instance of %s appears to be running "  "$ModName"
-  printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n\n"
+  printColor "\n  WARNING: more than one instance of %s appears to be running "  "$ModName"
+  printf "\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n"
   read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
   [[ $MultiQuit == "q" ]] && exit directly
   tput rc ; tput ed
@@ -2677,9 +2677,9 @@ if [[ $MultiInstanceCount -gt 1 ]]; then
 fi
 
 if [[ "$(pgrep quickgui)" ]] ; then
-  printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running "
-  printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"
-  printf "\n\n  Stopping an instance shown as running in QuickGUI may stop an instance started in qqX. \n\n"
+  printColor "\n  WARNING: an instance of QUICKGUI appears to be running "
+  printf "\n  Both this program and qqX do have an amount of cross-link protection, however note that:"
+  printf "\n  Stopping an instance shown as running in QuickGUI may stop an instance started in qqX. \n"
   read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
   [[ $MultiQuit == "q" ]] && exit directly
 fi
@@ -2751,24 +2751,24 @@ while true ; do
   if [[ $XDG_QcowRightClick_NO_qqX ]] || [[ $XDG_QcowRightClick ]]; then
     check_disk_is_okay "$XDG_QcowRightClick_VM_Dir_Name"  "$XDG_QcowRightClick_DiskName"
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then
-      printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus"
+      printColor "\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus"
     fi
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then
-      [[ $DiskChkStatus == "Okay" ]] && printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
+      [[ $DiskChkStatus == "Okay" ]] && printColor  "\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n"
     else
-      printColor  "\n\n  qqX/quickemu bootable: \n\n"
+      printColor  "\n  qqX/quickemu bootable: \n"
       if [[ $DiskChkStatus != "Okay" ]]; then
         printColor "  BUT has errors: Try qqX [disk] utils "
-        printf "\n\n Also see  https://qemu.readthedocs.io  "
-        printf  "> QEMU disk image utility notes\n\n"
+        printf "\n Also see  https://qemu.readthedocs.io  "
+        printf  "> QEMU disk image utility notes\n"
       fi
     fi
     "$QEMU_IMG" info "$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName"
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then
-      printColor "\n\n See  https://qemu.readthedocs.io  "
+      printColor "\n See  https://qemu.readthedocs.io  "
       printf  "> QEMU disk image utility may be useful"
-      printf "\n\n  [enter] to quit  "
-    else  printColor "\n\n  [enter] to continue  "
+      printf "\n  [enter] to quit  "
+    else  printColor "\n  [enter] to continue  "
     fi
     read -rp  "  >  "
     if [[ ! $XDG_QcowRightClick_NO_qqX ]]; then
@@ -2789,7 +2789,7 @@ while true ; do
   elif [[ $KillPID_Menu_Exited ]] || [[ $Select_VM ]] ; then
     if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then
       #  REVIEW  add use of PID file
-      printf "\n\n  %s is still running ..." "$VM_InstanceName"
+      printf "\n  %s is still running ..." "$VM_InstanceName"
       function_KillPID_Menu
       continue
     else
@@ -2807,7 +2807,7 @@ while true ; do
         #echo
       else
         printf "\n    %s   >   is now shut down \n" "$VM_InstanceName"
-        if [[ -s "$QemuErrorLog" ]]; then printf "\n\n" ; cat "$QemuErrorLog" ; fi
+        if [[ -s "$QemuErrorLog" ]]; then printf "\n" ; cat "$QemuErrorLog" ; fi
       fi
     fi
     [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=
@@ -2820,12 +2820,12 @@ while true ; do
   find_main_drive
   check_disk_is_okay
   if [[ $MainDrive_NOT_present ]]; then
-    printf "\n\n  Main Drive NOT found (yet)  >  Start VM (to create one)"
-    printf "\n\n  %s \n"  "$disk_img"
+    printf "\n  Main Drive NOT found (yet)  >  Start VM (to create one)"
+    printf "\n  %s \n"  "$disk_img"
   fi
   ## Qemu_IMG log > eg. for disk repair functions
   Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
-  if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+  if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
   ##  Qemu SYSTEM log
   QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
   ## Print menu:
@@ -2839,32 +2839,32 @@ while true ; do
       printf "   [del] delete selected VM"
       printColor  "    [u]   hide utils & technical"
       printf "\n"
-      printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives"
-      printf "\n\n  [2] create a second  [3] a shared  > virtual hard-drive \n"
-      if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"
-      else  printf  "\n\n  [v]   show verbose qemu args & check before booting" ; fi
+      printf "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives"
+      printf "\n  [2] create a second  [3] a shared  > virtual hard-drive \n"
+      if [[ $VerboseArgs ]]; then printf  "\n  [v]   hide verbose qemu args"
+      else  printf  "\n  [v]   show verbose qemu args & check before booting" ; fi
       printf  "   [xa]  edit extra qemu args  "
-      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
-      [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
+      printf "\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
+      [[ $ExtraArgs ]] && printf  "\n  Extra Args:  %s"  "$ExtraArgs"
       printf "\n"
     fi
-    printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
+    printf  "\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
     printf "\n"
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then
-      printColor  "\n\n  ?? "
+      printColor  "\n  ?? "
     else
-      printColor  "\n\n  [d]   start with SDL display"
+      printColor  "\n  [d]   start with SDL display"
       if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)"
       elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)"
       elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)    [df] 99%% "  "$SDL_ScreenPercent"
       elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
       fi
-      if [[ $HeadlessDisplay ]]; then printColor  "\n\n  [s]   start with Spice display (HEADLESS) "
-      else  printColor  "\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
-      printColor "\n\n  [g]   start with GTK display"
+      if [[ $HeadlessDisplay ]]; then printColor  "\n  [s]   start with Spice display (HEADLESS) "
+      else  printColor  "\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
+      printColor "\n  [g]   start with GTK display"
     fi
     printf "\n"
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
+    printf  "\n  [gt]  quickget a new distro   [i]  show VM drives info "
     filter_and_flag_qemu_errors
     if [[ $QemuErrorExists ]] ; then printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then
@@ -2941,12 +2941,12 @@ while true ; do
       Zsync_OS_Name=
       Zsync_Release_Name=
     fi
-    printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] open .conf file"
+    printf  "\n  [h]   show help & info   [set] open settings file in text editor   [conf] open .conf file"
     if [[ $ConfSettingsAdjusted ]]; then
       ConfSettingsAdjusted=
-      printf "\n\n  done - general refresh not normally needed for .conf edits (use [vm] if req'd)"
+      printf "\n  done - general refresh not normally needed for .conf edits (use [vm] if req'd)"
     fi
-    printf  "\n\n"
+    printf  "\n"
     if [[ $qqX_UpdaterPID ]]; then
       while true ; do
         if [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then
@@ -2960,11 +2960,11 @@ while true ; do
       done
     fi
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then
-      printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
+      printColor "  DISK.QCOW2 ERROR  %s  \n  [disk] repair utils "  "$DiskChkStatus"
     else
       [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_CurrentReleaseType" "$qqX_LatestRelease"
     fi
-    printf  "  [q]   quit \n\n"
+    printf  "  [q]   quit \n"
     read -rp "  >  "  MainMenuChoice
   fi
   # ACTIONS:
@@ -2976,36 +2976,36 @@ while true ; do
     AddHW_Record=
     if [[ -e "$QemuArgsFile" ]]; then
       printf "\033c"
-      if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n\n  Existing Record: \n\n"; cat "$QemuVirtHardwareRecord"; fi
-      printf "\n\n  Current Args / Qemu Virtual Hardware \n\n"
+      if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n  Existing Record: \n"; cat "$QemuVirtHardwareRecord"; fi
+      printf "\n  Current Args / Qemu Virtual Hardware \n"
       cat "$QemuArgsFile"
-      if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n\n"
-      else printColor "  Create new Virtual Hardware Record using Current Args?\n\n"
+      if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n"
+      else printColor "  Create new Virtual Hardware Record using Current Args?\n"
       fi
       read -rp "  [enter] to continue  [b] to go back"  AddHW_Record
       if [[ $AddHW_Record != "b" ]]; then
         cat "$QemuArgsFile" >> "$QemuVirtHardwareRecord"
       fi
     else
-      printf "\n\n  No Args log found. The virtual machine launch process must be run first. \n\n"
-      printf "\n\n  The 'VerboseArgs' option may be used, which will allow checking.  \n\n"
+      printf "\n  No Args log found. The virtual machine launch process must be run first. \n"
+      printf "\n  The 'VerboseArgs' option may be used, which will allow checking.  \n"
     fi
   elif [[ $MainMenuChoice == "u" ]] ; then
     if [[ ! $ShowUtilsMenu ]]; then ShowUtilsMenu=1 ; else ShowUtilsMenu= ; fi
   elif [[ $MainMenuChoice == "set" ]] ; then
     qqX_edit_settings
   elif [[ $MainMenuChoice == "ql" ]] ; then
-    printf "\n\n"
+    printf "\n"
     if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  cat "$QemuErrorLog"
-    else  printf "\n\n  No qemu errors were present on the last VM load ...  ?? " ; fi
-    printf "\n\n  [enter] to return \n\n"
+    else  printf "\n  No qemu errors were present on the last VM load ...  ?? " ; fi
+    printf "\n  [enter] to return \n"
     read -rp "  >  "
   elif [[ $MainMenuChoice == "f" ]] ; then
     nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
     # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....
     #  As from 'WebBrowser' section and handling of firefox etc
   elif [[ $MainMenuChoice == "dl" ]] ; then
-    printf "\033c \n\n"
+    printf "\033c \n"
     function_qqX_printf_logo_title  "qqX updater"
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
     if [[ ! $qqX_LatestTarBall ]] ; then
@@ -3031,10 +3031,10 @@ while true ; do
       printf "  Neatly download the release into its own sub-folder at: "
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then
-        printColor "\n\n  [enter] Current/Default Folder  %s "  "$Default_VM_Folder"
+        printColor "\n  [enter] Current/Default Folder  %s "  "$Default_VM_Folder"
       else
-        printf "\n\n  [c] Current Folder  %s "  "$(pwd)"
-        printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
+        printf "\n  [c] Current Folder  %s "  "$(pwd)"
+        printColor "\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
       fi
       printf "\n\n"
       [[ $WebBrowser ]] && printColor "  [w] to open qqX web page with %s"  "$WebBrowser"
@@ -3059,29 +3059,29 @@ while true ; do
     mkdir -p "$qqX_LatestTarBall_Folder"
     # record where to come back to, when done
     ReturnFolder="$(pwd)"
-    cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
+    cd "$qqX_LatestTarBall_Folder"  || printColor "\n  ERROR  making or changing to qqX.releases folder"
     if [[ $qqX_Latest_Secure_TarBall ]]; then
       wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
       wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
       SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
       printColor "\n  SHA256 Check: %s "  "$SHA_Check"
-      [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
+      [[ "$SHA_Check" != *'OK' ]] &&  printf "\n  ERROR  - RETRY  DOWNLOAD \n"
     else
       wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
     fi
-    printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
+    printColor "\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
     if [[ $BetaTxReleasePoint ]]; then
-      printf "\n\n\n  Transitioning from beta to release ...  If required,"
-      printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
+      printf "\n\n  Transitioning from beta to release ...  If required,"
+      printf "\n  Beta Notifications can be turned off in the general settings file \n"
     fi
-    printColor "\n\n Use the installer script to quickly refresh and add new features to your settings file."
-    printf "\n\n  All option settings, locations and preferences will be kept."
-    printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
+    printColor "\n Use the installer script to quickly refresh and add new features to your settings file."
+    printf "\n  All option settings, locations and preferences will be kept."
+    printf "\n\n  [enter] to run the installer script   [r] to return to main menu \n"
     read -rp "  >  "  qqX_UpdateExit
     if [[ $qqX_UpdateExit != "r" ]]; then
       # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
       tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
-      cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+      cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n  ERROR  changing to qqX.releases folder"
       # move current execution away from this script and to the installer
       exec  bash -c "./qqX_setup_and_install  Upgrade"
     fi
@@ -3099,27 +3099,27 @@ while true ; do
       MainMenuZsync=1
       function_quick_get_wrap
     else
-      printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
+      printColor "\n  %s is not being recognised as Zsync updatable Release \n"   "$VM_InstanceName"
     fi
   elif [[ $MainMenuChoice == "m" ]] ; then
     KVM_MSR_selector_LoadHelp=1
     select_msr_config
   # REVIEW  adding gtk option ?
   elif [[ $MainMenuChoice == "g" ]] ; then
-    printf "\n\n"
+    printf "\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-      printf "\n\n [enter] to return \n\n"
+      printf "\n [enter] to return \n"
       read -rp "  >  "
     else
       eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk"
       function_KillPID_Menu
     fi
   elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then
-    printf "\n\n"
+    printf "\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-      printf "\n\n [enter] to return \n\n"
+      printf "\n [enter] to return \n"
       read -rp "  >  "
     else
       if [[ $MainMenuChoice == "df"  ]]; then
@@ -3127,14 +3127,14 @@ while true ; do
       else
         eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params"
       fi
-      [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
+      [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n"
       function_KillPID_Menu
     fi
   elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
-    printf "\n\n"
+    printf "\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-      printf "\n\n [enter] to return \n\n"
+      printf "\n [enter] to return \n"
       read -rp "  >  "
     else
       if [[ $HeadlessCmd ]]; then
@@ -3150,35 +3150,35 @@ while true ; do
       function_KillPID_Menu
     fi
   elif  [[ $MainMenuChoice == "q" ]] ; then
-    printf "\n\n"
+    printf "\n"
     MainMenuChoice=
     exit directly
   elif  [[ $MainMenuChoice == "i" ]] ; then
     drives_and_snapshots  info
-    printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-    [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-    printf "\n\n  [enter] to return to menu \n\n "
+    printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+    [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n  Scroll to View "
+    printf "\n  [enter] to return to menu \n "
     read -rp "  >  "
   elif  [[ $MainMenuChoice == "disk" ]] ; then
     drives_and_snapshots  select  as_disk_util
     if [[ ! -e "$Selected_Drive" ]]; then
-      printf "\n\n  [b] go back to main menu"
+      printf "\n  [b] go back to main menu"
     else
-      printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
+      printf "\n  Selected Drive is %s " "$Selected_DriveName"
       check_disk_is_okay  "$Selected_Drive"
-      if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n\n  Status:  %s"  "$DiskChkStatus" ; fi
+      if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n  Status:  %s"  "$DiskChkStatus" ; fi
       [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
       DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
       DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
       DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
       DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
       if [[ $DiskChkStatus == "Okay" ]]; then
-        printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
-        printf "\n\n  Correction is advised if the content exceeds the theoretical envelope"
+        printf "\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
+        printf "\n  Correction is advised if the content exceeds the theoretical envelope"
       fi
       if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
-        printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
-        [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
+        printf "\n  Standard repair uses multithreads. Use slow method if standard fails."
+        [[ $DiskChkExitCode == "2" ]] && printf "\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
       fi
       # Check there is disk free space to make a backup
       if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
@@ -3186,39 +3186,39 @@ while true ; do
       DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
       DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
       if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
-        printColor "\n\n  WARNING: insufficient or very low space on host drive"
+        printColor "\n  WARNING: insufficient or very low space on host drive"
       else
-        printf "\n\n\n"
+        printf "\n\n"
         if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
         elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
         else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
         fi
       fi
-      printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere."
+      printf "\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere."
       # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-      [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-      printf "\n\n  A back-up will be made. All processes will remove any snapshots ...  [b] back to menu "
+      [[ $(pgrep -x kvm) ]] &&  printColor "\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+      printf "\n  A back-up will be made. All processes will remove any snapshots ...  [b] back to menu "
     fi
     DiskManage=
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "  DiskManage
-    printf "\n\n"
+    printf "\n"
     # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-convert
     # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-check
     # REVIEW   qemu's differential 'bitmap' tracking  https://lwn.net/Articles/837053/
     if [[ $DiskManage != "b" ]]; then
       if [[ $DiskManage == "rz" ]]; then
-        printf "\n\n  This will resize the external envelope. For internal partitions, use gparted"
-        printColor "\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n\n"
+        printf "\n  This will resize the external envelope. For internal partitions, use gparted"
+        printColor "\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n"
         read -rp "  >  "  ResizePlus
-        printf "\n\n"
+        printf "\n"
         ResizePlus="$(tr -cd "[:digit:]" <<< "$ResizePlus")"
       fi
       DiskDate="$(date +%b%d.%H.%M)"
       DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
       mv "$Selected_Drive" "$DiskBackup"
-      printf  "  Original drive: %s \n\n" "$Selected_Drive"
-      printColor "  Moved to back up as: %s \n\n" "$DiskBackup"
+      printf  "  Original drive: %s \n" "$Selected_Drive"
+      printColor "  Moved to back up as: %s \n" "$DiskBackup"
       if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then
         printf "" > "$Qemu_IMG_ErrorLog"
         DU_BackUpSize="$(du "$DiskBackup" | cut -f 1)"
@@ -3240,7 +3240,7 @@ while true ; do
         dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
         # https://web.archive.org/web/20230412163832/https://wiki.bash-hackers.org/howto/redirection_tutorial#order_of_redirection_ie_file_2_1_vs_2_1_file
         "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
-        printColor "\n\n  Attemping repair .... \n\n"
+        printColor "\n  Attemping repair .... \n"
       else
         "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive"
       fi
@@ -3249,40 +3249,40 @@ while true ; do
         [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
         [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog"
         # option 'rd' is basically 'convert' process only  (all options do this as standard)
-        printColor "\n\n  Drive Updated ..."
+        printColor "\n  Drive Updated ..."
       else
-        printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
+        printColor  "\n  ERROR: a NEW drive could not be created from the backup ??"
       fi
-      printf "\n\n  [enter] to return to menu \n\n "
+      printf "\n  [enter] to return to menu \n "
       read -rp "  >  "
     fi
   elif  [[ $MainMenuChoice == "sl" ]] ; then
     drives_and_snapshots
-    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-    printf "\n\n  [enter] to return to menu \n\n "
+    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n  Scroll to View "
+    printf "\n  [enter] to return to menu \n "
     read -rp "  >  "
   elif  [[ $MainMenuChoice == "sc" ]] ; then
     drives_and_snapshots  select
-    printColor "\n\n  [enter] date.time title  "
+    printColor "\n  [enter] date.time title  "
     printf "  [text input] descriptor   [b] back to menu "
     SnapTitle=
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "  SnapTitle
-    printf "\n\n"
+    printf "\n"
     [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
     if [[ $SnapTitle != "b" ]]; then
       # remove spaces, make title dot separated, as easier to IFS
       SnapTitle="${SnapTitle// /.}"
       "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive"
       "$QEMU_IMG" info "$Selected_Drive"
-      printColor "\n\n  Drive Updated ..."
-      printf "\n\n  [enter] to return to menu \n\n "
+      printColor "\n  Drive Updated ..."
+      printf "\n  [enter] to return to menu \n "
       read -rp "  >  "
     fi
   elif  [[ $MainMenuChoice == "sd" ]] ; then
     drives_and_snapshots  select
-    printColor "\n\n %s Snapshot Delete function "  "$ModName"
-    printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
+    printColor "\n %s Snapshot Delete function "  "$ModName"
+    printf "\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
     # Create range-selectable array
     #SnapListString="$(drives_and_snapshots | grep '[0-9][0-9]:')"
     SnapListString="$("$QEMU_IMG" info "$Selected_Drive" | grep '[0-9][0-9]:')"
@@ -3291,7 +3291,7 @@ while true ; do
     mapfile -t SnapListArrRaw <<< "$SnapListString"
     i=0
     SnapListArrSeparated=()
-    printColor "\n\n ID   Array  Name \n\n"
+    printColor "\n ID   Array  Name \n"
     while [[ "${SnapListArrRaw[i]}" ]]; do
       IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
       # prints the first two elements of each snapshot info line
@@ -3299,14 +3299,14 @@ while true ; do
       ((i+=1))
     done
     SnapListArrTotal=$((i-1))
-    printColor "\n\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
-    printf "\n\n or [full individual name] for difficult names only showing correctly in the FULL listing"
-    printf "\n\n or [enter] to return to main menu "
+    printColor "\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
+    printf "\n or [full individual name] for difficult names only showing correctly in the FULL listing"
+    printf "\n or [enter] to return to main menu "
     SnapName=
     SnapDeleteStart=
     SnapDeleteEnd=
     SnapDeleteConfirm=
-    printf "\n\n"
+    printf "\n"
     read -rp " >  "  SnapDeleteStart
     if [[ $SnapDeleteStart ]]; then
         SpecialSnapName="$SnapDeleteStart"
@@ -3314,15 +3314,15 @@ while true ; do
       if  [[ $SpecialSnapName ]]; then
         # restore name as valid name if, when all digits removed, there is still something
         SpecialSnapName="$SnapDeleteStart"
-        printf "\n\n  Snap to delete: \"%s\"" "$SpecialSnapName"
+        printf "\n  Snap to delete: \"%s\"" "$SpecialSnapName"
       else
-        printColor "\n\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n\n"
+        printColor "\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n"
         read -rp " >  "  SnapDeleteEnd
         if [[ $SnapDeleteEnd ]]; then
-          printf "\n Array Range = %s to %s \n\n" "$SnapDeleteStart"  "$SnapDeleteEnd"
+          printf "\n Array Range = %s to %s \n" "$SnapDeleteStart"  "$SnapDeleteEnd"
           i="$SnapDeleteStart"
           SnapListArrSeparated=()
-          printColor "\n\n ID   Array  Name \n\n"
+          printColor "\n ID   Array  Name \n"
           while true; do
             IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
             # prints the first two elements of each snapshot info line
@@ -3332,14 +3332,14 @@ while true ; do
           done
         else
           printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart"
-          printf "\n\n  %s" "${SnapListArrRaw[SnapDeleteStart]}"
+          printf "\n  %s" "${SnapListArrRaw[SnapDeleteStart]}"
           SnapDeleteEnd="$SnapDeleteStart"
         fi
       fi
-      printColor "\n\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
+      printColor "\n [enter] to delete  [b] back to main menu (or reselect) \n"
       read -rp " >  "  SnapDeleteConfirm
       if [[ $SnapDeleteConfirm == "b" ]]; then
-        printf "\n\n Deletion schedule has been CANCELLED"
+        printf "\n Deletion schedule has been CANCELLED"
       else
         if [[ $SpecialSnapName ]]; then
           "$QEMU_IMG" snapshot -q -d "$SpecialSnapName" "$Selected_Drive"
@@ -3349,11 +3349,11 @@ while true ; do
             IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[$SnapDeleteRangeCounter]}"
             SnapName="${SnapListArrSeparated[1]}"
             if [[ ! $SnapName ]]; then
-              printColor "\n\n ERROR with SnapShot Array List \n\n"
+              printColor "\n ERROR with SnapShot Array List \n"
               sleep 5
               exit 1
             else
-              printColor "\n\n Deleting SnapShot %2d   %2d  %s \n\n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
+              printColor "\n Deleting SnapShot %2d   %2d  %s \n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
               "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive"
             fi
             ((SnapDeleteRangeCounter+=1))
@@ -3361,7 +3361,7 @@ while true ; do
         fi
         "$QEMU_IMG" info "$Selected_Drive"
       fi
-      printf "\n\n [enter] to return to menu \n\n "
+      printf "\n [enter] to return to menu \n "
       read -rp " >  "
     fi
     #  TODO  see if tiano core bios can be set to select 'misc device' instead of 'windows boot manager'
@@ -3370,46 +3370,46 @@ while true ; do
     #  https://github.com/theopolis/uefi-firmware-parser
   elif  [[ $MainMenuChoice == "sa" ]] ; then
     drives_and_snapshots select
-    printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
+    printColor "\n  Give number of snapshot to use  [enter] to return to menu "
     SnapNumber=
-    printf "\n\n"
+    printf "\n"
     read -rp "  >  "  SnapNumber
-    printf "\n\n"
+    printf "\n"
     if [[ $SnapNumber ]]; then
       "$QEMU_IMG" snapshot -q -a "$SnapNumber" "$Selected_Drive"
-      printf "\n\n  May take a moment .... \n\n"
-      printColor "\n\n  Snapshot %s has been applied. \n\n"  "$SnapNumber "
+      printf "\n  May take a moment .... \n"
+      printColor "\n  Snapshot %s has been applied. \n"  "$SnapNumber "
     fi
   elif [[ $MainMenuChoice == "2" || $MainMenuChoice == "3" ]] ; then
     SecondDriveCreateSize=
     DriveCreated=
-    if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs ]] ; then printColor "\n\n  ERROR:  a shared drive already exists. Make backups ...\n\n"
-    elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then printColor "\n\n  ERROR:  a second drive already exists. Make backups ...\n\n"
+    if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs ]] ; then printColor "\n  ERROR:  a shared drive already exists. Make backups ...\n"
+    elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then printColor "\n  ERROR:  a second drive already exists. Make backups ...\n"
     else
-      [[ $MainMenuChoice == "2" ]] && printColor "\n\n  Create a SECOND virtual hard-drive for this VM instance:"
-      [[ $MainMenuChoice == "3" ]] && printColor "\n\n  Create a SHARED virtual hard-drive for this VM instance:"
-      printf "\n\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that"
-      printf "\n\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
-      printf "\n\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
-      printf "\n\n  It is easier make them larger now than to resize later ... "
-      printColor "\n\n\n  [enter] create 64G   [integer] create int G   [b] go back \n\n"
+      [[ $MainMenuChoice == "2" ]] && printColor "\n  Create a SECOND virtual hard-drive for this VM instance:"
+      [[ $MainMenuChoice == "3" ]] && printColor "\n  Create a SHARED virtual hard-drive for this VM instance:"
+      printf "\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that"
+      printf "\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
+      printf "\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
+      printf "\n  It is easier make them larger now than to resize later ... "
+      printColor "\n\n  [enter] create 64G   [integer] create int G   [b] go back \n"
       read -rp "  >  "  SecondDriveCreateSize
       [[ ! $SecondDriveCreateSize ]]  && SecondDriveCreateSize="64"
       [[ $SecondDriveCreateSize ]]  &&  SecondDriveCreateSize="$(tr -cd "[:digit:]" <<< "$SecondDriveCreateSize")"
       if [[ $SecondDriveCreateSize ]]; then
         if [[ $MainMenuChoice == "2" ]] && grep -s -q SecondDrive "$VM_Conf_File" ; then
-          printColor "\n\n  ERROR: A SecondDrive entry is already present in your .conf file ??"
-          printf "\n\n  Check general settings & notes on drives set up.  Edit the configuration. \n\n"
+          printColor "\n  ERROR: A SecondDrive entry is already present in your .conf file ??"
+          printf "\n  Check general settings & notes on drives set up.  Edit the configuration. \n"
         elif [[ $MainMenuChoice == "3" ]] && [[ ! -d "$Default_VM_Folder" ]]; then
-            printf "\n\n  Default_VM_Folder not present. Edit the main settings file first. \n\n"
+            printf "\n  Default_VM_Folder not present. Edit the main settings file first. \n"
         else
           if [[ $MainMenuChoice == "2" ]]; then
-            printf "\n\n  A Storage Drive will be created in the VM's folder \n\n  %s"  "$VM_InstanceName"
+            printf "\n  A Storage Drive will be created in the VM's folder \n  %s"  "$VM_InstanceName"
           elif [[ $MainMenuChoice == "3" ]]; then
-            printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
-            printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$Q_Mod_SettingsFile"
+            printf "\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n  %s"  "$Default_VM_Folder"
+            printf "\n  It may later be moved. Editing settings file: \n  %s" "$Q_Mod_SettingsFile"
           fi
-          printColor "\n\n  [enter] to continue  [b] to go back \n\n"
+          printColor "\n  [enter] to continue  [b] to go back \n"
           NewDriveCreate=
           read -rp "  > "  NewDriveCreate
           if [[ $NewDriveCreate != "b" ]]; then
@@ -3433,28 +3433,28 @@ while true ; do
               if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
                 # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
                 SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
-                printf "\n\n  Backing up settings file to /tmp and changing line %s \n\n"  "$SharedDriveSettingsLine"
+                printf "\n  Backing up settings file to /tmp and changing line %s \n"  "$SharedDriveSettingsLine"
                 eval cp "$Q_Mod_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
                 eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$Q_Mod_SettingsFile"
               else
-                printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n"
+                printColor "\n  A drive has been created but the settings file will need to be edited manually \n"
                 grep 'SharedDrive=' "$Q_Mod_SettingsFile"
-                printf "\n\n"
+                printf "\n"
               fi
             fi
             if [[ $DriveCreated ]]; then
               set_drive_paths
               printColor "\n  The Created Drive should now be formatted from inside a VM:"
-              printf "\n\n  Use Gparted or similar to set a device table and add partition(s)"
-              printf "\n\n  Read notes in main settings if older MacOS or if Windows present."
+              printf "\n  Use Gparted or similar to set a device table and add partition(s)"
+              printf "\n  Read notes in main settings if older MacOS or if Windows present."
             else
-              printColor "\n\n  Something went wrong. Drive not created "
+              printColor "\n  Something went wrong. Drive not created "
             fi
           fi
         fi
       fi
     fi
-    printf "\n\n"
+    printf "\n"
     read -rp "  [enter] to return > "
   elif [[ $MainMenuChoice == "v" ]] ; then
     if [[ $VerboseArgs ]]; then VerboseArgs=
@@ -3469,26 +3469,26 @@ while true ; do
   elif [[ $MainMenuChoice == "xa" ]] ; then
     MenuXA=
     MenuXA_Correct=
-    printColor "\n\n  Give extra qemu arguments to use "
-    printf     "\n\n  Format = grouped & with space separated elements "
-    printf     "\n\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
-    [[ $ExtraSetArgs ]] && printf  "\n\n  Extra Set Args:  %s"  "$ExtraSetArgs"
+    printColor "\n  Give extra qemu arguments to use "
+    printf     "\n  Format = grouped & with space separated elements "
+    printf     "\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
+    [[ $ExtraSetArgs ]] && printf  "\n  Extra Set Args:  %s"  "$ExtraSetArgs"
     if [[ $ExtraArgs ]] && [[ "$ExtraArgs" != "$ExtraSetArgs" ]]; then
-      printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
-      if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only "
-      else printf "\n\n  [r] remove the Extra Args " ; fi
+      printf  "\n  Extra Args:  %s"  "$ExtraArgs"
+      if [[ $ExtraSetArgs ]]; then printf "\n  [r] reset back to Set Args only "
+      else printf "\n  [r] remove the Extra Args " ; fi
     fi
-    printf "\n\n"
+    printf "\n"
     read -rp "  > "  MenuXA
     if [[ $MenuXA != "r" ]]; then
-      printf "\n\n  %s %s"  "$ExtraArgs" " $MenuXA"
-      printf "\n\n  Is this correct y/n ? \n\n"
+      printf "\n  %s %s"  "$ExtraArgs" " $MenuXA"
+      printf "\n  Is this correct y/n ? \n"
       read -rp "  >  "  MenuXA_Correct
     fi
-    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 1.5
-    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1
+    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n  Ignoring the entered Qemu Args \n" ; sleep 1.5
+    elif [[ $MenuXA == "r" ]]; then printColor "\n  Resetting \n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1
     else  ExtraArgs="$ExtraArgs $MenuXA" ; fi
-    printf "\033c\n\n"
+    printf "\033c\n"
   fi
 done
 # vim:tabstop=2:shiftwidth=2:expandtab
