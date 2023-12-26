@@ -6213,7 +6213,7 @@ while true ; do
 
     SnapListArrTotal=$((i-1))
 
-    printColor "\n\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
+    printColor "\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
     printf "\n\n or [full individual name] for difficult names only showing correctly in the FULL listing"
     printf "\n\n or [enter] to return to main menu "
 
@@ -6237,15 +6237,24 @@ while true ; do
         # restore name as valid name if, when all digits removed, there is still something
         SpecialSnapName="$SnapDeleteStart"
 
-        printf "\n\n  Snap to delete: \"%s\"" "$SpecialSnapName"
+        printf "\n  Snap to delete: \"%s\"" "$SpecialSnapName"
 
       else
 
-        printColor "\n\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n\n"
+        printColor "\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n\n"
         read -rp " >  "  SnapDeleteEnd
 
         if [[ $SnapDeleteEnd ]]; then 
-          printf "\n Array Range = %s to %s \n\n" "$SnapDeleteStart"  "$SnapDeleteEnd"
+
+          SnapDeleteEnd="$(tr -cd "[:digit:]" <<< "$SnapDeleteEnd")"
+
+          if [[ $SnapDeleteEnd ]]; then  [[ $SnapDeleteEnd -gt "$SnapListArrTotal" ]] && SnapDeleteEnd="$SnapListArrTotal"
+
+          else  SnapDeleteEnd="$SnapListArrTotal"
+
+          fi
+
+          printf "\n Array Range = %s to %s" "$SnapDeleteStart"  "$SnapDeleteEnd"
 
           i="$SnapDeleteStart"
           SnapListArrSeparated=()
@@ -6267,7 +6276,7 @@ while true ; do
 
       fi
 
-      printColor "\n\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
+      printColor "\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
 
       read -rp " >  "  SnapDeleteConfirm
 
