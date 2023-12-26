@@ -6092,13 +6092,11 @@ while true ; do
             [[ ! $DU_SelectedSize ]] && DU_SelectedSize=1
 
             DD_ProgressPercent="$(bc <<< "scale=5; ($DU_SelectedSize/$DU_BackUpSize)*100")"
-
             DD_ProgressPercent="$(bc <<< "scale=0; ($DD_ProgressPercent + 0.5)/1")"
 
             [[ $DD_ProgressPercent -ge 98 ]] && break
 
             printf "\r  New Drive Progress = %s%%   "  "$DD_ProgressPercent"
-
             sleep 3
 
           done
@@ -6113,9 +6111,7 @@ while true ; do
 
         printColor "\n\n  Attemping repair .... \n\n"
 
-      else
-
-        "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
+      else  "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
 
       fi
 
@@ -6131,9 +6127,7 @@ while true ; do
 
         printColor "\n\n  Drive Updated ..."
 
-      else
-
-        printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
+      else  printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
 
       fi
 
@@ -6180,7 +6174,6 @@ while true ; do
 
     fi
 
-
   elif  [[ $MainMenuChoice == "sd" ]] ; then
 
     drives_and_snapshots  select 
@@ -6225,18 +6218,15 @@ while true ; do
     printf "\n\n"
     read -rp " >  "  SnapDeleteStart
     
-
     if [[ $SnapDeleteStart ]]; then
 
         SpecialSnapName="$SnapDeleteStart"
-
         SpecialSnapName="$(tr -d "[:digit:]" <<< "$SpecialSnapName")"
 
       if  [[ $SpecialSnapName ]]; then
 
         # restore name as valid name if, when all digits removed, there is still something
         SpecialSnapName="$SnapDeleteStart"
-
         printf "\n  Snap to delete: \"%s\"" "$SpecialSnapName"
 
       else
@@ -6305,7 +6295,7 @@ while true ; do
               exit 1
             else
               printColor "\n\n Deleting SnapShot %2d   %2d  %s \n\n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
-              
+
               "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive" 
 
             fi
@@ -6315,7 +6305,6 @@ while true ; do
         fi
 
         "$QEMU_IMG" info "$Selected_Drive"
-
 
       fi
 
