@@ -84,7 +84,7 @@ NoClear=
 
 # This script:
 
-ModVersion="1.4.01"
+ModVersion="1.5.0.01"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]
 
@@ -5573,7 +5573,7 @@ while true ; do
 
     else
 
-      [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_CurrentReleaseType" "$qqX_LatestRelease"
+      [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
     fi
 
