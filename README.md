@@ -28,7 +28,7 @@ It's not without its flaws. But its flaws can be fixed and it can be made to wor
 
 VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
 
-Gnome Boxes (with QEMU) has a very polished interface. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/soneca/gnome-boxes/-/tree/main/src?ref_type=heads>
+Gnome Boxes (with QEMU) has a very polished interface. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
 
 ## Why qqX?
 
