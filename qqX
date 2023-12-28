@@ -5640,15 +5640,19 @@ while true ; do
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
+    QL_LogView=
+    
     printf "\n\n"
 
     if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  cat "$QemuErrorLog"
 
     else  printf "\n\n  No qemu errors were present on the last VM load ...  ?? " ; fi
 
-    printf "\n\n  [enter] to return \n\n"
+    printf "\n\n  [enter] to return   [w] hide non-critical warnings, for this session \n\n"
 
-    read -rp "  >  "
+    read -rp "  >  "  QL_LogView
+
+    [[ $QL_LogView  == "w" ]] && QemuErrorFilter+=("warning" "deprecated") 
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 

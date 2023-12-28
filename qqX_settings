@@ -243,9 +243,9 @@ SharedDrive=""
 
 
 
-## QEMU ERROR FILTER 
+## QEMU ERROR FILTER  -  QL LOG
 
-# Add here any 'errors' that changes in QEMU might throw up and that we want to ignore 
+# Add here any 'errors' that changes in QEMU might throw up and that we want to ignore  eg. "warning" or "deprecated"
 
 # @ 2023/12 Defaults: 
 
