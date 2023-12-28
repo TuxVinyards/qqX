@@ -5700,16 +5700,18 @@ while true ; do
     while true ; do
 
       printf "  Neatly download the release into its own sub-folder at: "
-      
+
+      [[ $Specified_Updates_Location ]] && printf "\n\n  [s] Specified folder  %s"  "$Specified_Updates_Location"
+
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
       
-        printColor "\n\n  [enter] Current/Default Folder  %s "  "$Default_VM_Folder" 
+        printColor "\n\n  [enter] Current/Default folder  %s "  "$Default_VM_Folder" 
 
       else  
 
-        printf "\n\n  [c] Current Folder  %s "  "$(pwd)"  
+        printf "\n\n  [c] Current folder    %s "  "$(pwd)"  
         
         printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
 
@@ -5717,7 +5719,7 @@ while true ; do
 
       printf "\n\n"
 
-      [[ $WebBrowser ]] && printColor "  [w] to open qqX web page with %s"  "$WebBrowser"
+      [[ $WebBrowser ]] && printColor "  [w] popup qqX web pages with %s"  "$WebBrowser"
 
       printf "   or [b] to go back \n\n"
 
@@ -5726,7 +5728,9 @@ while true ; do
       printf "\n\n"
 
 
-      if [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
+      if [[ $qqX_LatestTarBall_Folder == "s" ]]; then  qqX_LatestTarBall_Folder="$Specified_Updates_Location" ; break
+
+      elif [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
 
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
 
