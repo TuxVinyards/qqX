@@ -557,7 +557,7 @@ function_refresh_and_reload_VM_arrays() {
 
   function_scan_VM_folderList  
 
-  check_screen_percentage
+  check_screen_percentage_and_output
 
   set_drive_paths
 
@@ -1459,7 +1459,9 @@ clear_and_load_quickemu_vars
 
 cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
 
-    # Overide the quickemu default
+    # Overide specified quickemu defaults,  though not all may be done here.
+    
+    # Quickemu also sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
 
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
 
@@ -1659,7 +1661,7 @@ QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f
 tail "+$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
 
 
-##  Add in the standard actions 
+##  Add in the standard actions ( also where quickemu sources in the .conf file )
 
 ((QE_EoCasePoint += (QE_StartCasePoint +2) ))
 
@@ -1670,6 +1672,8 @@ QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':
 QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
 
 QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
+
+# quickemu sources in the .conf file at the start of 'actions'  (see function 'quickemu')
 
 tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-temp"
 
@@ -1759,6 +1763,12 @@ function quickemu {
 
     source "/tmp/qmod-actions-temp"  
 
+    # Quickemu sources in the .conf file at the start of "/tmp/qmod-actions-temp", so some overides need placing here
+
+    # Others go into the modded function 'vm_boot' ...
+
+    [[ $SetGL_OverRide ]] &&  gl="$SetGL_OverRide"
+
 
     if [[ $VM_ExecBoot ]]; then
 
@@ -1812,14 +1822,17 @@ QE_VerNumber="$VERSION"
 
 #  REVIEW  make sure the tmp files are reading the right version before qqX machine swap edition is released
 
-#  Runnning this when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
+#  Runnning this function when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
 
-function check_screen_percentage {
+#  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  (See main settings)
+
+function check_screen_percentage_and_output {
 
   SDL_ScreenPercent=
   SDL_ScrnPcnt_Cmd=
   HeadlessCmd=
-
+  gl=
+  
   if [[ $VM_Conf_File ]]; then
 
     eval "$(grep -s Custom_SDL_ScreenPercent "$VM_Conf_File")"
@@ -1830,15 +1843,22 @@ function check_screen_percentage {
 
     [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
 
+    if grep -q -s -e 'gl="' "$VM_Conf_File" ; then  eval "$(grep -s -e 'gl="' "$VM_Conf_File")" ; fi
+
   fi
 
   [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
+
+  [[ $SetGL_DefaultAsOff ]] && [[ ! $gl ]] && gl="off"
+
+  [[ $gl ]] &&  gl="$(tr -cd "[:lower:]" <<< "$gl")" && [[ ! $SetGL_OverRide ]] && SetGL_OverRide="$gl"
 
   [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
 
   if [[ $SDL_ScreenPercent ]]; then 
   
     SDL_ScrnPcnt_Error=
+    SDL_ScreenPercent="$(tr -cd "[:digit:]" <<< "$SDL_ScreenPercent")"
 
     if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
@@ -5278,7 +5298,7 @@ while true ; do
 
   QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
-  check_screen_percentage
+  check_screen_percentage_and_output
 
   set_drive_paths
 
@@ -5366,7 +5386,11 @@ while true ; do
 
       elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)" 
 
-      elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)    [df] 99%% "  "$SDL_ScreenPercent"
+      elif [[ $SDL_ScrnPcnt_Cmd ]]; then 
+      
+        printColor " (%s%%)    [df]  99%% "  "$SDL_ScreenPercent" 
+        
+        [[ $SetGL_OverRide == "off" ]] && printColor "  (scaleable)"
 
       elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
 
@@ -5376,7 +5400,11 @@ while true ; do
 
       else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
 
-      printColor "\n\n  [g]   start with GTK display"
+      printColor "\n\n  [g]   start with GTK display          "
+
+      if [[ $SetGL_OverRide == "off" ]] ; then printColor "[gl] toggle compatibility graphics mode (current = off)"  
+
+      else printColor "[gl] toggle performance graphics mode (current = on)" ; fi
 
     fi
 
@@ -5840,7 +5868,15 @@ while true ; do
     KVM_MSR_selector_LoadHelp=1
     select_msr_config
 
-  # REVIEW  adding gtk option ?
+  elif [[ $MainMenuChoice == "gl" ]] ; then 
+
+    if [[ ! $SetGL_OverRide ]] ; then  SetGL_OverRide="off"
+
+    elif [[ $SetGL_OverRide == "on" ]] ; then SetGL_OverRide="off"
+
+    else SetGL_OverRide="on"
+
+    fi
 
   elif [[ $MainMenuChoice == "g" ]] ; then 
 

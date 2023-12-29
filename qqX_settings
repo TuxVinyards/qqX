@@ -202,8 +202,24 @@ Default_SDL_ScreenPercent="68"
 
 #  NB headless only runs in Spice and an SSH connection may need to be set as an extra QE parameter
 
-#  See: https://github.com/quickemu-project/quickemu#headless
+#  See: https://github.com/quickemu-project/quickemu#headless   --ssh-port <port> : Set ssh-port manually
 
+#  Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/commit/ca7faf6fad5ad1c1c707e9fb6cc59aefd2ab227d
+
+#  --access : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
+
+
+##  GL GRAPHICS
+
+#   By default, quickemu sets GL to "on"  Individually, placing gl as = "off" in the .conf file will reverse this.
+
+#   This state may be toggled from the main qqX start menu  or set here to normally boot as "off"
+
+#   While "on" can give enhanced output, "off" has increased distro compatibility and also allows scaling in SDL mode
+
+#   Leave blank for "on" or set =1 for "off"  Individually, both states of "on" or "off" may be set in the .conf file.
+
+SetGL_DefaultAsOff=
 
 
 ##  SHARED or SECOND DRIVE  (auto-create in qqX via the utils menu)
