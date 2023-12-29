@@ -184,7 +184,6 @@ ExtraArgs=
 Extra_QE_Params=
 
 
-
 ##  DEFAULT load up SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Leave blank for none. 
 
 #  From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
@@ -194,14 +193,16 @@ Extra_QE_Params=
 Default_SDL_ScreenPercent="68"
 
 
-## Individual SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"  
+# INDIVIDUAL SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"  
 
 
 ## HEADLESS commands may be set using Extra_QE_Params using "--display none"  BUT
 
 #  to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file 
 
-#  An SSH connection will need to be set.   See: https://github.com/quickemu-project/quickemu#headless
+#  NB headless only runs in Spice and an SSH connection may need to be set as an extra QE parameter
+
+#  See: https://github.com/quickemu-project/quickemu#headless
 
 
 

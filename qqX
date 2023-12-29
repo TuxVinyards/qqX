@@ -1817,8 +1817,8 @@ QE_VerNumber="$VERSION"
 function check_screen_percentage {
 
   SDL_ScreenPercent=
-
   SDL_ScrnPcnt_Cmd=
+  HeadlessCmd=
 
   if [[ $VM_Conf_File ]]; then
 
@@ -1832,19 +1832,9 @@ function check_screen_percentage {
 
   fi
 
-  if [[ ! $SDL_ScreenPercent ]]; then
+  [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
 
-    [[ $Default_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
-
-  fi
-
-  if [[ $HeadlessDisplay ]]; then
-
-    # NB headless only runs in Spice
-
-    HeadlessCmd=" --display  none"
-
-  fi
+  [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
 
   if [[ $SDL_ScreenPercent ]]; then 
   
@@ -1852,30 +1842,19 @@ function check_screen_percentage {
 
     if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
-      if [[ -e "/tmp/qmod-case-temp" ]]; then 
+      if grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then   SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
 
-        if grep -q -e 'screenpct' "/tmp/qmod-case-temp" ; then 
-        
-          SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
-
-        else
-
-          printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
-          SDL_ScrnPcnt_Error="> not possible with this qe-version"
-
-        fi
-
+      else
+        printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
+        SDL_ScrnPcnt_Error="> not possible with this qe-version"
       fi
 
     else
-      
       printColor "\n\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
       SDL_ScrnPcnt_Error="Out of Range"
-
     fi
 
   fi
-
 }  
 
 
