@@ -2247,7 +2247,7 @@ function_quick_get_wrap ()  {
       
         function_quick_get_wrap
 
-        break
+        return
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
@@ -2317,6 +2317,8 @@ function_quick_get_wrap ()  {
           QGW_Release_Arr_NameSelected=
         
           function_quick_get_wrap
+
+          return
 
         else
 
@@ -2579,7 +2581,7 @@ function_quick_get_wrap ()  {
 
         if [[ $MainMenuZsync ]]; then MainMenuZsync= ; else function_quick_get_wrap ; fi
 
-        break
+        return
       ;;
 
 
