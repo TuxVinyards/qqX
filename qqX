@@ -5442,9 +5442,11 @@ while true ; do
 
           #  older than 6hrs (in epoch seconds)
 
-          if [[ $LastZsync -gt 21600 ]]; then  printColor "   [z] run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
+          printf "\n\n"
 
-          else  printf "   [z] run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
+          if [[ $LastZsync -gt 21600 ]]; then  printColor "  [z]   run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
+
+          else  printf "  [z]   run a quick zsync check - last update happened %d hrs ago"  "$((LastZsync/3600))"
           
           fi
 
