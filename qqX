@@ -2184,11 +2184,17 @@ function_quick_get_wrap ()  {
 
         printColor "Checking ...."
 
-        QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
+        if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then QGW_OS_HomePage="https://ubuntu.com/"
 
-        QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
+        else
 
-        QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+          QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
+
+          QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
+
+          QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+
+        fi
 
         [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
 
