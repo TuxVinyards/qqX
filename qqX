@@ -1586,6 +1586,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
       printColor "  [enter] to continue  [b] to go back \n\n"
       read -rp " >  " BreakAtVerboseArgs
       printf "\n\n"
+
       [[ $BreakAtVerboseArgs == "b" ]]  && return
 
     fi
@@ -1769,7 +1770,6 @@ function quickemu {
 
     [[ $SetGL_OverRide ]] &&  gl="$SetGL_OverRide"
 
-
     if [[ $VM_ExecBoot ]]; then
 
       # make sure quickemu doesn't run the vm boot sequence after running an 'action' unless flagged to do so
@@ -1780,19 +1780,21 @@ function quickemu {
       #         whether the run is made as [v] verbose & terminated
 
       printf "" > "/tmp/qqX_echo_output.log"
-
       printf "" > "$QemuErrorLog"
-
       source "/tmp/qmod-boot-temp" 
 
       VM_ExecBoot=
+
+      if [[ $BreakAtVerboseArgs ]]; then
+        SpicyPID="$(pgrep spicy)"
+        [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
+      fi
 
     fi
 
   else
 
     printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
-
     sleep 5
 
   fi
