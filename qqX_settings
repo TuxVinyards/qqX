@@ -200,13 +200,15 @@ Default_SDL_ScreenPercent="68"
 
 #  to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file 
 
-#  NB headless only runs in Spice and an SSH connection may need to be set as an extra QE parameter
+#  NB headless ONLY RUNS IN SPICE and an SSH connection may need to be set as an extra QE parameter
 
-#  See: https://github.com/quickemu-project/quickemu#headless   --ssh-port <port> : Set ssh-port manually
+#  Originally: https://github.com/quickemu-project/quickemu#headless   --ssh-port <port> : Set ssh-port manually
 
-#  Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/commit/ca7faf6fad5ad1c1c707e9fb6cc59aefd2ab227d
+#  BUT Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/commit/ca7faf6fad5ad1c1c707e9fb6cc59aefd2ab227d
 
 #  --access : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
+
+#  May be set INDIVIDUALLY by placing eg ACCESS="1.1.1.1" in the .conf file  (NB the var 'ACCESS' in CAPS)
 
 
 ##  GL GRAPHICS
