@@ -214,8 +214,8 @@ CustomTerminalProfile=
 
 ## SET TERMINAL SIZES
 
-Term_Width=145
-Term_Height=45
+Term_Width=150
+Term_Height=48
 Term_Taller=55
 
 
@@ -564,7 +564,7 @@ if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
   printColor "\n\n  A desktop launcher already exists >> "  
 
-  printf "\n\n  May be skipped, unless changing the icon or similar ..." 
+  printf "\n\n  May be skipped, unless changing the terminal load size, the icon or similar ..." 
 
   printColor "\n\n  [enter] to skip   " 
 
@@ -601,7 +601,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   if [[ ! $CustomTerminalProfile ]]; then 
 
-    printf "\n\n  Use extra height (%s) to help show multifile output better"  "$Term_Taller"
+    printf "\n\n  Use extra height (%s) to help show multifile or quickget output better"  "$Term_Taller"
 
     printf "\n\n  but be aware this will hide more of the file manager output"
 
