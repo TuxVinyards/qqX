@@ -221,7 +221,7 @@ Default_SDL_ScreenPercent="68"
 
 #   Leave blank for "on" or set =1 for "off"  Individually, both states of "on" or "off" may be set in the .conf file.
 
-SetGL_DefaultAsOff=
+SetGL_DefaultAsOff=    #  FIXME   to be sorted in release 1.5 
 
 
 ##  SHARED or SECOND DRIVE  (auto-create in qqX via the utils menu)

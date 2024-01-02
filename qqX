@@ -557,6 +557,8 @@ function_refresh_and_reload_VM_arrays() {
 
   function_scan_VM_folderList  
 
+  qqX_GL_Mode=
+
   check_screen_percentage_and_output
 
   set_drive_paths
@@ -1764,11 +1766,12 @@ function quickemu {
 
     source "/tmp/qmod-actions-temp"  
 
-    # Quickemu sources in the .conf file at the start of "/tmp/qmod-actions-temp", so some overides need placing here
+    # Quickemu 'sources-in' the .conf file at the start of "/tmp/qmod-actions-temp"
+    
+    # Some setting confirmations and overides need placing here, others go into the modded function 'vm_boot'   
 
-    # Others go into the modded function 'vm_boot' ...
+    # gl="$qqX_GL_Mode"  #  FIXME   to be sorted in release 1.5 
 
-    [[ $SetGL_OverRide ]] &&  gl="$SetGL_OverRide"
 
     if [[ $VM_ExecBoot ]]; then
 
@@ -1833,29 +1836,35 @@ function check_screen_percentage_and_output {
   SDL_ScreenPercent=
   SDL_ScrnPcnt_Cmd=
   HeadlessCmd=
-  gl=
   
-  if [[ $VM_Conf_File ]]; then
+  # Always make sure that qqX_GL_Mode has been set. Use SetGL_DefaultAsOff as cue, if no overides present. 
 
-    eval "$(grep -s Custom_SDL_ScreenPercent "$VM_Conf_File")"
+  # While function_refresh_and_reload_VM_arrays will clear qqX_GL_Mode to force picking up any specified normal VM conf setting
 
-    [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
-
-    eval "$(grep -s HeadlessDisplay "$VM_Conf_File")"
-
-    [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
+  if [[ ! $qqX_GL_Mode ]]; then   #  FIXME   to be sorted in release 1.5 
 
     if grep -q -s -e 'gl="' "$VM_Conf_File" ; then  eval "$(grep -s -e 'gl="' "$VM_Conf_File")" ; fi
 
+    [[ $gl ]] &&  gl="$(tr -cd "[:lower:]" <<< "$gl")" 
+    
+    if [[ $gl == "off" || $gl == "on" ]]; then qqX_GL_Mode="$gl" 
+
+    else
+
+      if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off" ; else qqX_GL_Mode="on" ; fi
+
+      gl="$qqX_GL_Mode"
+
+    fi
+
   fi
 
+  
+  eval "$(grep -s Custom_SDL_ScreenPercent "$VM_Conf_File")"
+
+  [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
+
   [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
-
-  [[ $SetGL_DefaultAsOff ]] && [[ ! $gl ]] && gl="off"
-
-  [[ $gl ]] &&  gl="$(tr -cd "[:lower:]" <<< "$gl")" && [[ ! $SetGL_OverRide ]] && SetGL_OverRide="$gl"
-
-  [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
 
   if [[ $SDL_ScreenPercent ]]; then 
   
@@ -1877,6 +1886,13 @@ function check_screen_percentage_and_output {
     fi
 
   fi
+
+  eval "$(grep -s HeadlessDisplay "$VM_Conf_File")"
+
+  [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
+
+  [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
+
 }  
 
 
@@ -4175,27 +4191,15 @@ function show_quickemu_WRAP_help {
 
   HelpSelect=
 
-  if [[ $ModName_qqX ]]; then 
+  [[ ! $ModName_qqX ]] && printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion" 
 
-    printf "\n"
-  
-    function_qqX_printf_logo_title  "$qqX_title"
+  printf "\n\n  For help with settings and user modes, see notes in the general settings file"  
 
-    printf "\n\n\n  %s is currently wrapping: QEMU %s  quickemu %s  &  quickget %s"  "$ModName" "$QEMU_VER_LONG" "$QE_VerNumber"  "$QG_VerNumber" 
-
-  else 
-  
-    printColor "\n\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion" 
-
-  fi
-
-  printf "\n\n  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern"  
-
-  printf "\n\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
+  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
 
   [[ ! $ModName_qqX ]] &&  printf "\n\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
   
-  printf "\n\n  [enter] to return   [a] %s API detail   " "$ModName"
+  printf "\n\n\n  [enter] to return   [a] %s API detail   " "$ModName"
 
   [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
 
@@ -5400,7 +5404,7 @@ while true ; do
       
         printColor " (%s%%)    [df]  99%% "  "$SDL_ScreenPercent" 
         
-        [[ $SetGL_OverRide == "off" ]] && printColor "  (scaleable)"
+        # [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    #  FIXME   to be sorted in release 1.5 
 
       elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
 
@@ -5412,9 +5416,9 @@ while true ; do
 
       printColor "\n\n  [g]   start with GTK display          "
 
-      if [[ $SetGL_OverRide == "off" ]] ; then printColor "[gl] toggle compatibility graphics mode (current = off)"  
+      # if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
 
-      else printColor "[gl] toggle performance graphics mode (current = on)" ; fi
+      # else printColor "[gl] ON > toggle-off" ; fi   
 
     fi
 
@@ -5880,14 +5884,12 @@ while true ; do
     KVM_MSR_selector_LoadHelp=1
     select_msr_config
 
-  elif [[ $MainMenuChoice == "gl" ]] ; then 
+  elif [[ $MainMenuChoice == "gl" ]] ; then
 
-    if [[ ! $SetGL_OverRide ]] ; then  SetGL_OverRide="off"
+    if [[ $qqX_GL_Mode == "on" ]] ; then qqX_GL_Mode="off"
 
-    elif [[ $SetGL_OverRide == "on" ]] ; then SetGL_OverRide="off"
-
-    else SetGL_OverRide="on"
-
+    elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
+    
     fi
 
   elif [[ $MainMenuChoice == "g" ]] ; then 
