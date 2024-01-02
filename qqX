@@ -1521,9 +1521,11 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     # Using $VERSION $VMDIR and other internal quickemu variables  & adding the qqX extra args:
 
-    { printf "\n#  qqX:  This file is NOT used by quickemu to run the VM but it will run it if the script is placed"
+    { printf "\n#  qqX:  This file is NOT used by quickemu to run the VM but could run it if the script is placed"
 
-      printf "\n\n#  in the calling folder, where the .conf file is located, and if it is given execute permission ...\n\n"
+      printf "\n\n#  in the calling folder, where the .conf file is located, and if it is given execute permission"
+
+      printf "\n\n#  You may need to cross check with qqX Args file as qqX may have issued a modified version ... \n\n"
     
     } >> "${VMDIR}/${VMNAME}.sh"
 
@@ -1540,9 +1542,19 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     i=0
 
+    # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a BUG ...
+    # if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport=1 ; else NoSmartcardSupport= ; fi
+
+    declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt" 
+
     while [[ "${args[i]}" ]]; do
 
+      # fixes for quickemu deprecated code, to be updated from time to time REVIEW 
+
+      if [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
+
       a="${args[i]}"
+
       if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
       elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
       else printf " %s" "$a" >> "$QemuArgsFile"
@@ -1553,10 +1565,9 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
         a="${a//)/"\)"}"
         args[i]="$a"
       fi
-      
-      # add extra spaces
-      args[i]=" $a"
 
+      args[i]=" $a"   # add extra space
+      
       # add quotes - REVIEW ?? should be quoted, theoretically, but runs counter to quickemu
       # if [[ "$a" != -* ]]; then [[ "$a" != \'* ]] && args[i]='"'"$a"'"' ; fi
 
