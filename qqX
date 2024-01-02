@@ -1542,8 +1542,8 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     i=0
 
-    # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a BUG ...
-    # if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport=1 ; else NoSmartcardSupport= ; fi
+    # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a build BUG ... but add this in case
+    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport=1 ; else NoSmartcardSupport= ; fi
 
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt" 
 
@@ -1553,20 +1553,29 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
       if [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
 
-      a="${args[i]}"
+      if [[ "${args[i]}" == *smartcard ]] && [[ $NoSmartcardSupport ]]; then 
 
-      if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
-      elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
-      else printf " %s" "$a" >> "$QemuArgsFile"
+          args[i]=" " 
+          args[i-1]=" " 
+
+      else
+
+        a="${args[i]}"
+
+        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
+        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
+        else printf " %s" "$a" >> "$QemuArgsFile"
+        fi
+
+        if [[ "$a" == *'(c)'* ]]; then
+          a="${a//(/'\('}"
+          a="${a//)/"\)"}"
+          args[i]="$a"
+        fi
+
+        args[i]=" $a"   # add extra space
+
       fi
-
-      if [[ "$a" == *'(c)'* ]]; then
-        a="${a//(/'\('}"
-        a="${a//)/"\)"}"
-        args[i]="$a"
-      fi
-
-      args[i]=" $a"   # add extra space
       
       # add quotes - REVIEW ?? should be quoted, theoretically, but runs counter to quickemu
       # if [[ "$a" != -* ]]; then [[ "$a" != \'* ]] && args[i]='"'"$a"'"' ; fi
@@ -1589,7 +1598,10 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     else    
       printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
-      printf "\n\n\n"  >> "$QemuArgsFile"
+
+    [[ $NoSmartcardSupport ]] && printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: \n\n  ignore reported chardev line after ccid, is not actually present, see args array file for details" >> "$QemuArgsFile"
+
+    printf "\n\n\n"  >> "$QemuArgsFile"
 
     if [[ $VerboseArgs ]]; then 
 
