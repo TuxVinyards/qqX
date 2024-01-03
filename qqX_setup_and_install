@@ -6,6 +6,14 @@
 #  OR:  open a terminal from in the folder  &  type  ./qqX_setup_and_install   (note prefix ./)
 
 
+##  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files ###
+
+#  $1 as 'Upgrade'  may be supplied to change the menu look (see qqX updater function)
+
+
+##  CUSTOM TERMINAL SIZES & PROFILE  may be set further down, just after the initial system checks
+
+
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
 
@@ -214,7 +222,7 @@ CustomTerminalProfile=
 
 ## SET TERMINAL SIZES
 
-Term_Width=150
+Term_Width=145
 Term_Height=48
 Term_Taller=55
 
