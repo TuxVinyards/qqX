@@ -1551,9 +1551,9 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
       # fixes for quickemu deprecated code, to be updated from time to time REVIEW 
 
-      if [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
+      if [[ $FixArgs_hpet ]] && [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
 
-      if [[ "${args[i]}" == *smartcard ]] && [[ $NoSmartcardSupport ]]; then 
+      if [[ $FixArgs_smartcard ]] && [[ "${args[i]}" == *smartcard ]] && [[ $NoSmartcardSupport ]]; then 
 
           args[i]=" " 
           args[i-1]=" " 

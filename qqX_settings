@@ -277,6 +277,18 @@ SharedDrive=""
 QemuErrorFilter=("gl_version 46" "signal 15 from pid")
 
 
+## FIXES for QUICKEMU'S  QEMU  'args'
+
+#  Selected fixes & hot-fixes for the quickemu code that gets passed to QEMU, 
+
+#  where quickemu has not yet fixed things or has released the fix.  Some may not be needed or may be distro specfic.
+
+#  Set = blank to disable, if causing problems or if not needed with your particular installation.  Set = 1 to activate.
+
+FixArgs_hpet=1
+
+FixArgs_smartcard=1
+
 
 ## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
 
