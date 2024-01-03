@@ -204,11 +204,11 @@ Default_SDL_ScreenPercent="68"
 
 #  Originally: https://github.com/quickemu-project/quickemu#headless   --ssh-port <port> : Set ssh-port manually
 
-#  BUT Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/commit/ca7faf6fad5ad1c1c707e9fb6cc59aefd2ab227d
+#  BUT Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/pull/835
 
-#  --access : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
+#  --access : Enable remote spice access support. 'local' | 'remote' | 'clientipaddress'    none (std default) = local 
 
-#  May be set INDIVIDUALLY by placing eg ACCESS="1.1.1.1" in the .conf file  (NB the var 'ACCESS' in CAPS)
+#  May be set INDIVIDUALLY by placing eg ACCESS="1.1.1.1" in the .conf file  (NB 'ACCESS' in CAPS, but value in lower case)
 
 
 ##  GL GRAPHICS
