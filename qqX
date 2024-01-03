@@ -2202,6 +2202,8 @@ function_quick_get_wrap ()  {
 
     else
 
+      #  TODO  add digit filter & alpha redux option
+
       [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_OS_Array[@]}"
 
       QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
@@ -2419,6 +2421,8 @@ function_quick_get_wrap ()  {
 
       printf "  Checking download sources ... \n\n"
 
+      [[ $QGW_OS_Arr_NameSelected == "windows" ]] &&  printf "  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
+
       quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
 
       cat "/tmp/qqX_get.test.iso.url.log"
@@ -2481,11 +2485,23 @@ function_quick_get_wrap ()  {
 
     while [[ ${VM_Folder_List[i]} ]]; do
 
-      if [[ $i -eq 0 ]]; then printf "\n\n  [0]  %s (current)"  "${VM_Folder_List[i]}"
+      if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
 
-      elif [[ $i -eq 1 ]]; then printf "\n\n  [1]  %s (default)"  "${VM_Folder_List[i]}"
+        if [[ $i -eq 0 ]]; then printf "\n\n  [0]  %s (current)"  "${VM_Folder_List[i]}"
 
-      else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+        elif [[ $i -eq 1 ]]; then printf "\n\n  [1]  %s (default)"  "${VM_Folder_List[i]}"
+
+        else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+
+        fi
+
+      else
+      
+        if [[ $i -eq 0 ]]; then printf "\n\n  [0]  %s (current/default)"  "${VM_Folder_List[i]}"
+
+        else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+
+        fi
 
       fi
 
@@ -2632,7 +2648,7 @@ function_quick_get_wrap ()  {
       ;;
 
 
-      0|1|2|3) QWG_DownLoadFolder="${VM_Folder_List[QGW_DownloadStart]}" 
+      [0-9]|[0-9][0-9]) QWG_DownLoadFolder="${VM_Folder_List[QGW_DownloadStart]}" 
       
       ;;
 
@@ -2677,8 +2693,13 @@ function_quick_get_wrap ()  {
 
     esac
 
-    [[ ! $QWG_DownLoadFolder ]] &&  QWG_DownLoadFolder="$Default_VM_Folder" 
+    if [[ ! $QWG_DownLoadFolder ]]; then
+    
+      QWG_DownLoadFolder="$Default_VM_Folder" 
 
+      printColor " \n\n  Using %s for now.  \n\n  Selected Download Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder" 
+
+    fi
 
   done
 
