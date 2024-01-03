@@ -4,11 +4,17 @@
 
 - The program's built-in downloader will neatly place releases into their own special sub-folder.
 
-New releases 1.4.1 :christmas_tree: has lots of minor improvements plus now features URL checking and a neat no-hang browser opening for OS Home Pages in quickget. Also includes several under the hood changes in readiness for release 1.5 in the new year.
+New release 1.4.1 :christmas_tree: had lots of minor improvements plus now features URL checking and a neat no-hang browser opening for OS Home Pages in quickget. Also included several under the hood changes in readiness for release 1.5 in the new year.
 
-- Use the Github **code/clone** button for the latest tweaks & bug fixes (if needed).
+Release 1.4.5 is semi interim to 1.5.  As previously, it has yet more improvements but several small new features have also made their way in, hence the number jump.
 
-The installer script will update the settings file with the new feature options.
+Of major importance are two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the QEMU 8.2 smartcard issue that is affecting some distros and appears to be a dependancy or build issue. Manjaro, for example seems to be unaffected. Both of these fixes can be toggled from the main settings menu.
+
+The installer script will update the settings file with the new feature options. Also, if you you are finding the quickget interface a bit cramped these days, running the desktop part, rather than skipping, will allow you to tweak the terminal size. Remembering of course that terminal (monospaced) font size also affects this. For that see your desktop control panel.
+
+There's also a new setting to allow you to place updates in a custom folder, instead of the usual 'Downloads' one ...
+
+- Use the Github **code/clone** button for the very latest tweaks & bug fixes (if needed).
 
 ### quickemu quickget X terminal project
 
