@@ -2801,7 +2801,7 @@ function_quick_get_wrap ()  {
 
       LastZsync="0" 
 
-      date +%s > "$VM_InstanceName/zsync.date.txt"
+      [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
 
       while [[ -e "$RckFile" ]]; do
         
@@ -2847,7 +2847,7 @@ function_quick_get_wrap ()  {
 
           LastZsync="0" 
 
-          date +%s > "$VM_InstanceName/zsync.date.txt"
+          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
 
         else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
 
@@ -5510,7 +5510,7 @@ while true ; do
 
         else
 
-          date +%s > "$VM_InstanceName/zsync.date.txt"
+          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
             
         fi
 
