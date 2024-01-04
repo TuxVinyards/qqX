@@ -8,7 +8,7 @@ New release 1.4.1 :christmas_tree: had lots of minor improvements plus introduce
 
 Release 1.4.5 is semi interim to 1.5.  As previously, it has yet more improvements but several small new features have also made their way in, hence the number jump.
 
-Of major importance are two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the recurring 'smartcard problem' #888  #717 that can affect some distros. Both of these fixes can be toggled from the main settings menu.
+Of major importance are two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the recent and recurring 'smartcard problem' [#888](https://github.com/quickemu-project/quickemu/issues/888) and [#717](https://github.com/quickemu-project/quickemu/issues/717) that can affect some distros. Both of these fixes can be toggled from the main settings menu.
 
 The installer script will update the settings file with the new feature options. Also, if you you are finding the quickget interface a bit cramped these days, running the desktop part, rather than skipping, will allow you to tweak the terminal size. Remembering of course that terminal (monospaced) font size also affects this. For that see your desktop control panel.
 
