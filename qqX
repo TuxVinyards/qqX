@@ -4656,6 +4656,10 @@ function_config_tune_up ()  {
   
   # @2023/11 free --mega  can fail in Manjaro ( & arch ?) at the command prompt at least  (interactive)
 
+  # @2024/01  REVIEW  Change this all to use 'free -m'  And add a filter for [:alpha:] characters  
+
+  #  See  https://github.com/quickemu-project/quickemu/issues/899
+
   if [[ ! $RAM_Available ]]; then
 
     RAM_Available="$(grep MemTotal /proc/meminfo | cut -d':' -f2 | tr -cd '[:digit:]' 2>/dev/null)"
