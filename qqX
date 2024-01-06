@@ -3057,17 +3057,13 @@ function_quick_get_wrap ()  {
   if [[ $MainMenuZsync ]] && [[ $ZsyncDownload ]]; then 
 
     SettingsFileAdjusted=
-
     ByPass_VM_Array_Selector=1
 
   else
 
     # re-load arrays, if not already done
-    
     SettingsFileAdjusted=1
-
     function_refresh_and_reload_VM_arrays
-
     ByPass_VM_Array_Selector=1
 
   fi
@@ -3075,10 +3071,7 @@ function_quick_get_wrap ()  {
 }
 
 
-
-
 ##  END of ADD-IN of ORIGINAL QUICKEMU and setting up the QUICKGET wrapper.  START MENU FUNCTIONS:
-
 
 
 function_conf_error () {
@@ -3087,7 +3080,7 @@ function_conf_error () {
 
   NewSetupFlag=
 
-  # clear any accidental initial double pressing of the enter key caused during error
+  # clear any accidental initial double pressing of the enter key occuring while experiencing the error
 
   read -r -t 0.1  
   read -r -t 0.1  
@@ -3202,17 +3195,14 @@ function_conf_error () {
 function_VM_array_add_confs () {
 
   ## Adds to VM array & lists, if submitted item has not been already listed 
-
   #  where $1 is 'VM_Path' and  $2 is 'VM_Conf' to be tested against the existing list (non-sparse)
 
   if [[ $1 ]]; then
 
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
-
     TestFolderFile="$1/$2"
 
     [[ ! -e $TestFolderFile ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
-    
 
     if [[ ! ${VM_Array[0,0]} ]]; then 
     
@@ -3228,15 +3218,9 @@ function_VM_array_add_confs () {
 
         ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
 
-        if [[ $ArrFolderFile == "$TestFolderFile" ]]; then 
-        
-          # already exists, stop searching, quit function:
-          return
+        if [[ $ArrFolderFile == "$TestFolderFile" ]]; then return  # already exists, stop searching, quit function:
 
-        else  
-
-          # carry on interating the array
-          ((i+=1))  
+        else  ((i+=1))  # carry on interating the array
 
         fi
         
@@ -3245,7 +3229,6 @@ function_VM_array_add_confs () {
     fi
 
       # if it's the first entry, or at the end there is no match found in the array, then add it
-
       VM_Array[$New_VM_ElementCount,0]="$1" 
       VM_Array[$New_VM_ElementCount,1]="$2" 
 
@@ -3256,13 +3239,9 @@ function_VM_array_add_confs () {
 
 function_scan_VM_folderList () {
 
-  ##  Scans of current & listed VM folders for other potential '.conf' files to the VM array
-
-  #   Adds via calls to 'function_VM_array_add_confs'
-
-
+  #  Scans of current & listed VM folders for other potential '.conf' files to the VM array
+  #  Adds via calls to 'function_VM_array_add_confs'
   #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
-
   #  Starts by checking for settings file errors
 
   VM_SettingsError=
@@ -3277,19 +3256,14 @@ function_scan_VM_folderList () {
 
       # Settings file checking loop. Runs until either settings file reads correctly or the user quits.
 
-      ## CHECK 1
-
-      #  Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
-
+      # CHECK 1
+      # Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
       [[ "$(( VM_ElementCount % 2 ))" == "1" ]] &&  VM_SettingsError=1 
 
-
-      ## CHECK 2
-
+      # CHECK 2
       if [[ ! $VM_SettingsError ]]; then
 
         # Check that array is non-sparse & is in pairs & that the elements exist
-
         # Note that a sparse array will stop listing at the first empty entry
 
         i=0
@@ -3322,10 +3296,8 @@ function_scan_VM_folderList () {
       fi
 
 
-      ## CHECK 3
-
+      # CHECK 3
       # If empty array elements were present, the pairs counter won't have incremented fully
-
       # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
 
       if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then  
@@ -3380,11 +3352,8 @@ function_scan_VM_folderList () {
       for TestFile in "${Folder_Conf_Array[@]}"; do 
 
         # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
-
         if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
-            
           function_VM_array_add_confs  "$FolderPathName" "$TestFile" 
-
         fi
       
       done
@@ -3394,7 +3363,6 @@ function_scan_VM_folderList () {
     ((i +=1))
 
   done
-  
 
   if [[ ! ${VM_Array[0,0]} ]] ; then
     function_conf_error  "VM ARRAY - No VMs - Is it time to get some distros?  Also check"
@@ -3407,15 +3375,11 @@ function_scan_VM_folderList () {
 
 function_print_conf_array () {
 
-  # Print a list of the VM's in the VM array
+  ## Print a list of the VM's in the VM array
 
   i=0
-
   ListTitleFolder=
-
   ListTitleLine_ItemCount=0
-
-  #printf "\n"
 
   VM_ElementCount="${#VM_Array[@]}" 
 
@@ -3426,7 +3390,6 @@ function_print_conf_array () {
     if [[ ! -d "${VM_Array[$i,0]}" ]]; then 
 
       printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"   
-
       function_conf_error  "folder $i" 
       SelectArrayError=1
       break 
@@ -3434,9 +3397,7 @@ function_print_conf_array () {
     else
 
       ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-
       ArrayConf_Item_Listing="${VM_Array[$i,1]}"
-
       ArrayConf_Item_Listing="${ArrayConf_Item_Listing/'.conf'/}"
 
       if [[ -e "$ArrayConf_Item" ]]; then 
@@ -3460,11 +3421,8 @@ function_print_conf_array () {
           fi
 
           QcowTarget=
-
           QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
-
           QcowTarget="${QcowTarget/'disk_img='/}"  
-
           QcowTarget="${QcowTarget//'"'/}"
 
           # Newly downloaded VMs will have a qcow disk path in the .conf file 
@@ -3486,9 +3444,8 @@ function_print_conf_array () {
            
               [[  ! $(du -b -t 500000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]  &&  ArrayConf_Item_Listing+=" (z)"
 
-              #  Live VMs only, as zsync only updates the iso file.  Live VM qcow2 disks are normally only 196k. 
-
-              #  Test ceiling is set at 500k.  REVIEW if problems.
+              #  Live VMs only, as zsync only updates the iso file.   
+              #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
  
             fi
 
@@ -3500,14 +3457,10 @@ function_print_conf_array () {
 
           fi
 
-          # move to new line when number of items per line reached  (default 4, see main settings)
-
+          # Move to new line when number of items per line reached  (default 4, see main settings)
           if [[ $ListTitleLine_ItemCount == "$VM_Select_ItemsPerLine" ]]; then
-
             ListTitleLine_ItemCount=0
-
             printf "\n\n  "
-
           fi
 
         fi
@@ -3540,15 +3493,12 @@ function_Select_VM () {
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
 
     # if reselecting & the array is already loaded (which it should be ...)
-
     ByPass_VM_Array_Loader=
 
   else 
 
     # Re-scan folders as something new may have been added
-
     function_scan_VM_folderList
-
     function_VM_array_add_confs
 
   fi
@@ -3643,11 +3593,9 @@ function_Select_VM () {
 
   fi
 
-  if [[ $SettingsFileAdjusted && $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]]; then
+  if [[ $SettingsFileAdjusted && $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]]; then  true
 
     # Only the array checker is run after a settings edit, if a VM selection is already in place 
-
-    true
 
   else
 
@@ -3824,7 +3772,6 @@ drives_and_snapshots() {
     fi
 
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
 
   fi
@@ -4035,12 +3982,14 @@ qqX_edit_settings() {
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"  
 
+      qqX_GL_Mode=
       check_screen_percentage_and_output   
       
     elif [[ $1 == "tune-up" ]]; then
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 
 
+      qqX_GL_Mode=
       check_screen_percentage_and_output 
 
     else 
@@ -4049,21 +3998,19 @@ qqX_edit_settings() {
 
       SettingsFileAdjusted=1
 
-      # .conf is read only when booting the VM, just the general settings needs a system refresh
-
       VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect"
 
       function_refresh_and_reload_VM_arrays
      
     fi
 
-    # Note, these commands can throw a complaint if 'xapps' has not not been installed.
+    # Note, app opening commands can throw a complaint if 'xapps' has not not been installed.
     # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
 
     # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of gtk2 and gtk3 etc ....  
     #  As from 'WebBrowser' section and handling of firefox etc
 
-    # NB  don't set to run in background, as the web browser does, as qqX needs to take the new settings 
+    # NB  don't set to run the editor in the background, as the web browser does, as qqX needs to take the new settings 
 
   fi
 
@@ -4935,56 +4882,38 @@ if [[ $1 ]]; then
     if grep -q -s "disk_img="'"'"$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName" "$XDG_QcowRightClick_VM_Dir_Name.conf" ; then
 
       VM_Conf_Dir="$(pwd)"
-
       VM_Conf_File="$XDG_QcowRightClick_VM_Dir_Name.conf"
-
       VM_InstanceName="$XDG_QcowRightClick_VM_Dir_Name"
-
       shift
 
-    else
-
-      XDG_QcowRightClick_NO_qqX=1
-
-      shift
+    else  XDG_QcowRightClick_NO_qqX=1 ; shift
 
     fi
 
   elif [[ $XDG_StartVariant ]]; then
 
     echo
-    
     function_qqX_logo
-
     printColor "\n\n  %s  not understood \n\n  Or non valid file type %s \n\n"  "$1 "  "$XDG_MimeType"
-
     sleep 5 
-
 
   elif [[ "$1" == *'vm' ]] && [[ "$2" == *'.conf' ]]; then
 
     # conforms to  -vm | --vm  file.conf
-  
     VM_Conf_Dir="$(dirname "$2")"
-
     VM_Conf_File="$(basename "$2")"
-
     shift $#
 
   else 
   
     show_wrap_CLI_usage 
-
     printf "\n\n"
-
     exit directly
 
   fi
 
 
-  if [[ ! $VM_Conf_Dir ]]; then 
-  
-    VM_Conf_Dir="$CurrentFolder"
+  if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
 
   else
 
@@ -4994,9 +4923,7 @@ if [[ $1 ]]; then
     
       function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
 
-    else
-
-      cd "$VM_Conf_Dir"  || function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
+    else  cd "$VM_Conf_Dir"  || function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
 
     fi
 
@@ -5010,10 +4937,8 @@ if [[ $1 ]]; then
 
   fi
 
-
-  # Selection now made, but array must still be loaded as may be needed for reselecting later ...
-
-  ByPass_VM_Array_Selector=1
+   # Selection now made, but array must still be loaded as may be needed for reselecting later ...
+   ByPass_VM_Array_Selector=1
 
 fi
 
@@ -5065,15 +4990,11 @@ fi
 if [[ ! $Disable_qqX_upd_Checks ]]; then
 
   check_for_qqX_updates &   
-
   qqX_UpdaterPID="$!"
 
 fi
 
-# check the VM disk is not corrupt  (quickemu default name only)
-
-# to run only after the VM_InstanceName exists
-
+# After the VM_InstanceName exists, check the VM disk is not corrupt  (quickemu default name only)
 # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-check
 
 function check_disk_is_okay {
@@ -5102,7 +5023,6 @@ function check_disk_is_okay {
   if [[ -e "$DiskCheckFolderName/$DiskCheck_Disk" ]]; then
 
     # Disk won't exist if new (or named differently REVIEW )
-
     # Qemu-img with '-q' only outputs if error & on outputs on stderr   The exit status remains separately recorded.
 
     if [[ $PrintErrors ]]; then  "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
@@ -5110,7 +5030,6 @@ function check_disk_is_okay {
     else "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"  2>/dev/null ; fi
 
     # Note "Okay"  is also used as a flag  > caution if changing   # REVIEW  could also be flagged using:
-
     # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)" 
 
     case "$?" in 
@@ -5161,11 +5080,9 @@ filter_and_flag_qemu_errors () {
 while true ; do
 
   MainMenuChoice=
-
   SnapTitle=
   SnapNumber=
   SnapName=
-
   QemuErrorLog=
 
   function_show_main_menu_header
@@ -5290,6 +5207,7 @@ while true ; do
   QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
   QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
+  qqX_GL_Mode=
   check_screen_percentage_and_output
   set_drive_paths
   find_main_drive
@@ -5414,9 +5332,8 @@ while true ; do
     
       if [[ ! $(du -b -t 500000 "$VM_InstanceName/disk.qcow2" 2>/dev/null) ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]] ; then
 
-        #  Live VMs only, as zsync only updates the iso file.  Live VM qcow2 disks are normally only 196k.  
-        
-        #  Test ceiling is set at 500k.  REVIEW if problems.
+        #  Live VMs only, as zsync only updates the iso file.   
+        #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
 
         if [[ -e "$VM_InstanceName/zsync.date.txt" ]]; then
 
@@ -5442,62 +5359,19 @@ while true ; do
             
         fi
 
-
-        zsync_quickget_code_snippets_in_a_way_that_shows_them_as_formatted_notes () {
-
-          ## DEV NOTES in formatted display, NOT FOR RUNNING
-
-          # FROM:  function get_ubuntu in quickget (original, ver 4.8)  
-
-          if [[ "${RELEASE}" == *"daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
-              # Ubuntu Studio daily-live images are in the dvd directory
-              RELEASE="dvd"
-          elif [ "${RELEASE}" == "daily-canary" ] && [ "${OS}" != "ubuntu" ]; then
-              # daily-canary is only available for Ubuntu, switch flavours to daily-live
-              RELEASE="daily-live"
-          elif [ "${RELEASE}" == "daily-legacy" ] && [ "${OS}" != "ubuntu" ]; then
-              # daily-legacy is only available for Ubuntu, switch flavours to daily-live
-              RELEASE="daily-live"
-          fi
-
-          # AND from function list_csv()
-
-          # shellcheck disable=SC2086,SC2034
-
-          if [ "${OS}" == "macos" ]; then
-            DOWNLOADER="macrecovery"
-
-          elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-            DOWNLOADER="zsync"
-
-          elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-legacy" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-            DOWNLOADER="zsync"
-
-          elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-            DOWNLOADER="zsync"
+        ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget  
 
           # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
-          
           # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
 
-
           # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
-
           # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
-
           
           # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-          
           # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
 
-          else
-            DOWNLOADER="${DL}"
-          fi
 
-        }
-
-        #  Sort out the quickget / function_quick_get_wrap  call & the var/flags   
-        
+        # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
         # Expect these to need updating from time to time ...
 
         Zsync_OS_Name="$VM_InstanceName"
@@ -5545,9 +5419,7 @@ while true ; do
 
       while true ; do
 
-        if [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then  
-        
-          sleep 1
+        if [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then   sleep 1
 
         else 
         
@@ -5566,14 +5438,11 @@ while true ; do
 
       printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
 
-    else
-
-      [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
+    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
     fi
 
     printf  "  [q]   quit \n\n"
-
     read -rp "  >  "  MainMenuChoice
 
   fi
@@ -5654,7 +5523,6 @@ while true ; do
     nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
     # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
-    
     #  As from 'WebBrowser' section and handling of firefox etc
 
   elif [[ $MainMenuChoice == "dl" ]] ; then
@@ -5738,7 +5606,6 @@ while true ; do
         nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
 
         # https://unix.stackexchange.com/questions/103483/opening-firefox-from-terminal#103486
-
         # > "/tmp/qqX_nohup.txt" handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc ....
 
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
@@ -5756,35 +5623,25 @@ while true ; do
     else
 
       # each release to its own folder makes things tidier
-
       qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
-
       mkdir -p "$qqX_LatestTarBall_Folder"
 
-
       # record where to come back to, when done
-
       ReturnFolder="$(pwd)"
 
-
       cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
-
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         
         wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
-
         wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
-
         SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
 
         printColor "\n  SHA256 Check: %s "  "$SHA_Check"
 
         [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
       
-      else
-
-        wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+      else  wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
 
       fi
 
@@ -5814,40 +5671,29 @@ while true ; do
         cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
 
         # move current execution away from this script and to the installer
-
         exec  bash -c "./qqX_setup_and_install  Upgrade" 
 
       fi
 
       sleep 0.6
-
       cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
 
     fi
 
-  elif [[ $MainMenuChoice == "conf" ]] ; then
+  elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
 
-    qqX_edit_settings  conf
+  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
 
-  elif [[ $MainMenuChoice == "tune" ]] ; then
-
-      function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
-
-  elif [[ $MainMenuChoice == "gt" ]] ; then
-
-    function_quick_get_wrap
+  elif [[ $MainMenuChoice == "gt" ]] ; then function_quick_get_wrap
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
 
       MainMenuZsync=1
-
       function_quick_get_wrap
 
-    else 
-
-      printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
+    else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
 
     fi
 
@@ -5873,13 +5719,11 @@ while true ; do
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
 
       printf "\n\n [enter] to return \n\n"
-
       read -rp "  >  "
 
     else
 
       eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
-
       function_KillPID_Menu
 
     fi
@@ -5898,13 +5742,9 @@ while true ; do
 
     else
 
-      if [[ $MainMenuChoice == "df"  ]]; then
+      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
 
-        eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
-
-      else
-
-        eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
 
       fi
 
@@ -5931,16 +5771,11 @@ while true ; do
       if [[ $HeadlessCmd ]]; then 
 
         # headless only runs in Spice
-
         eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
 
-      elif [[ $MainMenuChoice == "sf" ]]; then
+      elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
 
-        eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
-
-      else
-
-        eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
 
       fi
 
@@ -5964,8 +5799,8 @@ while true ; do
 
     printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
 
-
     [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
+
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  
 
@@ -6431,23 +6266,15 @@ while true ; do
               # 'sed' can get very HIEROGLYPHICAL  https://stackoverflow.com/a/9453461
 
               # 'awk' ?  https://stackoverflow.com/a/32995760
-
               #  awk :  https://stackoverflow.com/a/6541653   https://stackoverflow.com/tags/awk/info 
-
               #  sed awk easy methods: https://www.ubuntumint.com/insert-line-specific-line-number-linux/
-
               #  date ref awk:  https://unix.stackexchange.com/a/599097
 
-              #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options   
-
+              #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options  
               #  Make sure sed command works in --posix  if testing on gnu sed ...
-
               #  Also note here:
-
               #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
-
               #  sed -i only works in GNU sed  ... 
-              
 
               if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
@@ -6504,22 +6331,16 @@ while true ; do
     
   elif [[ $MainMenuChoice == "v" ]] ; then
 
-    if [[ $VerboseArgs ]]; then VerboseArgs=
-
-    else VerboseArgs=1  ; fi
+    if [[ $VerboseArgs ]]; then VerboseArgs= ; else VerboseArgs=1 ; fi
 
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
-    if [[ ! ${VM_Array[0,0]} ]]; then
-
-      function_refresh_and_reload_VM_arrays
-
-    fi
-
+    if [[ ! ${VM_Array[0,0]} ]]; then function_refresh_and_reload_VM_arrays ; fi
     Select_VM=1
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
+
 
   elif [[ $MainMenuChoice == "xa" ]] ; then
 
@@ -6543,21 +6364,16 @@ while true ; do
     fi
 
     printf "\n\n"
-
     read -rp "  > "  MenuXA
 
     if [[ $MenuXA != "r" ]]; then
 
       printf "\n\n  %s %s"  "$ExtraArgs" " $MenuXA"
-
       printf "\n\n  Is this correct y/n ? \n\n"
-
       read -rp "  >  "  MenuXA_Correct
 
     fi
-
     
-
     if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 1.5 
 
     elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1 
@@ -6567,10 +6383,17 @@ while true ; do
     printf "\033c\n\n"
 
 
+  else
+
+    # refresh
+
+    # Check the .conf file, for any individual .conf load up values
+    qqX_GL_Mode=
+    check_screen_percentage_and_output
+
   fi
 
 done
-
 
 # vim:tabstop=2:shiftwidth=2:expandtab
 
