@@ -7,9 +7,7 @@
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
-
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
 # 	Otherwise:  
@@ -186,7 +184,6 @@ if [[ ! -d "/tmp" ]]; then
   sleep 5
   exit 1
 fi
-
 
 
 if [[ $1 == "XDG" ]]; then 
