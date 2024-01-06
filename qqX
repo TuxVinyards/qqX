@@ -71,12 +71,9 @@ NoClear=
 
 ModVersion="1.4.05"
 
-# major.minor.point[.dev-point]  x.x.2dp[.2dp]
-
-# where x = any whole number and the last register always being 2dp.
+# major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation
-
 # while a single 0 in the third register indicates beta  [with fourth register at 2dp]
 
 
@@ -3476,7 +3473,6 @@ function_Select_VM () {
   fi
 
   # clear any no-longer needed flags
-
   Select_VM=
   ByPass_VM_Array_Loader=
   ByPass_VM_Array_Selector=
@@ -3635,33 +3631,14 @@ function_KillPID_Menu() {
 
   elif [[ $BreakAtVerboseArgs ]]; then BreakAtVerboseArgs= ; return
 
-  else  sleep 2 ; fi
+  else  sleep 2 
   
-  #if [[ ! $InstancePID ]]; then
+  fi
+  
+  # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
 
-    # belt & braces check for the PID:  
+  InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
 
-    # belt:
-
-    #InstancePID="$(pgrep "$VM_InstanceName")"
-
-    #echo "PID $InstancePID - VM_InstanceName $VM_InstanceName "
-
-    # braces: qemu SHOULD write a .pid file while it is running & remove it when not  
-    
-    # REVIEW  Probably we should assume VM is not running if QEMU's & file is not there as this would indicate QEMU failure
-
-    # Also the belt of pgrep can give truncated output with long VM names
-
-    # Uses quickemu Var Names:
-
-    # [[ ! $InstancePID ]] && InstancePID="$(cat "${VMDIR}/${VMNAME}.pid")"
-
-    InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
-
-    # echo "PID $InstancePID - VMDIR $VMDIR  VMNAME  $VMNAME QEMU $QEMU"
-
-  #fi
 
   if [[ $InstancePID ]]; then 
 
@@ -4030,38 +4007,26 @@ check_for_qqX_updates() {
   if [[ $qqX_LatestRelease ]]; then
 
     # should normally be the case, if internet connection is up
-
     qqX_LatestRelease="${qqX_LatestRelease/'"tag_name": "'/}"
-
     qqX_LatestRelease="${qqX_LatestRelease//'",'/}"
-
     qqX_LatestRelease="$(tr -cd '[:graph:]' <<< "$qqX_LatestRelease")"
 
     # std downloads: 
-
     # eg "tarball_url": "https://api.github.com/repos/TuxVinyards/qqX/tarball/0.09.00.016",
-
     qqX_LatestTarBall="$(grep -s tarball "/tmp/latest-qqX" )"
-
     qqX_LatestTarBall="${qqX_LatestTarBall/'"tarball_url": "'/}"
-
     qqX_LatestTarBall="${qqX_LatestTarBall//'",'/}"
-
     qqX_LatestTarBall="$(tr -cd '[:graph:]' <<< "$qqX_LatestTarBall")"
 
     # assets: 
-    
     # eg "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz"
-
     # &  "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz.sha256"
 
     qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
 
-
     if [[ "$(grep -s -c "$qqX_Latest_Secure_TarTest" "/tmp/latest-qqX")" == "2" ]] ; then
 
       qqX_Latest_Secure_TarBall="$qqX_Latest_Secure_TarTest"
-      
       qqX_Latest_Secure_TarSha="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz.sha256"
            
     fi
@@ -4071,47 +4036,31 @@ check_for_qqX_updates() {
 
     # Current Version is carried out at the start, in similar way
 
-
     # qqX_LatestVer_Arr[0] remains unpadded  (& to the left of the decimal point)
 
     [[ ${#qqX_LatestVer_Arr[1]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[1] "%.2d" "${qqX_LatestVer_Arr[1]}"
-
     [[ ${#qqX_LatestVer_Arr[2]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[2] "%.2d" "${qqX_LatestVer_Arr[2]}"
 
     #legacy 3dp pre "0.09.00.017"
 
     [[ ${#qqX_LatestVer_Arr[3]} -gt 2 ]] && qqX_LatestVer_Arr[3]="${qqX_LatestVer_Arr[3]:(-2)}"
-
     [[ ${#qqX_LatestVer_Arr[3]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[3] "%.2d" "${qqX_LatestVer_Arr[3]}"
 
     qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}${qqX_LatestVer_Arr[3]}"
 
-    
-    #echo "latest $qqX_LatestVer_Float  current $qqX_CurrentVer_Float"   
-
-
     #  Flag up release type.  Also used in qqX general title to show if using beta or release.
 
-    if [[ "${qqX_LatestVer_Arr[3]}" ]] && [[ "${qqX_LatestVer_Arr[2]}" == "00" ]]; then 
-    
-      qqX_LatestReleaseType="beta"
+    if [[ "${qqX_LatestVer_Arr[3]}" ]] && [[ "${qqX_LatestVer_Arr[2]}" == "00" ]]; then  qqX_LatestReleaseType="beta"
 
     else qqX_LatestReleaseType="release"
     
     fi
-    
-    #echo "latest $qqX_LatestReleaseType  current $qqX_CurrentReleaseType"   
-
 
     #  If current ver is beta OR if beta notifications are requested in the general settings:
-
     [[ $qqX_CurrentReleaseType == "beta" ]] && Hide_qqX_BetaUpdates=
 
-
     #  Also flag up about beta notifications if transitioning from beta to release:
-
     [[ $qqX_CurrentReleaseType == "beta" ]] && [[ $qqX_LatestReleaseType == "release" ]] && BetaTxReleasePoint=1
-
 
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
 
@@ -4143,12 +4092,7 @@ check_for_qqX_updates() {
 
     fi
 
-    #  REVIEW  dev searches for pre-releases?  Needs 'jq' but this is required by quickemu anyway.  Or just leave as UnHide_Beta?
-    
-    # https://stackoverflow.com/questions/67688662/how-can-i-get-the-latest-pre-release-release-for-my-github-repo-bash
-
   fi 
-
 
 }
 
@@ -4156,7 +4100,6 @@ check_for_qqX_updates() {
 function_config_tune_up ()  {
 
   # $1 should be the full path/filename.conf
-
   # &  $2 the VM Folder name
 
   TuneUpTargetFile="$1" 
@@ -4683,16 +4626,11 @@ function_show_main_menu_header () {
 
   else
 
-    #[[ $InstancePID ]] && [[ ! $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]] && InstancePID=
-
     [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
-
-    #  Now using Qemu's PID file.  REVIEW   
 
     [[ ! $InstancePID ]] && printf "\033c"  && show_qmod_title
  
     printf "\n"
-
     printColor "    %s " "$VM_InstanceName" 
 
     #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
