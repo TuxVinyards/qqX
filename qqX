@@ -1608,7 +1608,6 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
 
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
-
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
 
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
@@ -1616,7 +1615,6 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
             
     ## call QEMU  (with any extras, if present)
-
     # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
  
     eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
@@ -1632,40 +1630,26 @@ EOF
 
 source "/tmp/qmod-function-vm_boot-new-temp"
 
-
 ## Add in the standard parameter cases 
 
 tail +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
-
 # note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
-
 QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-
 QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-
 ((QE_EoCasePoint -= (QE_StartCasePoint -1) ))
-
 tail "+$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
-
 
 ##  Add in the standard actions ( also where quickemu sources in the .conf file )
 
 ((QE_EoCasePoint += (QE_StartCasePoint +2) ))
-
 QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-
 ((QE_vm_bootPoint -= 2))
-
 QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
-
 QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
 
 # quickemu sources in the .conf file at the start of 'actions'  (see function 'quickemu')
-
 tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-temp"
-
 tail "+$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
-
 
 
 function quickemu {      
@@ -1673,20 +1657,18 @@ function quickemu {
   # Any calls to quickemu become re-routed to this function instead.
 
   # Check 'mod' params first, then quickemu's
-
   # plus quickemu_vars have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
   clear_and_load_quickemu_vars
 
 
-  ## Do a first check for amy qwrap internal commands 
+  ## Do a first check for amy qwrap internal commands   (deprecated)
 
   local FirstParamCount=0
 
   IFS=' '  read -ra FirstParamsArray <<< "$*"
 
   # declare -p FirstParamsArray
-
   # read
 
   # https://unix.stackexchange.com/questions/50654/function-caller-positional-parameters?rq=1
@@ -1729,29 +1711,20 @@ function quickemu {
   ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
 
   #  These bits are basically the remaining sections of the original code. 
-  
   #  The earlier original code sections are all functions that have now been loaded, as is, or modified
 
   if [[ -e "/tmp/qmod-case-temp" ]] && [[ -e "/tmp/qmod-actions-temp" ]] && [[ -e "/tmp/qmod-boot-temp" ]]; then
     
-    while [[ $1 ]]; do
-
-      source "/tmp/qmod-case-temp"  
-
-    done  
+    while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done  
 
     # after read, remove any leftover params not cleared due to trapped exit re-route 
-
     # & if not yet given, decide on action   
-
     #  https://unix.stackexchange.com/questions/18981/how-to-unset-the-positional-parameters
 
     shift  $#
-
     source "/tmp/qmod-actions-temp"  
 
     # Quickemu 'sources-in' the .conf file at the start of "/tmp/qmod-actions-temp"
-    
     # Some setting confirmations and overides need placing here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
@@ -1760,7 +1733,6 @@ function quickemu {
     if [[ $VM_ExecBoot ]]; then
 
       # make sure quickemu doesn't run the vm boot sequence after running an 'action' unless flagged to do so
-
       # load extracted standard quickemu code that gives the okay to run main function 'vm_boot' (in this case, the modded one)
 
       # REVIEW  these logs only get cleared just before running, so stay until a boot sequence is run, irrespective of
@@ -1788,31 +1760,20 @@ function quickemu {
 
 }
 
-
 # Temps usually get removed with reboot 
-
 # BUT can get removed by time (eg 24hrs) so check they are there still ( REVIEW  if causes problems )
-
 # See https://serverfault.com/questions/377348/when-does-tmp-get-cleared#377349
 
-
 ## The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
-
 QG_VerNumber="$(quickget "--version")"
 
 # Quick EMU uses its internal var '$VERSION'
-
 QE_VerNumber="$VERSION"
 
-
-##  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
-
+#  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
 #  But check the to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
 
-#  REVIEW  make sure the tmp files are reading the right version before qqX machine swap edition is released
-
 #  Runnning this function when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
-
 #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  (See main settings)
 
 function check_screen_percentage_and_output {
@@ -1835,9 +1796,7 @@ function check_screen_percentage_and_output {
     else gl= 
     fi 
     
-    if [[ $gl == "off" || $gl == "on" ]]; then 
-    
-      qqX_GL_Mode="$gl" 
+    if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
 
     else
 
@@ -1891,28 +1850,16 @@ function check_screen_percentage_and_output {
 function set_drive_paths {
 
   #  For a SECOND/SHARED DRIVE (thanks @gnudoc on the quickemu Discord channel)  do "qemu-img create -f qcow2 disk2.qcow2 40G"  or as required
-
   #  Set  ExtraArgs=" -device virtio-blk-pci,drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=/vm_folder/disk2.qcow2"  
-
   #  Edit path & boot a VM.  Use 'Disks'  Gparted or similar to find, format and mount.  
-
   #  The function needs to be run everytime a different VM is selected to allow for individual VM settings or requirements.
 
-
   #  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
-
   #  Any OS older than and including 10.13 Mojave 2018 should have a flag in the .conf file > MacLegacyDrive="true"
-
   #  See https://en.wikipedia.org/wiki/MacOS_version_history
 
 
-  #  Manual edit/creation: "qemu-img create -f qcow2 disk2.qcow2 64G"  or as size required, to create a disk.
-
-  #  Thanks @gnudoc on the quickemu Discord channel for initiating this idea.  
-
-
   #  SECOND DRIVE and .conf file
-
   #  Drive path to be individually set in the .conf file on a per VM basis.  
 
   SecondDrive=
@@ -1931,7 +1878,6 @@ function set_drive_paths {
     else BusType="virtio-blk-pci"; fi
 
     #  SECOND DRIVE 
-
     #  Drive path to be individually set in the .conf file on a per VM basis.  
 
     eval "$(grep -s SecondDrive "$VM_Conf_File")"
@@ -1953,7 +1899,6 @@ function set_drive_paths {
   fi
 
   #  SHARED DRIVE
-
   #  This drive should be availble to all VMs and act as a shared resource.  See main settings.
 
   if [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
@@ -1991,15 +1936,10 @@ function set_drive_paths {
 
 }  
 
-
-## MAIN DRIVE
-
+#  MAIN DRIVE
 #  Drive path to be individually set in the .conf file on a per VM basis.  
-
 #  The function needs to be run everytime a different VM is selected.
-
 #  Added so we can distinguish between different drives for snapshots.
-
 #  Finds the quickemu var 'disk_img' which is the main drive 'disk.qcow2' 
 
 function find_main_drive {
@@ -2012,13 +1952,9 @@ function find_main_drive {
 
     eval "$(grep disk_img "$VM_Conf_File" 2>/dev/null)"
 
-    if [[ -e "$disk_img" ]]; then
+    if [[ -e "$disk_img" ]]; then  MainDrive="$disk_img"
 
-      MainDrive="$disk_img"
-
-    else
-      
-      MainDrive_NOT_present=1
+    else  MainDrive_NOT_present=1
 
     fi
 
@@ -2030,12 +1966,9 @@ function find_main_drive {
 
 ##  WRAPPING FUNCTIONS FOR 'quickget' 
 
-
 print_quickget_choices () {
 
-  # listing function for use inside 'function_quick_get_wrap'
-
-  # adapted with $2 as number per line   ( REVIEW )
+  # listing function for use inside 'function_quick_get_wrap'  &  adapted with $2 as number per line   ( REVIEW )
 
   declare -n QGW_List_ArrName="$1"
 
@@ -2044,11 +1977,8 @@ print_quickget_choices () {
   if [[ $2 ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
   QGW_List_ArrNum=0
-
   QGW_List_ArrNum_Last="${#QGW_List_ArrName[@]}"
-
   QGW_List_DisplayNum=1
-
   QGW_List_NewLineCounter=1
 
   for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
@@ -2067,9 +1997,7 @@ print_quickget_choices () {
     printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
 
     ((QGW_List_ArrNum+=1))
-
     ((QGW_List_DisplayNum+=1))
-
     ((QGW_List_NewLineCounter+=1))
 
     if [[ $QGW_List_NewLineCounter == "$QGW_List_NewLinePoint" ]];  then
@@ -2142,7 +2070,6 @@ function_quick_get_wrap ()  {
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
 
     QGW_OS_Arr_NameSelected="$Zsync_OS_Name"
-
     QGW_Release_Arr_NameSelected="$Zsync_Release_Name"
 
   else
@@ -2160,7 +2087,6 @@ function_quick_get_wrap ()  {
     printColor "\n\n\n  Give list NUMBER of OS name to select for download or to browse OS website  [b] to go back \n\n"    
 
     read -rp "  >  "  QGW_List_NumSelected
-
 
     if [[ $QGW_List_NumSelected == "b" ]]; then 
     
@@ -2195,23 +2121,23 @@ function_quick_get_wrap ()  {
 
         printColor "Checking ...."
 
-        if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then QGW_OS_HomePage="https://ubuntu.com/"
+        if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
 
         else
 
           QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
-
           QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
-
           QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
 
         fi
 
         [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
 
-        if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then printf " (working)"
+        if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then  printf " (working)"
 
-        else printf " (site down or bad link)" ; printColor " ??" ; fi
+        else  printf " (site down or bad link)" ; printColor " ??" 
+        
+        fi
 
       fi
 
@@ -2219,11 +2145,8 @@ function_quick_get_wrap ()  {
      
     fi
 
-
     QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
-
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
-
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
     while true ; do
@@ -2246,10 +2169,11 @@ function_quick_get_wrap ()  {
 
       fi  
 
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
 
-      else printf "\n\n" ; fi
-
+      else  printf "\n\n" 
+      
+      fi
 
       printf "  [b] to go back \n\n"   
 
@@ -2259,11 +2183,8 @@ function_quick_get_wrap ()  {
       if [[ $QGW_List_NumSelected == "b" ]]; then 
 
         QGW_List_NumSelected= 
-
         QGW_OS_Arr_NameSelected=
-      
         function_quick_get_wrap
-
         return
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
@@ -2273,17 +2194,13 @@ function_quick_get_wrap ()  {
       elif [[ $QGW_List_NumSelected ]]; then 
 
         [[ $QGW_List_NumSelected -gt "${#QGW_Releases_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Releases_Array[@]}"
-
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
-
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
-
         break
 
       else 
 
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
-      
         break
 
       fi
@@ -2318,12 +2235,6 @@ function_quick_get_wrap ()  {
         print_quickget_choices  "QGW_Editions_Array"
 
         printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"  
-
-        if [[ $QGW_OS_Arr_NameSelected == "fedora" ]]  && [[ $QGW_Release_Arr_NameSelected == "33" ]] || [[ $QGW_Release_Arr_NameSelected == "34" ]]; then 
-        
-          printf "  Note: Fedora 33 i3 and Fedora 34 Cinnamon are not possible \n\n"
-
-        fi
 
         read -rp "  >  "  QGW_List_NumSelected   
 
