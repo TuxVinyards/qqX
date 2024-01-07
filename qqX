@@ -66,10 +66,16 @@ if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
   echo; sleep 10; exit 1
 fi
 
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+AllowMoreLocale=
+
+
 ##  Dev: set =1 to stop screen clears (and pause 1 sec), for easier fault tracing
 #   Set =integer for add longer pauses, "0.2" etc for less.
 
 NoClear=
+
 
 # This script:
 
@@ -130,8 +136,8 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 #  Make sure shell is set during session to decimal separator of dot 
 
-#  If LC_ALL=C changes too much, just set the numeric. (adjust in main settings)  
-#  This may upset some input/output filters ....    CAUTION   
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
 
 #  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
 #  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1

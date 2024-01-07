@@ -341,12 +341,10 @@ Specified_Updates_Location=
 
 
 ## LOCALE
-
 #  Setting to =1  will increase the use of more locale-centric language/typeface features 
-
 #  BUT this may upset some input/output filters ....    CAUTION
-
-AllowMoreLocale=
+#  AllowMoreLocale=  has to be set prior to reading the main settings 
+#  This should be set, where indicated, near the start of the qqX file, prior to running the installer.
 
 
 ## End of Settings
