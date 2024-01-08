@@ -1543,7 +1543,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     i=0
 
     # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a build BUG ... but add this in case
-    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport=1 ; else NoSmartcardSupport= ; fi
+    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport= ; else NoSmartcardSupport=1 ; fi
 
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt" 
 
@@ -5338,8 +5338,6 @@ while true ; do
       else
 
         printf "\n    %s   >   is now shut down \n" "$VM_InstanceName" 
-
-        if [[ -s "$QemuErrorLog" ]]; then printf "\n\n" ; cat "$QemuErrorLog" ; fi
 
       fi
     

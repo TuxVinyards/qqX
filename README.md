@@ -16,6 +16,8 @@ There's also a new setting to allow you to place updates in a custom folder, ins
 
 - Use the Github **code/clone** button for the very latest tweaks & bug fixes (if needed).
 
+@ 08/jan tweak the smartcard fix & the gl reporting (apologies) Use Clone.
+
 ### quickemu quickget X terminal project
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
