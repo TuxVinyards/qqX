@@ -53,10 +53,10 @@
 
 ## ShellCheck global disables:
 
-# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open, SC1090 for file sourcing
 
 #  shellcheck disable=SC2242
-
+#  shellcheck disable=SC1090 
 
 ##  Expect Bash 5.0+   (2023: we are now at ver 5 for quite a few years)  
 if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
@@ -342,19 +342,19 @@ else
   
 fi
 
-
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
-
 declare -gA VM_Array=()
-
 declare -ga Extra_VM_Folder=()
 
-
 # Clear or set any default variables, if needed.
-
 VM_ExecBoot=
 Extra_QE_Params=
 VM_Select_ItemsPerLine="4"
+
+# Set .conf settings record from any previous session but not normally clear it until multi-instance issues have been approved
+ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
+[[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
+
 
 # LOAD SETTINGS & Array PRESETS  
 
@@ -470,41 +470,6 @@ function_create_VM_folderList() {
 
 # Now populate the list: 
 function_create_VM_folderList
-
-# But, if settings need reloading, following a settings edit or a VM deletion:
-
-function_refresh_and_reload_VM_arrays() {
-
-  # NB clear extra folders array
-  Extra_VM_Folder=()
-
-  # NB clear pre-set folders array 
-  VM_Array=()
-
-  # Re-Read settings file & pre-set folders:
-  # shellcheck disable=SC1090
-
-  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
-
-  # make sure other functions know that the settings was was re-read
-  SettingsFileAdjusted=1
-
-  # re-load:
-  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
-
-  function_create_VM_folderList  
-  function_scan_VM_folderList  
-  set_drive_paths
-  find_main_drive
-
-  # reload screen 
-  ByPass_VM_Array_Selector=1
-  KVM_MSR_Error=
-  ShowUtilsMenu=
-  printf "\033c"
-  show_qmod_title
-
-}
 
 # Record any set ExtraArgs in case of need to reset
 ExtraSetArgs="$ExtraArgs"
@@ -1524,7 +1489,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
         if [[ "$Line" == *'-name'* ]]; then
         
-          printf "\n\n\n$Line"
+          printf "\n\n\n%s" "$Line"
 
           printf "\n\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
 
@@ -1534,7 +1499,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
         elif [[ ! "$(tr -cd '[:print:]' <<< "$Line")" ]]; then true
 
-        else  printf "\n\n$Line"
+        else  printf "\n\n%s" "$Line"
 
         fi
 
@@ -3453,13 +3418,28 @@ function_Select_VM () {
 
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
     # otherwise any items specified in the previous config, but not in the new one, will remain.
-    gl=
-    qqX_GL_Mode=
-    Custom_SDL_ScreenPercent=
-    HeadlessDisplay=
 
-    # shellcheck disable=SC1090 
+    source "$ConfClearanceLog"
+
     source "$VM_Conf_File"
+
+    # re-populate the ConfClearanceLog with current value set
+
+    printf "" > "$ConfClearanceLog"
+
+    mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+
+    for Line in "${ConfClearance_Arr[@]}"; do
+
+      if [[ $Line ]] && [[ "$Line" == *'='* ]] && [[ "$Line" != '#'* ]]; then
+
+        Line="$(cut -d'=' -f1 <<< "$Line")"
+        Line="$Line""="
+        printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
+
+      fi
+
+    done
 
     ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
 
@@ -4652,6 +4632,40 @@ function_show_main_menu_header () {
 
 }
 
+# If settings need reloading, following a settings edit or a VM deletion:
+
+function_refresh_and_reload_VM_arrays() {
+
+  # NB clear extra folders array
+  Extra_VM_Folder=()
+
+  # NB clear pre-set folders array 
+  VM_Array=()
+
+  # Re-Read settings file & pre-set folders:
+  # shellcheck disable=SC1090
+
+  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
+
+  # make sure other functions know that the settings was was re-read
+  SettingsFileAdjusted=1
+
+  # re-load:
+  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
+
+  function_create_VM_folderList  
+  function_scan_VM_folderList  
+  set_drive_paths
+  find_main_drive
+
+  # reload screen 
+  ByPass_VM_Array_Selector=1
+  KVM_MSR_Error=
+  ShowUtilsMenu=
+  printf "\033c"
+  show_qmod_title
+
+}
 
 
 ##  START:  QUICKEMU-WRAP  menu interface  &  API DIVIDER  ###
@@ -4752,11 +4766,14 @@ if [[ $MultiInstanceCount -gt 1 ]]; then
 
   [[ $MultiQuit == "q" ]] && exit directly
 
-  tput rc ; tput ed
-
-  #  clear back the last lines to sc (set cursor)
+  tput rc ; tput ed  #  clear back the last lines to sc (set cursor)
   
 fi
+
+
+# clear .conf settings record from any previous/other session
+printf "" > "$ConfClearanceLog"
+
 
 if [[ "$(pgrep quickgui)" ]] ; then
 
