@@ -1327,7 +1327,8 @@ cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
 
     # Overide specified quickemu defaults,  though not all may be done here.
     
-    # Quickemu also sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
+    # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
+    # BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
 
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
 
@@ -1407,7 +1408,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     i=0
 
     # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a build BUG ... but add this in case
-    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport=1 ; else NoSmartcardSupport= ; fi
+    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport= ; else NoSmartcardSupport=1 ; fi
 
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt" 
 
@@ -1550,8 +1551,12 @@ QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':
 QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
 QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
 
-# quickemu sources in the .conf file at the start of 'actions'  (see function 'quickemu')
-tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-temp"
+# Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
+# BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
+
+tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
+grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
+
 tail "+$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
 
 
@@ -1559,13 +1564,7 @@ function quickemu {
 
   # Any calls to quickemu become re-routed to this function instead.
 
-  # Check 'mod' params first, then quickemu's
-  # plus quickemu_vars have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
-
-  clear_and_load_quickemu_vars
-
-
-  ## Do a first check for amy qwrap internal commands   (deprecated)
+  ## Do a first check for amy qwrap internal commands   REVIEW 
 
   local FirstParamCount=0
 
@@ -1613,24 +1612,33 @@ function quickemu {
 
   ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
 
-  #  These bits are basically the remaining sections of the original code. 
+  #  These bits are basically the remaining sections of the original quickemu code. 
   #  The earlier original code sections are all functions that have now been loaded, as is, or modified
 
-  if [[ -e "/tmp/qmod-case-temp" ]] && [[ -e "/tmp/qmod-actions-temp" ]] && [[ -e "/tmp/qmod-boot-temp" ]]; then
-    
+  if [[ ! -e "/tmp/qmod-case-temp" ]] || [[ ! -e "/tmp/qmod-actions-temp" ]] || [[ ! -e "/tmp/qmod-boot-temp" ]]; then
+
+    printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
+    sleep 5
+
+  else
+
+    # keep running quickemu 'case' checks for matches:
     while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done  
 
-    # after read, remove any leftover params not cleared due to trapped exit re-route 
+    # if no more matches, remove any leftover params not cleared due to trapped exit re-route 
     # & if not yet given, decide on action   
     #  https://unix.stackexchange.com/questions/18981/how-to-unset-the-positional-parameters
 
     shift  $#
-    source "/tmp/qmod-actions-temp"  
 
-    # Quickemu 'sources-in' the .conf file at the start of "/tmp/qmod-actions-temp"
-    # Some setting confirmations and overides need placing here, others go into the modded function 'vm_boot'   
+    # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp" 
+    # BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
+
+    # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
+
+    source "/tmp/qmod-actions-temp" 
 
 
     if [[ $VM_ExecBoot ]]; then
@@ -1643,6 +1651,7 @@ function quickemu {
 
       printf "" > "/tmp/qqX_echo_output.log"
       printf "" > "$QemuErrorLog"
+
       source "/tmp/qmod-boot-temp" 
 
       VM_ExecBoot=
@@ -1653,11 +1662,6 @@ function quickemu {
       fi
 
     fi
-
-  else
-
-    printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
-    sleep 5
 
   fi
 
@@ -3425,7 +3429,7 @@ function_Select_VM () {
 
     # re-populate the ConfClearanceLog with current value set
 
-    printf "" > "$ConfClearanceLog"
+    printf "#%s/%s\n" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
 
     mapfile -t ConfClearance_Arr < "$VM_Conf_File"
 
@@ -3446,6 +3450,13 @@ function_Select_VM () {
     QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
+    # Qemu_IMG log > eg. for disk repair functions 
+    Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
+    if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+
+    # Qemu SYSTEM log
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+
     check_screen_percentage_and_output
     set_drive_paths
     find_main_drive
@@ -3457,14 +3468,6 @@ function_Select_VM () {
       printf "\n\n  %s \n"  "$disk_img"
 
     fi
-
-    # Qemu_IMG log > eg. for disk repair functions 
-    Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
-    if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
-
-    # Qemu SYSTEM log
-    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
-
 
   fi
 
@@ -4887,7 +4890,6 @@ while true ; do
   SnapTitle=
   SnapNumber=
   SnapName=
-  QemuErrorLog=
 
   function_show_main_menu_header
 
@@ -4995,7 +4997,6 @@ while true ; do
       else
 
         printf "\n    %s   >   is now shut down \n" "$VM_InstanceName" 
-        if [[ -s "$QemuErrorLog" ]]; then printf "\n\n" ; cat "$QemuErrorLog" ; fi
 
       fi
     
