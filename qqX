@@ -491,12 +491,9 @@ function_refresh_and_reload_VM_arrays() {
 
   # re-load:
   [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
+
   function_create_VM_folderList  
   function_scan_VM_folderList  
-
-  qqX_GL_Mode=
-  check_screen_percentage_and_output
-
   set_drive_paths
   find_main_drive
 
@@ -1723,20 +1720,10 @@ function check_screen_percentage_and_output {
   SDL_ScrnPcnt_Cmd=
   HeadlessCmd=
   
-  # Always make sure that qqX_GL_Mode has been set. Use SetGL_DefaultAsOff as cue, if no overides present. 
-
-  # While if changing VM, function_refresh_and_reload_VM_arrays will clear qqX_GL_Mode to force picking up any specified normal VM conf setting
+  # function_Select_VM should clear all existing .conf vars before sourcing a new conf file  
 
   if [[ ! $qqX_GL_Mode ]]; then   
 
-    if grep -q -s -e 'gl="' "$VM_Conf_File" ; then  
-      eval "$(grep -s -e 'gl="' "$VM_Conf_File")" 
-    fi
-
-    if [[ $gl ]] && [[ "$gl" != *'#'* ]]; then gl="$(tr -cd "[:lower:]" <<< "$gl")" 
-    else gl= 
-    fi 
-    
     if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
 
     else
@@ -1744,14 +1731,12 @@ function check_screen_percentage_and_output {
       if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off"
       else qqX_GL_Mode="on" 
       fi
+
       gl="$qqX_GL_Mode"
 
     fi
 
   fi
-
-  
-  eval "$(grep -s Custom_SDL_ScreenPercent "$VM_Conf_File")"
 
   [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
 
@@ -1777,8 +1762,6 @@ function check_screen_percentage_and_output {
     fi
 
   fi
-
-  eval "$(grep -s HeadlessDisplay "$VM_Conf_File")"
 
   [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
 
@@ -3355,9 +3338,6 @@ function_Select_VM () {
 
   fi
 
-    echo "qqX_GL_Mode is $qqX_GL_Mode ."
-
-
   if [[ $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]] ; then
 
     true
@@ -3445,11 +3425,7 @@ function_Select_VM () {
 
   fi
 
-  if [[ $SettingsFileAdjusted && $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]]; then  true
-
-    # Only the array checker is run after a settings edit, if a VM selection is already in place 
-
-  else
+  if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
 
     ## Check file/folder exists and that we are where we need to be
     [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder"  && SelectArrayError=1
@@ -3475,9 +3451,40 @@ function_Select_VM () {
       msrs_conflict_check_resolver
     fi
 
-    # Check the .conf file, for any individual .conf load up values
+    # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+    # otherwise any items specified in the previous config, but not in the new one, will remain.
+    gl=
     qqX_GL_Mode=
+    Custom_SDL_ScreenPercent=
+    HeadlessDisplay=
+
+    # shellcheck disable=SC1090 
+    source "$VM_Conf_File"
+
+    ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
+
+    QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
+    QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
+
     check_screen_percentage_and_output
+    set_drive_paths
+    find_main_drive
+    check_disk_is_okay
+
+    if [[ $MainDrive_NOT_present ]]; then
+
+      printf "\n\n  Main Drive NOT found (yet)  >  Start VM (to create one)"
+      printf "\n\n  %s \n"  "$disk_img"
+
+    fi
+
+    # Qemu_IMG log > eg. for disk repair functions 
+    Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
+    if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+
+    # Qemu SYSTEM log
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+
 
   fi
 
@@ -3813,16 +3820,10 @@ qqX_edit_settings() {
       read -rp "   >   "
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"  
-
-      qqX_GL_Mode=
-      check_screen_percentage_and_output   
       
     elif [[ $1 == "tune-up" ]]; then
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 
-
-      qqX_GL_Mode=
-      check_screen_percentage_and_output 
 
     else 
 
@@ -4326,21 +4327,19 @@ function_config_tune_up ()  {
   RAM_Available=
   Shared_RAM_Mb=
 
-  printf "\n\n\n  Memory showing: \n\n"
+  printColor "\n\n\n\n  Memory showing: \n\n"
 
   free --si -h  
 
-  RAM_Available="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2)"
+  RAM_Available="$(free --giga | tr ' ' '\n' | grep -m 1 [0-9] 2>/dev/null)"
+ 
+  # @2024/01 Although free --mega etc seems to fail in Manjaro ( & Arch ?) at the (interactive) command prompt, it will work in scripts.
 
-  if [[ "$RAM_Available" == *G* ]]; then  RAM_Available="$( cut -d'G' -f1  <<< "$RAM_Available" | tr -cd '[:graph:]' 2>/dev/null)"
+  # And while Qemu defaults to 128 MiB (mebibytes) the ram values are taken as MB or GB
 
-  else  RAM_Available=  ; fi
-  
-  # @2023/11 free --mega  can fail in Manjaro ( & arch ?) at the command prompt at least  (interactive)
+  # Consider "free --mega | tr ' ' '\n' | grep -m 4 [0-9] | tail -1"  for shared  & "free --giga | tr ' ' '\n' | grep -m 1 [0-9]" for total
 
-  # @2024/01  REVIEW  Change this all to use 'free -m'  And add a filter for [:alpha:] characters  
-
-  #  See  https://github.com/quickemu-project/quickemu/issues/899
+  #  See  https://github.com/quickemu-project/quickemu/issues/899     REVIEW  
 
   if [[ ! $RAM_Available ]]; then
 
@@ -4352,7 +4351,7 @@ function_config_tune_up ()  {
 
   else 
 
-    Shared_RAM_Allocated="$(free --mega -h 2>/dev/null | grep Mem | cut -d':' -f2 | cut -d'G' -f4 | tr -cd '[:graph:]' 2>/dev/null)"
+    Shared_RAM_Allocated="$(free --mega -h | tr ' ' '\n' | grep -m 4 [0-9] | tail -1  2>/dev/null)"
 
     if [[ "$Shared_RAM_Allocated" == *M* ]]; then 
 
@@ -4370,7 +4369,7 @@ function_config_tune_up ()  {
 
   fi
 
-  printf "\n\n\n"
+  printf "\n\n"
 
   printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
 
@@ -4995,32 +4994,6 @@ while true ; do
   fi
 
 
-  ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
-
-  QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
-  QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
-
-  qqX_GL_Mode=
-  check_screen_percentage_and_output
-  set_drive_paths
-  find_main_drive
-  check_disk_is_okay
-
-  if [[ $MainDrive_NOT_present ]]; then
-
-    printf "\n\n  Main Drive NOT found (yet)  >  Start VM (to create one)"
-    printf "\n\n  %s \n"  "$disk_img"
-
-  fi
-
-  # Qemu_IMG log > eg. for disk repair functions 
-  Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
-  if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
-
-  # Qemu SYSTEM log
-  QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
-
-
   ## Print menu:
 
   if [[ ! $MainMenuChoice ]]; then
@@ -5103,9 +5076,6 @@ while true ; do
     fi
 
     printf "\n"
-
-    echo "qqX_GL_Mode is $qqX_GL_Mode ."
-
 
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
@@ -6179,10 +6149,7 @@ while true ; do
   else
 
     # refresh
-
-    # Check the .conf file, for any individual .conf load up values
-    qqX_GL_Mode=
-    check_screen_percentage_and_output
+    true 
 
   fi
 
