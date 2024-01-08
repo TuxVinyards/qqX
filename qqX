@@ -4141,7 +4141,7 @@ function_config_tune_up ()  {
 
   cat "$TuneUpTmpCopy"
 
-  printColor "\n\n  All changes made here, may be reversed:"
+  printColor "\n  All changes made here, may be reversed:"
     
   printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
@@ -4325,7 +4325,6 @@ function_config_tune_up ()  {
 
   SharedRAM_NotFound=
   RAM_Available=
-  Shared_RAM_Mb=
 
   printColor "\n\n\n\n  Memory showing: \n\n"
 
@@ -4357,17 +4356,15 @@ function_config_tune_up ()  {
 
       Shared_RAM_Allocated="$(cut -d'M' -f1 <<< "$Shared_RAM_Allocated")"
 
-      Shared_RAM_Mb="$Shared_RAM_Allocated"
-
       if [[ $(bc <<< "$Shared_RAM_Allocated < 500") == 1 ]]; then Shared_RAM_Allocated=
 
       else Shared_RAM_Allocated="1" ; fi
 
-      [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
-
     fi
 
   fi
+
+  [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
 
   printf "\n\n"
 
@@ -4386,8 +4383,6 @@ function_config_tune_up ()  {
     printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"  
     
     if [[ $Shared_RAM_Allocated ]]; then printColor "of which %sG is possibly allocated to graphics" "$Shared_RAM_Allocated"
- 
-    elif [[ $Shared_RAM_Mb ]]; then printColor "of which %sM *may* be allocated to graphics" "$Shared_RAM_Mb"
  
     elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
  
