@@ -2626,20 +2626,13 @@ function_quick_get_wrap ()  {
 
       read -r 
      
-
-      for Jobs_PID in "${Jobs_Arr[@]}" ; do
-
-        kill "$Jobs_PID" 2> /dev/null
-
-      done
-
+      for Jobs_PID in "${Jobs_Arr[@]}" ; do kill "$Jobs_PID" 2> /dev/null ; done
 
       # removing the old rcksum files not only tidies up but also stops the background monitor process
-
       [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]] && remove_old_rcksum_files
 
       
-      # check macOS particularities
+      # check macOS particularities:
 
       P3_Arr=()
 
@@ -2670,13 +2663,11 @@ function_quick_get_wrap ()  {
           pkill curl   2> /dev/null
           pkill wget   2> /dev/null
           pkill zsync  2> /dev/null
-
           sleep 2
 
           if [[ ! $(pgrep aria2) && ! $(pgrep curl) && ! $(pgrep wget) && ! $(pgrep zsync) ]]; then
 
             QGW_DownloadStopped=1
-
             sleep 2 ; break
 
           fi
@@ -2692,12 +2683,9 @@ function_quick_get_wrap ()  {
   fi
 
   #  sleep/pauses needed to give different processes time to output their summaries & finish up
-
   sleep 1
 
-
   New_VM_Folder=
-
   New_VM_File=
 
   if [[ ! $ZsyncDownload ]]; then
@@ -2830,20 +2818,25 @@ function_quick_get_wrap ()  {
 
   if [[ $New_VM_File ]] && [[ ! $QGW_DownloadStopped ]]; then
 
+    # clear any accidental initial double pressing of the enter key occuring while experiencing the error
+
+    read -r -t 0.1  
+    read -r -t 0.1  
+    read -r -t 0.1  
+    read -r -t 0.1	
+    read -r -t 0.1  
+    read -r -t 0.1 
+
     NewFileTuneUp=1
 
     function_config_tune_up  "$New_VM_File"  "$New_VM_Folder"
 
     NewFileTuneUp=
+    NewFileTuneUp_JustDone=1
 
-  elif [[ $QGW_FolderDelete == "d" ]]; then
+  elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
 
-    sleep 1.4
-
-  else
-
-    printColor "\n\n  [enter] to return or continue \n\n" 
-    read -rp "  > "
+  else  printColor "\n\n  [enter] to return or continue \n\n" ; read -rp "  > "
 
   fi
 
@@ -2887,6 +2880,9 @@ function_conf_error () {
   read -r -t 0.1	
   read -r -t 0.1  
   read -r -t 0.1 	
+
+
+  if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
 
   printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
@@ -3799,15 +3795,6 @@ qqX_edit_settings() {
         fi
 
       done
-
-    elif [[ $1 == "new_conf" ]]; then
-
-      custom_conf_notes
-
-      printColor "  [enter] to edit \n\n"
-      read -rp "   >   "
-
-      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"  
       
     elif [[ $1 == "tune-up" ]]; then
 
@@ -4113,13 +4100,11 @@ function_config_tune_up ()  {
     sleep 100
   fi
 
-
   TuneUpOldFile="$TuneUpDistroFolder/OldConfig.$TuneUpDate.conf"
 
   cp "$TuneUpTargetFile"  "$TuneUpOldFile"
 
   TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
-
   TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
 
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
@@ -4139,9 +4124,7 @@ function_config_tune_up ()  {
   ConfLine="$(grep '#!/usr/bin' "$TuneUpTmpCopy")"
 
   ConfPointer="${ConfLine/"#!/usr/bin/"/}"
-
   ConfPointer="${ConfPointer/"--vm"/}"
-
   ConfPointer="${ConfPointer// /}"
 
   if [[ ! $ConfLine ]]; then 
@@ -4292,9 +4275,7 @@ function_config_tune_up ()  {
 
     printf "cpu_cores=\"%s\"\n"  "$CoresSetNumber"  >> "$TuneUpTargetDraft"
 
-  elif [[ $CoresSetNumber == "c" ]]; then
-
-    printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+  elif [[ $CoresSetNumber == "c" ]]; then  printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
 
   elif [[ $CoresSetNumber == "d" ]]; then  true 
 
