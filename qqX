@@ -1689,23 +1689,18 @@ function check_screen_percentage_and_output {
   SDL_ScrnPcnt_Cmd=
   HeadlessCmd=
   
-  # function_Select_VM should clear all existing .conf vars before sourcing a new conf file  
+  # function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
 
-  if [[ ! $qqX_GL_Mode ]]; then   
+  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
 
-    if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
+  else
 
-    else
-
-      if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off"
-      else qqX_GL_Mode="on" 
-      fi
-
-      gl="$qqX_GL_Mode"
-
+    if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off"
+    else qqX_GL_Mode="on" 
     fi
 
   fi
+
 
   [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
 
@@ -2867,7 +2862,7 @@ function_quick_get_wrap ()  {
 
     # re-load arrays, if not already done
     SettingsFileAdjusted=1
-    function_refresh_and_reload_VM_arrays
+    refresh_and_reload_VM_arrays
     ByPass_VM_Array_Selector=1
 
   fi
@@ -3290,6 +3285,44 @@ function_print_conf_array () {
 }
 
 
+function refresh_conf_vars_and_values {
+
+  # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+  # otherwise any items specified in the previous config, but not in the new one, will remain.
+  # Needed from qqX ver 1.5 onwards
+
+  source "$ConfClearanceLog"
+
+  source "$VM_Conf_File"
+
+  # clear & re-populate the ConfClearanceLog with current value set, for the next occasion
+
+  printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
+
+  mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+
+  for Line in "${ConfClearance_Arr[@]}"; do
+
+    if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
+
+      Line="$(cut -d'=' -f1 <<< "$Line")"
+      Line="$Line""="
+      [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+      printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
+
+      # Note that commented out lines need including, in case the comment gets removed
+
+    fi
+
+  done
+
+  # check any menu values that based on the file .conf 
+
+  check_screen_percentage_and_output
+
+}
+
+
 function_Select_VM () {  
 
   SelectArrayError=
@@ -3423,27 +3456,7 @@ function_Select_VM () {
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
     # otherwise any items specified in the previous config, but not in the new one, will remain.
 
-    source "$ConfClearanceLog"
-
-    source "$VM_Conf_File"
-
-    # re-populate the ConfClearanceLog with current value set
-
-    printf "#%s/%s\n" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
-
-    mapfile -t ConfClearance_Arr < "$VM_Conf_File"
-
-    for Line in "${ConfClearance_Arr[@]}"; do
-
-      if [[ $Line ]] && [[ "$Line" == *'='* ]] && [[ "$Line" != '#'* ]]; then
-
-        Line="$(cut -d'=' -f1 <<< "$Line")"
-        Line="$Line""="
-        printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
-
-      fi
-
-    done
+    refresh_conf_vars_and_values
 
     ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
 
@@ -3457,7 +3470,6 @@ function_Select_VM () {
     # Qemu SYSTEM log
     QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
 
-    check_screen_percentage_and_output
     set_drive_paths
     find_main_drive
     check_disk_is_okay
@@ -3764,7 +3776,6 @@ qqX_edit_settings() {
     if [[ $1 == "conf" ]]; then
 
       printf "\n\n"
-
       cat "$VM_Conf_Dir/$VM_Conf_File"
 
       while true ; do
@@ -3774,20 +3785,15 @@ qqX_edit_settings() {
 
         read -rp "  >  "   ConfEdit_Select
 
-        if [[ $ConfEdit_Select == "r" ]] ; then
+        if [[ $ConfEdit_Select == "r" ]] ; then    custom_conf_notes
 
-          custom_conf_notes
-
-        elif [[ $ConfEdit_Select == "b" ]] ; then
-
-          break
+        elif [[ $ConfEdit_Select == "b" ]] ; then  break
 
         else
 
           nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
-
           ConfSettingsAdjusted=1
-
+          refresh_conf_vars_and_values
           break
 
         fi
@@ -3799,7 +3805,6 @@ qqX_edit_settings() {
       custom_conf_notes
 
       printColor "  [enter] to edit \n\n"
-
       read -rp "   >   "
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$New_VM_File"  
@@ -3807,16 +3812,15 @@ qqX_edit_settings() {
     elif [[ $1 == "tune-up" ]]; then
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 
+      ConfSettingsAdjusted=1
+      refresh_conf_vars_and_values
 
     else 
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$Q_Mod_SettingsFile"  
-
       SettingsFileAdjusted=1
-
       VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect"
-
-      function_refresh_and_reload_VM_arrays
+      refresh_and_reload_VM_arrays
      
     fi
 
@@ -3923,7 +3927,7 @@ function_delete_Selected_VM () {
 
     SettingsFileAdjusted=1
 
-    function_refresh_and_reload_VM_arrays
+    refresh_and_reload_VM_arrays
 
   fi
 
@@ -4315,13 +4319,12 @@ function_config_tune_up ()  {
 
   RAM_Available="$(free --giga | tr ' ' '\n' | grep -m 1 [0-9] 2>/dev/null)"
  
-  # @2024/01 Although free --mega etc seems to fail in Manjaro ( & Arch ?) at the (interactive) command prompt, it will work in scripts.
+  # @2024/01 free --mega etc failing in Manjaro at the (interactive) command prompt, will work in scripts 
+  # & has been traced to 'free' being aliased.  Manjaro Devs may wish to comment this out in ~/bashrc 
 
-  # And while Qemu defaults to 128 MiB (mebibytes) the ram values are taken as MB or GB
+  # Of note, Qemu defaults to 128 MiB (mebibytes) but the ram values are taken as MB or GB
 
-  # Consider "free --mega | tr ' ' '\n' | grep -m 4 [0-9] | tail -1"  for shared  & "free --giga | tr ' ' '\n' | grep -m 1 [0-9]" for total
-
-  #  See  https://github.com/quickemu-project/quickemu/issues/899     REVIEW  
+  # Also see https://github.com/quickemu-project/quickemu/issues/899    
 
   if [[ ! $RAM_Available ]]; then
 
@@ -4637,7 +4640,7 @@ function_show_main_menu_header () {
 
 # If settings need reloading, following a settings edit or a VM deletion:
 
-function_refresh_and_reload_VM_arrays() {
+refresh_and_reload_VM_arrays() {
 
   # NB clear extra folders array
   Extra_VM_Folder=()
@@ -4954,7 +4957,7 @@ while true ; do
 
       # REVIEW  add disk conversion utility ??  Or something?
 
-      #function_refresh_and_reload_VM_arrays
+      #refresh_and_reload_VM_arrays
       #MainMenuChoice="vm"
       #function_show_main_menu_header
       #continue
@@ -6112,7 +6115,7 @@ while true ; do
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
-    if [[ ! ${VM_Array[0,0]} ]]; then function_refresh_and_reload_VM_arrays ; fi
+    if [[ ! ${VM_Array[0,0]} ]]; then refresh_and_reload_VM_arrays ; fi
     Select_VM=1
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
