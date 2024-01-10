@@ -108,8 +108,12 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, eg. the ambiguous quickemu var '$VERSION'  
 #  Likewise care must be taken not to confuse lowercase vars with standard application commands, especially in non-highlighting editors.
 
-#  BRACKETS: Use the newer style, more powerful, double [[ brackets ]] 
+#  BRACKETS: Use the newer* style, more powerful, double [[ brackets ]] 
 #  if [[ $Foo ]] && [[ ! $Bar ]];   NOT   if [ -n ${Foo} ] && [ -z ${Bar} ]; 
+#  *from bash 3.2 onwards See https://github.com/bminor/bash/blob/master/COMPAT item 32
+
+#  See https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  (in section bash.html#Conditional-Constructs)
+#  Also https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
 
 #  COMMENTS:  
 #  Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
@@ -1297,7 +1301,9 @@ function clear_and_load_quickemu_vars {
 
 }
 
-# just loads the vars here, but make this as a function so they can be re-sourced later too
+# Vars are now all r/w. Loads adjusted vars here. 
+# As a function so they can be cleared & re-loaded later BUT in qqX ver 1.5 
+# later use has become removed to avoid conflict with conf var refresh & overwrite
 
 clear_and_load_quickemu_vars
 
@@ -1852,7 +1858,7 @@ function find_main_drive {
 
 
 
-##  WRAPPING FUNCTIONS FOR 'quickget' 
+##  QUICKGET 
 
 print_quickget_choices () {
 
@@ -1976,6 +1982,8 @@ function_quick_get_wrap ()  {
 
     read -rp "  >  "  QGW_List_NumSelected
 
+    #  TODO  add digit filter & alpha redux option
+
     if [[ $QGW_List_NumSelected == "b" ]]; then 
     
       QGW_List_NumSelected=
@@ -1983,8 +1991,6 @@ function_quick_get_wrap ()  {
       return
 
     else
-
-      #  TODO  add digit filter & alpha redux option
 
       [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_OS_Array[@]}"
 
