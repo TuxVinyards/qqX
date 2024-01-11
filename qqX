@@ -3192,7 +3192,6 @@ function_scan_VM_folderList () {
 }
 
 
-
 function_print_conf_array () {
 
   ## Print a list of the VM's in the VM array
@@ -3202,8 +3201,10 @@ function_print_conf_array () {
   ListTitleLine_ItemCount=0
 
   VM_ElementCount="${#VM_Array[@]}" 
-
   VM_PairsCount="$((VM_ElementCount/2))"
+
+  ZsyncDistrosFound=
+  LiveDistrosFound=
 
   while [[ ${VM_Array[$i,0]} ]] ; do
 
@@ -3252,30 +3253,26 @@ function_print_conf_array () {
 
             ArrayConf_Item_Listing+=" (new)"
 
-            if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
-            
-            printColor "%-29s" "$ArrayConf_Item_Listing"
+          elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
 
-            ((ListTitleLine_ItemCount+=1))
-
-          else
+            #  Live VM qcow2 disks are as little only 196k. 
+            #  But set test ceiling is set at 1,000,000k (1G) to allow for meta preallocation etc REVIEW 
 
             if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
-           
-              [[  ! $(du -b -t 500000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]  &&  ArrayConf_Item_Listing+=" (z)"
-
-              #  Live VMs only, as zsync only updates the iso file.   
-              #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
- 
+              #  Are Live VMs only, as zsync only updates the iso file.   
+              ArrayConf_Item_Listing+=" (Z)"
+              ZsyncDistrosFound=1
+            else
+              #  Live VMs only, in general, running off the iso file.   
+              ArrayConf_Item_Listing+=" (L)"
+              LiveDistrosFound=1
             fi
 
-            if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
-            
-            printColor "%-29s" "$ArrayConf_Item_Listing"
-
-            ((ListTitleLine_ItemCount+=1))
-
           fi
+
+          if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
+          printColor "%-29s" "$ArrayConf_Item_Listing"
+          ((ListTitleLine_ItemCount+=1))   
 
           # Move to new line when number of items per line reached  (default 4, see main settings)
           if [[ $ListTitleLine_ItemCount == "$VM_Select_ItemsPerLine" ]]; then
@@ -3385,31 +3382,24 @@ function_Select_VM () {
 
       printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
-      VM_Array_NameZero="${VM_Array[0,1]}"
+      if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
+        printf "   ("
+        [[ $LiveDistrosFound ]] && printf "L=LiveISO"
+        [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf " & "
+        [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
+        printf ")"
+      fi
 
+      VM_Array_NameZero="${VM_Array[0,1]}"
       VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
 
       printColor "\n\n  [Enter]  "
-      
       printf "%s  "  "${VM_Array_NameZero^^}"
 
     fi
 
     printf "\n\n"
-
     read -rp  "   >  "  VM_Selection
-
-
-    [[ $VM_Selection == "q" || $VM_Selection == "Q" ]] && echo && exit directly 
-
-    if [[ $VM_Selection == "set" ]];then
-
-      VM_Selection=
-      VM_InstanceName=
-      qqX_edit_settings 
-      return
-
-    fi
 
     if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
           
@@ -3422,7 +3412,16 @@ function_Select_VM () {
 
     fi
 
-    if [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
+    if [[ $VM_Selection == "q" || $VM_Selection == "Q" ]]; then echo ; exit directly 
+
+    elif [[ $VM_Selection == "set" ]];then
+
+      VM_Selection=
+      VM_InstanceName=
+      qqX_edit_settings 
+      return
+
+    elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
 
       if [[ $VM_Selection == "GT" ]]; then
 
@@ -3438,13 +3437,14 @@ function_Select_VM () {
       show_qmod_title
       return
 
+    else  
+    
+      VM_Selection=0  
+      sleep 0.1   # gives background scans a little more time
+      VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
+      VM_Conf_File="${VM_Array[$VM_Selection,1]}"
+
     fi
-
-    [[ ! $VM_Selection ]] &&  VM_Selection=0  
-
-    sleep 0.1   # gives background scans a little more time
-    VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
-    VM_Conf_File="${VM_Array[$VM_Selection,1]}"
 
   fi
 
