@@ -2000,60 +2000,65 @@ function_quick_get_wrap ()  {
       elif [[ "$QGW_List_NumSelected" == [a-z] ]]; then 
 
         printf "\n"
-
         print_quickget_choices  "QGW_OS_Array" "$QGW_List_NumSelected"
-
         QGW_List_NumSelected=
 
       else
 
-        [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_OS_Array[@]}"
+        QGW_List_NumSelected="$(tr -cd "[:digit:]" <<< "$QGW_List_NumSelected")"
 
-        QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
+        if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then
 
-        QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
+          printf "\n"
+          print_quickget_choices  "QGW_OS_Array" 
+          QGW_List_NumSelected=
 
-        printColor  "\n  Selected = %s  "  "$QGW_OS_Arr_NameSelected"
+        else
 
-        # OS HOME PAGES  could be pulled in variable quality from the download URL
+          QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
+          QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
 
-        # However, and while, some of @zen0bit's and others work is available (@dec19/2023)
-        # some is not  >  https://github.com/quickemu-project/quickemu/pull/864
+          printColor  "\n  Selected = %s  "  "$QGW_OS_Arr_NameSelected"
 
-        # So, just grep quickget source instead. And is probably just as quick, or quicker ...
+          # OS HOME PAGES  could be pulled in variable quality from the download URL
 
-        # Also add check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
+          # However, and while, some of @zen0bit's and others work is available (@dec19/2023)
+          # some is not  >  https://github.com/quickemu-project/quickemu/pull/864
 
-        quickget "filepath"  
+          # So, just grep quickget source instead. And is probably just as quick, or quicker ...
 
-        if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
+          # Also add check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
 
-          printColor "Checking ...."
+          quickget "filepath"  
 
-          if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
+          if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
 
-          else
+            printColor "Checking ...."
 
-            QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
-            QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
-            QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+            if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
+
+            else
+
+              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
+              QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
+              QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+
+            fi
+
+            [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+
+            if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then  printf " (working)"
+
+            else  printf " (site down or bad link)" ; printColor " ??" 
+            
+            fi
 
           fi
 
-          [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-
-          if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then  printf " (working)"
-
-          else  printf " (site down or bad link)" ; printColor " ??" 
-          
-          fi
-
+          break
+      
         fi
 
-        break
-
-        # REVIEW possible API web search bangs for homepage ?
-      
       fi
 
     done
