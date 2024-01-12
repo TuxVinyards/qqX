@@ -1865,6 +1865,8 @@ print_quickget_choices () {
 
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
+  if [[ $2 == "UbuntuOthers" ]]; then QGW_List_UbuntuOthers=1; else QGW_List_UbuntuOthers=; fi
+
   if [[ "$2" == [a-z] ]]; then QGW_List_AlphaFilter="$2"; else QGW_List_AlphaFilter=; fi
 
   QGW_List_ArrNum=0
@@ -1885,10 +1887,14 @@ print_quickget_choices () {
 
   for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
 
-    if [[ ! $QGW_List_AlphaFilter ]] ||  [[  ${QGW_List_Arr_Item:0:1} ==  "$QGW_List_AlphaFilter" ]]; then
+    if [[ $QGW_List_UbuntuOthers ]] && [[ ${QGW_List_Arr_Item:1:3} ==  "ubu" ]]; then
 
       printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
+      ((QGW_List_NewLineCounter+=1))
 
+    elif [[ ! $QGW_List_UbuntuOthers ]] && [[ ! $QGW_List_AlphaFilter || ${QGW_List_Arr_Item:0:1} == "$QGW_List_AlphaFilter" ]] ; then
+
+      printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
       ((QGW_List_NewLineCounter+=1))
 
     fi
@@ -1995,6 +2001,14 @@ function_quick_get_wrap ()  {
 
         printf "\n"
         print_quickget_choices  "QGW_OS_Array" "$QGW_List_NumSelected"
+
+        if [[ $QGW_List_NumSelected == "u" ]]; then
+
+          printf "  and ... \n\n"
+          print_quickget_choices  "QGW_OS_Array" "UbuntuOthers"
+
+        fi
+
         QGW_List_NumSelected=
 
       else
