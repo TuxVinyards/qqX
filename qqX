@@ -3599,7 +3599,7 @@ drives_and_snapshots() {
 
   if [[ $1 == "select" ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
 
-    printColor "\n  SELECT:  [enter]  Main Drive (or back to main menu)"
+    printColor "\n  SELECT:  [enter]  MAIN DRIVE (or back to main menu)"
     
     [[ $SecondDriveArgs ]] && printColor "   [2]  Second Drive"
     [[ $SharedDriveArgs ]] && printColor "   [3]  Shared Drive"
@@ -3642,7 +3642,7 @@ drives_and_snapshots() {
 
     if [[ $2 != "as_disk_util" ]]; then
 
-      printf "\n\n  Health Status:  %s"  "$DiskChkStatus"
+      printf "\n\n  Health Status:  %s  (%s)"  "$DiskChkStatus"  "$Selected_DriveName"
 
       if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
 
@@ -5786,7 +5786,7 @@ while true ; do
 
     drives_and_snapshots  select
 
-    printColor "\n\n  [enter] date.time title  "
+    printColor "\n\n  [enter] automatic date.time title  "
     printf "  [text input] descriptor   [b] back to menu " 
     SnapTitle=
     printf "\n\n"
