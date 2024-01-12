@@ -3390,7 +3390,7 @@ function_Select_VM () {
       if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
         printf "   ("
         [[ $LiveDistrosFound ]] && printf "L=LiveISO"
-        [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf " & "
+        [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
         [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
         printf ")"
       fi
