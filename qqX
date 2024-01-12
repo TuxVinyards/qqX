@@ -1758,6 +1758,7 @@ function set_drive_paths {
 
   SecondDrive=
   SharedDrive=
+  DriveLocationError=
   SharedDrive_Conf=
   SecondDriveArgs=
   SharedDriveArgs=
@@ -1781,12 +1782,9 @@ function set_drive_paths {
       SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"  
 
     elif [[ $SecondDrive ]]; then 
-      
-      printf "\n\n ERROR SecondDrive NOT found (.conf file)"
 
-      printf "\n\n  %s \n\n"  "$SecondDrive"
-
-      sleep 1.4
+      # whilst the conf entry exists the above test didn't find it
+      DriveLocationError="ERROR SecondDrive NOT found (.conf file)"
 
     fi
 
@@ -1818,11 +1816,7 @@ function set_drive_paths {
 
     elif [[ $SharedDrive ]]; then 
 
-      printf "\n\n ERROR SharedDrive NOT found (main settings)"
-
-      printf "\n\n  %s \n\n"  "$SharedDrive"
-
-      sleep 1.4
+      DriveLocationError="ERROR SharedDrive NOT found (main settings)"
 
     fi
 
@@ -5222,6 +5216,8 @@ while true ; do
     fi
     
     printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] open .conf file"
+
+    [[ $DriveLocationError ]] &&  printColor "\n\n  %s"  "$DriveLocationError"
 
     if [[ $ConfSettingsAdjusted ]]; then 
 
