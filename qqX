@@ -3065,14 +3065,12 @@ function_VM_array_add_confs () {
 function_scan_VM_folderList () {
 
   #  Scans of current & listed VM folders for other potential '.conf' files to the VM array
-  #  Adds via calls to 'function_VM_array_add_confs'
+  #  Adds via calls to ** 'function_VM_array_add_confs' **
+
   #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
   #  Starts by checking for settings file errors
 
   VM_SettingsError=
-
-  VM_ElementCount=
-
   VM_ElementCount="${#VM_Array[@]}" 
 
   if [[ $VM_ElementCount ]]; then 
@@ -3207,6 +3205,7 @@ function_print_conf_array () {
 
   VM_ElementCount="${#VM_Array[@]}" 
   VM_PairsCount="$((VM_ElementCount/2))"
+  VM_Array_LastIndex="$((VM_PairsCount-1))"
 
   ZsyncDistrosFound=
   LiveDistrosFound=
@@ -3363,95 +3362,119 @@ function_Select_VM () {
 
   fi
 
-  if [[ $ByPass_VM_Array_Selector ]] || [[ $SelectArrayError ]] ; then
-
-    true
-
-  else 
+  if [[ ! $ByPass_VM_Array_Selector && ! $SelectArrayError ]] ; then
 
     VM_Selection=
     VM_Conf_Dir=
     VM_Conf_File=
 
-    function_print_conf_array
+    while true; do
+
+      function_print_conf_array
     
-    if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
+      if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
 
-      printf "\n\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
+        printf "\n\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
 
-      [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit " 
+        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit " 
 
-      [[ $ExtraFolderError ]] && printf "\n\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
+        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
 
-    else
+      else
 
-      printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
+        printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
-      if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
-        printf "   ("
-        [[ $LiveDistrosFound ]] && printf "L=LiveISO"
-        [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
-        [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
-        printf ")"
-      fi
+        if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
+          printf "   ("
+          [[ $LiveDistrosFound ]] && printf "L=LiveISO"
+          [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
+          [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
+          printf ")"
+        fi
 
-      VM_Array_NameZero="${VM_Array[0,1]}"
-      VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
+        VM_Array_NameZero="${VM_Array[0,1]}"
+        VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
 
-      printColor "\n\n  [Enter]  "
-      printf "%s  "  "${VM_Array_NameZero^^}"
-
-    fi
-
-    printf "\n\n"
-    read -rp  "   >  "  VM_Selection
-
-    if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
-          
-      DefaultFolderError= 
-      ExtraFolderError=
-      VM_Selection=
-      VM_InstanceName=
-      qqX_edit_settings 
-      return
-
-    fi
-
-    if [[ $VM_Selection == "q" || $VM_Selection == "Q" ]]; then echo ; exit directly 
-
-    elif [[ $VM_Selection == "set" ]];then
-
-      VM_Selection=
-      VM_InstanceName=
-      qqX_edit_settings 
-      return
-
-    elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
-
-      if [[ $VM_Selection == "GT" ]]; then
-
-        printColor "\n\n  CAPS LOCK should be unset \n\n"
-        read -rp "  [enter] to continue  >  "
+        printColor "\n\n  [Enter]  "
+        printf "%s  "  "${VM_Array_NameZero^^}"
 
       fi
 
-      VM_Selection=
-      function_quick_get_wrap 
-      ByPass_VM_Array_Loader=
-      printf "\033c"
-      show_qmod_title
-      return
+      printf "\n\n"
+      read -rp  "   >  "  VM_Selection
 
-    else  
-    
-      VM_Selection=0  
-      sleep 0.1   # gives background scans a little more time
-      VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
-      VM_Conf_File="${VM_Array[$VM_Selection,1]}"
+      #
 
-    fi
+      if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
+            
+        DefaultFolderError= 
+        ExtraFolderError=
+        VM_Selection=
+        VM_InstanceName=
+        qqX_edit_settings 
+        return
+
+      fi
+
+      if [[ $VM_Selection == "q" || $VM_Selection == "Q" ]]; then echo ; exit directly 
+
+      elif [[ $VM_Selection == "set" ]];then
+
+        VM_Selection=
+        VM_InstanceName=
+        qqX_edit_settings 
+        return
+
+      elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
+
+        if [[ $VM_Selection == "GT" ]]; then
+
+          printColor "\n\n  CAPS LOCK should be unset \n\n"
+          read -rp "  [enter] to continue  >  "
+
+        fi
+
+        VM_Selection=
+        function_quick_get_wrap 
+        ByPass_VM_Array_Loader=
+        printf "\033c"
+        show_qmod_title
+        return
+
+      elif [[ $VM_Selection == [0-9] || $VM_Selection == [0-9][0-9] || $VM_Selection == [0-9][0-9][0-9] ]]; then
+
+        if [[ $VM_Selection -gt $VM_Array_LastIndex ]]; then  
+
+          VM_Conf_Dir=
+          VM_Conf_File=
+          VM_Selection=
+
+        else
+
+          VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
+          VM_Conf_File="${VM_Array[$VM_Selection,1]}"
+          VM_Selection=
+
+          break
+
+        fi
+
+      else  
+      
+        sleep 0.1   # gives background scans a little more time, if using the faster [enter] selection
+        VM_Conf_Dir="${VM_Array[0,0]}"
+        VM_Conf_File="${VM_Array[0,1]}"
+        VM_Selection=
+
+
+        break
+
+      fi
+
+    done
 
   fi
+
 
   if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
 
@@ -3511,6 +3534,7 @@ function_Select_VM () {
 
   # clear any no-longer needed flags
   Select_VM=
+  VM_Selection=
   ByPass_VM_Array_Loader=
   ByPass_VM_Array_Selector=
 
