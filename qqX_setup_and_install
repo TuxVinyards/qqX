@@ -522,7 +522,7 @@ if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
   printColor "\n\n  A desktop launcher already exists >> "  
 
-  printf "\n\n  May be skipped, unless changing the terminal load size, the icon or similar ..." 
+  printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
 
   printColor "\n\n  [enter] to skip   " 
 
@@ -564,9 +564,11 @@ if [[ ! $SkipMkLauncher ]]; then
 
     printf "\n\n  while some menu screens may contain empty space."
 
+    printf "\n\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
+
   fi
 
-  printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
+  printf "\n\n\n  Note that qqX uses system default sizes if starting from the command line."
 
   printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
 
@@ -589,6 +591,8 @@ if [[ ! $SkipMkLauncher ]]; then
 
   elif [[ $TerminalHeightChoice == "t" ]]; then
 
+    printf "\n\n  Height selected = %s " "$Term_Taller"
+
     MateTerminalProfile="$MateTerminalProfile_Taller"
 
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
@@ -596,6 +600,8 @@ if [[ ! $SkipMkLauncher ]]; then
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
 
   else
+
+    printf "\n\n  Height selected = %s " "$Term_Height"
 
     MateTerminalProfile="$MateTerminalProfile_Standard"
 
@@ -625,19 +631,21 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
-  echo; echo
+  printf "\n\n"
 
   # Select Icon colour (to go with text shade)
 
-  printColor "\n\n  Select Desktop Icon colour "
+  printf "\n\n  Select Desktop ICON colour "
 
+  printColor   "\n\n  [enter] standard yellow icon"
+  
   tput setaf 6
 
-  printf " (text colour may be set in the settings file)"   
+  printf  "   [b] alternative blue icon"
 
   tput sgr0
 
-  printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
+  printf "\n\n  Text colour adjustments are found in the general settings file \n\n"   
 
   read -rp "  >  "  IconSelect
 

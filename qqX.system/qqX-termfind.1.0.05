@@ -6,7 +6,6 @@
 
 
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
-
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
 # 	Otherwise:  
@@ -27,10 +26,7 @@
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-
 # THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
-
-
 
 
 ##  2023/07  qqX - quickemu quickget X terminal project   
@@ -65,19 +61,15 @@ if [[ ! $UserTerm ]]; then
 
     echo "  UserTerm is $UserTerm" ; echo
 
-    echo "  Is this correct?  y/n" ; echo
+    echo "  Is this correct?  [enter] yes  [n] no " ; echo
 
     read -rp "   >  "   
     
     echo
 
-    if [[ $REPLY == "n" ]]; then
+    if [[ $REPLY == "n" ]]; then UserTerm=
     
-      UserTerm=
-    
-    else
-
-      UserTerm_Found=1
+    else UserTerm_Found=1
 
     fi
 
@@ -372,7 +364,7 @@ while [[ ! $UserTerm_Found ]]; do
 
     echColor " $ProbTerm UserTerm is $UserTerm" ; echo
 
-    echo "  Is this correct?  y/n " ; echo
+    echo "  Is this correct?  [enter] yes  [n] no " ; echo
 
     read -rp "  >  "   
 
@@ -383,9 +375,7 @@ while [[ ! $UserTerm_Found ]]; do
       UserTerm=
       UserTerm_Found=
 
-    else
-
-      UserTerm_Found=1
+    else  UserTerm_Found=1
 
     fi
 
