@@ -3466,7 +3466,6 @@ function_Select_VM () {
           VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
           VM_Conf_File="${VM_Array[$VM_Selection,1]}"
           VM_Selection=
-
           break
 
         fi
@@ -3477,8 +3476,6 @@ function_Select_VM () {
         VM_Conf_Dir="${VM_Array[0,0]}"
         VM_Conf_File="${VM_Array[0,1]}"
         VM_Selection=
-
-
         break
 
       fi
