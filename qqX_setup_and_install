@@ -433,7 +433,13 @@ else
 
 
 
-    if [[ ! -d  "$HOME/VMQs" ]] ; then
+    if [[ -d  "$HOME/VMQs" ]] ; then
+
+      printColor "\n\n  Standard default VM directory has been found >> "  
+
+      printf "\n\n  %s " "$HOME/VMQs" 
+      
+    else
 
       #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
 

@@ -3719,7 +3719,7 @@ function_KillPID_Menu() {
 
     sleep  "$P_Kill_WaitSecs"   
 
-    printColor "\n  Quickemu instance %s on PID:  %s"  "$VM_InstanceName"  "$InstancePID"
+    printColor "\n  Quickemu instance %s on PID:  %s  %s"  "$VM_InstanceName"  "$InstancePID"  "$LiveISO_Boot"
 
     printColor  "   [k] force close the Quickemu instance   "
     
@@ -4673,9 +4673,13 @@ function_show_main_menu_header () {
 
     #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
 
-    if [[ "$(pwd)" == "$Default_VM_Folder" ]]; then printf "  @   %s"  "$VM_Conf_Dir"     
+    #  See if using a Live ISO boot  (as in function_print_conf_array)
 
-    else  printColor "  @   %s"  "$VM_Conf_Dir" 
+    if  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  LiveISO_Boot="(LiveISO)" ; else LiveISO_Boot= ; fi
+
+    if [[ "$(pwd)" == "$Default_VM_Folder" ]]; then printf "  @   %s   %s"  "$VM_Conf_Dir"  "$LiveISO_Boot"  
+
+    else  printColor "  @   %s   %s"  "$VM_Conf_Dir" "$LiveISO_Boot"  
 
     fi
 
