@@ -3961,12 +3961,11 @@ function_delete_Selected_VM () {
 
       if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
 
+        printf "\n\n  Moving files to the bin ... \n\n"
         gio trash "$1"
         gio trash "$2"
 
-      else
-
-        printf "\n\n  NOT deleted ... \n\n"
+      else  printf "\n\n  NOT deleted ... \n\n"
 
       fi
 
