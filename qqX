@@ -2218,8 +2218,6 @@ function_quick_get_wrap ()  {
 
   function_test_iso_url () {
 
-    QGW_Download_BadLink=
-
     if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
 
       if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
@@ -2235,8 +2233,12 @@ function_quick_get_wrap ()  {
       if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then
 
         printColor "  ERROR  Bad link or server down ... \n\n"
-
         QGW_Download_BadLink=1
+
+      else
+
+        printColor "  Links look good ... \n\n"
+        QGW_Download_BadLink=
     
       fi
 
