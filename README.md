@@ -18,6 +18,8 @@ There's also a new setting to allow you to place updates in a custom folder, ins
 
 @ 08/jan tweak the smartcard fix & the gl reporting (apologies) Use Clone.
 
+@ 13/jan Dev branch for 1.5 has had several days of testing and tweaks. Looks stable ...
+
 ### quickemu quickget X terminal project
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
