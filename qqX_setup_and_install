@@ -177,6 +177,8 @@ function print_terminal_notes {
 
   #  Some XFCE distros default to mate-terminal >  XFCE users may like to install this.
 
+  #  Also remember that column width units are based on the size of your terminal font.
+
 Notes
 
 }
@@ -577,6 +579,10 @@ if [[ ! $SkipMkLauncher ]]; then
   printf "\n\n\n  Note that qqX uses system default sizes if starting from the command line."
 
   printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+
+  printf "\n\n  Also remember that column width units are based on the size of your terminal font,"
+
+  printf "\n\n  so changing the font will also change the physical terminal size."
 
   printf "\n\n\n"
 
