@@ -167,11 +167,12 @@ function print_terminal_notes {
 
   cat << Notes
 
-  #  The terminal may also be specified by editing 'UserTerm' at the start of the install script 
-  
-  #  if this script is not auto detecting correctly or if a specific profile is needed.
+  #  If the install script is not auto detecting correctly or if a specific profile is needed,
 
-  #  Actual 'Xterm' itself, if installed, will need a bit of custom tweaking
+  #  the terminal name may be specified by editing 'UserTerm' located near the script start. 
+    
+
+  #  Actual base level 'Xterm' itself, if installed, will need a bit of custom tweaking
 
   #  eg  xterm -geometry 150x50 -fa truetype -fs 12
 
@@ -576,11 +577,16 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
-  printf "\n\n\n  Note that qqX uses system default sizes if starting from the command line."
+  printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
 
   printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
 
   printf "\n\n  Also remember that column width units are based on the size of your terminal font,"
+
+  printf "\n\n  so changing the font will also change the physical terminal size."
+
+
+  printf "\n\n\n  Remember that column width units are based on the size of your terminal font,"
 
   printf "\n\n  so changing the font will also change the physical terminal size."
 
