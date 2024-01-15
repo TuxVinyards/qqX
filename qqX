@@ -3992,7 +3992,7 @@ function show_quickemu_WRAP_help {
 
   [[ ! $ModName_qqX ]] && printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion" 
 
-  printf "\n\n  For help with settings and user modes, see notes in the general settings file"  
+  printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
 
   printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
 

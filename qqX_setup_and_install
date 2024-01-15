@@ -580,6 +580,7 @@ if [[ ! $SkipMkLauncher ]]; then
   printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
 
   printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+  
 
   printf "\n\n\n  Remember that column width units are based on the size of your terminal font,"
 
