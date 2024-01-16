@@ -5338,15 +5338,22 @@ while true ; do
     
     printf "\n\n"
 
-    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  cat "$QemuErrorLog"
+    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  
+    
+      cat "$QemuErrorLog"
+
+      printf "\n\n  The log gets cleared when you re-start the VM, or it can be cleared now."
 
     else  printf "\n\n  No qemu errors were present on the last VM load ...  ?? " ; fi
 
-    printf "\n\n  [enter] to return   [w] hide non-critical warnings, for this session \n\n"
+    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this session \n\n"
 
     read -rp "  >  "  QL_LogView
 
     [[ $QL_LogView  == "w" ]] && QemuErrorFilter+=("warning" "deprecated") 
+
+    [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
+    
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
