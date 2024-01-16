@@ -533,7 +533,7 @@ if [[ ! $(type -p zsync) ]]; then
 fi
 
 
-## Check if a default File Manager and a default Web Browser are set or are available
+## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
 
 if [[ $FileManager == "no" ]]; then FileManager=
 
@@ -3526,6 +3526,7 @@ function_Select_VM () {
 
     # Qemu SYSTEM log
     QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
 
     set_drive_paths
     find_main_drive
@@ -4917,7 +4918,9 @@ function check_disk_is_okay {
 
 filter_and_flag_qemu_errors () {
 
-  if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
+  if [[ ! -e "$QemuErrorLog" ]]; then  printColor "\n\n  Internal ERROR:  QemuErrorLog not found.  A %s re-start may be needed."  "$ModName"
+  
+  elif [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
 
     QemuErrorExists=1
 
@@ -5353,7 +5356,7 @@ while true ; do
     [[ $QL_LogView  == "w" ]] && QemuErrorFilter+=("warning" "deprecated") 
 
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
-    
+
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
