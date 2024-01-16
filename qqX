@@ -1043,8 +1043,8 @@ show_kvm_sudo_security_note () {
 
 select_msr_config () {
 
-  # MSR_offer normally present if MSRS/OS conflict previously detected, 
-  # or selector is being used to change current status. 
+  # Normally called when MSRS/OS conflict previously detected, 
+  # or if selector is being used to change current status. 
 
   find_kvm_msr_default_and_status
   KVM_MSR_selector=
@@ -1174,11 +1174,7 @@ msrs_conflict_check_resolver() {
       
       printf " 'ignore_msrs' is set & is recommended for Windows and Mac"  
 
-      MSR_offer="Y"
-
       select_msr_config
-
-      find_kvm_msr_default_and_status
 
       if [[ $KVM_MSR_status == "N" ]]; then KVM_MSR_Error=1 ; else KVM_MSR_Error= ; fi
 
@@ -1186,7 +1182,7 @@ msrs_conflict_check_resolver() {
     
   else
 
-    #  Status = Y  &  which is only recommended for Windows & Mac 
+    #  Status = Y  &  which is recommended for Windows & Mac 
 
     if [[ "$VM_InstanceName" != *windows*  ]] &&	[[ "$VM_InstanceName" != *macos*  ]] ; then
 
@@ -1196,11 +1192,7 @@ msrs_conflict_check_resolver() {
     
       printf "\n\n 'ignore_msrs' is set:  can be okay for other OS's but is normally used only with Windows and Mac"  
 
-      MSR_offer="N"
-
       select_msr_config
-
-      find_kvm_msr_default_and_status
 
       if [[ $KVM_MSR_status == "Y" ]]; then KVM_MSR_Error=1 ; else KVM_MSR_Error= ; fi
 
