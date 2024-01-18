@@ -487,6 +487,11 @@ P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
 QG_FilePathDefault="$(type -p quickget)"
 
+# Set up any quickemu variables needed for .conf file analysis
+disk_img=
+img=
+iso=
+
 
 function quickget {
 
@@ -533,49 +538,56 @@ if [[ ! $(type -p zsync) ]]; then
 fi
 
 
-## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
+function find_xdg_settings()  {
 
-if [[ $FileManager == "no" ]]; then FileManager=
+  ## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
 
-else
+  if [[ $FileManager == "no" ]]; then FileManager=
 
-  [[ $FileManager ]] && [[ ! $(type -p "$FileManager") ]] && FileManager=
+  else
 
-  if [[ ! $FileManager ]] ; then
+    [[ $FileManager ]] && [[ ! $(type -p "$FileManager") ]] && FileManager=
 
-    if [[ $(xdg-mime query default inode/directory) ]] ; then  FileManager="xdg-open"
-    elif [[ $(type -p caja) ]] ; then  FileManager="caja"
-    elif [[ $(type -p nautilus) ]] ; then  FileManager="nautilus"
-    elif [[ $(type -p dolphin) ]] ; then  FileManager="dolphin"
-    elif [[ $(type -p pcmanfm) ]] ; then  FileManager="pcmanfm"
-    else FileManager=
+    if [[ ! $FileManager ]] ; then
+
+      if [[ $(xdg-mime query default inode/directory) ]] ; then  FileManager="xdg-open"
+      elif [[ $(type -p caja) ]] ; then  FileManager="caja"
+      elif [[ $(type -p nautilus) ]] ; then  FileManager="nautilus"
+      elif [[ $(type -p dolphin) ]] ; then  FileManager="dolphin"
+      elif [[ $(type -p pcmanfm) ]] ; then  FileManager="pcmanfm"
+      else FileManager=
+
+      fi
+
+    fi
+  fi
+
+  if [[ $WebBrowser == "no" ]]; then WebBrowser=
+
+  else
+
+    [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
+
+    if [[ ! $WebBrowser ]]; then
+
+      if [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
+      elif [[ $(type -p firefox) ]] ; then  WebBrowser="firefox"
+      elif [[ $(type -p 'google-chrome') ]] ; then  WebBrowser="google-chrome"
+      elif [[ $(type -p falkon) ]] ; then  WebBrowser="falkon"
+      else WebBrowser=
+
+      fi
 
     fi
 
   fi
-fi
 
-if [[ $WebBrowser == "no" ]]; then WebBrowser=
+  printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
 
-else
+}
 
-  [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
-
-  if [[ ! $WebBrowser ]]; then
-
-    if [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
-    elif [[ $(type -p firefox) ]] ; then  WebBrowser="firefox"
-    elif [[ $(type -p 'google-chrome') ]] ; then  WebBrowser="google-chrome"
-    elif [[ $(type -p falkon) ]] ; then  WebBrowser="falkon"
-    else WebBrowser=
-
-    fi
-
-  fi
-
-fi
-
-printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
+# Also needs calling if re-loading the settings file  See refresh_and_reload_VM_arrays
+find_xdg_settings
 
 
 ##  START of new functions that may be used by the menu system (or by Mod API)
@@ -1742,7 +1754,7 @@ function set_drive_paths {
 
 
   #  SECOND DRIVE and .conf file
-  #  Drive path to be individually set in the .conf file on a per VM basis.  
+  #  Drive path to be individually set in the .conf file on a per VM basis.   
 
   SecondDrive=
   SharedDrive=
@@ -1754,7 +1766,7 @@ function set_drive_paths {
 
   if [[ $VM_Conf_File ]]; then
 
-    eval "$(grep -s MacLegacyDrive "$VM_Conf_File")"
+    eval "$(grep -s MacLegacyDrive "$VM_Conf_File")"     #  TODO   eval grep not needed post 1.5
 
     if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2" 
           
@@ -1812,29 +1824,19 @@ function set_drive_paths {
 
 }  
 
-#  MAIN DRIVE
-#  Drive path to be individually set in the .conf file on a per VM basis.  
-#  The function needs to be run everytime a different VM is selected.
-#  Added so we can distinguish between different drives for snapshots.
-#  Finds the quickemu var 'disk_img' which is the main drive 'disk.qcow2' 
+#  MAIN DRIVE & BOOT
+# 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
+#  everytime a different VM is selected or the .conf file is reconfigured
+#  Quickemu uses 'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
 
-function find_main_drive {
+function find_main_drive_and_img_iso {
 
   MainDrive=
-  disk_img=
-  MainDrive_NOT_present=
+  IsoImg=
 
-  if [[ $VM_Conf_File ]]; then
-
-    eval "$(grep disk_img "$VM_Conf_File" 2>/dev/null)"
-
-    if [[ -e "$disk_img" ]]; then  MainDrive="$disk_img"
-
-    else  MainDrive_NOT_present=1
-
-    fi
-
-  fi
+  [[ -e "$disk_img" ]] && MainDrive="$disk_img"
+  [[ -e "$img" ]] && IsoImg="$img"
+  [[ -e "$iso" ]] && IsoImg="$iso"
 
 }  
 
@@ -3339,11 +3341,12 @@ function refresh_conf_vars_and_values {
 
   done
 
-  # check any menu values that based on the file .conf 
+  # check any menu values that are based on the file .conf 
 
   check_screen_percentage_and_output
-  find_main_drive
+  find_main_drive_and_img_iso
   set_drive_paths
+  check_disk_is_okay
 
 }
 
@@ -3520,17 +3523,6 @@ function_Select_VM () {
     QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
     [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
 
-    set_drive_paths
-    find_main_drive
-    check_disk_is_okay
-
-    if [[ $MainDrive_NOT_present ]]; then
-
-      printf "\n\n  Main Drive NOT found (yet)  >  Start VM (to create one)"
-      printf "\n\n  %s \n"  "$disk_img"
-
-    fi
-
   fi
 
   # clear any no-longer needed flags
@@ -3566,7 +3558,7 @@ drives_and_snapshots() {
 
   Selected_Drive=
   Selected_DriveName=
-  find_main_drive
+  find_main_drive_and_img_iso
   set_drive_paths
 
   if [[ $SecondDriveArgs ]]; then
@@ -4664,7 +4656,9 @@ function_show_main_menu_header () {
 
     #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
     
-    if  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
+    if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
+
+    elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
     
     elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(ISO/IMG Boot: Distro Non-installed)" 
     
@@ -4676,6 +4670,10 @@ function_show_main_menu_header () {
     printf "\n"
 
     [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
+
+    # Note .conf won't exist at first load, at VM selector menu
+
+    [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] && printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
 
   fi
 
@@ -4702,10 +4700,14 @@ refresh_and_reload_VM_arrays() {
   # re-load:
   [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
 
+  quickget filepath
+  find_xdg_settings
+
   function_create_VM_folderList  
   function_scan_VM_folderList  
+  find_main_drive_and_img_iso
   set_drive_paths
-  find_main_drive
+
 
   # reload screen 
   ByPass_VM_Array_Selector=1

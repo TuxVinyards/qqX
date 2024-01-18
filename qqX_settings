@@ -243,6 +243,8 @@ FixArgs_smartcard=1
 QE_Version=                 
 QG_Version= 
 
+# NB - A RESTART of qqX is NEEDED if changing *quickemu* version from within qqX.
+
 
 ## QEMU VERSION
 
