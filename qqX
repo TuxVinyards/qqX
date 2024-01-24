@@ -350,6 +350,7 @@ fi
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
 declare -gA VM_Array=()
 declare -ga Extra_VM_Folder=()
+declare -ga QemuError_VM_Filter=()
 
 # Clear or set any default variables, if needed.
 VM_ExecBoot=
@@ -3332,14 +3333,18 @@ function_print_conf_array () {
 function refresh_conf_vars_and_values {
 
   # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
-  # otherwise any items specified in the previous config, but not in the new one, will remain.
+  # otherwise any items specified in any previous config, but not in the new one, will remain.
   # Needed from qqX ver 1.5 onwards
+
+  # A blank clearance will have been created at first session start.  
 
   source "$ConfClearanceLog"
 
+  QemuError_VM_Filter=()
+
   source "$VM_Conf_File"
 
-  # clear & re-populate the ConfClearanceLog with current value set, for the next occasion
+  # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
   printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
 
@@ -3349,9 +3354,16 @@ function refresh_conf_vars_and_values {
 
     if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
 
-      Line="$(cut -d'=' -f1 <<< "$Line")"
-      Line="$Line""="
-      [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+      if [[ "$Line" == *'QemuError_VM_Filter'* ]]; then Line='QemuError_VM_Filter=()'
+
+      else
+
+        Line="$(cut -d'=' -f1 <<< "$Line")"
+        Line="$Line""="
+        [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+
+      fi
+      
       printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
 
       # Note that commented out lines need including, in case the comment marker gets removed
@@ -4949,7 +4961,7 @@ function check_disk_is_okay {
 
 }
 
-## filter for 'errors' that changes in QEMU might throw up and that we want to ignore  (see main settings)
+## filter for 'ERRORS' that changes in QEMU might throw up and that WE WANT TO IGNORE  (see main settings)
 
 filter_and_flag_qemu_errors () {
 
@@ -4961,6 +4973,12 @@ filter_and_flag_qemu_errors () {
 
     if [[ "${QemuErrorFilter[*]}" ]]; then
       for ErrChk in "${QemuErrorFilter[@]}"; do
+        if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorExists= ; return ; fi
+      done
+    fi
+
+    if [[ "${QemuError_VM_Filter[*]}" ]]; then
+      for ErrChk in "${QemuError_VM_Filter[@]}"; do
         if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorExists= ; return ; fi
       done
     fi
@@ -5143,9 +5161,6 @@ while true ; do
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
 
     printf "\n"
-
-echo
-    declare -p QemuErrorFilter
 
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then
 
@@ -5383,15 +5398,17 @@ echo
     
       cat "$QemuErrorLog"
 
-      printf "\n\n  The log gets cleared when you re-start the VM, or it can be cleared now."
+      printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
 
-    else  printf "\n\n  No qemu errors were present on the last VM load ...  ?? " ; fi
+    else  printf "  No qemu errors were present on the last VM load ...  ?? " ; fi
 
-    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this session \n\n"
+    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
+
+    #  Avoid any "[W] permanent" type option because it could overwrite something manually placed in the .conf file
 
     read -rp "  >  "  QL_LogView
 
-    [[ $QL_LogView  == "w" ]] && QemuErrorFilter+=("warning" "deprecated") 
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated") 
 
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
 
