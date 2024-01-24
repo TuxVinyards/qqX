@@ -445,7 +445,6 @@ function_create_VM_folderList() {
 
   fi
 
-
   # shellcheck disable=SC2154
 
   for xF in "${Extra_VM_Folder[@]}"; do
@@ -457,12 +456,7 @@ function_create_VM_folderList() {
       # if .conf targeted start, then no need to print this, 
       # unless re-selecting, in which case the error flag will create a later highlight.
     
-      if [[ ! $Conf_TriggerFolder ]]; then 
-      
-        printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" 
-        sleep 2 
-
-      fi
+      if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
 
       ExtraFolderError=1
 
@@ -485,13 +479,13 @@ P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 #  Check custom QE & QG, plus set the 'quickget' version
 [[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
 [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
+QE_FilePathDefault="$(type -p quickemu)"
 QG_FilePathDefault="$(type -p quickget)"
 
 # Set up any quickemu variables needed for .conf file analysis
 disk_img=
 img=
 iso=
-
 
 function quickget {
 
@@ -1216,6 +1210,7 @@ msrs_conflict_check_resolver() {
 
 #   End of MSRS functions
 
+
 ##  Start ADD-IN of ORIGINAL quickemu functions & the needed variables
 
 #   Technically, this script absorbs rather than wraps. 
@@ -1223,13 +1218,9 @@ msrs_conflict_check_resolver() {
 
 ## Load the right version of quickemu  (from settings)
 
-# shellcheck disable=SC2154
+if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$(type -p "quickemu")" ; fi
 
-if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="/usr/bin/quickemu" ; fi
-
-# shellcheck disable=SC2154
-
-if [[ ! $(type -p "$QuickEmuSource") ]] ; then
+if [[ ! -e "$QuickEmuSource" ]] ; then
 
   printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
 
@@ -3856,7 +3847,9 @@ qqX_edit_settings() {
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$Q_Mod_SettingsFile"  
       SettingsFileAdjusted=1
-      VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect"
+      VM_Conf_Dir=
+      if [[ $VM_InstanceName ]]; then  VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect to Re-Initialize"
+      else VM_InstanceName="Initializing Settings Updated  >>  Make a Selection" ; fi
       refresh_and_reload_VM_arrays
      
     fi
@@ -4612,6 +4605,30 @@ show_qmod_title() {
 
   printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
 
+  quickget filepath
+
+  QE_FilePath_Short=
+  QG_FilePath_Short=
+
+  if [[ $QuickEmuSource != "$QE_FilePathDefault" ]]; then
+
+    if [[ "${#QuickEmuSource}" -gt 40 ]]; then QE_FilePath_Short=".... ${QuickEmuSource:(-35)}" ; else QE_FilePath_Short="$QuickEmuSource" ; fi
+
+  fi
+
+  if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]]; then
+
+    if [[ "${#QG_FilePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_FilePath:(-35)}" ; else QG_FilePath_Short="$QG_FilePath" ; fi
+
+  fi
+
+  [[ $QE_FilePath_Short && $QG_FilePath_Short ]] && printf "\n\n  Custom Source:"
+
+  [[ $QE_FilePath_Short ]] &&  printf "  %s"  "$QE_FilePath_Short"
+
+  [[ $QG_FilePath_Short ]] &&  printf "  %s"  "$QG_FilePath_Short"
+
+
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
   
   PWD_Folder="$(pwd)"
@@ -4656,7 +4673,9 @@ function_show_main_menu_header () {
 
     #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
     
-    if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
+    if [[ $Select_VM ]]; then  BootAlert=
+
+    elif  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
 
     elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
     
@@ -4665,8 +4684,9 @@ function_show_main_menu_header () {
     else  BootAlert= 
     
     fi
-    
-    printf "  @   %s   %s"  "$VM_Conf_Dir"  "$BootAlert"  
+
+    [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
+    printf "   %s" "$BootAlert"  
     printf "\n"
 
     [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
