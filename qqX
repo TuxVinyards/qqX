@@ -293,6 +293,7 @@ custom_conf_notes () {
 
 }
 
+
 #  Pick up the SETTINGS file:  If placing the main file in /usr/bin,"
 #  then place the settings file as "/$HOME/.qmod_settings, OR if qqX in "/$HOME/.qqX/qqX_settings"
 
@@ -580,7 +581,7 @@ function find_xdg_settings()  {
 
 }
 
-# Also needs calling if re-loading the settings file  See refresh_and_reload_VM_arrays
+# Also needs calling if re-loading the settings file  See refresh_sources_and_reload_VM_arrays
 find_xdg_settings
 
 
@@ -1216,64 +1217,70 @@ msrs_conflict_check_resolver() {
 #   Technically, this script absorbs rather than wraps. 
 #   The original code remains basically as is but some calls get re-routed via new functions ....
 
-## Load the right version of quickemu  (from settings)
+function find_quickemu_source_functions_and_vars {
 
-if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$(type -p "quickemu")" ; fi
+  ## Load the right version of quickemu  (from settings)
 
-if [[ ! -e "$QuickEmuSource" ]] ; then
+  if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$QE_FilePathDefault" ; fi
 
-  printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
+  if [[ ! -e "$QuickEmuSource" ]] ; then
 
-  printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s \n\n"  "$QuickEmuSource"
+    printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
 
-  exit  hold
+    printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s \n\n"  "$QuickEmuSource"
 
-fi
+    exit  hold
 
-# Ignore first bits, bash check & locale preamble etc.  
-# QE starts into setting out the functions almost straight away.  
+  fi
 
-QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QuickEmuSource" | cut -d ':' -f 1)
+  # Ignore first bits, bash check & locale preamble etc.  
+  # QE starts into setting out the functions almost straight away.  
 
-# grep -n : print line number with the output lines   -m : stop after NUM selected lines
+  QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QuickEmuSource" | cut -d ':' -f 1)
 
-((QE_StartFuncsPoint -= 1))
+  # grep -n : print line number with the output lines   -m : stop after NUM selected lines
 
-QE_EOfuncsPoint=$(grep -n '### MAIN' "$QuickEmuSource" | cut -d ':' -f 1)
+  ((QE_StartFuncsPoint -= 1))
 
-QE_EOfuncsTrim=$((QE_EOfuncsPoint - QE_StartFuncsPoint -1))
+  QE_EOfuncsPoint=$(grep -n '### MAIN' "$QuickEmuSource" | cut -d ':' -f 1)
 
-tail +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
+  QE_EOfuncsTrim=$((QE_EOfuncsPoint - QE_StartFuncsPoint -1))
 
-source "/tmp/qmod-functions-temp" 
+  tail +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
 
-## Quickemu Variables (set & clear)
-#  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
+  source "/tmp/qmod-functions-temp" 
 
-QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
+  ## Quickemu Variables (set & clear)
+  #  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
-QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
+  QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
 
-tail +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
-  
-# BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
-# with QEMU_IMG checker which has been replaced (at the start of qqX)
-# and the 3 strangely & unexplainedly read-only vars which need special treatment ...
+  QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
 
-SpecialVarCheckArr=("LAUNCHER" "DISK_MIN_SIZE" "VERSION")
+  tail +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
+    
+  # BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
+  # with QEMU_IMG checker which has been replaced (at the start of qqX)
+  # and the 3 strangely & unexplainedly read-only vars which need special treatment ...
+
+  SpecialVarCheckArr=("LAUNCHER" "DISK_MIN_SIZE" "VERSION")
 
 
-# Separate the re-writeable vars   
+  # Separate the re-writeable vars   
 
-# NB not all vars are listed by the quickemu script ...  
+  # NB not all vars are listed by the quickemu script ...  
 
-# Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
+  # Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
 
-QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
+  QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
 
-((QE_rw_Vars_StartPoint -=2))
+  ((QE_rw_Vars_StartPoint -=2))
 
-head -"$QE_rw_Vars_StartPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
+  head -"$QE_rw_Vars_StartPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
+
+}
+
+find_quickemu_source_functions_and_vars
 
 
 function refresh_and_load_quickemu_vars {
@@ -1298,6 +1305,8 @@ function refresh_and_load_quickemu_vars {
 
 refresh_and_load_quickemu_vars
 
+
+function  load_mod_quickemu_boot {
 
   ## OVERWRITE ORIGINAL Functions Source, as required
 
@@ -1526,35 +1535,54 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
 EOF
 
+  # End of boot modding. Now add the modded boot code as the new function 'vm_boot'
 
-## Now add the modded boot code as the new function 'vm_boot'
+  source "/tmp/qmod-function-vm_boot-new-temp"
 
-source "/tmp/qmod-function-vm_boot-new-temp"
+}
 
-## Add in the standard parameter cases 
+load_mod_quickemu_boot
 
-tail +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
-# note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
-QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-((QE_EoCasePoint -= (QE_StartCasePoint -1) ))
-tail "+$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
 
-##  Add in the standard actions ( also where quickemu sources in the .conf file )
+function load_quickemu_cases_and_actions {
 
-((QE_EoCasePoint += (QE_StartCasePoint +2) ))
-QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-((QE_vm_bootPoint -= 2))
-QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
-QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
+  ## Add in the standard parameter cases 
 
-# Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
-# BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
+  tail +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
+  # note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
+  QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
+  QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
+  ((QE_EoCasePoint -= (QE_StartCasePoint -1) ))
+  tail "+$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
 
-tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
-grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
+  ##  Add in the standard actions ( also where quickemu sources in the .conf file )
 
-tail "+$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
+  ((QE_EoCasePoint += (QE_StartCasePoint +2) ))
+  QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
+  ((QE_vm_bootPoint -= 2))
+  QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
+  QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
+
+  # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
+  # BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
+
+  tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
+  grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
+
+  tail "+$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
+
+}
+
+load_quickemu_cases_and_actions
+
+
+function refresh_and_load_main_sources {
+
+  find_quickemu_source_functions_and_vars
+  load_mod_quickemu_boot
+  load_quickemu_cases_and_actions
+
+}
 
 
 function quickemu {      
@@ -2876,7 +2904,7 @@ function_quick_get_wrap ()  {
 
     # re-load arrays, if not already done
     SettingsFileAdjusted=1
-    refresh_and_reload_VM_arrays
+    refresh_sources_and_reload_VM_arrays
     ByPass_VM_Array_Selector=1
 
   fi
@@ -3326,7 +3354,7 @@ function refresh_conf_vars_and_values {
       [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
       printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
 
-      # Note that commented out lines need including, in case the comment gets removed
+      # Note that commented out lines need including, in case the comment marker gets removed
 
     fi
 
@@ -3498,7 +3526,6 @@ function_Select_VM () {
 
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
     # otherwise any items specified in the previous config, but not in the new one, will remain.
-
     refresh_conf_vars_and_values
 
     ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
@@ -3850,8 +3877,8 @@ qqX_edit_settings() {
       VM_Conf_Dir=
       if [[ $VM_InstanceName ]]; then  VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect to Re-Initialize"
       else VM_InstanceName="Initializing Settings Updated  >>  Make a Selection" ; fi
-      refresh_and_reload_VM_arrays
-     
+      refresh_sources_and_reload_VM_arrays
+
     fi
 
     # Note, app opening commands can throw a complaint if 'xapps' has not not been installed.
@@ -3956,7 +3983,7 @@ function_delete_Selected_VM () {
 
     SettingsFileAdjusted=1
 
-    refresh_and_reload_VM_arrays
+    refresh_sources_and_reload_VM_arrays
 
   fi
 
@@ -4701,33 +4728,26 @@ function_show_main_menu_header () {
 
 # If settings need reloading, following a settings edit or a VM deletion:
 
-refresh_and_reload_VM_arrays() {
+refresh_sources_and_reload_VM_arrays() {
 
-  # NB clear extra folders array
+  # clear any previously declared settings based arrays 
   Extra_VM_Folder=()
-
-  # NB clear pre-set folders array 
   VM_Array=()
+  QemuErrorFilter=()
 
-  # Re-Read settings file & pre-set folders:
   # shellcheck disable=SC1090
 
   if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
 
-  # make sure other functions know that the settings was was re-read
-  SettingsFileAdjusted=1
-
-  # re-load:
-  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
-
+  refresh_and_load_main_sources
   quickget filepath
-  find_xdg_settings
+
+  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdg_settings
 
   function_create_VM_folderList  
   function_scan_VM_folderList  
   find_main_drive_and_img_iso
   set_drive_paths
-
 
   # reload screen 
   ByPass_VM_Array_Selector=1
@@ -5024,7 +5044,7 @@ while true ; do
 
       # REVIEW  add disk conversion utility ??  Or something?
 
-      #refresh_and_reload_VM_arrays
+      #refresh_sources_and_reload_VM_arrays
       #MainMenuChoice="vm"
       #function_show_main_menu_header
       #continue
@@ -5123,6 +5143,9 @@ while true ; do
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
 
     printf "\n"
+
+echo
+    declare -p QemuErrorFilter
 
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then
 
@@ -6191,7 +6214,7 @@ while true ; do
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
-    if [[ ! ${VM_Array[0,0]} ]]; then refresh_and_reload_VM_arrays ; fi
+    if [[ ! ${VM_Array[0,0]} ]]; then refresh_sources_and_reload_VM_arrays ; fi
     Select_VM=1
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
