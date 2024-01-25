@@ -4,11 +4,11 @@
 
 Release 1.5.02 now has several new features and is running very smoothly.
 
-- The code has been refactored and is now more small screen friendly.
+- Refactored code is now more small screen friendly.
 
-- The VM selector menu signals if the distro is live boot or installed.
+- VM selector menu signals if the distro is live boot or installed.
 
-- The Quickget interface allows alphabetical entries and zooming into list sections. See screenshot below.
+- Quickget interface allows alphabetical entries and zooming into list sections. See screenshot below.
 
 - GL graphics can be toggled on/off as required. Particularly handy when loading basic distro installers.
 
