@@ -10,9 +10,9 @@ Release 1.5.02 now has several new features and is running very smoothly.
 
 - Quickget interface gives alphabetical zooming into list sections.
 
-- GL graphics can be toggled on/off as required. Handy for basic distros.
+- GL graphics on/off toggle - Handy for basic distros.
 
-- Qemu messages can be suppressed on a per VM basis.
+- Qemu message suppression - Individual VM or Global.
 
 - See screenshots below.
 
