@@ -16,9 +16,7 @@
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
-
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
 # 	Otherwise:  
@@ -39,62 +37,44 @@
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-
 # THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
 
 
 ##  qqX - quickemu quickget X terminal project   
 
 #  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
-
-#  See:  https://en.wikipedia.org/wiki/Wrapper_library   https://en.wikipedia.org/wiki/Adapter_pattern 
-
-
 #  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
 
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
-
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
-
-# THIS INSTALL SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files ###
-
-# $1 as 'Upgrade'  may be supplied to change the menu look (see qqX updater function)
-
-
-# Bash 5.0+     # details: try 'bash -version at the commandline'   (2023: we are now at ver 5 for at least 10 years ...)
-
-# shellcheck disable=SC1090
-
-
-## qqX STANDARD INSTALLATION (default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx)    
-
+#  STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx    
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
-
 # It is not a silver bullet & can also cause problems with bash exec clauses ...
-
 # Some users may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
-
 # Only the main qqX script itself should need to be changed. This is easiest if done before running the installer but can also be done afterwards.
-
 # The commands "type -p bash" or "which bash" should help locate this.  
-
 # See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
-
 #  Differences may be present in non FHS distros & may need special installation 
-
 #  See var 'qqX_Std_Bin_Dir' below  &  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard  
 
-
 # In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID, 
-
 # this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
-
 # See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756 
 
+# https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
+# shellcheck disable=SC1090
+# shellcheck disable=SC2317
 
+##  Expect Bash 5.0+   (2023: we are now at ver 5 for quite a few years)  
+if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
+  echo; echo "  Sorry, you need bash 5.0 or newer to run this script."; echo
+  echo "  Your version: "; echo
+  bash --version
+  echo; sleep 10; exit 1
+fi
 
 if [[ ! -d "/tmp" ]]; then 
 
@@ -114,7 +94,6 @@ fi
 
 
 # Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem 
-
 # will need more adjustments than just this, so flag up for them to read the notes & probably other:
 
 OS_BashLocation="$(type -p bash)"
@@ -149,13 +128,10 @@ qqX_Version="$(./qqX --version 2>/dev/null)"
 qqX_XDG_Name="qqX"
 
 # Default location is next to quickemu in "/usr/bin" but where qqX_Std_Bin_Dir is set to "/bin" to improve portabilty.
-
 # @2023 there is normally a symlink for "/bin" so this will actually install to "/usr/bin" 
 
 # In the same way that the bash shebang itself starts at "/bin" 
-
 # the use of "/bin" allows for other systems that have not adopted or allowed for the newer standard method.
-
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  add a check for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
@@ -168,10 +144,6 @@ qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"
 
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
-
-
-
-# shellcheck disable=SC2317
 
 function print_manual_uninstall_notes {
 
@@ -191,21 +163,22 @@ Notes
 
 ## TERMINAL:
 
-# shellcheck disable=SC2317
-
 function print_terminal_notes {
 
   cat << Notes
 
-  #  The terminal may also be specified by editing 'UserTerm' at the start of the install script 
-  
-  #  if this script is not auto detecting correctly or if a specific profile is needed.
+  #  If the install script is not auto detecting correctly or if a specific profile is needed,
 
-  #  Actual 'Xterm' itself, if installed, will need a bit of custom tweaking
+  #  the terminal name may be specified by editing 'UserTerm' located near the script start. 
+    
+
+  #  Actual base level 'Xterm' itself, if installed, will need a bit of custom tweaking
 
   #  eg  xterm -geometry 150x50 -fa truetype -fs 12
 
   #  Some XFCE distros default to mate-terminal >  XFCE users may like to install this.
+
+  #  Also remember that column width units are based on the size of your terminal font.
 
 Notes
 
@@ -214,9 +187,7 @@ Notes
 # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     ( NB use of escape EOF, or quotes, not used )
 
 
-
 UserTerm=
-
 CustomTerminalProfile=
 
 
@@ -275,7 +246,6 @@ Number_start=${#LIST_start[@]}
 . "${LIST_start[$Number_start-1]}"
 
 
-
 ## START 
 
 printf "\033c"
@@ -292,23 +262,16 @@ if [[ "$(whoami)" == root ]]; then
   printColor "\n\n  User-Interactive Scripts:\n\n  Root installation is not currently available. \n\n  Select a trusted UserLand folder (%s) etc\n\n" "$UserLand_Name"
 
   #  If installing as root, eg making folder /usr/share/qqX  then root will not have xdg data
-
   #  However core-util 'users' will show who is logged in and thus where non-sudo $HOME is located.
 
   #  User-Interactive Scripts:  Root installation just adds unneeded (?) complications ...
-  
   #  When time is available and if demand is present. But probably a bit of a rabbit hole that could end up as creating distro installs ...
 
   read -rp "  See setup script and installation notes  > "
 
 fi
 
-
-## 
-
 echo
-
-
 
 ## PROBE SYSTEM ENVIRONMENT  
 
@@ -331,7 +294,6 @@ fi
 # INITIAL MENU:
 
 printf "\033c"
-
 echo
 
 function_qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
@@ -349,7 +311,6 @@ fi
 # REVIEW  add quickemu release/version checking ? 
 
 printf "\n"
-
 
 if [[ ! -e "qqX_settings" ]] || [[ ! -e "qqX" ]] || [[ ! -d  "qqX.system" ]]; then
 
@@ -425,9 +386,7 @@ else
       tput cnorm
       exit
 
-    else
-
-      sleep 0.6 ; exit
+    else   sleep 0.6 ; exit
 
     fi
 
@@ -465,29 +424,29 @@ else
 
     
     # Make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link   Means copying to qqx will copy to qqX, and vice versa.
-
     # and check that the right version is there:
 
-    #qqX_Version_Installed="$(qqX --version 2>/dev/null)"
-
-    #if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$qqX_Version_Installed" == "$qqX_Version" ]] ; then 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
     
       printColor "\n\n  All good  \n\n" 
 
-    else 
-    
-      printColor "\n\n  ERROR qqX version %s not not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000 
+    else  printColor "\n\n  ERROR qqX version %s not not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000 
     
     fi
 
 
 
-    if [[ ! -d  "$HOME/VMQs" ]] ; then
+    if [[ -d  "$HOME/VMQs" ]] ; then
+
+      printColor "\n\n  Standard default VM directory has been found >> "  
+
+      printf "\n\n  %s " "$HOME/VMQs" 
+      
+    else
 
       #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
 
-      #  TODO  for qqX add some kind of detection to find if this is an update, then if exist, auto skip 
+      #  REVIEW  if $1 as 'Upgrade', then if exist default (from settings?), auto skip ??
 
       MkDefDir=
 
@@ -572,7 +531,7 @@ if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
   printColor "\n\n  A desktop launcher already exists >> "  
 
-  printf "\n\n  May be skipped, unless changing the terminal load size, the icon or similar ..." 
+  printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
 
   printColor "\n\n  [enter] to skip   " 
 
@@ -600,7 +559,6 @@ if [[ ! $SkipMkLauncher ]]; then
   ## Determine how the interface will look
 
   printf "\033c"
-
   echo
 
   function_qqX_logo_title  "Setting up the desktop:"
@@ -615,11 +573,18 @@ if [[ ! $SkipMkLauncher ]]; then
 
     printf "\n\n  while some menu screens may contain empty space."
 
+    printf "\n\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
+
   fi
 
   printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
 
   printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+  
+
+  printf "\n\n\n  Remember that column width units are based on the size of your terminal font,"
+
+  printf "\n\n  so changing the font will also change the physical terminal size."
 
   printf "\n\n\n"
 
@@ -640,6 +605,8 @@ if [[ ! $SkipMkLauncher ]]; then
 
   elif [[ $TerminalHeightChoice == "t" ]]; then
 
+    printf "\n\n  Height selected = %s " "$Term_Taller"
+
     MateTerminalProfile="$MateTerminalProfile_Taller"
 
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
@@ -647,6 +614,8 @@ if [[ ! $SkipMkLauncher ]]; then
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
 
   else
+
+    printf "\n\n  Height selected = %s " "$Term_Height"
 
     MateTerminalProfile="$MateTerminalProfile_Standard"
 
@@ -676,20 +645,21 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
-  echo; echo
-
+  printf "\n\n"
 
   # Select Icon colour (to go with text shade)
 
-  printColor "\n\n  Select Desktop Icon colour "
+  printf "\n\n  Select Desktop ICON colour "
 
+  printColor   "\n\n  [enter] standard yellow icon"
+  
   tput setaf 6
 
-  printf " (text colour may be set in the settings file)"   
+  printf  "   [b] alternative blue icon"
 
   tput sgr0
 
-  printf   "\n\n  [enter] std yellow  [b]  blue \n\n"
+  printf "\n\n  Text colour adjustments are found in the general settings file \n\n"   
 
   read -rp "  >  "  IconSelect
 
@@ -699,11 +669,7 @@ if [[ ! $SkipMkLauncher ]]; then
   else  Icon_Var="std"; fi
 
 
-
-
-
   ## RUN .desktop CREATOR  
-
 
   if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
 
@@ -779,10 +745,9 @@ if [[ ! $SkipMkLauncher ]]; then
 
     #  Remove any old launcher file & create a new one  
 
-    # NoDisplay: means don't show in the main menu  (Use =false)
+    #  NoDisplay: means don't show in the main menu  (Use =false)
 
-    # Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
-
+    #  Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
 
     {
       echo "[Desktop Entry]"
@@ -811,7 +776,7 @@ if [[ ! $SkipMkLauncher ]]; then
       
       echo "Categories=System;Emulator"
 
-      #https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
+      # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
 
       # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
 
@@ -833,16 +798,13 @@ if [[ ! $SkipMkLauncher ]]; then
 
     # desktop-file-validate  qqX.desktop 
 
-
     # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
-
 
     # Important: 
 
     update-desktop-database  "$HOME/.local/share/applications" 
 
     # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
-
 
     #  REVIEW   Different distros have different setups.
 

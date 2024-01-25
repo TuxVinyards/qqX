@@ -174,7 +174,7 @@ function  update_old_settings_file_with_new_options {
 
   else
 
-    printColor "\n\n  A backup of the original settings file has been made & verified \n\n"
+    printf "\n\n  A backup of the original settings file has been made & verified \n\n"
 
   fi
 
@@ -288,7 +288,7 @@ function  update_old_settings_file_with_new_options {
 
   done
 
-  printColor "  The settings file has now been updated. \n\n  All recognised original settings have been transferred. \n\n"
+  printf "  The settings file has now been updated. \n\n  All recognised original settings have been transferred. \n\n"
   
 }
 
