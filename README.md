@@ -2,23 +2,23 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-- The program's built-in downloader will neatly place releases into their own special sub-folder.
+Release 1.5.02 now has several new features and is running very smoothly.
 
-New release 1.4.1 :christmas_tree: had lots of minor improvements plus introduced @zen0bit's URL checking. There was also a neat no-hang browser for opening for OS Home Pages and several under the hood changes in readiness for release 1.5 in the new year.
+- The VM selector menu now signals if the distro is live boot or installed.
 
-Release 1.4.5 is semi interim to 1.5.  As previously, it has yet more improvements but several small new features have also made their way in, hence the number jump.
+- The Quickget interface now allows alphabetical entries to zoom in to list sections. See screenshot below.
 
-Of major importance are two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the recent and recurring 'smartcard problem' [#888](https://github.com/quickemu-project/quickemu/issues/888) and [#717](https://github.com/quickemu-project/quickemu/issues/717) that can affect some distros. Both of these fixes can be toggled from the main settings menu.
+- GL graphics can now be toggled on/off as required. Particularly handy when loading basic distro installers.
 
-The installer script will update the settings file with the new feature options. Also, if you you are finding the quickget interface a bit cramped these days, running the desktop part, rather than skipping, will allow you to tweak the terminal size. Remembering of course that terminal (monospaced) font size also affects this. For that see your desktop control panel.
+- Qemu messages can now be individually suppressed on a per VM basis, where needed.
 
-There's also a new setting to allow you to place updates in a custom folder, instead of the usual 'Downloads' one ...
+- The code itself has had around 500 lines removed to make it more notebook and small screen friendly. :rocket:
+
+The installer script will update older settings files with the new feature options.
 
 - Use the Github **code/clone** button for the very latest tweaks & bug fixes (if needed).
 
-@ 08/jan tweak the smartcard fix & the gl reporting (apologies) Use Clone.
-
-@ 13/jan Dev branch for 1.5 has had several days of testing and tweaks. Looks stable ...
+- The program's built-in downloader will neatly place releases into their own special sub-folder.
 
 ### quickemu quickget X terminal project
 
@@ -62,11 +62,11 @@ Confident Linux users should quickly find themselves at home.
 
 ### Work continues
 
-Release 1.1.01 improves the front end machine selector & makes clearer folder organisation:
+Release 1.1.01 improved the front end machine selector & makes clearer folder organisation:
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-Release 1.1.03 adds a few tweaks to the main menu & adds a gtk display option :
+Release 1.1.03 improved the main menu & added a gtk display option, while 1.5.02 now has GL toggle:
 
 ![qqX-main-113](https://github.com/TuxVinyards/qqX/assets/3956806/bb5db28d-9105-46e4-9ac2-c6cf4e57a951)
 
@@ -146,11 +146,15 @@ All folders can be easily moved around, but make sure that they have their .conf
 
 Multiple folders can help organise your distros. You can edit which VMs to show first in the general settings.
 
+If you you are finding the interface a bit cramped, re-run the installer making sure to run the desktop part, rather than skipping, will allow you to tweak the terminal size. Remember of course that terminal window sizing is also affected by the (monospaced) font size. For fonts you may need to see your host distro control panel.
+
 Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community and can help make this software better for others.
 
 ### Updating
 
 Make sure to use the installer script so that new features get added to your settings file.
+
+The main settings file has an option for placing updates in a custom folder, instead of the usual 'Downloads' one ...
 
 All locations and preferences will be kept.
 
@@ -184,6 +188,12 @@ Same with no-start new distros from the config wizard not adding 'G' to the ram=
 
 The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested and developed. :rocket:
 
+New release 1.4.1 :christmas_tree: had lots of minor improvements plus introduced @zen0bit's URL checking. There was also a neat no-hang browser for opening for OS Home Pages and several under the hood changes in readiness for release 1.5 in the new year.
+
+Release 1.4.5 was semi interim to 1.5.  As previously, it had yet more improvements but several small new features also made their way in, hence the number jump.
+
+Of major importance were two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the recent and recurring 'smartcard problem' [#888](https://github.com/quickemu-project/quickemu/issues/888) and [#717](https://github.com/quickemu-project/quickemu/issues/717) that can affect some distros. Both of these fixes can be toggled from the main settings menu.
+
 Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
 
 ### Next release
@@ -201,8 +211,6 @@ Note the disk health checker doing its thing, in the version 2 snap below.  Clus
 ![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
 
 Being able to autoinstall from any given random non-quickget ISO is on the wish list.
-
-Also not forgetting some of the new pull requests making their way into quickemu code, like @zen0bit 's for distro homepages  [here](<https://github.com/quickemu-project/quickemu/pull/801#issuecomment-1762671744>)
 
 Conversion between gnome boxes and quickemu is currently on the the todo list for version 2.2 (?)
 
