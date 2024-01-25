@@ -6,13 +6,15 @@ Release 1.5.02 now has several new features and is running very smoothly.
 
 - Refactored code is now more small screen friendly.
 
-- VM selector menu signals if the distro is live boot or installed.
+- VM selector shows if the distro is live boot or installed.
 
-- Quickget interface allows alphabetical entries and zooming into list sections. See screenshot below.
+- Quickget interface gives alphabetical zooming into list sections.
 
-- GL graphics can be toggled on/off as required. Particularly handy when loading basic distro installers.
+- GL graphics can be toggled on/off as required. Handy for basic distros.
 
-- Qemu messages can be individually suppressed on a per VM basis, where needed.
+- Qemu messages can be suppressed on a per VM basis.
+
+- See screenshots below.
 
 The installer script will update older settings files with the new feature options.
 
