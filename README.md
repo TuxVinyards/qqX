@@ -90,7 +90,7 @@ Plus:
 
 Quick Get multi distro menu:
 
-![QGW](https://github.com/TuxVinyards/quickemu-mod/assets/3956806/c948f51a-a954-4180-ba62-1d5045e5f4fc)
+![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
 Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
 
