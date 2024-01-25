@@ -68,7 +68,7 @@ Release 1.1.01 improved the front end machine selector & makes clearer folder or
 
 Release 1.1.03 improved the main menu & added a gtk display option, while 1.5.02 now has GL toggle:
 
-![qqX-main-113](https://github.com/TuxVinyards/qqX/assets/3956806/bb5db28d-9105-46e4-9ac2-c6cf4e57a951)
+![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
 Earlier releases have added:
 
