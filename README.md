@@ -4,15 +4,15 @@
 
 Release 1.5.02 now has several new features and is running very smoothly.
 
-- The VM selector menu now signals if the distro is live boot or installed.
+- The code has been refactored and is now more small screen friendly.
 
-- The Quickget interface now allows alphabetical entries to zoom in to list sections. See screenshot below.
+- The VM selector menu signals if the distro is live boot or installed.
 
-- GL graphics can now be toggled on/off as required. Particularly handy when loading basic distro installers.
+- The Quickget interface allows alphabetical entries and zooming into list sections. See screenshot below.
 
-- Qemu messages can now be individually suppressed on a per VM basis, where needed.
+- GL graphics can be toggled on/off as required. Particularly handy when loading basic distro installers.
 
-- The code itself has had around 500 lines removed to make it more notebook and small screen friendly. :rocket:
+- Qemu messages can be individually suppressed on a per VM basis, where needed.
 
 The installer script will update older settings files with the new feature options.
 
@@ -225,6 +225,8 @@ qqX has several layers of backup and fail safe, however do backup critical VMs i
 You are recommended to place any development changes to the settings file into a single block so that they can be easily pasted back after carrying out release upgrades to your main qqX installation.
 
 Whilst the release installer will automatically backup your settings file, part of the update procedure is the removal of obsolete and unneeded lines. This will cause a temporary removal of any changes that you may have made.
+
+The code has now been refactored to make readability easier on notebooks and smaller height screens. Release 1.5.02, even with its new added features and script, is more compact and around 500 lines shorter ... :rocket:
 
 ## Bash
 
