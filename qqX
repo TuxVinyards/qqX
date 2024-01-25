@@ -79,7 +79,7 @@ NoClear=
 
 # This script:
 
-ModVersion="1.5.01"
+ModVersion="1.5.02"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 
