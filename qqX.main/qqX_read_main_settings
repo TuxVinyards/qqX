@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+# https://www.shellcheck.net/wiki/SC1090  SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
+function_create_VM_folderList() {
+
+  DefaultFolderError=
+  ExtraFolderError=
+
+  # Make sure that 'Default_VM_Folder' has a value and it exists
+
+  [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
+
+  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
+
+  
+  # set and clear the folder array, current first but don't scan twice
+
+  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
+ 
+    declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
+
+  else
+
+    declare -ga VM_Folder_List=("$Default_VM_Folder")
+
+  fi
+
+  for xF in "${Extra_VM_Folder[@]}"; do
+
+    [[ $xF ]] && VM_Folder_List+=("$xF")
+
+    if [[ $xF ]] &&  [[ ! -d "$xF" ]] ; then 
+
+      # if .conf targeted start, then no need to print this, 
+      # unless re-selecting, in which case the error flag will create a later highlight.
+    
+      if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
+
+      ExtraFolderError=1
+
+    fi
+
+  done
+
+}
+
+
+# Run the function & populate the list: 
+function_create_VM_folderList
+
+# Record any set ExtraArgs in case of need to reset
+ExtraSetArgs="$ExtraArgs"
+
+#  Add default values, if none supplied
+[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="6"
+P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
+
+# Set up any quickemu variables needed for .conf file analysis
+disk_img=
+img=
+iso=
+
+
+function find_xdgopen_settings()  {
+
+  ## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
+
+  if [[ $FileManager == "no" ]]; then FileManager=
+
+  else
+
+    [[ $FileManager ]] && [[ ! $(type -p "$FileManager") ]] && FileManager=
+
+    if [[ ! $FileManager ]] ; then
+
+      if [[ $(xdg-mime query default inode/directory) ]] ; then  FileManager="xdg-open"
+      elif [[ $(type -p caja) ]] ; then  FileManager="caja"
+      elif [[ $(type -p nautilus) ]] ; then  FileManager="nautilus"
+      elif [[ $(type -p dolphin) ]] ; then  FileManager="dolphin"
+      elif [[ $(type -p pcmanfm) ]] ; then  FileManager="pcmanfm"
+      else FileManager=
+
+      fi
+
+    fi
+  fi
+
+  if [[ $WebBrowser == "no" ]]; then WebBrowser=
+
+  else
+
+    [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
+
+    if [[ ! $WebBrowser ]]; then
+
+      if [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
+      elif [[ $(type -p firefox) ]] ; then  WebBrowser="firefox"
+      elif [[ $(type -p 'google-chrome') ]] ; then  WebBrowser="google-chrome"
+      elif [[ $(type -p falkon) ]] ; then  WebBrowser="falkon"
+      else WebBrowser=
+
+      fi
+
+    fi
+
+  fi
+
+  printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
+
+}
+
+# Also needs calling if re-loading the settings file  See refresh_sources_and_reload_VM_arrays
+find_xdgopen_settings
+
+
+# Check custom QE & QG, plus set the 'quickget' version
+
+[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
+[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
+
+QE_FilePathDefault="$(type -p quickemu)"
+QG_FilePathDefault="$(type -p quickget)"
+
+
+# Find the right version for the standard 'quickget' call 
+# which is only used in simple API wrapping mode, for now ...
+# quick*emu* is later and is more complex
+
+
+function quickget {
+
+  if [[ $QG_Version ]]; then  
+  
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
+    else  eval command "$QG_Version" " $*" ; fi
+
+  else 
+
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
+    else eval command quickget " $*" ; fi
+
+  fi
+  
+}
+

@@ -45,6 +45,14 @@
 #  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
 #  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
 
+
+# https://www.shellcheck.net/wiki/SC1090  SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
 if [[ $AllowMoreLocale ]]; then
 
   export "LC_NUMERIC=C"
@@ -99,10 +107,19 @@ if [[ ! -d "/tmp" ]]; then
   exit 1
 fi
 
+##  Check for 'curl' and 'aria2' etc  as is often omitted from quickemu install recipes
+#   & where $1 test is true if command line is being used 
+
+if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]] || [[ ! $(type -p zsync) ]]; then
+  echo
+  echo "  You need to install 'curl' & 'aria2' & 'zsync' to run parts of the quickget script ..."
+  echo
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
 
 if [[ $1 == "XDG" ]]; then 
 
-  # set flags & deal with details after the setting up is done
+  # set xdg flags for now, deal with details after the basic initializing is done
 
   if [[ -e "$2" ]]; then
 
@@ -207,4 +224,58 @@ else
   
 fi
 
+
+if [[ -e "$Q_Mod_SettingsFile" ]]; then
+    
+  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
+
+else 
+
+  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
+  
+fi
+
+
+# Determine possible XDG folders 
+
+function_xdg_start_folder () {
+
+  #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
+  #  Also can be called (belt & braces) at the other command line $1 trap towards end of script ...  REVIEW 
+
+  if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
+
+    cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found " 
+
+    CurrentFolder="$Default_VM_Folder"
+
+  else
+
+    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
+
+    CurrentFolder="$HOME"
+
+  fi
+
+}
+
+
+[[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
+
+
+if [[ $XDG_QcowRightClick ]]; then
+
+  XDG_QcowRightClick_Conf_Dir="$(dirname "$1")"
+  XDG_QcowRightClick_DiskName="$(basename "$1")"
+  XDG_QcowRightClick_VM_Dir_Name="$(basename "$XDG_QcowRightClick_Conf_Dir")"
+
+  # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
+
+  cd "$XDG_QcowRightClick_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+
+  cd ..  || printf "\n\n XDG .desktop starter  >  Disk's root Folder not found " 
+
+  CurrentFolder="$XDG_QcowRightClick_Conf_Dir"
+
+fi
 

@@ -53,10 +53,14 @@
 
 ## ShellCheck global disables:
 
-# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open, SC1090 for file sourcing
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
 #  shellcheck disable=SC2242
 #  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
 
 ##  Expect Bash 5.0+   (2023: we are now at ver 5 for quite a few years)  
 if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
@@ -79,7 +83,7 @@ NoClear=
 
 # This script:
 
-ModVersion="1.5.02"
+ModVersion="1.6.01"
 
 # major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 
@@ -169,264 +173,8 @@ ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 
 source "$qqX_MainFolder/qqX_Initialize"
 
-if [[ -e "$Q_Mod_SettingsFile" ]]; then
+source "$qqX_MainFolder/qqX_read_main_settings"
 
-  # shellcheck disable=SC1090
-    
-  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
-
-else
-
-  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 
-  
-fi
-
-
-# INDIVIDUAL SETTINGS:
-
-custom_conf_notes () {
-
-  printColor "\n\n  qqX .conf reminders:"
-
-  printf "
-  
-    #!/usr/bin/qqX --vm                (for qqX direct start)
-
-    Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
-    HeadlessDisplay=\"true\"
-
-    SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"
-    SharedDrive_Conf=\"no-shared\"
-    MacLegacyDrive=\"true\"
-
-    Other:
-    disk_size=\"xxG\"   (integer, used once, for first build)
-    cpu_cores=\"x\"     (even integer)
-    ram=\"xG\"          (integer)
-
-    boot=\"legacy\"     (use bios, not UEFI)
-
-    Windows:
-    tpm=\"on\"          secureboot=\"off\"
-    gl=\"off\"          (scaleable SDL, easier restarts) (?)
-
-    Difficult booting: 
-    boot=\"legacy\"  &  gl=\"off\"  may help ...
-
-    highlight then shift-ctrl-c  to copy ...
-  \n"
-
-}
-
-
-
-# Intepret the settings:
-
-function_xdg_start_folder () {
-
-  #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
-  #  Also can be called (belt & braces) at the other command line $1 trap towards end of script ...  REVIEW 
-
-  if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
-
-    cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found " 
-
-    CurrentFolder="$Default_VM_Folder"
-
-  else
-
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
-
-    CurrentFolder="$HOME"
-
-  fi
-
-}
-
-
-[[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
-
-
-if [[ $XDG_QcowRightClick ]]; then
-
-  XDG_QcowRightClick_Conf_Dir="$(dirname "$1")"
-  XDG_QcowRightClick_DiskName="$(basename "$1")"
-  XDG_QcowRightClick_VM_Dir_Name="$(basename "$XDG_QcowRightClick_Conf_Dir")"
-
-  # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
-
-  cd "$XDG_QcowRightClick_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
-
-  cd ..  || printf "\n\n XDG .desktop starter  >  Disk's root Folder not found " 
-
-  CurrentFolder="$XDG_QcowRightClick_Conf_Dir"
-
-fi
-
-
-# Create a list of preset VM locations 
-
-function_create_VM_folderList() {
-
-  DefaultFolderError=
-  ExtraFolderError=
-
-  # Make sure that 'Default_VM_Folder' has a value and it exists
-
-  [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
-
-  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
-
-  
-  # set and clear the folder array, current first but don't scan twice
-
-  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
- 
-    declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
-
-  else
-
-    declare -ga VM_Folder_List=("$Default_VM_Folder")
-
-  fi
-
-  # shellcheck disable=SC2154
-
-  for xF in "${Extra_VM_Folder[@]}"; do
-
-    [[ $xF ]] && VM_Folder_List+=("$xF")
-
-    if [[ $xF ]] &&  [[ ! -d "$xF" ]] ; then 
-
-      # if .conf targeted start, then no need to print this, 
-      # unless re-selecting, in which case the error flag will create a later highlight.
-    
-      if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
-
-      ExtraFolderError=1
-
-    fi
-
-  done
-
-}
-
-# Now populate the list: 
-function_create_VM_folderList
-
-# Record any set ExtraArgs in case of need to reset
-ExtraSetArgs="$ExtraArgs"
-
-#  Add default values, if none supplied
-[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="6"
-P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
-
-#  Check custom QE & QG, plus set the 'quickget' version
-[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
-[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
-QE_FilePathDefault="$(type -p quickemu)"
-QG_FilePathDefault="$(type -p quickget)"
-
-# Set up any quickemu variables needed for .conf file analysis
-disk_img=
-img=
-iso=
-
-function quickget {
-
-  # finds the right version for the standard 'quickget' call 
-  # which is only used in simple API wrapping mode, for now ...
-  # quick*emu* is later and is more complex
-
-  if [[ $QG_Version ]]; then  
-  
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
-    else  eval command "$QG_Version" " $*" ; fi
-
-  else 
-
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
-    else eval command quickget " $*" ; fi
-
-  fi
-  
-}
-
-
-##  Check for 'curl' and 'aria2' etc  ( where $1, is if command line )
-
-if [[ ! $(type -p curl) ]] ; then
-  echo
-  echo "  You need to install 'curl' to run parts of the quickget script ..."
-  echo
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
-fi
-
-if [[ ! $(type -p aria2c) ]]; then
-  echo
-  echo "  You need to install 'aria2' to run parts of the quickget script ..."
-  echo
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
-fi
-
-if [[ ! $(type -p zsync) ]]; then
-  echo
-  echo "  You need to install 'zsync' to run parts of the quickget script ..."
-  echo
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
-fi
-
-
-function find_xdg_settings()  {
-
-  ## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
-
-  if [[ $FileManager == "no" ]]; then FileManager=
-
-  else
-
-    [[ $FileManager ]] && [[ ! $(type -p "$FileManager") ]] && FileManager=
-
-    if [[ ! $FileManager ]] ; then
-
-      if [[ $(xdg-mime query default inode/directory) ]] ; then  FileManager="xdg-open"
-      elif [[ $(type -p caja) ]] ; then  FileManager="caja"
-      elif [[ $(type -p nautilus) ]] ; then  FileManager="nautilus"
-      elif [[ $(type -p dolphin) ]] ; then  FileManager="dolphin"
-      elif [[ $(type -p pcmanfm) ]] ; then  FileManager="pcmanfm"
-      else FileManager=
-
-      fi
-
-    fi
-  fi
-
-  if [[ $WebBrowser == "no" ]]; then WebBrowser=
-
-  else
-
-    [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
-
-    if [[ ! $WebBrowser ]]; then
-
-      if [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
-      elif [[ $(type -p firefox) ]] ; then  WebBrowser="firefox"
-      elif [[ $(type -p 'google-chrome') ]] ; then  WebBrowser="google-chrome"
-      elif [[ $(type -p falkon) ]] ; then  WebBrowser="falkon"
-      else WebBrowser=
-
-      fi
-
-    fi
-
-  fi
-
-  printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
-
-}
-
-# Also needs calling if re-loading the settings file  See refresh_sources_and_reload_VM_arrays
-find_xdg_settings
 
 
 ##  START of new functions that may be used by the menu system (or by Mod API)
@@ -2759,6 +2507,41 @@ function_quick_get_wrap ()  {
 ##  END of ADD-IN of ORIGINAL QUICKEMU and setting up the QUICKGET wrapper.  START MENU FUNCTIONS:
 
 
+custom_conf_notes () {
+
+  printColor "\n\n  qqX .conf reminders:"
+
+  printf "
+  
+    #!/usr/bin/qqX --vm                (for qqX direct start)
+
+    Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
+    HeadlessDisplay=\"true\"
+
+    SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"
+    SharedDrive_Conf=\"no-shared\"
+    MacLegacyDrive=\"true\"
+
+    Other:
+    disk_size=\"xxG\"   (integer, used once, for first build)
+    cpu_cores=\"x\"     (even integer)
+    ram=\"xG\"          (integer)
+
+    boot=\"legacy\"     (use bios, not UEFI)
+
+    Windows:
+    tpm=\"on\"          secureboot=\"off\"
+    gl=\"off\"          (scaleable SDL, easier restarts) (?)
+
+    Difficult booting: 
+    boot=\"legacy\"  &  gl=\"off\"  may help ...
+
+    highlight then shift-ctrl-c  to copy ...
+  \n"
+
+}
+
+
 function_conf_error () {
 
   ErrorMenuSelect=
@@ -4597,7 +4380,7 @@ refresh_sources_and_reload_VM_arrays() {
   refresh_and_load_main_sources
   quickget filepath
 
-  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdg_settings
+  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdgopen_settings
 
   function_create_VM_folderList  
   function_scan_VM_folderList  
