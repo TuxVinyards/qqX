@@ -132,127 +132,52 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  However & specifically, echo within the main section of the actual qqX script *must* be avoided
 #  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
 
-## SHELLCHECK: make use of this & avoid disables where possible.  The VS Code shellcheck extension works well, if set to check-on-save.
+# SHELLCHECK: make use of this & avoid disables where possible.  The VS Code shellcheck extension works well, if set to check-on-save.
 
+
+## Find where the main code is. Use local for Dev or Custom installs. Otherwise use FHS standard locations.
+
+if [[ -d "qqX.main" ]]; then qqX_MainFolder="$(realpath "qqX.main")"
+
+elif [[ -d "/usr/share/qqX/qqX.main" ]]; then qqX_MainFolder="/usr/share/qqX/qqX.main"
+
+else  echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1
+
+fi
 
 
 ## INITIALIZE
 
-#  Make sure shell is set during session to decimal separator of dot 
+# ARRAYS & VARS
 
-#  If LC_ALL=C changes too much, just set the numeric.  
-#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+# Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
+declare -gA VM_Array=()
+declare -ga Extra_VM_Folder=()
+declare -ga QemuError_VM_Filter=()
 
-#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
-#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
-#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+# Clear or set any default variables, if needed.
+VM_ExecBoot=
+Extra_QE_Params=
+VM_Select_ItemsPerLine="4"
 
-if [[ $AllowMoreLocale ]]; then
-
-  export "LC_NUMERIC=C"
-  export "LC_COLLATE=C"
-
-else  export "LC_ALL=C"
-
-fi
+# Set .conf settings record from any previous session but not normally clear it until multi-instance issues have been approved
+ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
+[[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
 
 
-if  [[ $NoClear ]]; then 
+# LOAD SETTINGS & Array PRESETS  
 
-	printf () {
+source "$qqX_MainFolder/qqX_Initialize"
 
-		# shellcheck disable=SC2199
-		# checks for occurence of the clearing pattern within the parameter text, treating the text as a single string
+if [[ -e "$Q_Mod_SettingsFile" ]]; then
 
-		if [[ "$@" ==  '\033c'* ]]; then
-
-			# shellcheck disable=SC2124
-			# see http://www.tldp.org/LDP/abs/html/internalvariables.html#APPREF
-			# and http://mywiki.wooledge.org/BashGuide/Parameters#Special_Parameters_and_Variables
-
-			PFtext="$@"
-			PFtext=${PFtext//'\033c'/}			# remove all escape clears from the printf instruction
-      command echo
-      command echo "  ***************************************************************************"
-      sleep "$NoClear"
-			command printf "$PFtext"
-    else
-
-      # let all other printf commands through
-      command printf "$@"
-
-    fi
-
-	}
-
-fi
-
-
-if ! tput -V | grep -q ncurses 2> /dev/null; then
-  printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
-  sleep 5
-  exit 1
-fi
-
-if [[ ! -d "/tmp" ]]; then
-  printf "\n\n  Check for your OS >  \n\n  A directory '/tmp' should be present. A symbolic link may be needed. "
-  printf "\n\n  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard"
-  sleep 5
-  exit 1
-fi
-
-
-if [[ $1 == "XDG" ]]; then 
-
-  # set flags & deal with details after the setting up is done
-
-  if [[ -e "$2" ]]; then
-
-    XDG_MimeType="$(mimetype "$2" 2>/dev/null)"
-   
-    if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_Valid=1
-
-    else XDG_MimeType_Valid=  ; fi
-
-  fi
-
-  if [[ $XDG_MimeType_Valid ]]; then
-
-    # is a right-click start on a qcow2 disk (set flag for later) 
-    XDG_QcowRightClick=1
-    shift
+  # shellcheck disable=SC1090
     
-  elif [[ $2 ]]; then
+  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
 
-    # is right click XDG but at this stage needs flagging for later analysis or other type of handling
-    XDG_StartVariant=1
-    shift
+else
 
-  else
-
-    shift
-    # set to $HOME folder and flag to run the VM selector
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
-    CurrentFolder="$HOME"
-    XDG_GeneralDesktopStart=1
-
-  fi
-
-
-elif [[ $ModName_qqX ]] && [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$ModVersion" ; exit 
-
-
-elif [[ ! $ModName_qqX ]] && [[ "$1" == *'vm' ]]; then  
-
-  # quickemu-wrap only  &  where test [[ $Conf_TriggerFolder ]] will also flag up if the script was .conf target started
-
-  Conf_TriggerFolder="$(dirname "$0")"
-  
-  CurrentFolder="$(dirname "$2")"
-
-else 
-
-  CurrentFolder="$(pwd)"
+  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 
   
 fi
 
@@ -293,88 +218,6 @@ custom_conf_notes () {
 
 }
 
-
-#  Pick up the SETTINGS file:  If placing the main file in /usr/bin,"
-#  then place the settings file as "/$HOME/.qmod_settings, OR if qqX in "/$HOME/.qqX/qqX_settings"
-
-#  For details, see notes at start of the settings file ...
-
-#  Use full quoted path & name if adding in a additional folder to this script or different to these defaults
-#  For .conf click starts, the Positional parameters need reading to check the settings file location;
-#  this would be expected to be where the specified wrap script is located as a first check
-
-
-if [[ $ModName_qqX ]]; then SettingsName="qqX_settings"
-
-else SettingsName="qmod_settings" ; fi
-
-
-if [[ $ModName_qqX ]]; then 
-
-  [[ -e "$HOME/.qqX/qqX_settings" ]] && Q_Mod_SettingsFile="$HOME/.qqX/qqX_settings"
-
-#
-
-elif [[ $Conf_TriggerFolder ]] && [[ -e "$Conf_TriggerFolder/${SettingsName}" ]]; then  
-
-  Q_Mod_SettingsFile="$Conf_TriggerFolder/${SettingsName}"
-
-#
-
-elif [[ -e "$CurrentFolder/${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  Q_Mod_SettingsFile="$CurrentFolder/${SettingsName}"
-
-elif [[ -e "$CurrentFolder/.${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  Q_Mod_SettingsFile="$CurrentFolder/.${SettingsName}"
-
-#  
-
-elif [[ -e "$HOME/.qmod_settings" ]] && [[ ! $ModName_qqX ]] ; then  
-
-  Q_Mod_SettingsFile="$HOME/.qmod_settings"
-
-elif [[ -e "$HOME/qmod_settings" ]] && [[ ! $ModName_qqX ]] ; then 
-
-  Q_Mod_SettingsFile="$HOME/qmod_settings"
-
-else  
-
-  Q_Mod_SettingsFile=  
-
-  echo; echo "  No settings file found .... " ; echo ; sleep 2
-  
-fi
-
-# Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
-declare -gA VM_Array=()
-declare -ga Extra_VM_Folder=()
-declare -ga QemuError_VM_Filter=()
-
-# Clear or set any default variables, if needed.
-VM_ExecBoot=
-Extra_QE_Params=
-VM_Select_ItemsPerLine="4"
-
-# Set .conf settings record from any previous session but not normally clear it until multi-instance issues have been approved
-ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
-[[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
-
-
-# LOAD SETTINGS & Array PRESETS  
-
-if [[ -e "$Q_Mod_SettingsFile" ]]; then
-
-  # shellcheck disable=SC1090
-    
-  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
-
-else
-
-  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 
-  
-fi
 
 
 # Intepret the settings:
