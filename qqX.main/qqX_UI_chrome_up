@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+# https://www.shellcheck.net/wiki/SC1090  SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
+#  GENERAL COLOR & THEMING   (see settings)
+
+[[ ! $X_Shade ]] &&  X_Shade="3"
+
+#  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1
+
+#  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+
+#  https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x405.html
+
+#  if source without declared shade, set default shade
+
+[[ ! $X_Shade ]]  && X_Shade=3
+
+
+echColor () {
+
+	# for X_Shade see qqX configs
+
+  # deprecated > use printColor 
+
+	if [[ $2 ]] ; then
+
+		if [[ "$1" == "-n" ]] ; then
+			tput setaf "$X_Shade"
+			echo -n "$2"
+			tput sgr0
+		else
+			tput setaf "$X_Shade"
+			echo "$@"          			
+			tput sgr0
+		fi
+
+	else
+		tput setaf "$X_Shade"
+		echo "$1"
+		tput sgr0
+	fi
+
+}
+
+
+# non-color echo trap, mainly designed to capture the technical output that quickemu doesn't send to log file
+
+printf "\n"  > "/tmp/qqX_echo_output.log"
+
+#
+
+echo () { command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; }
+
+
+
+printColor () {
+
+	tput setaf "$X_Shade"
+
+	# shellcheck disable=SC2059
+
+	printf "$@"
+
+	tput sgr0
+
+}
+
+
+
+## General default title:
+
+qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $ModVersion "
+
+
+## qqX chrome up  ( runs if ModName == qqX [or qqx] )
+
+
+function_qqX_logo() {
+  
+  # deprecated
+
+  echColor "  _    _   \/   "
+  echColor " (_|  (_|  /\ "
+  echColor "   |.   |.    "
+}
+
+
+function_qqX_printf_logo() {
+
+  # printf version (no end line feed)
+
+  printColor "  _    _   \/   "
+  printColor " (_|  (_|  /\ "
+  printColor "   |.   |.    "
+}
+
+
+# Variant on   http://www.figlet.org/  -f mini  (-k)   (c)  Alex Genovese
+
+
+function_qqX_logo_title() {
+
+  # deprecated
+
+  if [[ $1 ]]; then
+
+    qqX_LogoTxt="$1"
+
+  else
+
+    qqX_LogoTxt="$qqX_title"
+
+  fi
+
+  echColor "  _    _   \/   "
+  echColor " (_|  (_|  /\ "
+  echColor "   |.   |.     $qqX_LogoTxt"
+
+}
+
+function_qqX_printf_logo_title() {
+
+  # printf version (no end line feed & also avoids the quickemu echo trap)
+
+  if [[ $1 ]]; then
+
+    qqX_LogoTxt="$1"
+
+  else
+
+    qqX_LogoTxt="$qqX_title"
+
+  fi
+
+  printColor "\n  _    _   \/   "
+  printColor "\n (_|  (_|  /\ "
+  printColor "\n   |.   |.     %s"  "$qqX_LogoTxt"
+
+}
+
+
+show_wrap_CLI_usage () {
+
+  printColor  "\n  Command line Usage %s:  \n\n"    "$ModName"
+
+  printf     "  Either plain %s  or  with parameters  --vm  [path/to/vms-folder/]vm-name.conf   " "$ModName"    
+
+  printf     "\n\n  Scripts not located in /usr/bin should be in the VMs folder or a path should be supplied. "
+
+  printf     "\n\n  Start non /usr/bin with './' eg:  ./%s "  "$ModName" 
+
+  printf     "\n\n  Or by clicking on an edited .conf file:"
+
+  printf     "\n\n  Edit the first line of the .conf to point to %s instead of quickemu"  "$ModName" 
+
+  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/%s --vm  or similar (VM name not needed)" "$ModName" 
+
+  printf     "\n\n  For more complex CLI usage, try the alternative 'q-mod' script or quickemu itself."
+  
+  printf     "\n\n  @ 2023/08 qqX will now issue short version numbers on 'qqX --version' "
+
+  #printf     "\n\n"
+
+}
+
+
+function exit {
+
+  # trap to keep terminal open if started by mouse click  -t secs
+
+  # or to stop sourced quickemu quitting as 'normal' procedure   (tput resets any hidden cursors)
+
+  if [[ $1 == "directly" ]]; then
+
+    tput cnorm
+
+    command exit
+
+  elif [[ $1 ]] && [[ ! $NoExit ]]; then
+
+    printf "\n\n"
+
+    printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n\n"
+  
+    read -rp  "  >  "  -t 30  ExitTrap
+
+    [[ $ExitTrap == "h" ]] &&  printf "\n\n  Holding terminal open  [Enter] to quit  \n\n"  && read -rp "  >  "
+
+    tput cnorm
+
+    # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
+
+    command exit "$@"
+
+  fi
+
+  # zero the optional 'exit 1' bypass flag (if it has been set)
+
+  NoExit=
+
+}
+

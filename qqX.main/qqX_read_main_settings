@@ -195,3 +195,76 @@ function quickget {
   
 }
 
+
+## Analyse Current Version  (Latest version is carried out in the updater function)
+
+IFS='.' read -ra qqX_CurrentVer_Arr <<< "$ModVersion"
+
+# qqX_CurrentVer_Arr[0] remains unpadded  (& to the left of the decimal point)
+
+[[ ${#qqX_CurrentVer_Arr[1]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[1] "%.2d" "${qqX_CurrentVer_Arr[1]}"
+
+[[ ${#qqX_CurrentVer_Arr[2]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[2] "%.2d" "${qqX_CurrentVer_Arr[2]}"
+
+#legacy 3dp pre "0.09.00.017"
+
+[[ ${#qqX_CurrentVer_Arr[3]} -gt 2 ]] && qqX_CurrentVer_Arr[3]="${qqX_CurrentVer_Arr[3]:(-2)}"
+
+[[ ${#qqX_CurrentVer_Arr[3]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[3] "%.2d" "${qqX_CurrentVer_Arr[3]}"
+
+qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
+
+if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then 
+
+  qqX_CurrentReleaseType="beta"
+
+else qqX_CurrentReleaseType="release"
+
+fi
+
+
+# Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
+
+# Sets defaults, if not given in main settings. But also for later, so systems can be swapped out.
+
+[[ ! $QEMU_Default_SystemType ]] &&  QEMU_Default_SystemType="qemu-system-x86_64"
+
+[[ ! $QEMU_Default_MachineType ]] &&  QEMU_Default_MachineType="q35"
+
+QEMU="$(type -p "$QEMU_Default_SystemType")"
+
+QEMU_IMG="$(type -p qemu-img)"
+   
+
+function qemu_version_check {
+
+  if [[ ! $QEMU ]] || [[ ! $QEMU_IMG ]]; then
+
+    printColor "\n\n QEMU not found. Check installations of qemu and qemu-img"
+    printf "\n\n If using the quickemu packaging this should normally have been installed.\n\n"
+    sleep 1
+    return
+
+  fi
+
+  QEMU_VER_LONG=$( "$QEMU" -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 )
+
+  QEMU_VER_SHORT="${QEMU_VER_LONG//./}"
+
+  QEMU_VER_SHORT="${QEMU_VER_SHORT:0:2}"
+
+  if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="61"
+
+  elif [[ $QEMU_VER_SHORT -lt 60 ]]; then
+
+    printf "\n\n QEMU 6.0.0 or newer is required. Current version is: %s"  "$QEMU_VER_LONG"
+    printf "\n\n Use overide in main settings to handle future errors from changes to Qemu numbering format\n\n"
+    sleep 1
+
+  fi
+
+}
+
+qemu_version_check
+
+
