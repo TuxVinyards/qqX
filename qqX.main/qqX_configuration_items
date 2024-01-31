@@ -1,0 +1,939 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
+
+custom_conf_notes () {
+
+  printColor "\n\n  qqX .conf reminders:"
+
+  printf "
+  
+    #!/usr/bin/qqX --vm                (for qqX direct start)
+
+    Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
+    HeadlessDisplay=\"true\"
+
+    SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"
+    SharedDrive_Conf=\"no-shared\"
+    MacLegacyDrive=\"true\"
+
+    Other:
+    disk_size=\"xxG\"   (integer, used once, for first build)
+    cpu_cores=\"x\"     (even integer)
+    ram=\"xG\"          (integer)
+
+    boot=\"legacy\"     (use bios, not UEFI)
+
+    Windows:
+    tpm=\"on\"          secureboot=\"off\"
+    gl=\"off\"          (scaleable SDL, easier restarts) (?)
+
+    Difficult booting: 
+    boot=\"legacy\"  &  gl=\"off\"  may help ...
+
+    highlight then shift-ctrl-c  to copy ...
+  \n"
+
+}
+
+function check_screen_percentage_and_output {
+
+  SDL_ScreenPercent=
+  SDL_ScrnPcnt_Cmd=
+  HeadlessCmd=
+  
+  # function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
+
+  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
+
+  else
+
+    if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off"
+    else qqX_GL_Mode="on" 
+    fi
+
+  fi
+
+
+  [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
+
+  [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
+
+  if [[ $SDL_ScreenPercent ]]; then 
+  
+    SDL_ScrnPcnt_Error=
+    SDL_ScreenPercent="$(tr -cd "[:digit:]" <<< "$SDL_ScreenPercent")"
+
+    if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
+
+      if grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then   SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
+
+      else
+        printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
+        SDL_ScrnPcnt_Error="> not possible with this qe-version"
+      fi
+
+    else
+      printColor "\n\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
+      SDL_ScrnPcnt_Error="Out of Range"
+    fi
+
+  fi
+
+  [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
+
+  [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
+
+}  
+
+
+
+
+function set_drive_paths {
+
+  #  For a SECOND/SHARED DRIVE (thanks @gnudoc on the quickemu Discord channel)  do "qemu-img create -f qcow2 disk2.qcow2 40G"  or as required
+  #  Set  ExtraArgs=" -device virtio-blk-pci,drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=/vm_folder/disk2.qcow2"  
+  #  Edit path & boot a VM.  Use 'Disks'  Gparted or similar to find, format and mount.  
+  #  The function needs to be run everytime a different VM is selected to allow for individual VM settings or requirements.
+
+  #  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
+  #  Any OS older than and including 10.13 Mojave 2018 should have a flag in the .conf file > MacLegacyDrive="true"
+  #  See https://en.wikipedia.org/wiki/MacOS_version_history
+
+
+  #  SECOND DRIVE and .conf file
+  #  Drive path to be individually set in the .conf file on a per VM basis.   
+
+  SecondDrive=
+  SharedDrive=
+  DriveLocationError=
+  SharedDrive_Conf=
+  SecondDriveArgs=
+  SharedDriveArgs=
+  MacLegacyDrive=
+
+  if [[ $VM_Conf_File ]]; then
+
+    eval "$(grep -s MacLegacyDrive "$VM_Conf_File")"     #  TODO   eval grep not needed post 1.5
+
+    if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2" 
+          
+    else BusType="virtio-blk-pci"; fi
+
+    #  SECOND DRIVE 
+    #  Drive path to be individually set in the .conf file on a per VM basis.  
+
+    eval "$(grep -s SecondDrive "$VM_Conf_File")"
+
+    if [[ -e "$SecondDrive" ]]; then
+
+      SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"  
+
+    elif [[ $SecondDrive ]]; then 
+
+      # whilst the conf entry exists the above test didn't find it
+      DriveLocationError="ERROR SecondDrive NOT found (.conf file)"
+
+    fi
+
+  fi
+
+  #  SHARED DRIVE
+  #  This drive should be availble to all VMs and act as a shared resource.  See main settings.
+
+  if [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
+
+      eval "$(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' )"
+
+  fi
+
+  if [[ $SharedDrive ]]; then 
+
+    eval "$(grep -s SharedDrive_Conf "$VM_Conf_File")"
+
+    if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then 
+
+      SharedDrive=
+      SharedDriveArgs=
+
+    elif [[ -e "$SharedDrive" ]]; then
+
+      [[ ! $BusType ]] && BusType="virtio-blk-pci"
+
+      SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
+
+    elif [[ $SharedDrive ]]; then 
+
+      DriveLocationError="ERROR SharedDrive NOT found (main settings)"
+
+    fi
+
+  fi
+
+}  
+
+#  MAIN DRIVE & BOOT
+# 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
+#  everytime a different VM is selected or the .conf file is reconfigured
+#  Quickemu uses 'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
+
+function find_main_drive_and_img_iso {
+
+  MainDrive=
+  IsoImg=
+
+  [[ -e "$disk_img" ]] && MainDrive="$disk_img"
+  [[ -e "$img" ]] && IsoImg="$img"
+  [[ -e "$iso" ]] && IsoImg="$iso"
+
+}  
+
+
+function_conf_error () {
+
+  ErrorMenuSelect=
+
+  NewSetupFlag=
+
+  # clear any accidental initial double pressing of the enter key occuring while experiencing the error
+
+  read -r -t 0.1  
+  read -r -t 0.1  
+  read -r -t 0.1  
+  read -r -t 0.1	
+  read -r -t 0.1  
+  read -r -t 0.1 	
+
+
+  if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
+
+
+  printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
+
+  if [[ $1 ]] ; then printf "\n\n  Check %s settings, location & content ... "  "$1"
+
+  else printf "\n\n  Check the settings and re-run this script ... " ; fi
+
+
+  printf "\n\n  Settings file:  %s \n\n" "$Q_Mod_SettingsFile"
+
+  
+  if [[ "$1" == *'COMMAND'* ]]; then 
+  
+    printColor "\n\n  [q] to quit "
+
+    printf "  [enter] to view/edit settings file \n\n"
+
+
+  elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
+
+    printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
+
+    cat "$VM_Conf_File"
+
+    NewSetupFlag=1
+
+    printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
+    
+    printColor "\n\n  [c] continue  (with current settings) looks okay "
+
+    printf "\\n\n  [e] to edit %s general settings   [q] to quit \n\n"   "$ModName"
+
+    
+  elif [[ $1 == "folder" ]] ; then 
+
+    FolderConfigFlag=1
+
+    printf "\n  Folder config ERROR: "
+
+    printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
+    
+    printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
+
+    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit %s general settings " "$ModName"
+    
+    printf "\n\n  [q] to quit \n\n"   
+    
+  else   
+  
+    printColor "\n\n  [Enter] to edit %s general settings"  "$ModName" 
+
+    [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
+
+    printColor "  [q] to quit \n\n"  
+
+  fi   
+
+  read -rp "  >  "   ErrorMenuSelect
+
+  if [[ $ErrorMenuSelect == "q" ]]; then 
+  
+    printf "\n\n"; command exit 
+
+  elif [[ $ErrorMenuSelect == "tune" ]]; then 
+  
+    function_config_tune_up  "$VM_Conf_File" "$VM_InstanceName" 
+
+  elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
+  
+    SelectArrayError=
+    IgnoreFolderCheck=1
+
+    if [[ $ErrorMenuSelect == "c" ]]; then  true
+
+    elif [[ $ErrorMenuSelect == "e" ]]; then 
+
+      if [[ $NewSetupFlag || $FolderConfigFlag ]]; then qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
+
+    elif [[ $ErrorMenuSelect == "gt" ]]; then 
+
+      VM_Selection=
+      function_quick_get_wrap 
+      return
+
+    fi
+ 
+  else  
+  
+    if [[ $NewSetupFlag || $FolderConfigFlag ]]; then 
+
+      NewSetupFlag=
+      FolderConfigFlag=
+      qqX_edit_settings  "conf" 
+      
+    else  qqX_edit_settings
+    
+    fi
+    
+  fi
+
+}
+
+
+qqX_edit_settings() {
+
+  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && TextEditor=
+
+  if [[ ! $TextEditor ]]; then
+  
+    DefaultTextEditor="$(xdg-mime query default text/plain)"
+
+    EditorTest="${DefaultTextEditor/.desktop/}"
+
+    EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
+
+    if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
+
+    elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
+
+    elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
+
+    elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
+
+    elif [[ $(type -p nano) ]] ; then   TextEditor="nano"
+
+    fi
+
+  fi
+
+  if [[ ! $(type -p "$TextEditor") ]]; then 
+
+    printColor "\n\n  Unable to open settings.  Default or basic text editor not found."
+
+    printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
+
+    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
+
+    read -rp "  >  "
+
+  else
+
+    # Run the editor: 
+
+    if [[ $1 == "conf" ]]; then
+
+      printf "\n\n"
+      cat "$VM_Conf_Dir/$VM_Conf_File"
+
+      while true ; do
+
+        printColor "\n\n  [enter] to edit   [r] config reminder notes   [b] go back"
+        printf "\n\n"
+
+        read -rp "  >  "   ConfEdit_Select
+
+        if [[ $ConfEdit_Select == "r" ]] ; then    custom_conf_notes
+
+        elif [[ $ConfEdit_Select == "b" ]] ; then  break
+
+        else
+
+          nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
+          ConfSettingsAdjusted=1
+          refresh_conf_vars_and_values
+          break
+
+        fi
+
+      done
+      
+    elif [[ $1 == "tune-up" ]]; then
+
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 
+      ConfSettingsAdjusted=1
+      refresh_conf_vars_and_values
+
+    else 
+
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$Q_Mod_SettingsFile"  
+      SettingsFileAdjusted=1
+      VM_Conf_Dir=
+      if [[ $VM_InstanceName ]]; then  VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect to Re-Initialize"
+      else VM_InstanceName="Initializing Settings Updated  >>  Make a Selection" ; fi
+      refresh_sources_and_reload_VM_arrays
+
+    fi
+
+    # Note, app opening commands can throw a complaint if 'xapps' has not not been installed.
+    # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
+
+    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of gtk2 and gtk3 etc ....  
+    #  As from 'WebBrowser' section and handling of firefox etc
+
+    # NB  don't set to run the editor in the background, as the web browser does, as qqX needs to take the new settings 
+
+  fi
+
+}
+
+
+function_config_tune_up ()  {
+
+  # $1 should be the full path/filename.conf
+  # &  $2 the VM Folder name
+
+  TuneUpTargetFile="$1" 
+  TuneUpDistroFolder="$2"
+  TuneUpDate="$(date +%b%d.%H.%M)"
+
+  if [[ ! -e $TuneUpTargetFile ]]; then 
+    printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
+    sleep 100
+  fi
+
+  if [[ ! -d $TuneUpDistroFolder ]]; then 
+    printColor "\n\n  Internal ERROR  tune up DistroFolder not found \n\n  %s \n\n"
+    sleep 100
+  fi
+
+  TuneUpOldFile="$TuneUpDistroFolder/OldConfig.$TuneUpDate.conf"
+
+  cp "$TuneUpTargetFile"  "$TuneUpOldFile"
+
+  TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
+  TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
+
+  cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+
+  printColor "\n\n\n  CHECK ME: \n\n"
+
+  cat "$TuneUpTmpCopy"
+
+  printColor "\n  All changes made here, may be reversed:"
+    
+  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
+  
+  [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
+
+  # check starter
+
+  ConfLine="$(grep '#!/usr/bin' "$TuneUpTmpCopy")"
+
+  ConfPointer="${ConfLine/"#!/usr/bin/"/}"
+  ConfPointer="${ConfPointer/"--vm"/}"
+  ConfPointer="${ConfPointer// /}"
+
+  if [[ ! $ConfLine ]]; then 
+
+    # some kind of line is needed
+
+    printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft" 
+
+  elif [[ $ConfPointer != "$ModName" ]]; then
+
+    printColor "\n\n  The start line may be edited to point to %s"  "$ModName"
+
+    ConfEdit_Qstart=
+
+    printf "\n\n  Change the start line to point to %s ?"  "$ModName"
+
+    printf "\n\n  [enter] yes, go for it    [no] maybe not ...  [q] quit tune-up \n\n"
+
+    read -rp "  >  "  ConfEdit_Qstart
+
+    [[ $ConfEdit_Qstart == "q" ]] && return
+
+    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft" 
+
+    else printf "%s\n" "$ConfLine" > "$TuneUpTargetDraft" 
+
+    fi
+
+  else
+
+    printf "%s\n\n" "$ConfLine" > "$TuneUpTargetDraft"
+
+  fi
+
+
+  # disk size  (for existing installs use the 'disk' util)
+
+  ConfLine="$(grep -s 'disk_size' "$TuneUpTmpCopy")"
+
+  if [[ $NewFileTuneUp ]]; then
+
+    ConfEdit_DiskSize=
+
+    printColor "\n\n  Suggest adding disk_size=\"64G\" or higher if expecting to create snapshots: " 
+
+    printf "\n\n  qcow2 disks auto-compress & will normally occupy much less space"
+    
+    printColor "\n\n  & an empty disk only takes up 196k."
+    
+    printf "\n\n  It is easier make them larger now than to resize later ... " 
+
+    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   [no] leave as possibly sub-minimal  [q] quit tune-up "  
+
+    printf "\n\n"
+
+    read -rp  "  >  "  ConfEdit_DiskSize
+
+    [[ $ConfEdit_DiskSize == "q" ]] && return
+
+    [[ ! $ConfEdit_DiskSize ]]  && ConfEdit_DiskSize="128"
+
+    [[ $ConfEdit_DiskSize ]]  &&  ConfEdit_DiskSize="$(tr -cd "[:digit:]" <<< "$ConfEdit_DiskSize")"
+
+    if [[ $ConfEdit_DiskSize ]]; then 
+    
+      printf "disk_size=\"%sG\"\n"  "$ConfEdit_DiskSize"  >> "$TuneUpTargetDraft"
+
+    fi
+
+  else
+
+    [[ $ConfLine ]] && printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+
+  fi
+
+
+  # add cores menu  (using code from ffX project ...)
+
+  if [[ $(type -p lscpu) ]]; then
+
+    CoresAvail=$(lscpu | grep "Core(s) per socket:" | tr -cd "[:digit:]")
+
+    SocketsAvail=$(lscpu | grep "Socket(s):" | tr -cd "[:digit:]")   #  REVIEW  for dual cpu mobo (untested)
+
+    CoresAvail=$((SocketsAvail*CoresAvail))
+
+    # CoresAvail=2
+
+    ThreadsPerCoreAvail=$(lscpu | grep "Thread(s) per core:" | tr -cd "[:digit:]")      #  REVIEW  
+
+    ThreadsAvailable=$((ThreadsPerCoreAvail*CoresAvail))
+
+    ThreadsSuggested=$(bc <<< "scale=0; ((($ThreadsAvailable*3)/4)+0.5)/1" 2>/dev/null)
+
+    #  Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
+
+    [[ "$(( ThreadsSuggested % 2 ))" == "1" ]] && (( ThreadsSuggested +=1 ))
+
+    ThreadsSuggestLower=$(bc <<< "scale=0; ((($ThreadsAvailable*2)/3)+0.5)/1" 2>/dev/null)
+
+    [[ "$(( ThreadsSuggestLower % 2 ))" == "1" ]] && (( ThreadsSuggestLower +=1 ))
+
+  fi
+
+
+  [[ $ThreadsAvailable ]] && printColor "\n\n  You have %s 'cores' available  (actual cores, or cores x threads) " "$ThreadsAvailable"
+ 
+  printf "\n\n  Normal guest setting should be around 2/3 to 3/4 of the host's."
+  
+  printf "\n\n  All available 'cores x threads' can be allocated, esp. if running the VM full screen"
+
+  printf "\n\n  Possibly, if using 'big LITTLE'  CPU's you *may* need to use a lower figure."   
+
+  printf "\n\n  Quickemu defaults to safe half, minimals. Be generous as less will actually be used."
+  
+  # printf "\n\n  Remember, this is the 'maximum-allowed' number"
+  
+  printf "\n\n  And CPU virtualizing units will always protect the host ...."
+
+  [[ $ThreadsSuggested ]] && printColor "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
+
+
+  CoresSetNumber=
+  
+  ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
+
+  if [[ $ConfLine ]]; then 
+  
+    printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
+
+    CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
+ 
+    [[ $CurrentCores != "$ThreadsSuggestLower"  ]] && printColor "   [c] to use current  "
+
+  fi
+
+  if [[ $ThreadsSuggestLower ]]; then printColor "\n\n  [enter] use %s " "$ThreadsSuggestLower"; else  printf "\n\n" ; fi
+
+  printColor "  [integer] choose (even numbers are usual)  "
+  
+  printColor "[d] use quickemu defaults   [q] quit tune-up \n\n"  
+
+  read -rp  "  >  "  CoresSetNumber
+
+  [[ $CoresSetNumber == "q" ]] && return
+
+  if [[ $CoresSetNumber && $(tr -cd "[:digit:]" <<< "$CoresSetNumber") ]]; then
+
+    printf "cpu_cores=\"%s\"\n"  "$CoresSetNumber"  >> "$TuneUpTargetDraft"
+
+  elif [[ $CoresSetNumber == "c" ]]; then  printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+
+  elif [[ $CoresSetNumber == "d" ]]; then  true 
+
+  else
+
+    if [[ $ThreadsSuggestLower ]]; then  
+    
+      printf "cpu_cores=\"%s\"\n"  "$ThreadsSuggestLower"  >> "$TuneUpTargetDraft"
+
+      printf "\n\n  Max cores set to %s " "$ThreadsSuggestLower"
+
+    fi
+
+  fi
+
+  SharedRAM_NotFound=
+  RAM_Available=
+
+  printColor "\n\n\n\n  Memory showing: \n\n"
+
+  free --si -h  
+
+  RAM_Available="$(free --giga | tr ' ' '\n' | grep -m 1 [0-9] 2>/dev/null)"
+ 
+  # @2024/01 free --mega etc failing in Manjaro at the (interactive) command prompt, will work in scripts 
+  # & has been traced to 'free' being aliased.  Manjaro Devs may wish to comment this out in ~/bashrc 
+
+  # Of note, Qemu defaults to 128 MiB (mebibytes) but the ram values are taken as MB or GB
+
+  # Also see https://github.com/quickemu-project/quickemu/issues/899    
+
+  if [[ ! $RAM_Available ]]; then
+
+    RAM_Available="$(grep MemTotal /proc/meminfo | cut -d':' -f2 | tr -cd '[:digit:]' 2>/dev/null)"
+
+    RAM_Available="$(bc <<< "scale=1; $RAM_Available/999999" 2>/dev/null)"
+
+    SharedRAM_NotFound=1
+
+  else 
+
+    Shared_RAM_Allocated="$(free --mega -h | tr ' ' '\n' | grep -m 4 [0-9] | tail -1  2>/dev/null)"
+
+    if [[ "$Shared_RAM_Allocated" == *M* ]]; then 
+
+      Shared_RAM_Allocated="$(cut -d'M' -f1 <<< "$Shared_RAM_Allocated")"
+
+      if [[ $(bc <<< "$Shared_RAM_Allocated < 500") == 1 ]]; then Shared_RAM_Allocated=
+
+      else Shared_RAM_Allocated="1" ; fi
+
+    fi
+
+  fi
+
+  [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
+
+  printf "\n\n"
+
+  printColor "  Don't stinge on the VM's RAM  Again, esp. if running the VM full screen."
+
+  printf "\n\n  Quickemu will default to half, even quarter minimals ..."
+
+  printf "\n\n  For full screen VM, suggest RAM of around 2/3 total, round up/down to expected guest/host demand"
+
+  [[ $Shared_RAM_Allocated || $SharedRAM_NotFound ]] && printf "\n\n  Add about half of shared RAM, used for graphics"
+  
+  printf "\n\n  Integer values only. Possibly reduce if high quotas present.  \n\n  Use programs such as 'htop' for further tuning."
+
+  if [[ $RAM_Available ]]; then
+ 
+    printColor "\n\n  Your host system is showing %sG of RAM, " "$RAM_Available"  
+    
+    if [[ $Shared_RAM_Allocated ]]; then printColor "of which %sG is possibly allocated to graphics" "$Shared_RAM_Allocated"
+ 
+    elif [[ $SharedRAM_NotFound ]]; then printColor "of which some *may* be allocated to graphics" ; fi
+ 
+    # suggest around 2/3 of RAM (using around half of shared graphics) rounded as applicable
+
+    if [[ $Shared_RAM_Allocated ]]; then  RAM_ForCalcs="$(bc <<< "scale=3; ($RAM_Available-($Shared_RAM_Allocated/2))/1" )"
+
+    else RAM_ForCalcs="$RAM_Available"
+    
+    fi
+
+    RAM_Suggested_Lower="$(bc <<< "scale=3; (($RAM_ForCalcs /100)*55) /1" )"
+
+    RAM_Suggested_Higher="$(bc <<< "scale=3; (($RAM_ForCalcs /100)*65) /1" )"
+
+    printf -v RAM_Suggested_Lower  "%.0f" "$RAM_Suggested_Lower"           # rounded up/down
+
+    printf -v RAM_Suggested_Higher  "%.0f" "$RAM_Suggested_Higher"         # rounded up/down
+
+    printf "\n\n  Suggested RAM (lower)  = %sG"  "$RAM_Suggested_Lower"
+
+    printf "\n\n  Suggested RAM (higher) = %sG"  "$RAM_Suggested_Higher"
+
+  fi
+
+  ConfLine="$(grep -s 'ram=' "$TuneUpTmpCopy")"
+
+  if [[ $ConfLine ]]; then 
+  
+    printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
+
+    Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
+ 
+    [[ $Current_RAM != "$RAM_Suggested_Higher"  ]] && printColor "   [c] to use current  "
+
+  fi
+
+
+  RAM_SetNumber=
+
+  printColor "\n\n  [enter] use %s   [integer] choose   " "$RAM_Suggested_Higher"
+ 
+  printColor "[d] to use quickemu defaults  [q] quit tune-up \n\n"
+
+  read -rp  "  >  "  RAM_SetNumber
+
+  printf "\n\n"
+
+  [[ $RAM_SetNumber == "q" ]] && return
+
+  if [[ $RAM_SetNumber ]] && [[ $(tr -cd "[:digit:]" <<< "$RAM_SetNumber") ]]; then
+
+    printf "ram=\"%sG\"\n"  "$RAM_SetNumber"  >> "$TuneUpTargetDraft"
+
+  elif [[ $RAM_SetNumber == "d" ]]; then true
+
+  elif [[ $RAM_SetNumber == "c" ]]; then
+
+    printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+
+  else
+
+    [[ $RAM_Suggested_Higher ]] &&  printf "ram=\"%sG\"\n"  "$RAM_Suggested_Higher"  >> "$TuneUpTargetDraft" 
+
+  fi
+
+
+  # add in other conf lines
+
+  printf "\n" >> "$TuneUpTargetDraft" 
+
+  mapfile -t TuneUpArr < "$TuneUpTmpCopy"
+
+  for Line in "${TuneUpArr[@]}"; do
+
+    if [[ $(tr -cd "[:graph:]" <<< "$Line") ]] && [[ "$Line" != *'/usr/bin'* ]] && [[ "$Line" != 'disk_size='* ]] \
+    && [[ "$Line" != 'cpu_cores='* ]] && [[ "$Line" != 'ram='* ]] && [[ "$Line" != '#tpm='* ]]  && [[ "$Line" != 'tpm='* ]] \
+    && [[ "$Line" != *'cureboot='* ]]; then
+
+      [[ "$Line" == '# Secure Boot'* ]] && printf "\n" >> "$TuneUpTargetDraft"
+      printf "%s\n" "$Line" >> "$TuneUpTargetDraft" 
+
+    fi
+
+  done
+
+  # Check for OS specifics
+
+  guest_os=
+
+  ConfLine="$(grep -s 'guest_os=' "$TuneUpTmpCopy")"
+
+  if [[ ! $ConfLine ]]; then
+
+    printColor "\n\n  WARNING  a line 'guest_os=\"xxx\"' should be present"
+
+    printf "\n\n  This should be added manually, where  =\"linux\"  \"windows\"  or \"macos\" are valid options"
+
+    printf "\n\n  Re-run this checker after the guest_os line has been added"
+
+  else
+
+    eval "$ConfLine"
+
+    if [[ $guest_os == "windows" ]]; then 
+
+      printColor "\n\n Windows: "
+
+      printf "\n\n  Software TPM should be set as \"on\" until at least the registration process is complete"
+
+      printf "\n\n  but can be set to \"off\" at later stages. Lines may commented-out with a \"#\" \n"
+      
+      ConfLine="$(grep -s '# Secure Boot' "$TuneUpTmpCopy")"
+
+      if [[ ! $ConfLine ]]; then  
+      
+        printf "\n\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft"
+
+      fi
+
+      {   printf "\ntpm=\"on\"" 
+
+          printf "\nsecureboot=\"off\"\n\n"
+      
+      }   >> "$TuneUpTargetDraft"
+
+
+    elif [[ $guest_os == "macos" ]]; then 
+
+      ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
+
+      if [[ ! $ConfLine ]]; then 
+
+        printColor "\n\n  WARNING a line:  macos_release=\"catalina\" or similar should be present"
+        
+        printf "\n\n  This instructs Quickemu how to optimise & should be added manually.\n"
+
+        printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft"
+
+      fi
+
+    fi
+
+  fi
+
+
+  while true; do 
+
+    printColor "\n\n  CHECK ME: \n\n"
+
+    cat "$TuneUpTargetDraft"
+
+    TuneUpConfConfirm=
+
+    printColor "\n\n  [enter] all good, continue    [r] revert back to the old config"
+    
+    printf "\n\n  [e]  edit the config file in more detail   "
+    
+    [[ $NewFileTuneUp ]] && printf "[d]  delete the VM - something went wrong ..."
+
+    printf "\n\n"
+
+    read -rp "  >  "   TuneUpConfConfirm
+
+
+    if [[ $TuneUpConfConfirm == "e" ]]; then 
+
+      printf "\n# To restore use name:   %s \n" "$TuneUpTargetFile" >> "$TuneUpOldFile"
+
+      qqX_edit_settings  "tune-up" 
+  
+    elif [[ $TuneUpConfConfirm == "r" ]]; then 
+
+      printColor "\n\n  Undoing changes to config file \n\n"
+
+      cat "$TuneUpTargetFile"
+
+      printf "\n\n"
+
+      read -rp "  [enter] to continue  >  "
+
+      break
+    
+    elif [[ $NewFileTuneUp ]] && [[ $TuneUpConfConfirm == "d" ]]; then 
+    
+      function_delete_Selected_VM  "$TuneUpDistroFolder" "$TuneUpTargetFile"
+
+      break
+
+    else
+
+      printf "\n# To restore use name:   %s \n" "$TuneUpTargetFile" >> "$TuneUpOldFile"
+
+      cp "$TuneUpTargetDraft" "$TuneUpTargetFile"
+
+      break
+
+    fi
+
+  done
+
+}
+
+
+

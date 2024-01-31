@@ -252,3 +252,105 @@ function exit {
 
 }
 
+
+
+show_qmod_title() {
+
+  if [[ $ModName_qqX ]]; then printf "\n" ; function_qqX_printf_logo_title  "$qqX_title" ;  printf "\n"
+
+  else printColor "\n\n  Quickemu Mod - Virtual Machine Launcher  Wrap Version %s"  "$ModVersion" ; fi
+
+  printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
+
+  quickget filepath
+
+  QE_FilePath_Short=
+  QG_FilePath_Short=
+
+  if [[ $QuickEmuSource != "$QE_FilePathDefault" ]]; then
+
+    if [[ "${#QuickEmuSource}" -gt 40 ]]; then QE_FilePath_Short=".... ${QuickEmuSource:(-35)}" ; else QE_FilePath_Short="$QuickEmuSource" ; fi
+
+  fi
+
+  if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]]; then
+
+    if [[ "${#QG_FilePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_FilePath:(-35)}" ; else QG_FilePath_Short="$QG_FilePath" ; fi
+
+  fi
+
+  [[ $QE_FilePath_Short && $QG_FilePath_Short ]] && printf "\n\n  Custom Source:"
+
+  [[ $QE_FilePath_Short ]] &&  printf "  %s"  "$QE_FilePath_Short"
+
+  [[ $QG_FilePath_Short ]] &&  printf "  %s"  "$QG_FilePath_Short"
+
+
+  [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
+  
+  PWD_Folder="$(pwd)"
+
+  HideFolderTitleBar=
+
+  for TF in "${Extra_VM_Folder[@]}"; do
+
+    [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
+
+  done
+
+  if [[ ! $HideFolderTitleBar ]]; then  
+  
+    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
+
+  else
+
+    printf "\n"
+
+  fi
+
+}
+
+function show_quickemu_WRAP_help {
+
+  HelpSelect=
+
+  [[ ! $ModName_qqX ]] && printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion" 
+
+  printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
+
+  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
+
+  [[ ! $ModName_qqX ]] &&  printf "\n\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
+  
+  printf "\n\n\n  [enter] to return   [a] %s API detail   " "$ModName"
+
+  [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
+
+  printf "\n\n"
+
+  read -rp "  >  "  HelpSelect
+
+  if [[ $HelpSelect == "a" ]]; then   
+  
+    show_wrap_CLI_usage  
+
+    printf "\n\n\n"
+  
+    read -rp  "  [enter] to return >  " 
+
+  elif [[ $HelpSelect == "p" ]]; then
+  
+    printf "\n\n  Extra quickemu parameters for qmod API & qmod settings."  
+  
+    printf "\n\n  NB  not all options can be applicable  CAUTION \n\n" 
+
+    NoExit=1
+    echo
+    usage | tail +6
+    echo
+
+    read -rp  "  [enter] to return >  " 
+
+  fi
+}
+
