@@ -99,9 +99,15 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
  
 ##  CODING STYLE 
 
-#  VARIABLES & FUNCTIONS:
-#  When coding for qqX, aim for clarity and contextual identity.  Variables should normally tend towards 'CamelCase'  
-#  & functions should tend towards 'snake_case'.  Emphasis or separation underscoring & caps should be added where needed. 
+#  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
+
+#  All code should be SHELLCHECK linted & disables avoided where possible.  
+#  The VS Code shellcheck extension is recommended.  It works well if set to 'check-on-save'.
+
+
+#  VARIABLES & FUNCTIONS should aim for clarity and contextual identity.  Variables should normally tend towards 'CamelCase'  
+#  & functions should tend towards 'snake_case'.  Emphasis or separation underscoring & caps should be added where needed.
+
 #  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
 
 #  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text. 
@@ -109,18 +115,26 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 
 #  In some places ** quickemu's given variable names ** have to be used. These are generally CAPS and very brief, eg '$QEMU'.
 #  Except when working with the .conf file, where quickemu chooses to use lowercase.
-#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, eg. the ambiguous quickemu var '$VERSION'  
-#  Likewise care must be taken not to confuse lowercase vars with standard application commands, especially in non-highlighting editors.
+#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, 
+#  eg. the ambiguous quickemu var '$VERSION'
 
-#  BRACKETS: Use the newer* style, more powerful, double [[ brackets ]] 
-#  if [[ $Foo ]] && [[ ! $Bar ]];   NOT   if [ -n ${Foo} ] && [ -z ${Bar} ]; 
-#  *from bash 3.2 onwards See https://github.com/bminor/bash/blob/master/COMPAT item 32
+#  Likewise care must be taken not to confuse lowercase vars with standard application commands, 
+#  especially in non-highlighting editors. 
 
-#  See https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  (in section bash.html#Conditional-Constructs)
-#  Also https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
+#  Note that Shellcheck will not continuity follow all caps variables. https://www.shellcheck.net/wiki/SC2154
 
-#  COMMENTS:  
-#  Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
+
+#  BRACKETS: The more powerful [[ double bracket ]] system that was introduced in Bash 3.2 
+#  is now the standard method recommended in the Bash Manual.
+#  See https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  
+#  See https://github.com/bminor/bash/blob/master/COMPAT item 32
+
+#  Use: if [[ $Foo ]] && [[ ! $Bar ]] ...    Avoid:   if [ -n ${FOO} ] && [ -z ${bar} ] ....
+
+#  Further notes:  https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
+
+
+#  COMMENTS: Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
 #  Also add links to any how-to's that you used.  If you needed to check, then others may do also. 
 #  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
 #  It makes it easier for everyone, especially later on.
@@ -136,10 +150,11 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  However & specifically, echo within the main section of the actual qqX script *must* be avoided
 #  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
 
-# SHELLCHECK: make use of this & avoid disables where possible.  The VS Code shellcheck extension works well, if set to check-on-save.
 
 
-## Find where the main code is. Use local for Dev or Custom installs. Otherwise use FHS standard locations.
+## MAIN CODE  
+
+# Find where the main code is. Use local for Dev or Custom installs. Otherwise use FHS standard locations.
 
 if [[ -d "qqX.main" ]]; then qqX_MainFolder="$(realpath "qqX.main")"
 
