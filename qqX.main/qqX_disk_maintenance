@@ -1,0 +1,363 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+drives_and_snapshots() {
+
+  #  @ 2023/08  with adding of second and shared drives,  
+  #  also start accessing qemu-img directly instead of going round the houses with with quickemu calls 
+  #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select' 
+  #  $2 is for disk utility to hide the message to use the disk utility
+
+  [[ $1 == "as_disk_util" ]] && printColor "\n\n  Internal ERROR: disk uitilty needs two args \n\n"  && sleep 100
+
+  Selected_Drive=
+  Selected_DriveName=
+  find_main_drive_and_img_iso
+  set_drive_paths
+
+  if [[ $SecondDriveArgs ]]; then
+
+    printColor "\n  Second Drive: \n\n"
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
+
+    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo ; else check_disk_is_okay "$SecondDrive" ; fi
+
+    printf "  Health Status:  %s"  "$DiskChkStatus"
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n\n"
+
+  fi
+
+  if [[ $SharedDriveArgs ]]; then
+
+    printColor "\n  Shared Drive: \n\n"
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
+
+    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
+
+    printf "  Health Status:  %s"  "$DiskChkStatus"
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n\n"
+
+  fi
+
+  if [[ ! -e $MainDrive ]]; then  printColor "\n\n  NO MAIN DRIVE  (yet) \n\n"
+
+  else
+
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n\n  Main Drive: \n\n"
+    else printColor "\n\n  One Main Drive: \n\n"
+    fi
+
+    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
+
+    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo ; else check_disk_is_okay "$MainDrive" ; fi
+
+    printf " Health Status:  %s"  "$DiskChkStatus"
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    printf "\n\n"
+
+  fi
+
+  if [[ $1 == "select" ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
+
+    printColor "\n  SELECT:  [enter]  MAIN DRIVE (or back to main menu)"
+    
+    [[ $SecondDriveArgs ]] && printColor "   [2]  Second Drive"
+    [[ $SharedDriveArgs ]] && printColor "   [3]  Shared Drive"
+    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "  (scroll to view)"
+
+    printf "\n\n"
+
+    read -rp "  >  "   Selected_Drive
+
+    case "$Selected_Drive" in
+
+      2)  Selected_Drive="$SecondDrive" 
+          Selected_DriveName="Second Drive"
+      ;;
+
+      3)  Selected_Drive="$SharedDrive" 
+          Selected_DriveName="Shared Drive"
+      ;;
+
+      *)  Selected_Drive="$MainDrive" 
+          Selected_DriveName="Main Drive"
+      ;;
+
+    esac
+
+  else
+
+    Selected_Drive="$MainDrive" 
+    Selected_DriveName="Main Drive"
+
+  fi
+
+  if [[ $1 == "select" ]] && [[ -e "$Selected_Drive" ]] ; then
+
+    printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
+   
+    "$QEMU_IMG" info "$Selected_Drive"
+
+    check_disk_is_okay "$Selected_Drive"
+
+    if [[ $2 != "as_disk_util" ]]; then
+
+      printf "\n\n  Health Status:  %s  (%s)"  "$DiskChkStatus"  "$Selected_DriveName"
+
+      if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+
+      printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
+
+    fi
+
+    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
+  fi
+
+}
+
+
+function manange_and_repair_disks {
+
+  drives_and_snapshots  select  as_disk_util
+
+  if [[ ! -e "$Selected_Drive" ]]; then
+
+    printf "\n\n  [b] go back to main menu"
+
+  else
+
+    printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
+
+    check_disk_is_okay  "$Selected_Drive" 
+
+    if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n\n  Status:  %s"  "$DiskChkStatus" ; fi
+
+    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
+
+    DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
+
+    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
+
+    DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
+
+    DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
+
+    if [[ $DiskChkStatus == "Okay" ]]; then
+
+      printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
+
+      printf "\n\n  Correction is advised if the content exceeds the theoretical envelope"
+
+    fi
+
+    if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
+
+      printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
+
+      [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
+      
+    fi
+
+    # Check there is disk free space to make a backup  
+
+    if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
+
+    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" ; fi
+
+    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+
+    DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
+
+    if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
+
+      printColor "\n\n  WARNING: insufficient or very low space on host drive"
+    
+    else
+
+      printf "\n\n\n"
+
+      if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
+      
+      elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
+
+      else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
+
+      fi
+
+    fi
+    
+    printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
+
+    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+
+    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
+
+    printf "\n\n  A back-up will be made. All processes will remove any snapshots ...  [b] back to menu " 
+
+  fi
+
+  DiskManage=
+  printf "\n\n"
+  read -rp "  >  "  DiskManage
+  printf "\n\n"	
+
+  # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-convert
+
+  # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-check
+  
+  # REVIEW   qemu's differential 'bitmap' tracking  https://lwn.net/Articles/837053/
+
+  if [[ $DiskManage != "b" ]]; then 
+
+    if [[ $DiskManage == "rz" ]]; then
+
+      printf "\n\n  This will resize the external envelope. For internal partitions, use gparted" 
+      printColor "\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n\n"
+      read -rp "  >  "  ResizePlus
+      printf "\n\n"
+      ResizePlus="$(tr -cd "[:digit:]" <<< "$ResizePlus")"
+
+    fi
+
+    DiskDate="$(date +%b%d.%H.%M)"
+
+    DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
+  
+    mv "$Selected_Drive" "$DiskBackup" 
+
+    printf  "  Original drive: %s \n\n" "$Selected_Drive"
+    printColor "  Moved to back up as: %s \n\n" "$DiskBackup"
+
+    if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
+
+      printf "" > "$Qemu_IMG_ErrorLog"
+
+      DU_BackUpSize="$(du "$DiskBackup" | cut -f 1)"
+
+      function dd_progress_report {
+
+        sleep 5
+
+        while true ; do
+        
+          DU_SelectedSize="$(du "$2" | cut -f 1  2>/dev/null)"
+
+          DU_BackUpSize="$1"
+
+          [[ ! $DU_SelectedSize ]] && DU_SelectedSize=1
+
+          DD_ProgressPercent="$(bc <<< "scale=5; ($DU_SelectedSize/$DU_BackUpSize)*100")"
+          DD_ProgressPercent="$(bc <<< "scale=0; ($DD_ProgressPercent + 0.5)/1")"
+
+          [[ $DD_ProgressPercent -ge 98 ]] && break
+
+          printf "\r  New Drive Progress = %s%%   "  "$DD_ProgressPercent"
+          sleep 3
+
+        done
+
+      }
+
+      dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
+
+      # https://web.archive.org/web/20230412163832/https://wiki.bash-hackers.org/howto/redirection_tutorial#order_of_redirection_ie_file_2_1_vs_2_1_file
+
+      "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
+
+      printColor "\n\n  Attemping repair .... \n\n"
+
+    else  "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
+
+    fi
+
+    if [[ -e  "$DiskBackup" ]] && [[ -e "$Selected_Drive" ]]; then
+
+      [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
+
+      [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
+
+      [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
+
+      # option 'rd' is basically 'convert' process only  (all options do this as standard)
+
+      printColor "\n\n  Drive Updated ..."
+
+    else  printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
+
+    fi
+
+    printf "\n\n  [enter] to return to menu \n\n "
+    read -rp "  >  "  
+
+  fi
+
+}
+
