@@ -197,8 +197,28 @@ source "$qqX_MainFolder/qqX_MSR_functions"
 source "$qqX_MainFolder/qqX_wrap_quickemu"
 
 
+# Find the right version for the standard 'quickget' call 
+# which is only used in simple API wrapping mode, for now ...
 
+function quickget {
 
+  if [[ $QG_Version ]]; then 
+
+    # from main settings 
+  
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
+    else  eval command "$QG_Version" " $*" ; fi
+
+  else 
+
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
+    else eval command quickget " $*" ; fi
+
+  fi
+  
+}
+
+# Quickemu is more complex than quickget:
 
 function quickemu {      
 
@@ -322,6 +342,9 @@ QE_VerNumber="$VERSION"
 
 #  Runnning this function when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
 #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  (See main settings)
+
+
+
 
 function check_screen_percentage_and_output {
 

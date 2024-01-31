@@ -174,29 +174,8 @@ QE_FilePathDefault="$(type -p quickemu)"
 QG_FilePathDefault="$(type -p quickget)"
 
 
-# Find the right version for the standard 'quickget' call 
-# which is only used in simple API wrapping mode, for now ...
-# quick*emu* is later and is more complex
 
-
-function quickget {
-
-  if [[ $QG_Version ]]; then  
-  
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
-    else  eval command "$QG_Version" " $*" ; fi
-
-  else 
-
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
-    else eval command quickget " $*" ; fi
-
-  fi
-  
-}
-
-
-## Analyse Current Version  (Latest version is carried out in the updater function)
+## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
 IFS='.' read -ra qqX_CurrentVer_Arr <<< "$ModVersion"
 
