@@ -361,3 +361,296 @@ function manange_and_repair_disks {
 
 }
 
+function snapshot_delete {
+
+  printColor "\n\n %s Snapshot Delete function "  "$ModName"
+
+  printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
+
+  # Create range-selectable array 
+  #SnapListString="$(drives_and_snapshots | grep '[0-9][0-9]:')"
+  
+  SnapListString="$("$QEMU_IMG" info "$Selected_Drive" | grep '[0-9][0-9]:')"
+
+  # turns the multiline string into raw array with one whole line for each entry making each array element
+
+  # then line by line extract the snap number and its title:
+
+  mapfile -t SnapListArrRaw <<< "$SnapListString"
+
+  i=0
+  SnapListArrSeparated=()
+
+  printColor "\n\n ID   Array  Name \n\n"
+  while [[ "${SnapListArrRaw[i]}" ]]; do
+    IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}" 
+    # prints the first two elements of each snapshot info line 
+    printf "%2d    %2d    %s \n"  "${SnapListArrSeparated[0]}"  "$i"  "${SnapListArrSeparated[1]}"
+    ((i+=1))
+  done
+
+  SnapListArrTotal=$((i-1))
+
+  printColor "\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
+  printf "\n\n or [full individual name] for difficult names only showing correctly in the FULL listing"
+  printf "\n\n or [enter] to return to main menu "
+
+  SnapName=
+  SnapDeleteStart=
+  SnapDeleteEnd=
+  SnapDeleteConfirm=
+  
+  printf "\n\n"
+  read -rp " >  "  SnapDeleteStart
+  
+  if [[ $SnapDeleteStart ]]; then
+
+      SpecialSnapName="$SnapDeleteStart"
+      SpecialSnapName="$(tr -d "[:digit:]" <<< "$SpecialSnapName")"
+
+    if  [[ $SpecialSnapName ]]; then
+
+      # restore name as valid name if, when all digits removed, there is still something
+      SpecialSnapName="$SnapDeleteStart"
+      printf "\n  Snap to delete: \"%s\"" "$SpecialSnapName"
+
+    else
+
+      printColor "\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n\n"
+      read -rp " >  "  SnapDeleteEnd
+
+      if [[ $SnapDeleteEnd ]]; then 
+
+        SnapDeleteEnd="$(tr -cd "[:digit:]" <<< "$SnapDeleteEnd")"
+
+        if [[ $SnapDeleteEnd ]]; then  [[ $SnapDeleteEnd -gt "$SnapListArrTotal" ]] && SnapDeleteEnd="$SnapListArrTotal"
+
+        else  SnapDeleteEnd="$SnapListArrTotal"
+
+        fi
+
+        printf "\n Array Range = %s to %s" "$SnapDeleteStart"  "$SnapDeleteEnd"
+
+        i="$SnapDeleteStart"
+        SnapListArrSeparated=()
+
+        printColor "\n\n ID   Array  Name \n\n"
+        while true; do
+          IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}" 
+          # prints the first two elements of each snapshot info line 
+          printf "%2d    %2d    %s \n"  "${SnapListArrSeparated[0]}"  "$i"  "${SnapListArrSeparated[1]}"
+          [[ $i == "$SnapDeleteEnd" ]] && break
+          ((i+=1))
+        done
+
+      else         
+        printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart" 
+        printf "\n\n  %s" "${SnapListArrRaw[SnapDeleteStart]}" 
+        SnapDeleteEnd="$SnapDeleteStart"
+      fi
+
+    fi
+
+    printColor "\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
+
+    read -rp " >  "  SnapDeleteConfirm
+
+
+    if [[ $SnapDeleteConfirm == "b" ]]; then
+
+      printf "\n\n Deletion schedule has been CANCELLED"
+
+    else
+
+      if [[ $SpecialSnapName ]]; then
+
+        "$QEMU_IMG" snapshot -q -d "$SpecialSnapName" "$Selected_Drive" 
+
+      else
+    
+        SnapDeleteRangeCounter=$SnapDeleteStart
+
+        while [[ $SnapDeleteRangeCounter -le $SnapDeleteEnd ]]; do
+          IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[$SnapDeleteRangeCounter]}"
+          SnapName="${SnapListArrSeparated[1]}"
+
+          if [[ ! $SnapName ]]; then
+            printColor "\n\n ERROR with SnapShot Array List \n\n"
+            sleep 5
+            exit 1
+          else
+            printColor "\n\n Deleting SnapShot %2d   %2d  %s \n\n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
+
+            "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive" 
+
+          fi
+          ((SnapDeleteRangeCounter+=1))
+        done
+
+      fi
+
+      "$QEMU_IMG" info "$Selected_Drive"
+
+    fi
+
+    printf "\n\n [enter] to return to menu \n\n "
+    read -rp " >  "  
+
+  fi
+
+  #  REVIEW  see if tiano core bios can be set to select 'misc device' instead of 'windows boot manager' 
+  #          as this can cause problems when rebooting on updates
+  
+  #  https://github.com/tianocore/tianocore.github.io/wiki/UEFI-application
+
+  #  https://github.com/theopolis/uefi-firmware-parser
+
+}
+
+
+function create_new_drives {
+
+  SecondDriveCreateSize=
+  DriveCreated=
+
+  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs ]] ; then printColor "\n\n  ERROR:  a shared drive already exists. Make backups ...\n\n"
+
+  elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then printColor "\n\n  ERROR:  a second drive already exists. Make backups ...\n\n"
+
+  else
+
+    [[ $MainMenuChoice == "2" ]] && printColor "\n\n  Create a SECOND virtual hard-drive for this VM instance:"
+    
+    [[ $MainMenuChoice == "3" ]] && printColor "\n\n  Create a SHARED virtual hard-drive for this VM instance:"
+    
+    printf "\n\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that" 
+
+    printf "\n\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
+    
+    printf "\n\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
+    
+    printf "\n\n  It is easier make them larger now than to resize later ... " 
+
+    printColor "\n\n\n  [enter] create 64G   [integer] create int G   [b] go back \n\n"
+
+    read -rp "  >  "  SecondDriveCreateSize
+
+    [[ ! $SecondDriveCreateSize ]]  && SecondDriveCreateSize="64"
+
+    [[ $SecondDriveCreateSize ]]  &&  SecondDriveCreateSize="$(tr -cd "[:digit:]" <<< "$SecondDriveCreateSize")"
+
+    if [[ $SecondDriveCreateSize ]]; then 
+
+      if [[ $MainMenuChoice == "2" ]] && grep -s -q SecondDrive "$VM_Conf_File" ; then
+
+        printColor "\n\n  ERROR: A SecondDrive entry is already present in your .conf file ??"
+
+        printf "\n\n  Check general settings & notes on drives set up.  Edit the configuration. \n\n"
+
+      elif [[ $MainMenuChoice == "3" ]] && [[ ! -d "$Default_VM_Folder" ]]; then
+
+          printf "\n\n  Default_VM_Folder not present. Edit the main settings file first. \n\n"  
+
+      else
+          
+        if [[ $MainMenuChoice == "2" ]]; then
+
+          printf "\n\n  A Storage Drive will be created in the VM's folder \n\n  %s"  "$VM_InstanceName"
+
+        elif [[ $MainMenuChoice == "3" ]]; then 
+
+          printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
+
+          printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$Q_Mod_SettingsFile"
+
+        fi
+
+        printColor "\n\n  [enter] to continue  [b] to go back \n\n"
+
+        NewDriveCreate=
+
+        read -rp "  > "  NewDriveCreate
+
+        if [[ $NewDriveCreate != "b" ]]; then
+
+          if [[ $MainMenuChoice == "2" ]]; then 
+
+            printf "SecondDrive=\"%s/%s/storage.qcow2\"" "$VM_Conf_Dir" "$VM_InstanceName"  >> "$VM_Conf_File"
+
+            "$QEMU_IMG"  create -q -f qcow2 "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" "${SecondDriveCreateSize}G"
+
+            [[ -e "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" ]] && DriveCreated=2
+        
+          elif [[ $MainMenuChoice == "3" ]]; then
+
+            "$QEMU_IMG"  create -q -f qcow2 "$Default_VM_Folder/SharedDrive/shared.qcow2" "${SecondDriveCreateSize}G"
+
+            [[ -e "$Default_VM_Folder/SharedDrive//shared.qcow2" ]] && DriveCreated=3
+
+            # 'sed' can get very HIEROGLYPHICAL  https://stackoverflow.com/a/9453461
+
+            # 'awk' ?  https://stackoverflow.com/a/32995760
+            #  awk :  https://stackoverflow.com/a/6541653   https://stackoverflow.com/tags/awk/info 
+            #  sed awk easy methods: https://www.ubuntumint.com/insert-line-specific-line-number-linux/
+            #  date ref awk:  https://unix.stackexchange.com/a/599097
+
+            #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options  
+            #  Make sure sed command works in --posix  if testing on gnu sed ...
+            #  Also note here:
+            #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
+            #  sed -i only works in GNU sed  ... 
+
+            if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
+
+              # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
+              
+              SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
+
+              printf "\n\n  Backing up settings file to /tmp and changing line %s \n\n"  "$SharedDriveSettingsLine"
+
+              eval cp "$Q_Mod_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
+
+              eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$Q_Mod_SettingsFile"
+
+            else 
+
+              printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n"
+
+              grep 'SharedDrive=' "$Q_Mod_SettingsFile"
+
+              printf "\n\n"
+
+            fi
+
+          fi
+
+          if [[ $DriveCreated ]]; then
+
+            set_drive_paths
+
+            printColor "\n  The Created Drive should now be formatted from inside a VM:"
+
+            printf "\n\n  Use Gparted or similar to set a device table and add partition(s)"
+
+            printf "\n\n  Read notes in main settings if older MacOS or if Windows present."
+
+          else
+
+            printColor "\n\n  Something went wrong. Drive not created "
+
+          fi
+
+        fi
+
+      fi
+
+    fi
+      
+  fi
+
+  printf "\n\n"
+
+  read -rp "  [enter] to return > "
+  
+}
+
