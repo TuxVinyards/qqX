@@ -48,7 +48,8 @@
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
-#  STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx    
+#  STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
+#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
 # It is not a silver bullet & can also cause problems with bash exec clauses ...
@@ -63,6 +64,8 @@
 # In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID, 
 # this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
 # See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756 
+
+#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created. This location may be group edited, further on in the script.
 
 # https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
 # shellcheck disable=SC1090
@@ -132,7 +135,8 @@ qqX_XDG_Name="qqX"
 
 # In the same way that the bash shebang itself starts at "/bin" 
 # the use of "/bin" allows for other systems that have not adopted or allowed for the newer standard method.
-# In ref to https://github.com/TuxVinyards/qqX/issues/1  add a check for unusuals eg. nix/store/uniques etc
+
+# In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
 
@@ -143,6 +147,11 @@ else qqX_Std_Bin_Dir="/bin" ; fi
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
 
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
+
+#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
+#  For non FHS OS's also edit at start of main file 'qqX' ...
+
+qqX_Std_Share_Path="/usr/share/qqX"   
 
 
 function print_manual_uninstall_notes {
@@ -156,6 +165,8 @@ function print_manual_uninstall_notes {
   #  followed by:  update-desktop-database  ~/.local/share/applications  
 
   #  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
+
+  #  From qqX 1.6 onwards also remove  sudo rm -r /usr/share/qqX
 
 Notes
 
@@ -261,11 +272,7 @@ if [[ "$(whoami)" == root ]]; then
 
   printColor "\n\n  User-Interactive Scripts:\n\n  Root installation is not currently available. \n\n  Select a trusted UserLand folder (%s) etc\n\n" "$UserLand_Name"
 
-  #  If installing as root, eg making folder /usr/share/qqX  then root will not have xdg data
-  #  However core-util 'users' will show who is logged in and thus where non-sudo $HOME is located.
-
-  #  User-Interactive Scripts:  Root installation just adds unneeded (?) complications ...
-  #  When time is available and if demand is present. But probably a bit of a rabbit hole that could end up as creating distro installs ...
+  #  Root will not have xdg data ....
 
   read -rp "  See setup script and installation notes  > "
 
@@ -312,7 +319,7 @@ fi
 
 printf "\n"
 
-if [[ ! -e "qqX_settings" ]] || [[ ! -e "qqX" ]] || [[ ! -d  "qqX.system" ]]; then
+if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" ]] && [[ ! -d  "./qqX.main" ]]; then
 
   printColor "\n\n  ERROR  qqX source files not found \n\n"
 
@@ -322,21 +329,19 @@ else
 
   InstallSelect=
 
-  if [[ $1 == "Upgrade" ]]; then  printColor  "\n\n  Upgrade the program scripts:"   "$HOME" 
+  Current_qqX_Version="$(qqX --version)"
 
-  else  printColor  "\n\n  Install a settings file to %s & add program scripts?"   "$HOME" 
+  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n\n   Upgrade qqX %s program scripts:"   "$Current_qqX_Version"
+
+  else  printColor  "\n\n   Install a settings file to %s & add program scripts?"   "$HOME" 
 
   fi
 
-  printf "\n\n   sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
-
-  printf "\n\n   sudo ln -s \"%s\" \"%s\"" "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
-
-  printColor "\n\n  [enter] to run the above commands from this terminal"
+  printColor "\n\n  [enter] to auto-install from this terminal"
   
-  printf "   [s] issue sudo commands separately "
+  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n\n  [u] un-install   [enter] re-install/upgrade"
 
-  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [enter] re-install/upgrade"
+  printf "   [m] use manual installation"
 
   printf "   [q] to quit \n\n"
 
@@ -356,6 +361,8 @@ else
 
     qqX_RemovalTarget_X="$(type -p qqX)"
 
+    [[ -d "$qqX_Std_Share_Path" ]] && qqX_RemovalTargetShare="$qqX_Std_Share_Path"
+
     qqX_Remove=
 
     printColor "\n\n  [y] sudo auto removal of qqX scripts, plus of removal qqX folders & of settings" 
@@ -371,6 +378,8 @@ else
       [[ $qqX_RemovalTarget ]] && sudo rm "$qqX_RemovalTarget"
 
       [[ $qqX_RemovalTarget_X ]] && sudo rm "$qqX_RemovalTarget_X"
+
+      [[ $qqX_RemovalTargetShare ]] && sudo rm -r "$qqX_RemovalTargetShare"
 
       rm -r "$HOME/.qqX"  ||  printColor "\n\n  Settings folder ERROR or not found \n\n" 
 
@@ -396,29 +405,44 @@ else
 
     SeparateSudo=
 
-    if  [[ $InstallSelect == "s" ]] ; then 
+    if  [[ $InstallSelect == "m" ]] ; then 
 
-      printf "\n\n  Open another terminal IN THE SOURCE FOLDER"
+      printf "  Open another terminal IN THE SOURCE FOLDER"
       
-      printf "\n\n  (ctrl-shift-c to copy, ctrl-shift-v to paste)"
+      printf "\n\n  The following commands should be issued:"
+
+      printColor "\n\n  sudo cp \"qqX\" \"%s\" " "$qqX_Std_File_Path"
+
+      printColor "\n\n  sudo ln -s \"%s\" \"%s\" " "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
+
+      printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
       
-      printf "\n\n  The following commands should be issued from the SOURCE folder:"
+      printf "\n\n  for the subfolder and files of qqX.main."
 
-      printColor "\n\n  sudo cp \"qqX\" \"%s\"" "$qqX_Std_File_Path"
+      printColor "\n\n  sudo mkdir -p \"%s/qqX.main\" " "$qqX_Std_Share_Path"
 
-      printColor "\n\n  sudo ln -s \"%s\" \"%s\"" "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
+      printColor "\n\n  sudo cp \"./qqX.main/qqX_\"*  \"%s/qqX.main/\" " "$qqX_Std_Share_Path" 
 
-      printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
+
+      printf "\n\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
 
       read -rp  "  >  "  SeparateSudo
+
+      printf "\n\n"
 
     fi
 
     if [[  $SeparateSudo != "y" ]]; then
 
+      printColor "  Auto-Installing .... \n\n"
+
       sudo cp "qqX" "$qqX_Std_File_Path"
 
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
+
+      [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
+
+      sudo cp "./qqX.main/qqX_"*  "$qqX_Std_Share_Path/qqX.main/"
 
     fi
 
