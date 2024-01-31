@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+# Find the right version for the standard 'quickget' call 
+# which is only used in simple API wrapping mode, for now ...
+
+function quickget {
+
+  if [[ $QG_Version ]]; then 
+
+    # from main settings 
+  
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
+    else  eval command "$QG_Version" " $*" ; fi
+
+  else 
+
+    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
+    else eval command quickget " $*" ; fi
+
+  fi
+  
+}
+
+# Quickemu is more complex than quickget:
+
+function quickemu {      
+
+  # Any calls to quickemu become re-routed to this function instead.
+
+  ## Do a first check for amy qwrap internal commands   REVIEW 
+
+  local FirstParamCount=0
+
+  IFS=' '  read -ra FirstParamsArray <<< "$*"
+
+  # declare -p FirstParamsArray
+  # read
+
+  # https://unix.stackexchange.com/questions/50654/function-caller-positional-parameters?rq=1
+
+  while [[ "${FirstParamsArray[$FirstParamCount]}" ]]; do
+
+    for FirstParam in "${FirstParamsArray[@]}"; do
+
+      case "$FirstParam" in
+      
+        --vm_boot)  
+            VM_ExecBoot=1 
+            unset "FirstParamsArray[$FirstParamCount]"
+            set -- "${FirstParamsArray[@]}"
+            # no other cases applicable, move on.
+            break
+            ;;
+        --menu_bypass)
+            # used for msr functions below
+            unset "FirstParamsArray[$FirstParamCount]"
+            set -- "${FirstParamsArray[@]}"          
+            shift ;;
+        --toggle_msr_defaults)  
+            toggle_msr_defaults 
+            exit directly ;; 
+        --select_msr_config)  
+            select_msr_config 
+            exit directly ;; 
+        --msrs_conflict_check_resolver)  
+            msrs_conflict_check_resolver 
+            exit directly ;; 
+      esac
+
+      ((FirstParamCount+=1))
+
+    done
+
+  done
+
+  ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
+
+  #  These bits are basically the remaining sections of the original quickemu code. 
+  #  The earlier original code sections are all functions that have now been loaded, as is, or modified
+
+  if [[ ! -e "/tmp/qmod-case-temp" ]] || [[ ! -e "/tmp/qmod-actions-temp" ]] || [[ ! -e "/tmp/qmod-boot-temp" ]]; then
+
+    printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
+    sleep 5
+
+  else
+
+    # keep running quickemu 'case' checks for matches:
+    while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done  
+
+    # if no more matches, remove any leftover params not cleared due to trapped exit re-route 
+    # & if not yet given, decide on action   
+    #  https://unix.stackexchange.com/questions/18981/how-to-unset-the-positional-parameters
+
+    shift  $#
+
+    # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp" 
+    # BUT from qqX ver. 1.5 this happens at the end of 'function_Select_VM'
+
+    # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
+
+    gl="$qqX_GL_Mode"  
+
+    source "/tmp/qmod-actions-temp" 
+
+
+    if [[ $VM_ExecBoot ]]; then
+
+      # make sure quickemu doesn't run the vm boot sequence after running an 'action' unless flagged to do so
+      # load extracted standard quickemu code that gives the okay to run main function 'vm_boot' (in this case, the modded one)
+
+      # REVIEW  these logs only get cleared just before running, so stay until a boot sequence is run, irrespective of
+      #         whether the run is made as [v] verbose & terminated
+
+      printf "" > "/tmp/qqX_echo_output.log"
+      printf "" > "$QemuErrorLog"
+
+      source "/tmp/qmod-boot-temp" 
+
+      VM_ExecBoot=
+
+      if [[ $BreakAtVerboseArgs ]]; then
+        SpicyPID="$(pgrep spicy)"
+        [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
+      fi
+
+    fi
+
+  fi
+
+}
+
+# Temps usually get removed with reboot 
+# BUT can get removed by time (eg 24hrs) so check they are there still ( REVIEW  if causes problems )
+# See https://serverfault.com/questions/377348/when-does-tmp-get-cleared#377349
+
+## The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
+QG_VerNumber="$(quickget "--version")"
+
+# Quick EMU uses its internal var '$VERSION'
+QE_VerNumber="$VERSION"
+
+#  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
+#  But check the to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
+
+#  Runnning this function when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
+#  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  (See main settings)
+
+
