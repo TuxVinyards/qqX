@@ -544,3 +544,132 @@ function_Select_VM () {
   fi
 
 }
+
+
+function_delete_Selected_VM () {
+
+  if [[ ! $1 && ! $2 ]]; then
+
+    # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
+
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+
+    sleep 2 ;  return
+
+  else
+
+    if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
+
+      printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+
+      printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
+
+      sleep 2 ;  return
+
+    fi
+
+    if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
+
+    printColor "\n\n  Folder: %s " "$1"
+  
+    printColor "  & file: %s  to be deleted?"  "$2"
+  
+    printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
+
+    printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+
+    printf "\n\n  Folder content: \n\n"
+
+    ls "$1"
+
+    if [[ $TrashingAvailable ]]; then 
+
+      printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
+      
+      printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
+
+    else
+
+      printColor "\n\n  [enter] use the file manager to move things the trash bin "
+      
+      printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
+
+    fi
+
+    printf "\n\n"
+
+    read -rp "  >  "   Delete_VM_Option
+
+    if [[ $Delete_VM_Option == "y" ]]; then 
+
+      printf "\n\n  Folder & .conf file being deleted ... \n\n"
+      
+      rm -f -r "$1"  
+      echo
+
+      rm -f "$2"
+      echo
+
+    else
+
+      # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
+
+      if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
+
+        printf "\n\n  Moving files to the bin ... \n\n"
+        gio trash "$1"
+        gio trash "$2"
+
+      else  printf "\n\n  NOT deleted ... \n\n"
+
+      fi
+
+    fi
+
+    sleep 1.4
+
+    printColor "\n\n  [enter] to return or continue \n\n" 
+    read -rp "  > "
+
+    VM_InstanceName="$VM_InstanceName"" - Deleted >> ReSelect"
+
+    SettingsFileAdjusted=1
+
+    refresh_sources_and_reload_VM_arrays
+
+  fi
+
+}
+
+
+# If settings need reloading, following a settings edit or a VM deletion:
+
+refresh_sources_and_reload_VM_arrays() {
+
+  # clear any previously declared settings based arrays 
+  Extra_VM_Folder=()
+  VM_Array=()
+  QemuErrorFilter=()
+
+  # shellcheck disable=SC1090
+
+  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
+
+  refresh_and_load_main_sources
+  quickget filepath
+
+  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdgopen_settings
+
+  function_create_VM_folderList  
+  function_scan_VM_folderList  
+  find_main_drive_and_img_iso
+  set_drive_paths
+
+  # reload screen 
+  ByPass_VM_Array_Selector=1
+  KVM_MSR_Error=
+  ShowUtilsMenu=
+  printf "\033c"
+  show_qmod_title
+
+}
