@@ -56,28 +56,6 @@
 #  shellcheck disable=SC2034
 #  shellcheck disable=SC2154 
 
-# Find the right version for the standard 'quickget' call 
-# which is only used in simple API wrapping mode, for now ...
-
-function quickget {
-
-  if [[ $QG_Version ]]; then 
-
-    # from main settings 
-  
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
-    else  eval command "$QG_Version" " $*" ; fi
-
-  else 
-
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
-    else eval command quickget " $*" ; fi
-
-  fi
-  
-}
-
-# Quickemu is more complex than quickget:
 
 function quickemu {      
 
