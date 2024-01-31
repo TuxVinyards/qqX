@@ -935,5 +935,54 @@ function_config_tune_up ()  {
 
 }
 
+function refresh_conf_vars_and_values {
 
+  # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+  # otherwise any items specified in any previous config, but not in the new one, will remain.
+  # Needed from qqX ver 1.5 onwards
+
+  # A blank clearance will have been created at first session start.  
+
+  source "$ConfClearanceLog"
+
+  QemuError_VM_Filter=()
+
+  source "$VM_Conf_File"
+
+  # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
+
+  printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
+
+  mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+
+  for Line in "${ConfClearance_Arr[@]}"; do
+
+    if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
+
+      if [[ "$Line" == *'QemuError_VM_Filter'* ]]; then Line='QemuError_VM_Filter=()'
+
+      else
+
+        Line="$(cut -d'=' -f1 <<< "$Line")"
+        Line="$Line""="
+        [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+
+      fi
+      
+      printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
+
+      # Note that commented out lines need including, in case the comment marker gets removed
+
+    fi
+
+  done
+
+  # check any menu values that are based on the file .conf 
+
+  check_screen_percentage_and_output
+  find_main_drive_and_img_iso
+  set_drive_paths
+  check_disk_is_okay
+
+}
 
