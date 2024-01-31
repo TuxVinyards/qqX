@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  qqX - quickemu quickget X terminal project   
+
+#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
+#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
+
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Make sure shell is set during session to decimal separator of dot 
+
+#  If LC_ALL=C changes too much, just set the numeric.  
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
+function_KillPID_Menu() {
+
+  tput civis
+
+	# WAIT for background load & QEMU messages to appear before showing menu (unless reloading)
+
+	if [[ $KillPID_Menu_Exited ]]; then  KillPID_Menu_Exited=
+
+  elif [[ $BreakAtVerboseArgs ]]; then BreakAtVerboseArgs= ; return
+
+  else  sleep 2 
+  
+  fi
+  
+  # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
+
+  InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
+
+
+  if [[ $InstancePID ]]; then 
+
+    SpicyPID=
+
+    sleep  "$P_Kill_WaitSecs"   
+
+    printColor "\n  Quickemu instance %s on PID:  %s  %s"  "$VM_InstanceName"  "$InstancePID"  "$BootAlert"
+
+    printColor  "   [k] force close the Quickemu instance   "
+    
+    SpicyPID="$(pgrep spicy)"
+
+    if [[ $SpicyPID ]]; then 
+
+      #  REVIEW   if possible, add SDL reconnect 
+
+      SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
+    
+      printColor " [r] reload Spicy window (if closed)"
+
+    fi
+
+    printf "\n\n"
+    tput cnorm
+
+  fi
+
+  # return to menu requires VM to be shutdown first
+
+  while true ; do 
+
+    read -rp  "  >  " -t 1  KillPID_Menu
+
+    if [[ $KillPID_Menu == "k" ]]; then 
+
+      printf "\n\n"
+      if [[ $( ps -p "$InstancePID" --no-headers ) ]]; then
+        [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
+        kill "$InstancePID" 2>/dev/null &
+      fi
+
+      sleep 3
+      printf "\n\n"
+
+      tput cnorm
+      break
+
+    elif [[ $KillPID_Menu == "r" ]]; then 
+
+      if [[ ! $(pgrep spicy) ]]; then 
+        eval "$SpicyReStartCmd"
+        sleep 2
+        SpicyPID="$(pgrep spicy)"
+      fi
+
+    else
+
+      if [[ ! $( ps -p "$InstancePID" --no-headers ) ]]; then 
+      
+        tput cnorm 
+        break 
+
+      else
+
+        #  Erase text and adjust cursor:   "\e[1A\r"  "\e[2K\r"  etc    See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+       
+        printf "\r"
+
+      fi
+
+    fi
+
+  done
+
+  KillPID_Menu=
+
+  KillPID_Menu_Exited=1
+
+  P_Kill_WaitSecs="$P_Kill_WaitSecs_PreSet"
+
+  refresh_and_load_quickemu_vars
+  refresh_conf_vars_and_values
+
+}	
+
+
+
+function_show_main_menu_header () {
+
+  if [[ ! $VM_InstanceName ]]; then
+
+    Select_VM=1
+
+  else
+
+    [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
+
+    [[ ! $InstancePID ]] && printf "\033c"  && show_qmod_title
+ 
+    printf "\n"
+    printColor "    %s " "$VM_InstanceName" 
+
+    #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
+
+    #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
+    
+    if [[ $Select_VM ]]; then  BootAlert=
+
+    elif  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
+
+    elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
+    
+    elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(ISO/IMG Boot: Distro Non-installed)" 
+    
+    else  BootAlert= 
+    
+    fi
+
+    [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
+    printf "   %s" "$BootAlert"  
+    printf "\n"
+
+    [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
+
+    # Note .conf won't exist at first load, at VM selector menu
+
+    [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] && printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
+
+  fi
+
+}
+
+
