@@ -9,42 +9,9 @@
 
 # 	Otherwise:  
 
-# Licence  GPL3   https://www.gnu.org/licenses 
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# https://www.gnu.org/licenses  
-
-
-# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
-
+#   Licence  GPL3   https://www.gnu.org/licenses 
 
 ##  qqX - quickemu quickget X terminal project   
-
-#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
-#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
-
-#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
-#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
-
-#  Make sure shell is set during session to decimal separator of dot 
-
-#  If LC_ALL=C changes too much, just set the numeric.  
-#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
-
-#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
-#  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
-#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
-
 
 ## ShellCheck global disables:
 
