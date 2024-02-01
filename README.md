@@ -2,7 +2,7 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Release 1.5.02 now has several new features and is running very smoothly.
+Release 1.5.02 introduced several new features and is running very smoothly.
 
 - Refactored code is now more small screen friendly.
 
@@ -21,6 +21,8 @@ The installer script will update older settings files with the new feature optio
 - Use the Github **code/clone** button for the very latest tweaks & bug fixes (if needed).
 
 - The program's built-in downloader will neatly place releases into their own special sub-folder.
+
+Release 1.6.01 is functionally the same as 1.5 but now separates the main script up into more workable sections
 
 ### quickemu quickget X terminal project
 
