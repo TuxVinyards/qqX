@@ -52,7 +52,6 @@
 
 
 ## ShellCheck global disables:
-
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
@@ -61,42 +60,28 @@
 #  shellcheck disable=SC2034
 #  shellcheck disable=SC2154 
 
-
-##  Expect Bash 5.0+   (2023: we are now at ver 5 for quite a few years)  
-if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
+if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
+  # @2023: we have been at ver 5 for quite a few years
   echo; echo "  Sorry, you need bash 5.0 or newer to run this script."; echo
   echo "  Your version: "; echo
   bash --version
   echo; sleep 10; exit 1
 fi
 
-#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+# # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
+# The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
+ModVersion="1.6.01"
 
+ModName="$(basename "$0")"
+if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi    # deprecated
+
+# Locale: this may upset some input/output filters ....  CAUTION   (see notes in the main settings) 
 AllowMoreLocale=
 
-
-##  Dev: set =1 to stop screen clears (and pause 1 sec), for easier fault tracing
-#   Set =integer for add longer pauses, "0.2" etc for less.
-
+# Dev: set =1 to stop screen clears (and pause 1 sec), for easier fault tracing   Set =integer for add longer pauses, "0.2" etc for less.
 NoClear=
 
 
-# This script:
-
-ModVersion="1.6.01"
-
-# major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
-
-# The 2nd register becomes printf'ed to 2dp for upgrade valuation
-# while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-
-
-ModName="$(basename "$0")"
-
-if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi
-
-
- 
 ##  CODING STYLE 
 
 #  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
@@ -151,23 +136,12 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
 
 
-
-## MAIN CODE  
+## INITIALIZE
 
 # Find where the main code is. Use local for Dev or Custom installs. Otherwise use FHS standard locations.
-
 qqX_MainFolder="/usr/share/qqX/qqX.main"
-
 [[ -d "./qqX.main" ]] &&  qqX_MainFolder="$(realpath "./qqX.main")"
-
-if [[ ! -d "$qqX_MainFolder" ]]; then 
-
-  echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1
-
-fi
-
-
-## INITIALIZE
+if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
 declare -gA VM_Array=()
@@ -214,7 +188,7 @@ source "$qqX_MainFolder/qqX_main_menu_routines"
 
 ##  START:  QUICKEMU-WRAP  menu interface  &  API DIVIDER  ###
 
-#   NB   Also see initial $1 flag setting traps at script start
+#   NB   Also see initial $1 flag setting traps   &&  TODO   qwrap is now deprecated  
 
 if [[ $1 ]]; then
 
@@ -291,22 +265,16 @@ fi
 ##  Start main menu :   
 
 tput civis
-
 printf "\033c"
-
 show_qmod_title
-
 multi_instance_checks
 
 # quietly check for qqX updates, in the background. Once only, at the start.
 
 if [[ ! $Disable_qqX_upd_Checks ]]; then
-
   check_for_qqX_updates &   
   qqX_UpdaterPID="$!"
-
 fi
-
 
 ## MAIN MENU LOOP  (select VM then choose actions to do)
 
@@ -323,11 +291,7 @@ while true ; do
 
     check_disk_is_okay "$XDG_QcowRightClick_VM_Dir_Name"  "$XDG_QcowRightClick_DiskName"
 
-    if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then 
-
-      printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus"
-
-    fi
+    if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
 
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then 
       
@@ -340,9 +304,7 @@ while true ; do
       if [[ $DiskChkStatus != "Okay" ]]; then  
 
         printColor "  BUT has errors: Try qqX [disk] utils " 
-      
         printf "\n\n Also see  https://qemu.readthedocs.io  "
-      
         printf  "> QEMU disk image utility notes\n\n"
 
       fi
@@ -351,13 +313,10 @@ while true ; do
 
     "$QEMU_IMG" info "$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName"
         
-
     if [[ $XDG_QcowRightClick_NO_qqX ]]; then  
 
       printColor "\n\n See  https://qemu.readthedocs.io  "
-      
       printf  "> QEMU disk image utility may be useful"
-    
       printf "\n\n  [enter] to quit  "
       
     else  printColor "\n\n  [enter] to continue  "
@@ -365,9 +324,7 @@ while true ; do
     fi
 
     read -rp  "  >  "
-    
-    
-
+     
     if [[ ! $XDG_QcowRightClick_NO_qqX ]]; then
 
       XDG_QcowRightClick=
@@ -795,9 +752,7 @@ while true ; do
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
       printf "\n\n [enter] to return \n\n"
-
       read -rp "  >  "
 
     else
@@ -821,9 +776,7 @@ while true ; do
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
       printf "\n\n [enter] to return \n\n"
-
       read -rp "  >  "
 
     else
@@ -857,7 +810,7 @@ while true ; do
 
     drives_and_snapshots  info
 
-      printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+    printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
 
     [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
 
@@ -900,7 +853,6 @@ while true ; do
       "$QEMU_IMG" info "$Selected_Drive"
 
       printColor "\n\n  Drive Updated ..."
-
       printf "\n\n  [enter] to return to menu \n\n "
       read -rp "  >  "  
 
@@ -909,7 +861,6 @@ while true ; do
   elif  [[ $MainMenuChoice == "sd" ]] ; then
 
     drives_and_snapshots  select 
-
     snapshot_delete
           
   elif  [[ $MainMenuChoice == "sa" ]] ; then
@@ -935,13 +886,10 @@ while true ; do
   elif [[ $MainMenuChoice == "2" || $MainMenuChoice == "3" ]] ; then
 
     create_new_drives
-
-
     
   elif [[ $MainMenuChoice == "v" ]] ; then
 
     if [[ $VerboseArgs ]]; then VerboseArgs= ; else VerboseArgs=1 ; fi
-
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
@@ -949,7 +897,6 @@ while true ; do
     Select_VM=1
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
-
 
   elif [[ $MainMenuChoice == "xa" ]] ; then
 
@@ -966,9 +913,7 @@ while true ; do
     
       printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
 
-      if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only "
-
-      else printf "\n\n  [r] remove the Extra Args " ; fi
+      if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only " ; else printf "\n\n  [r] remove the Extra Args " ; fi
 
     fi
 
@@ -991,7 +936,6 @@ while true ; do
 
     printf "\033c\n\n"
 
-
   else
 
     # refresh
@@ -1001,7 +945,7 @@ while true ; do
 
 done
 
-# https://code.visualstudio.com/
+# https://code.visualstudio.com/  (recommended)
 
 # vim:tabstop=2:shiftwidth=2:expandtab
 
