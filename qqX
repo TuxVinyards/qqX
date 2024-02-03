@@ -60,6 +60,9 @@
 #  shellcheck disable=SC2034
 #  shellcheck disable=SC2154 
 
+export "LC_NUMERIC=C"
+export "LC_COLLATE=C"
+
 if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
   # @2023: we have been at ver 5 for quite a few years
   echo; echo "  Sorry, you need bash 5.0 or newer to run this script."; echo
@@ -70,19 +73,16 @@ fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-ModVersion="1.6.01"
+ModVersion="1.6.02"
 
 ModName="$(basename "$0")"
 if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi    # deprecated
 
-# Locale: this may upset some input/output filters ....  CAUTION   (see notes in the main settings) 
-AllowMoreLocale=
-
-# Dev: set =1 to stop screen clears (and pause 1 sec), for easier fault tracing   Set =integer for add longer pauses, "0.2" etc for less.
+#  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
 NoClear=
 
 
-##  CODING STYLE 
+#  CODING STYLE 
 
 #  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
 
@@ -90,8 +90,8 @@ NoClear=
 #  The VS Code shellcheck extension is recommended.  It works well if set to 'check-on-save'.
 
 
-#  VARIABLES & FUNCTIONS should aim for clarity and contextual identity.  Variables should normally tend towards 'CamelCase'  
-#  & functions should tend towards 'snake_case'.  Emphasis or separation underscoring & caps should be added where needed.
+#  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
+#  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
 
 #  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
 
@@ -106,7 +106,7 @@ NoClear=
 #  Likewise care must be taken not to confuse lowercase vars with standard application commands, 
 #  especially in non-highlighting editors. 
 
-#  Note that Shellcheck will not continuity follow all caps variables. https://www.shellcheck.net/wiki/SC2154
+#  Note that Shellcheck will not continuity follow all-caps variables. https://www.shellcheck.net/wiki/SC2154
 
 
 #  BRACKETS: The more powerful [[ double bracket ]] system that was introduced in Bash 3.2 
@@ -138,7 +138,7 @@ NoClear=
 
 ## INITIALIZE
 
-# Find where the main code is. Use local for Dev or Custom installs. Otherwise use FHS standard locations.
+# Respect standard FHS locations but allow local overide for Dev work or for Custom installs.  
 qqX_MainFolder="/usr/share/qqX/qqX.main"
 [[ -d "./qqX.main" ]] &&  qqX_MainFolder="$(realpath "./qqX.main")"
 if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
@@ -183,7 +183,6 @@ source "$qqX_MainFolder/qqX_disk_maintenance"
 source "$qqX_MainFolder/qqX_selfcheck_and_update"
 
 source "$qqX_MainFolder/qqX_main_menu_routines"
-
 
 
 ##  START:  QUICKEMU-WRAP  menu interface  &  API DIVIDER  ###
@@ -543,9 +542,7 @@ while true ; do
         Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
 
         Zsync_Release_Name="$VM_InstanceName"
-
         Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
-
         #echo; echo "$Zsync_OS_Name  $Zsync_Release_Name" 
 
         Zsync_Updatable_ISO=1

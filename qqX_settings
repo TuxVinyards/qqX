@@ -268,12 +268,10 @@ Hide_qqX_BetaUpdates=1
 Specified_Updates_Location=
 
 
-## LOCALE
-#  Setting to =1  will increase the use of more locale-centric language/typeface features 
-#  BUT this may upset some input/output filters ....    CAUTION
-#  AllowMoreLocale=  has to be set prior to reading the main settings 
-#  This should be set, where indicated, near the start of the qqX file, prior to running the installer.
-
+## LOCALE (CAUTION)
+#  Setting to =1  will increase the use of more locale-centric language/typeface features, if needed
+#  BUT this may upset some input/output filters ....  
+AllowMoreLocale=
 
 ## End of Settings
 
