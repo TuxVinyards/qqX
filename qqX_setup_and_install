@@ -65,7 +65,7 @@
 # this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
 # See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756 
 
-#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created. This location may be group edited, further on in the script.
+# From qqX 1.6 onwards, a folder /usr/share/qqX should be created. This location may be group edited, further on in the script.
 
 # https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
 # shellcheck disable=SC1090
@@ -79,13 +79,15 @@ if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
   echo; sleep 10; exit 1
 fi
 
-if [[ ! -d "/tmp" ]]; then 
+HideFHSwarnings=     # To disable FHS warnings. Set =1
+
+if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/sxhare"  ]]; then 
 
   # https://superuser.com/questions/332610/where-is-the-temporary-directory-in-linux#332616
 
   printf "\n\n\n  Please read the notes at the start of this installer script."
 
-  printf "\n\n  \"/tmp\" not located: non Filesystem_Hierarchy_Standard system"
+  printf "\n\n  NON Filesystem_Hierarchy_Standard system:  \"/tmp\" or \"/usr/share\" not located"
 
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
 
@@ -101,7 +103,7 @@ fi
 
 OS_BashLocation="$(type -p bash)"
 
-if [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then 
+if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then 
 
   printf "\n\n\n  Please read the notes at the start of this installer script."
 
