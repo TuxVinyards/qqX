@@ -216,8 +216,9 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     [[ "$(sed --version | head -1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
 
-
+    printf "\n  # This file may be used as the basis for a qqX Custom Boot File \n\n  %s \n" "$QEMU" > "$QemuArgsShortFile"
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
+
     printf "\n\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
     printf "\n\n  QuickEmu:  %s" "$VERSION"  >> "$QemuArgsFile"
     printf "\n\n  %s:       %s" "$ModName" "$ModVersion" >> "$QemuArgsFile"
@@ -245,9 +246,10 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
         a="${args[i]}"
 
-        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
-        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
-        else printf " %s" "$a" >> "$QemuArgsFile"
+        #if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
+        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
+        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
+        else printf " %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
         fi
 
         if [[ "$a" == *'(c)'* ]]; then
@@ -270,17 +272,29 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt" 
 
-    [[ $ExtraArgs ]] && printf "\n\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
+    if [[ $ExtraArgs ]]; then 
+      printf "\n\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
+      printf "\n\n %s "  "$ExtraArgs"  >> "$QemuArgsShortFile"
+    fi
 
-    [[ $SharedDriveArgs ]] && printf "\n\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
+    if [[ $SharedDriveArgs ]]; then 
+      printf "\n\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
+      printf "\n\n %s "  "$SharedDriveArgs"  >> "$QemuArgsShortFile"
+    fi
 
-    [[ $SecondDriveArgs ]] && printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
+    if [[ $SecondDriveArgs ]]; then 
+      printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
+      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile"
+    fi
 
     if [[ $tpm == "on" ]]; then 
       printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+      printf "\n\n %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
     else    
       printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
+
+    printf "\n\n\n" >> "$QemuArgsShortFile"
 
     [[ $NoSmartcardSupport ]] && printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: \n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" >> "$QemuArgsFile"
 

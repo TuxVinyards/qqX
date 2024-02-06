@@ -479,6 +479,7 @@ function_Select_VM () {
     ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
 
     QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
+    QemuArgsShortFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_List.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
     # Qemu_IMG log > eg. for disk repair functions 
