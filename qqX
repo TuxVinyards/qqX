@@ -384,7 +384,8 @@ while true ; do
     
     fi
 
-    [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=
+    [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=  
+    [[ $UseCustomBootArgs ]] && UseCustomBootArgs=  
 
   fi
 
@@ -615,10 +616,10 @@ while true ; do
     fi
 
     printf  "  [q]   quit \n\n"
-    read -rp "  >  "  MainMenuChoice
+
+    [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   fi
-
 
   # ACTIONS: 
 
@@ -858,7 +859,9 @@ while true ; do
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
-    manange_and_repair_disks
+    manage_and_repair_disks
+
+    drives_and_snapshots  info
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
 

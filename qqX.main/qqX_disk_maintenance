@@ -152,7 +152,7 @@ drives_and_snapshots() {
 }
 
 
-function manange_and_repair_disks {
+function manage_and_repair_disks {
 
   drives_and_snapshots  select  as_disk_util
 

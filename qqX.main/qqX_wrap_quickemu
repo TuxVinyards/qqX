@@ -352,7 +352,6 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     if [[ $UseCustomBootArgs ]]; then
 
-      UseCustomBootArgs=
       QemuCustomBootCommand=""
 
       mapfile -t CustomBootArr < "$QemuArgsCustomFile"
