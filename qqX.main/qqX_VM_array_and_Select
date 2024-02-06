@@ -480,6 +480,7 @@ function_Select_VM () {
 
     QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
     QemuArgsShortFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_List.txt"
+    QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
     # Qemu_IMG log > eg. for disk repair functions 

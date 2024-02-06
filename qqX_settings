@@ -255,6 +255,14 @@ QEMU_Default_SystemType=
 QEMU_Default_MachineType=  
 
 
+##  qqX CUSTOM BOOTING, including the Arm, Risc-V and other machine & system types
+
+# The file "Qemu_ShortArgs_List.txt" in the VM folder may be used as the basis for a custom boot script
+# Run the VM in the boot mode required, eg sdl, spice etc.  Verbose output may be used, esp. if the VM is not expected to boot.
+# Then from the VM folder the ShortArgs file may be renamed as "Qemu_ShortArgs_Custom.txt" and edited line by line.
+# Comments and blank lines may be used, and will be ignored.
+
+
 ##  qqX UPDATES
 
 #   Checks quietly for new GitHub releases (set =1 if not required)

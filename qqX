@@ -440,6 +440,16 @@ while true ; do
 
       printColor  "\n\n  ?? "
 
+    elif [[ -e "$QemuArgsCustomFile" ]]; then
+
+      MenuCustomSystem="$(grep '/qemu-' "$QemuArgsCustomFile")"
+
+      MenuCustomMachine="$(grep -e '-machine' "$QemuArgsCustomFile" | cut -d ',' -f 1)"
+
+      printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
+
+      printf "\n\n  [d] [df] std SDL   [s] [sf] std spice   [g] std gtk"
+ 
     else
 
       printColor  "\n\n  [d]   start with SDL display"
@@ -722,6 +732,25 @@ while true ; do
 
     elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
     
+    fi
+
+  elif [[ $MainMenuChoice == "c" ]] ; then 
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+
+    else
+
+      UseCustomBootArgs=1
+      eval quickemu "-vm $VM_Conf_File --vm_boot" 
+      function_KillPID_Menu
+
     fi
 
   elif [[ $MainMenuChoice == "g" ]] ; then 

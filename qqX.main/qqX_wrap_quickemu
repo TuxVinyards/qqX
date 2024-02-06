@@ -349,11 +349,30 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
 
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
+
+    if [[ $UseCustomBootArgs ]]; then
+
+      UseCustomBootArgs=
+      QemuCustomBootCommand=""
+
+      mapfile -t CustomBootArr < "$QemuArgsCustomFile"
+
+      for Line in "${CustomBootArr[@]}"; do
+
+        if [[ $(tr -cd "[:graph:]" <<< "$Line") ]] && [[ "$Line" != *'#'* ]]; then QemuCustomBootCommand+="$Line " ; fi
+
+      done
+
+      eval "$QemuCustomBootCommand" 2> "$QemuErrorLog"  &
+
+    else
             
-    ## call QEMU  (with any extras, if present)
-    # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
- 
-    eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      ## call QEMU  (with any extras, if present)
+      # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
+  
+      eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+
+    fi
 
   fi
   
