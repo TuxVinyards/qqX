@@ -440,7 +440,7 @@ while true ; do
 
       printColor  "\n\n  ?? "
 
-    elif [[ -e "$QemuArgsCustomFile" ]]; then
+    elif [[ -e "$QemuArgsCustomFile" ]] && [[ ! $ShowNonCustomBootMenu ]]; then
 
       MenuCustomSystem="$(grep '/qemu-' "$QemuArgsCustomFile")"
 
@@ -448,7 +448,7 @@ while true ; do
 
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
 
-      printf "\n\n  [d] [df] std SDL   [s] [sf] std spice   [g] std gtk"
+      printf "\n\n  [C]  show full non-custom menu   or   [d] [df] std SDL   [s] [sf] std spice   [g] std gtk "
  
     else
 
@@ -477,6 +477,8 @@ while true ; do
       if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
 
       else printColor "[gl] ON > toggle-off" ; fi   
+
+      [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C]  hide non-custom menu"
 
     fi
 
@@ -734,6 +736,11 @@ while true ; do
     
     fi
 
+  elif [[ $MainMenuChoice == "C" ]] ; then 
+
+    if [[ $ShowNonCustomBootMenu ]]; then  ShowNonCustomBootMenu= ; else  ShowNonCustomBootMenu=1 ; fi
+    MainMenuChoice=
+  
   elif [[ $MainMenuChoice == "c" ]] ; then 
 
     printf "\n\n"
