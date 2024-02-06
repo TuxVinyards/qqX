@@ -449,7 +449,9 @@ while true ; do
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
 
       printf "\n\n  [C]  show full non-custom menu   or   [d] [df] std SDL   [s] [sf] std spice   [g] std gtk "
- 
+
+      printf "\n\n  [cd] edit custom args file    [qd] open Qemu docs in browser"
+
     else
 
       printColor  "\n\n  [d]   start with SDL display"
@@ -478,7 +480,7 @@ while true ; do
 
       else printColor "[gl] ON > toggle-off" ; fi   
 
-      [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C]  hide non-custom menu"
+      [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] show CUSTOM args boot-menu"
 
     fi
 
@@ -707,6 +709,10 @@ while true ; do
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release
 
   elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
+
+  elif [[ $MainMenuChoice == "cd" ]] ; then qqX_edit_settings  custom
+
+  elif [[ $MainMenuChoice == "qd" ]] ; then nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
 

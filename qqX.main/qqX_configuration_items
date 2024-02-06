@@ -399,6 +399,10 @@ qqX_edit_settings() {
 
       done
       
+    elif [[ $1 == "custom" ]]; then
+
+      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$QemuArgsCustomFile" 
+
     elif [[ $1 == "tune-up" ]]; then
 
       nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 

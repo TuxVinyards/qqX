@@ -262,6 +262,20 @@ QEMU_Default_MachineType=
 # Then from the VM folder the ShortArgs file may be renamed as "Qemu_ShortArgs_Custom.txt" and edited line by line.
 # Comments and blank lines may be used, and will be ignored.
 
+#  Use "qemu-system-aarch64 -machine help"  or other, as appropriate, to see machine options  
+#  Note that Qemu does not default to a set machine & a machine must be set.
+#  See https://qemu.readthedocs.io/en/v8.1.0/system/target-arm.html
+
+#  Also of interest  https://wiki.alpinelinux.org/wiki/Alpine_on_ARM#Using_QEMU 
+
+#  https://risc-v-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html
+
+#  Works: https://en.opensuse.org/openSUSE:RISC-V   # note, needs 'sudo' for virt-copy-out (to disk.qcow2)
+
+#  See qqX issue #2 for howto details and discussion
+
+#  WORKS:  qemu-system-riscv64 -nographic -machine virt -m 4G  -device virtio-blk-device,drive=hd0 -drive file=disk.qcow2,format=qcow2,id=hd0  -device virtio-net-device,netdev=usernet -netdev user,id=usernet,hostfwd=tcp::22220-:22  -kernel boot/u-boot.bin
+
 
 ##  qqX UPDATES
 
