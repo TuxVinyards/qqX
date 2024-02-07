@@ -72,7 +72,14 @@ printf "\n"  > "/tmp/qqX_echo_output.log"
 
 #
 
-echo () { command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; }
+echo () { 
+
+  if [[ $UseCustomBootArgs ]]; then
+    command echo "$@" >>  "/tmp/qqX_echo_output.log" ; 
+  else 
+    command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; 
+  fi
+}
 
 
 

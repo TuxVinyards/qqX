@@ -150,7 +150,7 @@ cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
 
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
 
-    if [[ $QEMU_Default_SystemType ]]; then 
+    if [[ $QEMU_Default_SystemType ]] && [[ ! $UseCustomBootArgs ]]; then 
     
       printf "\nQEMU_SystemType =  %s   QEMU_MachineType =  %s \n\n" "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile" 
 
@@ -217,12 +217,14 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ "$(sed --version | head -1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
 
     printf "\n  # This file may be used as the basis for a qqX Custom Boot File \n\n  %s \n" "$QEMU" > "$QemuArgsShortFile"
-    printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
 
+    printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
     printf "\n\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
     printf "\n\n  QuickEmu:  %s" "$VERSION"  >> "$QemuArgsFile"
     printf "\n\n  %s:       %s" "$ModName" "$ModVersion" >> "$QemuArgsFile"
     printf "\n\n  Date:      %s \n" "$(date)" >> "$QemuArgsFile"
+
+    [[ $UseCustomBootArgs ]] && printf "\n  REPLACING THE FOLLOWING with CUSTOM ARGS > See End of File for details \n\n"  >> "$QemuArgsFile"
 
     i=0
 
@@ -337,6 +339,8 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
         fi
 
       done
+
+      [[ $UseCustomBootArgs ]] && printf "\n\n\nHOWEVER ignoring the above standard boot & using the following CUSTOM BOOT sequence instead: \n\n"  && cat "$QemuArgsCustomFile"
       
       printf "\n\n\n\n"
     

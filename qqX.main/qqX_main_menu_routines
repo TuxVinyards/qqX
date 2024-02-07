@@ -47,7 +47,7 @@ function_KillPID_Menu() {
 
     SpicyPID=
 
-    [[ $UseCustomBootArgs ]] && printColor "\n\n  USING CUSTOM BOOT SEQUENCE  Standard quickemu output may be ignored."
+    [[ $UseCustomBootArgs ]] && printColor "  USING CUSTOM BOOT SEQUENCE:  \n"
 
     sleep  "$P_Kill_WaitSecs"   
 

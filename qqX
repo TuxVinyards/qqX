@@ -81,7 +81,6 @@ if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModN
 #  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
 NoClear=
 
-
 #  CODING STYLE 
 
 #  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
