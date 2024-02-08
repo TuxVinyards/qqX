@@ -71,17 +71,23 @@
 # shellcheck disable=SC1090
 # shellcheck disable=SC2317
 
-##  Expect Bash 5.0+   (2023: we are now at ver 5 for quite a few years)  
-if [ -z "$(type -p bash)" ] || ((BASH_VERSINFO[0] < 5)); then
-  echo; echo "  Sorry, you need bash 5.0 or newer to run this script."; echo
+if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
+  # @2023: we have been at ver 5 for quite a few years
+  echo; echo "  Sorry, you probably need Bash 5.0 or newer to run this script."; echo
+  echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
   echo "  Your version: "; echo
   bash --version
-  echo; sleep 10; exit 1
+  echo
+  read -rp "  Press [enter] to try anyway   [e]  to  exit and update  >  "    UpdateBash
+  if [[ $UpdateBash ]]; then echo;  exit 1; 
+  else  echo; echo "  I understand the risks and have made backups" ; echo ; read -rp "  [enter] to confirm  [e] to exit > " UpdateBash ; fi
+  echo
+  [[ $UpdateBash ]] &&  exit 1
 fi
 
 HideFHSwarnings=     # To disable FHS warnings. Set =1
 
-if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/sxhare"  ]]; then 
+if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/share"  ]]; then 
 
   # https://superuser.com/questions/332610/where-is-the-temporary-directory-in-linux#332616
 

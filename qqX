@@ -65,10 +65,16 @@ export "LC_COLLATE=C"
 
 if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
   # @2023: we have been at ver 5 for quite a few years
-  echo; echo "  Sorry, you need bash 5.0 or newer to run this script."; echo
+  echo; echo "  Sorry, you probably need Bash 5.0 or newer to run this script."; echo
+  echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
   echo "  Your version: "; echo
   bash --version
-  echo; sleep 10; exit 1
+  echo
+  read -rp "  Press [enter] to try anyway   [e]  to  exit and update  >  "    UpdateBash
+  if [[ $UpdateBash ]]; then echo;  exit 1; 
+  else  echo; echo "  I understand the risks and have made backups" ; echo ; read -rp "  [enter] to confirm  [e] to exit > " UpdateBash ; fi
+  echo
+  [[ $UpdateBash ]] &&  exit 1
 fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
