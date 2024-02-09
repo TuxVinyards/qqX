@@ -62,9 +62,16 @@ X_Shade="3"
 
 ##  VM SELECTOR:  
 
-#   Normally the first opening menu, used to select VM's.  Recommended use = 1 if few VMs. Otherwise = 4 per line. 
+#   Normally the first opening menu, used to select VM's. Normal setting ="4"  Set lower if only a few VMs.  
 
 VM_Select_ItemsPerLine="4"
+
+##  QuickGet SELECTOR:  
+
+#   Normally set internally at ="7"  but certain internal functions may reduce this setting to as low as "3"
+#   Use with caution.  Suggest 5 or 6 as lowest setting.  Normally leave blank.
+
+Force_GetList_NewLinePoint=
 
 
 ##  TEXT EDITOR  

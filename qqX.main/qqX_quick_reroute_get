@@ -57,6 +57,14 @@ print_quickget_choices () {
 
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
 
+  # default QGW_List_NewLinePoint = 7  but some functions may reduce this to as low as 3
+
+  if [[ $Force_GetList_NewLinePoint ]] && [[ $Force_GetList_NewLinePoint -lt "$QGW_List_NewLinePoint" || $Force_GetList_NewLinePoint -gt "7" ]] ; then 
+  
+    QGW_List_NewLinePoint="$Force_GetList_NewLinePoint"
+    
+  fi
+
   if [[ $2 == "UbuntuOthers" ]]; then QGW_List_UbuntuOthers=1; else QGW_List_UbuntuOthers=; fi
 
   if [[ "$2" == [a-z] ]]; then QGW_List_AlphaFilter="$2"; else QGW_List_AlphaFilter=; fi
