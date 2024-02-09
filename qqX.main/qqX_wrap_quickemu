@@ -306,7 +306,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
       # hold the launch till we have checked the config 
       BreakAtVerboseArgs=
-      cat "$QemuArgsFile"
+      if [[ $UseCustomBootArgs ]]; then cat "$QemuArgsCustomFile" ; else cat "$QemuArgsFile" ; fi
       printColor "  [enter] to continue  [b] to go back \n\n"
       read -rp " >  " BreakAtVerboseArgs
       printf "\n\n"
