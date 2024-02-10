@@ -448,9 +448,9 @@ while true ; do
 
     elif [[ -e "$QemuArgsCustomFile" ]] && [[ ! $ShowNonCustomBootMenu ]]; then
 
-      MenuCustomSystem="$(grep '/qemu-' "$QemuArgsCustomFile")"
+      MenuCustomSystem="$(grep '/qemu-' "$QemuArgsCustomFile" | grep -v '#' )"
 
-      MenuCustomMachine="$(grep -e '-machine' "$QemuArgsCustomFile" | cut -d ',' -f 1)"
+      MenuCustomMachine="$(grep -e '-machine' "$QemuArgsCustomFile" | grep -v '#' | cut -d ',' -f 1)"
 
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
 

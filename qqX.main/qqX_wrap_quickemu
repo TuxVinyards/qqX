@@ -185,13 +185,10 @@ EOV
 
 cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
-    #  REVIEW can patching in $WinHyperV_RC  & creating a RC reader function be done here ??
-
     # Show all the compiled qemu & swmtp arguments as a human readable list 
     # both to a log file and to screen   (Args & Args/HW record are defined after the VM selection or re-selection)
 
     # @2023/08  in qqX, the quickemu screen output now gets logged
-
 
     # @2023 the quickemu .sh file gets to be more readable in version 4.8 here:  
     
@@ -247,11 +244,9 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
       else
 
         a="${args[i]}"
-
-        #if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
-        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
-        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
-        else printf " %s" "$a" | tee -a "$QemuArgsFile" "$QemuArgsShortFile" &> /dev/null
+        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+        else printf " %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
         fi
 
         if [[ "$a" == *'(c)'* ]]; then
@@ -388,6 +383,7 @@ EOF
   source "/tmp/qmod-function-vm_boot-new-temp"
 
 }
+
 
 load_mod_quickemu_boot
 
