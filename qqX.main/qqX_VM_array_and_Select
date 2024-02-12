@@ -483,6 +483,8 @@ function_Select_VM () {
     QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
+    [[ -e $QemuArgsCustomFile ]] && ShowCustomBootMenu=1  
+
     # Qemu_IMG log > eg. for disk repair functions 
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
     if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi

@@ -420,7 +420,7 @@ while true ; do
 
       printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
 
-      printf "\n\n  [2] create a second  [3] a shared  > virtual hard-drive \n"
+      printf "\n\n  [2] create a second  [3] a shared  > virtual hard-drive   [rtv] reset Tiano VMF boot Vars \n"
 
 
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
@@ -446,7 +446,9 @@ while true ; do
 
       printColor  "\n\n  ?? "
 
-    elif [[ -e "$QemuArgsCustomFile" ]] && [[ ! $ShowNonCustomBootMenu ]]; then
+    elif [[ -e "$QemuArgsCustomFile" &&  $ShowCustomBootMenu ]]; then
+
+      # NB  "$QemuArgsCustomFile" may exist BUT  $UseCustomBootArgs  remains menu selectable
 
       MenuCustomSystem="$(grep '/qemu-' "$QemuArgsCustomFile" | grep -v '#' )"
 
@@ -680,6 +682,35 @@ while true ; do
 
     qqX_edit_settings
 
+  elif [[ $MainMenuChoice == "rtv" ]] ; then
+
+    RtvBack=
+    printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
+    printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old. \n\n  Your VMF_VARS.fd file(s) will be reinstalled."
+    printf  "\n\n  [enter] to continue  [b] to go back "
+    read -rp "  >  "  RtvBack
+
+    if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
+
+    else
+
+      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/OVMF/OVMF_VARS.fd" ]]; then
+        cp -f "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd.old"
+        cp -f "/usr/share/OVMF/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd"
+        printf "\n\n  Reset/Installed 'OVMF_VARS.fd' "
+      fi
+
+      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/AAVMF/AAVMF_VARS.fd" ]]; then
+        cp -f "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd.old"
+        cp -f "/usr/share/AAVMF/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd"
+        printf "\n\n  Reset/Installed 'AAVMF_VARS.fd' "
+      fi
+
+      printf "\n\n  [enter] to return \n\n "
+      read -rp "  >  "
+
+    fi
+
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
     QL_LogView=
@@ -693,6 +724,8 @@ while true ; do
       printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
 
     else  printf "  No qemu errors were present on the last VM load ...  ?? " ; fi
+
+    printf "\n\n  Also try [rtv] from the utils menu which may help if the distro boot sequence is causing problems"
 
     printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
 
@@ -750,7 +783,7 @@ while true ; do
 
   elif [[ $MainMenuChoice == "C" ]] ; then 
 
-    if [[ $ShowNonCustomBootMenu ]]; then  ShowNonCustomBootMenu= ; else  ShowNonCustomBootMenu=1 ; fi
+    if [[ $ShowCustomBootMenu ]]; then  ShowCustomBootMenu= ; else  ShowCustomBootMenu=1 ; fi
     MainMenuChoice=
   
   elif [[ $MainMenuChoice == "c" ]] ; then 
