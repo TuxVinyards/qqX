@@ -390,7 +390,7 @@ qqX_edit_settings() {
 
         else
 
-          nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
+          nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
           break
@@ -401,17 +401,17 @@ qqX_edit_settings() {
       
     elif [[ $1 == "custom" ]]; then
 
-      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$QemuArgsCustomFile" 
+      nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile" 
 
     elif [[ $1 == "tune-up" ]]; then
 
-      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$TuneUpTargetDraft" 
+      nohup &> /dev/null   "$TextEditor" "$TuneUpTargetDraft" 
       ConfSettingsAdjusted=1
       refresh_conf_vars_and_values
 
     else 
 
-      nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt"  "$TextEditor" "$Q_Mod_SettingsFile"  
+      nohup &> /dev/null   "$TextEditor" "$Q_Mod_SettingsFile"  
       SettingsFileAdjusted=1
       VM_Conf_Dir=
       if [[ $VM_InstanceName ]]; then  VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect to Re-Initialize"

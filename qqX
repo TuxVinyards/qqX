@@ -740,7 +740,7 @@ while true ; do
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
-    nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
+    nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
     # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
     #  As from 'WebBrowser' section and handling of firefox etc
@@ -751,7 +751,7 @@ while true ; do
 
   elif [[ $MainMenuChoice == "cd" ]] ; then qqX_edit_settings  custom
 
-  elif [[ $MainMenuChoice == "qd" ]] ; then nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "https://qemu.readthedocs.io"  & 
+  elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
 

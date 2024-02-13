@@ -315,7 +315,7 @@ function_quick_get_wrap ()  {
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
-        nohup > "/tmp/qqX_nohup.txt" 2> "/tmp/qqX_nohup.txt" "$WebBrowser"  "$QGW_OS_HomePage"  & 
+        nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
 
       elif [[ $QGW_List_NumSelected ]]; then 
 
