@@ -47,7 +47,7 @@ function_KillPID_Menu() {
 
     SpicyPID=
 
-    [[ $UseCustomBootArgs ]] && printColor "  USING CUSTOM BOOT SEQUENCE:  \n"
+    [[ $UseCustomBootArgs ]] && printColor "  STARTING CUSTOM BOOT SEQUENCE:  \n"
 
     sleep  "$P_Kill_WaitSecs"   
 

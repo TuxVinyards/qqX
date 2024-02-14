@@ -383,7 +383,7 @@ while true ; do
 
       else
 
-        printf "\n    %s   >   is now shut down \n" "$VM_InstanceName" 
+        printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
 
       fi
     
@@ -456,7 +456,7 @@ while true ; do
 
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
 
-      printf "\n\n  [C]  show full non-custom menu   or   [d] [df] std SDL   [s] [sf] std spice   [g] std gtk "
+      printf "\n\n  [C]  show full normal menu  or  use normal:  [d] [df]  sdl   [s] [sf] spice   [g] std gtk "
 
       printf "\n\n  [cd] edit custom args file    [qd] open Qemu docs in browser"
 
@@ -733,7 +733,7 @@ while true ; do
 
     read -rp "  >  "  QL_LogView
 
-    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated") 
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") 
 
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
 
