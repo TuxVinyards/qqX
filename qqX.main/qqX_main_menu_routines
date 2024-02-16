@@ -42,10 +42,9 @@ function_KillPID_Menu() {
 
   InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
 
+  SpicyPID="$(pgrep spicy)"
 
   if [[ $InstancePID ]]; then 
-
-    SpicyPID=
 
     [[ $UseCustomBootArgs ]] && printColor "  STARTING CUSTOM BOOT SEQUENCE:  \n"
 
@@ -53,10 +52,8 @@ function_KillPID_Menu() {
 
     printColor "\n  Quickemu instance %s on PID:  %s  %s"  "$VM_InstanceName"  "$InstancePID"  "$BootAlert"
 
-    printColor  "   [k] force close the Quickemu instance   "
+    printColor  "\n\n  [k] force close the Quickemu instance   "
     
-    SpicyPID="$(pgrep spicy)"
-
     if [[ $SpicyPID ]]; then 
 
       #  REVIEW   if possible, add SDL reconnect 
@@ -70,9 +67,16 @@ function_KillPID_Menu() {
     printf "\n\n"
     tput cnorm
 
+  else
+
+    # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
+    [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
+
   fi
 
+
   # return to menu requires VM to be shutdown first
+  # run a check every second (-t 1)
 
   while true ; do 
 

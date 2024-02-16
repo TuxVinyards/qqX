@@ -213,7 +213,12 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     [[ "$(sed --version | head -1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
 
-    printf "\n  # This file may be used as the basis for a qqX Custom Boot File \n\n  %s \n" "$QEMU" > "$QemuArgsShortFile"
+    { 
+      printf   "\n  # This file may be used as the basis for a qqX Custom Boot File" 
+      printf "\n\n  # Comments and blank lines may be safely used & will be ignored." 
+      printf "\n\n  %s \n" "$QEMU" 
+      
+    }  > "$QemuArgsShortFile"
 
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
     printf "\n\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
@@ -243,16 +248,16 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
           
       else
 
-        a="${args[i]}"
-        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
-        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
-        else printf " %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
-        fi
-
+        a="${args[i]}"        
+        
         if [[ "$a" == *'(c)'* ]]; then
           a="${a//(/'\('}"
           a="${a//)/"\)"}"
-          args[i]="$a"
+        fi
+
+        if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+        elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+        else printf " %s" "$a" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
         fi
 
         args[i]=" $a"   # add extra space
@@ -286,7 +291,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
 
     if [[ $tpm == "on" ]]; then 
       printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
-      printf "\n\n %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
+      printf "\n\n  %s  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
     else    
       printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
     fi
