@@ -247,17 +247,18 @@ function_quick_get_wrap ()  {
 
             else
 
-              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep 'HOMEPAGE=' | cut -d '=' -f 2)"
-              QGW_OS_HomePage="${QGW_OS_HomePage/';;'/}"
+              # first listing, some may have two
+              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep -m 1 'HOMEPAGE=' | cut -d '=' -f 2)"
+              QGW_OS_HomePage="${QGW_OS_HomePage//';;'/}"
               QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
 
             fi
 
             [[ $QGW_OS_HomePage ]] &&  printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
 
-            if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2> /dev/null; then  printf " (working)"
-
-            else  printf " (site down or bad link)" ; printColor " ??" 
+            if [[ $QGW_OS_HomePage ]] && wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null; then  printf " (working)"
+           
+            else  printf "\n\n  Downloads might work but quickget appears to have a bad HOME PAGE link or site is down" ; printColor " ??" 
             
             fi
 
