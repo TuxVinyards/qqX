@@ -369,8 +369,6 @@ else
 
     qqX_RemovalTarget_X="$(type -p qqX)"
 
-    [[ -d "$qqX_Std_Share_Path" ]] && qqX_RemovalTargetShare="$qqX_Std_Share_Path"
-
     qqX_Remove=
 
     printColor "\n\n  [y] sudo auto removal of qqX scripts, plus of removal qqX folders & of settings" 
@@ -387,9 +385,9 @@ else
 
       [[ $qqX_RemovalTarget_X ]] && sudo rm "$qqX_RemovalTarget_X"
 
-      [[ $qqX_RemovalTargetShare ]] && sudo rm -r "$qqX_RemovalTargetShare"
+      [[ -d "/usr/share/qqX" ]] && sudo rm -r "/usr/share/qqX"  
 
-      rm -r "$HOME/.qqX"  ||  printColor "\n\n  Settings folder ERROR or not found \n\n" 
+      [[ -d "$HOME/.qqX" ]] && rm -r "$HOME/.qqX" 
 
       rm "$HOME/.local/share/applications/qqX.desktop" ||  printColor "\n\n  qqX.desktop file not found \n\n"
 
