@@ -633,8 +633,7 @@ refresh_sources_and_reload_VM_arrays() {
 
   function_create_VM_folderList  
   function_scan_VM_folderList  
-  find_main_drive_and_img_iso
-  set_drive_paths
+  refresh_conf_vars_and_values
 
   # reload screen 
   ByPass_VM_Array_Selector=1

@@ -113,7 +113,7 @@ function check_screen_percentage_and_output {
 
 function set_drive_paths {
 
-  #  For a SECOND/SHARED DRIVE (thanks @gnudoc on the quickemu Discord channel)  do "qemu-img create -f qcow2 disk2.qcow2 40G"  or as required
+  #  For a SECOND/SHARED DRIVE (idea from @gnudoc on the quickemu Discord channel)  do "qemu-img create -f qcow2 disk2.qcow2 40G"  or as required
   #  Set  ExtraArgs=" -device virtio-blk-pci,drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=/vm_folder/disk2.qcow2"  
   #  Edit path & boot a VM.  Use 'Disks'  Gparted or similar to find, format and mount.  
   #  The function needs to be run everytime a different VM is selected to allow for individual VM settings or requirements.
@@ -126,37 +126,24 @@ function set_drive_paths {
   #  SECOND DRIVE and .conf file
   #  Drive path to be individually set in the .conf file on a per VM basis.   
 
-  SecondDrive=
-  SharedDrive=
-  DriveLocationError=
-  SharedDrive_Conf=
-  SecondDriveArgs=
-  SharedDriveArgs=
-  MacLegacyDrive=
+  #  NOTE: From qqX ver 1.5 onwards, this function now gets called by 'refresh_conf_vars_and_values' 
+  #  which will have already sourced the .conf file and its variables
 
-  if [[ $VM_Conf_File ]]; then
+  if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2" 
+        
+  else BusType="virtio-blk-pci"; fi
 
-    eval "$(grep -s MacLegacyDrive "$VM_Conf_File")"     #  TODO   eval grep not needed post 1.5
+  #  SECOND DRIVE 
+  #  Drive path to be individually set in the .conf file on a per VM basis.  
 
-    if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2" 
-          
-    else BusType="virtio-blk-pci"; fi
+  if [[ -e "$SecondDrive" ]]; then
 
-    #  SECOND DRIVE 
-    #  Drive path to be individually set in the .conf file on a per VM basis.  
+    SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"  
 
-    eval "$(grep -s SecondDrive "$VM_Conf_File")"
+  elif [[ $SecondDrive ]]; then 
 
-    if [[ -e "$SecondDrive" ]]; then
-
-      SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"  
-
-    elif [[ $SecondDrive ]]; then 
-
-      # whilst the conf entry exists the above test didn't find it
-      DriveLocationError="ERROR SecondDrive NOT found (.conf file)"
-
-    fi
+    # whilst the conf entry exists the above test didn't find it
+    DriveLocationError="ERROR SecondDrive NOT found (.conf file)"
 
   fi
 
@@ -193,6 +180,7 @@ function set_drive_paths {
   fi
 
 }  
+
 
 #  MAIN DRIVE & BOOT
 # 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
@@ -915,6 +903,13 @@ function refresh_conf_vars_and_values {
 
   source "$ConfClearanceLog"
 
+  SecondDrive=
+  SharedDrive=
+  DriveLocationError=
+  SharedDrive_Conf=
+  SecondDriveArgs=
+  SharedDriveArgs=
+  MacLegacyDrive=
   QemuError_VM_Filter=()
 
   source "$VM_Conf_File"

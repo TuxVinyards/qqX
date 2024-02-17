@@ -35,15 +35,16 @@ drives_and_snapshots() {
 
   Selected_Drive=
   Selected_DriveName=
-  find_main_drive_and_img_iso
-  set_drive_paths
+  refresh_conf_vars_and_values
 
   if [[ $SecondDriveArgs ]]; then
 
     printColor "\n  Second Drive: \n\n"
-    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
 
-    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    else
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
+    fi
 
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo ; else check_disk_is_okay "$SecondDrive" ; fi
 
@@ -57,9 +58,11 @@ drives_and_snapshots() {
   if [[ $SharedDriveArgs ]]; then
 
     printColor "\n  Shared Drive: \n\n"
-    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
 
-    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    else
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
+    fi
 
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
 
@@ -70,21 +73,24 @@ drives_and_snapshots() {
 
   fi
 
+  if [[ $SharedDrive_Conf == "no-shared" ]]; then printColor "\n  Shared Drive:"; printf "\n\n  Disabled (see .conf file) \n\n" ; fi
+
   if [[ ! -e $MainDrive ]]; then  printColor "\n\n  NO MAIN DRIVE  (yet) \n\n"
 
   else
 
-    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n\n  Main Drive: \n\n"
-    else printColor "\n\n  One Main Drive: \n\n"
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n  Main Drive: \n\n"
+    else printColor "\n  One Main Drive: \n\n"
     fi
 
-    if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
-
-    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" ; fi
+    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    else
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
+    fi
 
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo ; else check_disk_is_okay "$MainDrive" ; fi
 
-    printf " Health Status:  %s"  "$DiskChkStatus"
+    printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
     printf "\n\n"
@@ -481,9 +487,13 @@ function create_new_drives {
   SecondDriveCreateSize=
   DriveCreated=
 
-  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs ]] ; then printColor "\n\n  ERROR:  a shared drive already exists. Make backups ...\n\n"
+  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs || $SharedDrive_Conf == "no-shared" ]] ; then 
+    
+    printColor "\n\n  ERROR:  a shared drive already exists. Check VM conf and general settings.\n\n"
 
-  elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then printColor "\n\n  ERROR:  a second drive already exists. Make backups ...\n\n"
+  elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then 
+  
+    printColor "\n\n  ERROR:  a second drive already exists. Check VM conf and general settings.\n\n"
 
   else
 
@@ -594,7 +604,7 @@ function create_new_drives {
 
           if [[ $DriveCreated ]]; then
 
-            set_drive_paths
+            refresh_conf_vars_and_values
 
             printColor "\n  The Created Drive should now be formatted from inside a VM:"
 
