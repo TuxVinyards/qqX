@@ -389,7 +389,7 @@ qqX_edit_settings() {
       
     elif [[ $1 == "custom" ]]; then
 
-      nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile" 
+      nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile"  &
 
     elif [[ $1 == "tune-up" ]]; then
 

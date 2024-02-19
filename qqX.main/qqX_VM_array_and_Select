@@ -321,7 +321,11 @@ function_print_conf_array () {
 function_Select_VM () {  
 
   SelectArrayError=
-   
+  ShowUtilsMenu=
+  ShowCustomBootMenu=
+  ShowDefault_Hybrid=
+  ForceCustomBootMenu=
+     
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
 
     # if reselecting & the array is already loaded (which it should be ...)
@@ -483,8 +487,6 @@ function_Select_VM () {
     QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
-    [[ -e $QemuArgsCustomFile ]] && ShowCustomBootMenu=1  
-
     # Qemu_IMG log > eg. for disk repair functions 
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
     if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
@@ -639,6 +641,7 @@ refresh_sources_and_reload_VM_arrays() {
   ByPass_VM_Array_Selector=1
   KVM_MSR_Error=
   ShowUtilsMenu=
+  ForceCustomBootMenu=
   printf "\033c"
   show_qmod_title
 
