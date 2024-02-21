@@ -128,53 +128,7 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 
 qqX always makes backups, as is *standard good practice* with *any* software.
 
-### Changes
-
-Other than in the news section:
-
-There have been a few minor point releases to improve installation on non-standard systems.  
-
-Handling of the new 3 dot quickemu release number has been sorted.
-
-Running of quickget when a zsync live distro had been previously selected has been fixed.
-
-Updates are now tidied into their own specific folders
-
-Tune up auto guidance has been improved.
-
-Qemu-img changing its disksize reporting has been sorted.
-
-Creation of first time snapshots has now been fixed.  
-
-Same with no-start new distros from the config wizard not adding 'G' to the ram= line.  
-
-The way qqX picks up the settings file has been changed to make it easier for forks and branches to be tested and developed. :rocket:
-
-New release 1.4.1 :christmas_tree: had lots of minor improvements plus introduced @zen0bit's URL checking. There was also a neat no-hang browser for opening for OS Home Pages and several under the hood changes in readiness for release 1.5 in the new year.
-
-Release 1.4.5 was semi interim to 1.5.  As previously, it had yet more improvements but several small new features also made their way in, hence the number jump.
-
-Of major importance were two hot fixes for QEMU issues.  One is 'hpet' deprecated code warning. The other is a fix for the recent and recurring 'smartcard problem' [#888](https://github.com/quickemu-project/quickemu/issues/888) and [#717](https://github.com/quickemu-project/quickemu/issues/717) that can affect some distros. Both of these fixes can be toggled from the main settings menu.
-
-Minor pull requests are welcome, as are issues. If qqX is not working, then say so.
-
-### Next release
-
-Work has been focusing on being able to select different qemu machines, set individual custom quickemu scripts and set detailed vm specific configurations.
-
-The ability to have on the fly switching from x86 to, for example aarch64 raspi3b, and others is workable but simpler methods are required, so that we don't take things outside the scope of the project.
-
-Several spin off features are now being backported instead.
-
-A version 2 with machine swaps is being temporarily moved to the back burner until the backporting is complete.
-
-Note the disk health checker doing its thing, in the version 2 snap below.  Clusters repaired too ...  👍
-
-![dev work and disk error alert](https://github.com/TuxVinyards/qqX/assets/3956806/20262c87-83eb-481c-a6f1-a50cd2a0c19b)
-
-Being able to autoinstall from any given random non-quickget ISO is on the wish list.
-
-Conversion between gnome boxes and quickemu is currently on the the todo list for version 2.2 (?)
+More details here: <https://github.com/TuxVinyards/qqX/wiki/Change-Log>
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
