@@ -118,49 +118,7 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
 
   No other software, support structures or dependancies are needed.
 
-- Extract the files & run the installer, usually right click, then run as program, or similar.
-
-  Further notes are in the installer script itself. Users of Non Filesystem Hierarchy Standard OS's such as NixOS, in particular, should read these & the notes to [#1](https://github.com/TuxVinyards/qqX/issues/1) raised by @flexiondotorg
-
-The installer does require a default VM folder:
-
-- If you have existing *quickemu* virtual machines, start qqX and edit the settings file to point to where they are.
-
-  ![copy location](https://github.com/TuxVinyards/qqX/assets/3956806/13ca993f-34aa-477a-878c-b859e5725c97)
-
-- 'VMQs' will be created in your Home folder, next to Downloads & Videos, if requested.
-
-- The default folder may be moved or renamed using your file manager. Start qqX and edit the settings to point to it.
-
-- If this is a new setup, installing a basic Linux distro, one that you are familiar with perhaps, will tell you if your setup is okay.
-
-When you know that everything is working correctly, you can start exploring ...
-
-- An auto-detector will tell you when new qqX releases are available.
-
-- The qqX installer can be used to update, reinstall, uninstall or reconfigure.
-
-### Installation Tips
-
-You can also open a terminal in the release folder & type `./qqX_setup_and_install`  Note the front `./`  Also note the file should already have execution permissions set. If not, use the right click file properties dialog to set them.
-
-If you have downloaded both named files from the release tab, you can check the download by opening a terminal in the release's download folder and typing `sha256sum -c qqX-` "tab-key" `.s` "tab-key".
-
-All folders can be easily moved around, but make sure that they have their .conf file next to them.
-
-Multiple folders can help organise your distros. You can edit which VMs to show first in the general settings.
-
-If you you are finding the interface a bit cramped, re-run the installer making sure to run the desktop part, rather than skipping, will allow you to tweak the terminal size. Remember of course that terminal window sizing is also affected by the (monospaced) font size. For fonts you may need to see your host distro control panel.
-
-Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community and can help make this software better for others.
-
-### Updating
-
-Make sure to use the installer script so that new features get added to your settings file.
-
-The main settings file has an option for placing updates in a custom folder, instead of the usual 'Downloads' one ...
-
-All locations and preferences will be kept.
+See the Wiki for more details <https://github.com/TuxVinyards/qqX/wiki>
 
 ## Release notes
 
