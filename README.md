@@ -62,13 +62,13 @@ qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quic
 
 Less is more:
 
-By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding. 
+By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
 qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API.
 
-Anything within quickemu can be easily pulled, shaped and improved. 
+Anything within quickemu can be easily pulled, shaped and improved.
 
 There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
