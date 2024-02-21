@@ -24,7 +24,7 @@ The installer script will update older settings files with the new feature optio
 
 Release 1.6.01 is functionally the same as 1.5 but now separates the main script up into more workable sections
 
-1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others. Plus a couple UI tweaks and minor bug fixes.
+1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others. Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
