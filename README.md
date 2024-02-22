@@ -8,7 +8,7 @@ Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
-### quickemu quickget X terminal project
+## quickemu quickget X terminal project
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
 
@@ -107,6 +107,10 @@ qqX will work quite happily alongside quickgui or quickemu shortcuts. But these 
   No other software, support structures or dependancies are needed.
 
 See the Wiki for more details <https://github.com/TuxVinyards/qqX/wiki>
+
+## FAQs and Help
+
+See Wiki <https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help>
 
 ## Release notes
 
