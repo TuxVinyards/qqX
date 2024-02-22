@@ -2,29 +2,9 @@
 
 ## Safe & Powerful text based Quickemu Virtual Machine Manager
 
-Release 1.5.02 introduced several new features and is running very smoothly.
+1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others.
 
-- Refactored code is now more small screen friendly.
-
-- VM selector shows if the distro is live boot or installed.
-
-- Quickget interface gives alphabetical zooming into list sections.
-
-- GL graphics on/off toggle - Handy for basic distros.
-
-- Qemu message suppression - Individual VM or Global.
-
-- See screenshots below.
-
-The installer script will update older settings files with the new feature options.
-
-- Use the Github **code/clone** button for the very latest tweaks & bug fixes (if needed).
-
-- The program's built-in downloader will neatly place releases into their own special sub-folder.
-
-Release 1.6.01 is functionally the same as 1.5 but now separates the main script up into more workable sections
-
-1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others. Plus a couple of UI tweaks and minor bug fixes.
+Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
@@ -100,7 +80,7 @@ Plus:
 
 - Multiple snapshot management, including of shared disks.  
 
-Quick Get multi distro menu:
+Release 1.5.02 added alphabetical zooming into list sections for the Quick Get multi distro menu:
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
