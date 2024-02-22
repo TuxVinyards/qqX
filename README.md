@@ -8,7 +8,7 @@ Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
-##  Quickemu Virtual Machine Manager - A Safe and Powerful TUI 
+## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
 
