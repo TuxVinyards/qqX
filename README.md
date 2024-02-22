@@ -16,6 +16,8 @@ See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
+[Translation](https://github.com/TuxVinyards/qqX/wiki/Translation) using Google Chrome is recommended as more accurate.
+
 ## Why quickemu?
 
 [Quickemu](https://github.com/quickemu-project/quickemu) is simply built and easy to use.
