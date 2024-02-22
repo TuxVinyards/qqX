@@ -96,7 +96,7 @@ Easy process controlled, progress reporting, distro downloads. Time reporting on
 
 ## How to Install
 
-qqX will work quite happily alongside quickgui or quickemu shortcuts. But these are not necessary.
+qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary.
 
 - Start by installing a full normal quickemu setup, if you don't already have a one, complete with all its components and all its dependencies, as in the instructions on the quickemu-project pages. <https://github.com/quickemu-project/quickemu>
   
