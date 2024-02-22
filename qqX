@@ -79,7 +79,7 @@ fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-ModVersion="1.6.02"
+ModVersion="1.6.03"
 
 ModName="$(basename "$0")"
 if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi    # deprecated

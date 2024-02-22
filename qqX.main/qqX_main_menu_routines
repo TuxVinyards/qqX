@@ -49,7 +49,12 @@ function_KillPID_Menu() {
 
   SpicyPID="$(pgrep spicy)"
 
-  if [[ $InstancePID ]]; then 
+  if [[ ! $InstancePID ]]; then 
+
+    # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
+    [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
+
+  else
 
     [[ $UseCustomBootArgs ]] && printColor "  STARTING CUSTOM BOOT SEQUENCE:  \n"
 
@@ -61,10 +66,7 @@ function_KillPID_Menu() {
     
     if [[ $SpicyPID ]]; then 
 
-      #  REVIEW   if possible, add SDL reconnect 
-
       SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
-    
       printColor " [r] reload Spicy window (if closed)"
 
     fi
@@ -72,13 +74,7 @@ function_KillPID_Menu() {
     printf "\n\n"
     tput cnorm
 
-  else
-    
-    # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
-    [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
-
   fi
-
 
   # return to menu requires VM to be shutdown first
   # run a check every second (-t 1)
