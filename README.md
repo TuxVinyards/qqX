@@ -1,6 +1,6 @@
 # qqX
 
-## A Safe & Powerful text based Quickemu Virtual Machine Manager
+## " quickemu quickget X terminal project "
 
 1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others.
 
@@ -8,7 +8,7 @@ Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
-## quickemu quickget X terminal project
+##  Quickemu Virtual Machine Manager - A Safe and Powerful TUI 
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
 
