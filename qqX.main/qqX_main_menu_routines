@@ -40,7 +40,12 @@ function_KillPID_Menu() {
   
   # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
 
+  # But from ver 1.6.02 there is a theoretical possibility of users customising out the call line: 
+  # eg -pidfile ubuntu-22.04/ubuntu-22.04.pid etc being removed, so do belt & braces check for the PID  
+
   InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
+
+  [[ ! $InstancePID ]] && InstancePID="$(pgrep "$VM_InstanceName")"
 
   SpicyPID="$(pgrep spicy)"
 
@@ -68,7 +73,7 @@ function_KillPID_Menu() {
     tput cnorm
 
   else
-
+    
     # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
     [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
 
