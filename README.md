@@ -1,6 +1,6 @@
 # qqX
 
-## Safe & Powerful text based Quickemu Virtual Machine Manager
+## A Safe & Powerful text based Quickemu Virtual Machine Manager
 
 1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others.
 
