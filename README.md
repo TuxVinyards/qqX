@@ -38,7 +38,7 @@ It has an easy installation. No additional software or dependancies are required
 
 Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system ...  and you can easily switch between the two.
+qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. Both may be installed. Safely test out the qqX difference on your existing quickgui VM's with multiple options of display modes, utilities, optimizers and tools...
 
 ### Why the text interface?
 
