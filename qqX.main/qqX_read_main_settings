@@ -24,6 +24,13 @@
 #  shellcheck disable=SC2154 
 
 
+## VM selector style default
+
+[[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="A"
+
+[[ ! $VM_Select_ItemsPerLine ]]  &&  VM_Select_ItemsPerLine="4"
+
+
 function_create_VM_folderList() {
 
   DefaultFolderError=
@@ -59,14 +66,13 @@ function_create_VM_folderList() {
     
       if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
 
-      ExtraFolderError=1
+      ExtraFolderError="$xF"
 
     fi
 
   done
 
 }
-
 
 # Run the function & populate the list: 
 function_create_VM_folderList

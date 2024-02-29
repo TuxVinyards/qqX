@@ -190,7 +190,7 @@ function_scan_VM_folderList () {
 
     fi
 
-    ((i +=1))
+    ((i+=1))
 
   done
 
@@ -201,14 +201,9 @@ function_scan_VM_folderList () {
 
 }
 
+## Variant styles of VM display & their common function units:
 
-function_print_conf_array () {
-
-  ## Print a list of the VM's in the VM array
-
-  i=0
-  ListTitleFolder=
-  ListTitleLine_ItemCount=0
+vm_selector_init_common () {
 
   VM_ElementCount="${#VM_Array[@]}" 
   VM_PairsCount="$((VM_ElementCount/2))"
@@ -218,94 +213,120 @@ function_print_conf_array () {
   LiveDistrosFound=
   MSR_DistrosFound=
 
+}
+
+function_vm_selector_array_check () {
+
+  # Legacy checker moved here in version 1.6.03 with introduction of selector styles
+  # Appears intended for changes made after main initialization has happened   # REVIEW  may not be now needed ?
+
+  SelectArrayError=
+  i=0
+
   while [[ ${VM_Array[$i,0]} ]] ; do
 
     if [[ ! -d "${VM_Array[$i,0]}" ]]; then 
 
-      printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"   
-      function_conf_error  "folder $i" 
-      SelectArrayError=1
-      break 
-
-    else
-
-      ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-      ArrayConf_Item_Listing="${VM_Array[$i,1]}"
-      ArrayConf_Item_Listing="${ArrayConf_Item_Listing/'.conf'/}"
-
-      if [[ -e "$ArrayConf_Item" ]]; then 
-
-        [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
-
-        if [[ ! $ByPass_VM_Array_Selector ]]; then
-                
-          if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
-
-            if [[ $ListTitleFolder ]]; then 
-            
-              printf " >>  %s\n\n\n  "  "$ListTitleFolder"
-
-              ListTitleLine_ItemCount=0
-
-            else  printf "\n\n  "
-            
-            fi
-
-            ListTitleFolder="${VM_Array[$i,0]}"
-
-          fi
-
-          QcowTarget=
-          QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
-          QcowTarget="${QcowTarget/'disk_img='/}"  
-          QcowTarget="${QcowTarget//'"'/}"
-
-          # Newly downloaded VMs will have a qcow disk path in the .conf file 
-          # BUT it won't be be there yet, not until quickemu has done a first run against the .conf
-
-          if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
-
-            ArrayConf_Item_Listing+=" (new)"
-
-          elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
-
-            #  Live VM qcow2 disks are as little only 196k. 
-            #  But set test ceiling is set at 1,000,000k (1G) to allow for meta preallocation etc REVIEW 
-
-            if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
-              #  Are Live VMs only, as zsync only updates the iso file.   
-              ArrayConf_Item_Listing+=" (Z)"
-              ZsyncDistrosFound=1
-            else
-              #  Live VMs only, in general, running off the iso file.   
-              ArrayConf_Item_Listing+=" (L)"
-              LiveDistrosFound=1
-            fi
-
-          fi
-
-          if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
-          printColor "%-29s" "$ArrayConf_Item_Listing"
-          ((ListTitleLine_ItemCount+=1))   
-
-          # Move to new line when number of items per line reached  (default 4, see main settings)
-          if [[ $ListTitleLine_ItemCount == "$VM_Select_ItemsPerLine" ]]; then
-            ListTitleLine_ItemCount=0
-            printf "\n\n  "
-          fi
-
-        fi
-
-      else
-
-        printf "\n\n  ERROR  %s ' .conf ' not found: \n\n  %s \n\n" "$ModName" "$ArrayConf_Item"
-
-        function_conf_error  "config $i" 
-        SelectArrayError=1
+        printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"   
+        function_conf_error  "folder $i" 
+        SelectArrayError="${VM_Array[$i,0]}"
         break
+    fi
+        
+    if [[ ! -e "${VM_Array[$i,0]}/${VM_Array[$i,1]}" ]]; then 
+
+      printf "\n\n  ERROR  %s ' .conf ' not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,1]}"
+      function_conf_error  "config $i" 
+      SelectArrayError="${VM_Array[$i,1]}"
+      break
+    fi
+
+    ((i+=1))
+
+  done
+
+}
+
+function_vm_folder_item_text () {
+
+  ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+  ArrayConf_Item_Listing="${VM_Array[$i,1]}"
+  ArrayConf_Item_Listing="${ArrayConf_Item_Listing/'.conf'/}"
+
+  [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
+
+  [[ ${#ArrayConf_Item_Listing} -gt "24" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:24}"
+
+  ## Decide on item text to print
+
+  QcowTarget=
+  QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
+  QcowTarget="${QcowTarget/'disk_img='/}"  
+  QcowTarget="${QcowTarget//'"'/}"
+
+  # Newly downloaded VMs will have a qcow disk path in the .conf file 
+  # BUT the disk won't be be there yet, not until quickemu has done a first run against the .conf
+
+
+  if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
+
+    ArrayConf_Item_Listing+=" (new)"
+
+  elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
+
+    #  Live VM qcow2 disks are as little as only 196k. 
+    #  But set test ceiling is set at 1,000,000k (1G) to allow for meta preallocation etc REVIEW 
+
+    if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
+      #  Are Live VMs only, as zsync only updates the iso file.   
+      ArrayConf_Item_Listing+=" (Z)"
+      ZsyncDistrosFound=1
+    else
+      #  Live VMs only, in general, running off the iso file.   
+      ArrayConf_Item_Listing+=" (L)"
+      LiveDistrosFound=1
+    fi
+
+  fi
+
+}
+
+function_print_conf_array_A_style () {
+
+  i=0
+  ListTitleFolder=
+  VM_List_LineItemCount=0
+
+  vm_selector_init_common
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
+
+      if [[ $ListTitleFolder ]]; then 
+      
+        # won't print first time if value has been initialized as empty ...
+        printf " >>  %s\n\n\n  "  "$ListTitleFolder"
+        VM_List_LineItemCount=0
+
+      else  printf "\n\n  "
 
       fi
 
+      ListTitleFolder="${VM_Array[$i,0]}"
+
+    fi
+
+    function_vm_folder_item_text
+
+    if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
+    printColor "%-29s" "$ArrayConf_Item_Listing"
+    ((VM_List_LineItemCount+=1))   
+
+    # Move to new line when number of items per line reached  (default 4, see main settings)
+    if [[ $VM_List_LineItemCount == "$VM_Select_ItemsPerLine" ]]; then
+      VM_List_LineItemCount=0
+      printf "\n\n  "
     fi
 
     ((i+=1))
@@ -313,14 +334,117 @@ function_print_conf_array () {
   done
 
   [[ $i == "$VM_PairsCount" ]] && printf " >>  %s"  "$ListTitleFolder"
+
+  printf "\n"
+
+}
+
+function_print_conf_array_B_style () {
+
+  i=0
+  VM_List_LineItemCount=0
+  ListTitleFolder="${VM_Array[0,0]}"
+
+  vm_selector_init_common
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
+
+      printf " >>  %s\n\n  "  "$ListTitleFolder"
+      VM_List_LineItemCount=0
+    
+    else  printf "\n  "
+
+    fi
+
+    ListTitleFolder="${VM_Array[$i,0]}"
+
+    function_vm_folder_item_text
+
+    if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
+    printColor "%-35s" "$ArrayConf_Item_Listing"
+    ((VM_List_LineItemCount+=1))   
+
+    # Move to new line when number of items per line reached  (default 4, see main settings)
+    if [[ $VM_List_LineItemCount == "$VM_Select_ItemsPerLine" ]]; then VM_List_LineItemCount=0 ; fi
+
+    ((i+=1))
+
+  done
+
+  [[ $i == "$VM_PairsCount" ]] && printf " >>  %s"  "$ListTitleFolder"
+
+  printf "\n"
+  
+}
+
+function_print_conf_array_C_style () {
+
+  i=0
+  VM_List_LineItemCount=1
+  ListTitleFolder=
+
+  vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_C_PerLine ]] && VM_Select_Items_style_C_PerLine="3"
+
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    function_vm_folder_item_text
+
+    ListTitleFolder="${VM_Array[$i,0]}"
+
+    if [[ $ListTitleFolder != "$ListTitleFolderOld" ]]; then
+
+      if [[ ${#ListTitleFolder} -gt 28 ]]; then
+
+        ListTitleFolderDisplay="${ListTitleFolder:(-28)}"
+        ListTitleFolderDisplay="${ListTitleFolderDisplay#*/}"
+        [[ "$ListTitleFolderDisplay" != '/'* ]] && ListTitleFolderDisplay="/$ListTitleFolderDisplay"
+
+      else  ListTitleFolderDisplay="$ListTitleFolder"
+
+      fi
+
+      [[ $ListTitleFolderOld ]] && printf "\n"
+
+      printf "\n\n  %-35s"  "$ListTitleFolderDisplay" 
+
+      VM_List_LineItemCount=1
+
+    else
+
+      if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_C_PerLine" ]]; then  
+      
+        printf "\n\n  " ;  VM_List_LineItemCount=0 
+
+        # Move to new line when number of items per line reached  (Variant style C default 3, normal = 4  See main settings) 
+
+      else  ((VM_List_LineItemCount+=1))  
+
+      fi
+    
+    fi
+
+    if [[ $i -le 9 ]]; then printf "[%d]  " "$i" ; printColor "%-30s" "$ArrayConf_Item_Listing"
+
+    else printf "[%d] " "$i" ;  printColor "%-30s" "$ArrayConf_Item_Listing" ; fi
+
+    ListTitleFolderOld="${VM_Array[$i,0]}"
+
+    ((i+=1))
+
+  done
+
+  printf "\n"
   
 }
 
 
-
 function_Select_VM () {  
 
-  SelectArrayError=
   ShowUtilsMenu=
   ShowCustomBootMenu=
   ShowDefault_Hybrid=
@@ -338,8 +462,8 @@ function_Select_VM () {
     function_VM_array_ADD_confs
 
   fi
-
-  if [[ ! $ByPass_VM_Array_Selector && ! $SelectArrayError ]] ; then
+ 
+  if [[ ! $ByPass_VM_Array_Selector ]] ; then
 
     VM_Selection=
     VM_Conf_Dir=
@@ -347,19 +471,23 @@ function_Select_VM () {
 
     while true; do
 
-      function_print_conf_array
-    
-      if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
+      function_vm_selector_array_check
 
-        printf "\n\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
+      [[ ! $SelectArrayError ]] && function_print_conf_array_"$VM_SelectorStyle"_style
+    
+      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
+
+        printf "\n\n  Settings file: %s" "$Q_Mod_SettingsFile"
 
         [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit " 
 
-        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: EXTRA FOLDER   [enter] to edit settings file  [q] to quit "
+        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY %s \n\n  [enter] to edit settings file  [q] to quit "  "$ExtraFolderError"
+
+        [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s \n\n  [enter] to edit settings file  [q] to quit " "$SelectArrayError"
 
       else
 
-        printf "\n\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
+        printf "\n\n  [number] to select a VM   [gt] quickget a new distro   [set] to edit settings file   [q] to quit "
 
         if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
           printf "   ("
@@ -382,7 +510,7 @@ function_Select_VM () {
 
       #
 
-      if [[ $DefaultFolderError || $ExtraFolderError ]]; then 
+      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
             
         DefaultFolderError= 
         ExtraFolderError=

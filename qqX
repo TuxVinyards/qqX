@@ -156,7 +156,6 @@ declare -ga QemuError_VM_Filter=()
 # Clear or set any default variables, if needed.
 VM_ExecBoot=
 Extra_QE_Params=
-VM_Select_ItemsPerLine="4"
 
 # Set .conf settings record from any previous session but not normally clear it until multi-instance issues have been approved
 ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"

@@ -286,7 +286,6 @@ function_conf_error () {
 
   elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
   
-    SelectArrayError=
     IgnoreFolderCheck=1
 
     if [[ $ErrorMenuSelect == "c" ]]; then  true

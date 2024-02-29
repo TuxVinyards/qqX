@@ -60,11 +60,22 @@ X_Shade="3"
 #  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 
 
-##  VM SELECTOR:  
+##  VM SELECTOR: 
 
-#   Normally the first opening menu, used to select VM's. Normal setting ="4"  Set lower if only a few VMs.  
+#  Normally the first opening menu, used to select VM's. 
 
-VM_Select_ItemsPerLine="4"
+#  Style Options  A to C   Default style ="A"   Use different style or adjust line number to terminal size and/or VM quota
+
+VM_SelectorStyle="C"
+
+# General setting, default ="4"   
+
+VM_Select_ItemsPerLine=
+
+# Style C setting, default ="3"  
+
+VM_Select_Items_style_C_PerLine=
+
 
 ##  QuickGet SELECTOR:  
 
