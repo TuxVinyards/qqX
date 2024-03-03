@@ -76,9 +76,9 @@ VM_Select_ItemsPerLine=
 
 VM_Select_Items_style_C_PerLine=
 
-# Style C & D setting, default ="2"  
+# Style E setting, default ="2"  
 
-VM_Select_Items_style_D_PerLine=
+VM_Select_Items_style_E_PerLine=
 
 
 ##  QuickGet SELECTOR:  
