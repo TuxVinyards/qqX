@@ -64,13 +64,17 @@ X_Shade="3"
 
 #  Normally the first opening menu, used to select VM's. 
 
-#  Style Options  A to D   Default style ="A"   Use different style or adjust line number to terminal size and/or VM quota
+#  Style Options  A to ..   Default style ="A"   Use different style or adjust line number to terminal size and/or VM quota
 
-VM_SelectorStyle="C"
+VM_SelectorStyle="D"
 
-# General setting, default ="4"   
+# General setting, default ="4"   (Number count starts at 0)
 
 VM_Select_ItemsPerLine=
+
+# Style B setting, default ="0"  
+
+VM_Select_Items_style_B_PerLine=
 
 # Style C & D setting, default ="3"  
 
