@@ -66,7 +66,7 @@ echColor () {
 }
 
 
-# non-color echo trap, mainly designed to capture the technical output that quickemu doesn't send to log file
+# initiate a non-color echo trap, mainly designed to capture the technical output that quickemu doesn't send to log file
 
 printf "\n"  > "/tmp/qqX_echo_output.log"
 
@@ -81,20 +81,14 @@ echo () {
   fi
 }
 
-
-
 printColor () {
 
 	tput setaf "$X_Shade"
-
 	# shellcheck disable=SC2059
-
 	printf "$@"
-
 	tput sgr0
 
 }
-
 
 
 ## General default title:
