@@ -24,7 +24,7 @@
 #  shellcheck disable=SC2154 
 
 
-function_KillPID_Menu() {
+vm_pid_kill_menu() {
 
   tput civis
 
@@ -137,48 +137,40 @@ function_KillPID_Menu() {
 
 
 
-function_show_main_menu_header () {
+show_main_menu_header () {
 
-  if [[ ! $VM_InstanceName ]]; then
+  [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
 
-    Select_VM=1
+  [[ ! $InstancePID ]] && printf "\033c"  && show_qmod_title   
 
-  else
+  printf "\n"
+  printColor "    %s " "$VM_InstanceName" 
 
-    [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
+  #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
 
-    [[ ! $InstancePID ]] && printf "\033c"  && show_qmod_title
- 
-    printf "\n"
-    printColor "    %s " "$VM_InstanceName" 
+  #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
+  
+  if [[ $Select_VM ]]; then  BootAlert=   
 
-    #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
+  elif  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
 
-    #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
-    
-    if [[ $Select_VM ]]; then  BootAlert=
-
-    elif  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
-
-    elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
-    
-    elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(ISO/IMG Boot: Distro Non-installed)" 
-    
-    else  BootAlert= 
-    
-    fi
-
-    [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
-    printf "   %s" "$BootAlert"  
-    printf "\n"
-
-    [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
-
-    # Note .conf won't exist at first load, at VM selector menu
-
-    [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] && printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
-
+  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
+  
+  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(ISO/IMG Boot: Distro Non-installed)" 
+  
+  else  BootAlert= 
+  
   fi
+
+  [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
+  printf "   %s" "$BootAlert"  
+  printf "\n"
+
+  [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
+
+  # Note .conf won't exist at first load, at VM selector menu
+
+  [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] && printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
 
 }
 

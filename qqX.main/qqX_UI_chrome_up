@@ -286,17 +286,13 @@ function show_quickemu_WRAP_help {
 
   HelpSelect=
 
-  [[ ! $ModName_qqX ]] && printColor "\n\n  Quickemu Mod - Virtual Machine Launcher - Wrap Version %s %s " "$ModName" "$ModVersion" 
-
   printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
 
-  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards"  
+  printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
 
-  [[ ! $ModName_qqX ]] &&  printf "\n\n  May be started in a folder terminal:  ./%s   or by mouse click"  "$ModName"
-  
-  printf "\n\n\n  [enter] to return   [a] %s API detail   " "$ModName"
-
-  [[ ! $ModName_qqX ]] && printf "[p] parameters for VM runtime settings"
+  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
+ 
+  printf "\n\n\n  [enter] to return    [w]  to open qqX wiki pages with %s    [a] %s API detail "  "$WebBrowser" "$ModName"
 
   printf "\n\n"
 
@@ -310,18 +306,9 @@ function show_quickemu_WRAP_help {
   
     read -rp  "  [enter] to return >  " 
 
-  elif [[ $HelpSelect == "p" ]]; then
+  elif [[ $HelpSelect == "w" ]]; then
   
-    printf "\n\n  Extra quickemu parameters for qmod API & qmod settings."  
-  
-    printf "\n\n  NB  not all options can be applicable  CAUTION \n\n" 
-
-    NoExit=1
-    echo
-    usage | tail +6
-    echo
-
-    read -rp  "  [enter] to return >  " 
+     nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & 
 
   fi
 }

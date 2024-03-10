@@ -25,10 +25,10 @@
 
 # For notes on custom vm menus > edit > find > "Custom menu styles" in this script
 
-function_VM_array_ADD_confs () {
+add_vm_array_confs () {
 
   ## Adds to VM array & lists, if submitted item has not been already listed 
-  #  where $1 is 'VM_Path' and  $2 is 'VM_Conf' to be tested against the existing list (non-sparse)
+  #  where $1 is 'VM_Path' and  $2 is 'VM_Conf_File' to be tested against the existing list (non-sparse)
 
   if [[ $1 ]]; then
 
@@ -70,10 +70,10 @@ function_VM_array_ADD_confs () {
 }
 
 
-function_scan_VM_folderList () {
+scan_vm_folders_list () {
 
   #  Scans of current & listed VM folders for other potential '.conf' files to the VM array
-  #  Adds via calls to ** 'function_VM_array_ADD_confs' **
+  #  Adds via calls to ** 'add_vm_array_confs' **
 
   #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
   #  Starts by checking for settings file errors
@@ -145,9 +145,7 @@ function_scan_VM_folderList () {
         printColor "\n\n  ERROR in VM array general settings"
 
         printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
-        
         printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
-
         printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
 
         read -rp  "  >  "  VM_SettingsError
@@ -184,7 +182,7 @@ function_scan_VM_folderList () {
 
         # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
         if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
-          function_VM_array_ADD_confs  "$FolderPathName" "$TestFile" 
+          add_vm_array_confs  "$FolderPathName" "$TestFile" 
         fi
       
       done
@@ -216,10 +214,10 @@ vm_selector_init_common () {
 
 }
 
-function_vm_selector_array_check () {
+vm_selector_array_check () {
 
   # Legacy checker moved here in version 1.6.03 with introduction of selector styles
-  # Appears intended for changes made after main initialization has happened   # REVIEW  may not be now needed ?
+  # For changes made after main initialization has happened.  Becomes called by 'refresh_sources_and_reload_VM_arrays'
 
   SelectArrayError=
   i=0
@@ -229,16 +227,16 @@ function_vm_selector_array_check () {
     if [[ ! -d "${VM_Array[$i,0]}" ]]; then 
 
         printf "\n\n  ERROR  %s folder not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,0]}"   
-        function_conf_error  "folder $i" 
         SelectArrayError="${VM_Array[$i,0]}"
+        function_conf_error  "folder"
         break
     fi
         
     if [[ ! -e "${VM_Array[$i,0]}/${VM_Array[$i,1]}" ]]; then 
 
       printf "\n\n  ERROR  %s ' .conf ' not found: \n\n  %s \n\n" "$ModName" "${VM_Array[$i,1]}"
-      function_conf_error  "config $i" 
       SelectArrayError="${VM_Array[$i,1]}"
+      function_conf_error  "config"
       break
     fi
 
@@ -291,13 +289,16 @@ function_vm_folder_item_text () {
 
 }
 
-function_print_conf_array_A_style () {
+print_selector_array_A_style () {
 
   i=0
   ListTitleFolder=
   VM_List_LineItemCount=0
 
   vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_A_PerLine ]] && VM_Select_Items_style_A_PerLine="4"
+
 
   while [[ ${VM_Array[$i,0]} ]] ; do
 
@@ -324,7 +325,7 @@ function_print_conf_array_A_style () {
     ((VM_List_LineItemCount+=1))   
 
     # Move to new line when number of items per line reached  (default 4, see main settings)
-    if [[ $VM_List_LineItemCount == "$VM_Select_ItemsPerLine" ]]; then
+    if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_A_PerLine" ]]; then
       VM_List_LineItemCount=0
       printf "\n\n  "
     fi
@@ -339,7 +340,7 @@ function_print_conf_array_A_style () {
 
 }
 
-function_print_conf_array_B_style () {
+print_selector_array_B_style () {
 
   i=0
   VM_List_LineItemCount=0
@@ -385,7 +386,7 @@ function_print_conf_array_B_style () {
  
 }
 
-function_print_conf_array_C_style () {
+print_selector_array_C_style () {
 
   i=0
   VM_List_LineItemCount=1
@@ -452,9 +453,9 @@ function_print_conf_array_C_style () {
   
 }
 
-function_print_conf_array_D_style () { function_print_conf_array_C_style  invert ; }
+print_selector_array_D_style () { print_selector_array_C_style  invert ; }
 
-function_print_conf_array_E_style () {
+print_selector_array_E_style () {
 
   i=0
   VM_List_LineItemCount=1
@@ -522,7 +523,7 @@ if [[ -e "$Default_VM_Folder/qqX.custom/custom_vm_selectors" ]]; then source "$D
 # Use style letters from end of alphabet eg R to Z   Letters must be CAPS but sequence may be non-contiguous. 
 
 
-function_Select_VM () {  
+vm_selector_menu () {  
 
   ShowUtilsMenu=
   ShowCustomBootMenu=
@@ -537,8 +538,8 @@ function_Select_VM () {
   else 
 
     # Re-scan folders as something new may have been added
-    function_scan_VM_folderList
-    function_VM_array_ADD_confs
+    scan_vm_folders_list
+    add_vm_array_confs
 
   fi
  
@@ -547,20 +548,24 @@ function_Select_VM () {
     VM_Selection=
     VM_Conf_Dir=
     VM_Conf_File=
+    VM_InstanceName=
 
     while true; do
 
-      function_vm_selector_array_check
+      printf "\033c"
+      show_qmod_title
 
-      if ! type -t "function_print_conf_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="A" ; fi
+      vm_selector_array_check
+
+      if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="B" ; fi  # REVIEW  E? or A?
 
       for Style in {A..Z} ; do
 
-        if type -t "function_print_conf_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
+        if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
 
       done
 
-      [[ ! $SelectArrayError ]] && function_print_conf_array_"$VM_SelectorStyle"_style
+      [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
     
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 
@@ -595,7 +600,9 @@ function_Select_VM () {
         printf "%s  "  "${VM_Array_NameZero^^}"
         printf "     [gt] quickget a new distro    [q] to quit"
 
-        [[ $MenuStylePreviewed ]] && printColor "    preview only - use [set] for menu permanency"
+        if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "    preview only - use [set] for menu permanency"
+        elif [[ $SettingsFileAdjusted ]]; then printColor "    ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
+        fi
 
       fi
 
@@ -622,9 +629,11 @@ function_Select_VM () {
         MenuStylePreviewed=1
         ListTitleFolderOld=
         InvertStyleColors=
-        printf "\033c"
-        show_qmod_title
-        function_Select_VM
+        VM_Conf_Dir=
+        VM_Conf_File=
+        VM_InstanceName=
+        VM_Selection=
+        return
         
       fi
 
@@ -633,7 +642,6 @@ function_Select_VM () {
       elif [[ $VM_Selection == "set" ]];then
 
         VM_Selection=
-        VM_InstanceName=
         qqX_edit_settings 
         return
 
@@ -642,8 +650,6 @@ function_Select_VM () {
         VM_Selection=
         function_quick_get_wrap 
         ByPass_VM_Array_Loader=
-        printf "\033c"
-        show_qmod_title
         return
 
       elif [[ $VM_Selection == [0-9] || $VM_Selection == [0-9][0-9] || $VM_Selection == [0-9][0-9][0-9] ]]; then
@@ -692,9 +698,15 @@ function_Select_VM () {
 
     # Check that the dir contains the right files  &&  grep .conf for right content
     if [[ $IgnoreFolderCheck ]]; then IgnoreFolderCheck=
-    else [[ ! $(ls "$VM_InstanceName"/*.qcow2 2> /dev/null) ]] && function_conf_error  "folder"  && SelectArrayError=1
+    elif [[ ! $(ls "$VM_InstanceName"/*.qcow2 2> /dev/null) ]]; then
+      if [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
+        SelectArrayError=1 ; function_conf_error  "new"
+      else
+        SelectArrayError=1; function_conf_error  "folder"
+      fi
     fi
-    ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
+
+   ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
 
     # Check KVM parameter settings & advise according to guest OS
     KVM_MSR_selector=
@@ -726,21 +738,16 @@ function_Select_VM () {
   fi
 
   # clear any no-longer needed flags
-  Select_VM=
   VM_Selection=
   ByPass_VM_Array_Loader=
   ByPass_VM_Array_Selector=
 
-  # reload if the editor was called, due to settings error
-  if [[ $SelectArrayError ]]; then
-  
-    MainMenuChoice="refresh" 
-    Select_VM=1
-    [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
+  # reload if the editor was called, or called due to settings error
+  if [[ $SelectArrayError || $SettingsFileAdjusted ]]; then
 
-  else
+    VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=
 
-    SettingsFileAdjusted=
+  else  SettingsFileAdjusted=
 
   fi
 
@@ -862,15 +869,14 @@ refresh_sources_and_reload_VM_arrays() {
   [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdgopen_settings
 
   function_create_VM_folderList  
-  function_scan_VM_folderList  
+  scan_vm_folders_list  
   refresh_conf_vars_and_values
+  vm_selector_array_check
 
   # reload screen 
   ByPass_VM_Array_Selector=1
   KVM_MSR_Error=
   ShowUtilsMenu=
   ForceCustomBootMenu=
-  printf "\033c"
-  show_qmod_title
 
 }

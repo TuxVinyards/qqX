@@ -65,12 +65,14 @@ X_Shade="3"
 #  Normally the first opening menu, used to select VM's. 
 #  Use different style or adjust items per line number to match terminal size and/or VM quota
 #  Style Options  A to ..    default style ="B" with 2 columns (=1)  Also recommended, style E.
-#  Plus custom menu styles:  see notes in qqX.main, file "qqX_VM_array_and_Select"
+
+#  For custom vm selector styles:  see notes in qqX.main, file "qqX_VM_array_and_Select"
+#  For custom main menu, see  file  "/qqX_main_menu_interface"
 
 VM_SelectorStyle="B"
 
-# General setting, default ="4"   (Number count starts at 0)
-VM_Select_ItemsPerLine=
+# Style A setting, default ="4"   (Number counts starts at 0)
+VM_Select_Items_style_A_PerLine=
 
 # Style B setting, default ="1"  
 VM_Select_Items_style_B_PerLine=

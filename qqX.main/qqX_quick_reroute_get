@@ -723,7 +723,7 @@ function_quick_get_wrap ()  {
 
       printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that %s will remove."  "$ModName"
 
-      printf "\n\n  To resume stopped downloads, any .iso.part files should be retained."
+      printf "\n\n  To resume stopped downloads, any \".iso.part\" files should be retained."
 
       # https://bugs.launchpad.net/ubuntu/+source/zsync/+bug/477551
 
@@ -763,7 +763,7 @@ function_quick_get_wrap ()  {
 		read -r -t 0.2 		
 
 
-    printColor "\n\n  Press [enter] at quickget finish,  at start your .. virtual machine ... etc "
+    printColor "\n\n  Press [enter] at quickget finish,  at  \"start your .. virtual machine ... etc\" "
     
     printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
 

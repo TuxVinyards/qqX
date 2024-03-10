@@ -202,7 +202,6 @@ function find_main_drive_and_img_iso {
 function_conf_error () {
 
   ErrorMenuSelect=
-
   NewSetupFlag=
 
   # clear any accidental initial double pressing of the enter key occuring while experiencing the error
@@ -217,8 +216,8 @@ function_conf_error () {
 
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
-
   printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
+
 
   if [[ $1 ]] ; then printf "\n\n  Check %s settings, location & content ... "  "$1"
 
@@ -234,14 +233,14 @@ function_conf_error () {
 
     printf "  [enter] to view/edit settings file \n\n"
 
-
-  elif [[ $1 == "folder" ]] && [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
+  elif [[ $1 == "new" ]]; then 
 
     printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
 
     cat "$VM_Conf_File"
 
     NewSetupFlag=1
+    IgnoreFolderCheck=1  
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     
@@ -265,6 +264,8 @@ function_conf_error () {
     printf "\n\n  [q] to quit \n\n"   
     
   else   
+
+    # includes "$1" = "config"
   
     printColor "\n\n  [Enter] to edit %s general settings"  "$ModName" 
 
@@ -275,6 +276,7 @@ function_conf_error () {
   fi   
 
   read -rp "  >  "   ErrorMenuSelect
+  
 
   if [[ $ErrorMenuSelect == "q" ]]; then 
   
@@ -288,7 +290,7 @@ function_conf_error () {
   
     IgnoreFolderCheck=1
 
-    if [[ $ErrorMenuSelect == "c" ]]; then  true
+    if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; return
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
@@ -400,9 +402,6 @@ qqX_edit_settings() {
 
       nohup &> /dev/null   "$TextEditor" "$Q_Mod_SettingsFile"  
       SettingsFileAdjusted=1
-      VM_Conf_Dir=
-      if [[ $VM_InstanceName ]]; then  VM_InstanceName="$VM_InstanceName"" - Settings Updated  >> ReSelect to Re-Initialize"
-      else VM_InstanceName="Initializing Settings Updated  >>  Make a Selection" ; fi
       refresh_sources_and_reload_VM_arrays
 
     fi
@@ -890,6 +889,20 @@ function_config_tune_up ()  {
 
   done
 
+  # usage case options are complex, so generally do a refresh all and return to vm selector menu ...  REVIEW 
+  
+  if [[ $NewFileTuneUp ]]; then 
+
+    VM_InstanceName=
+    refresh_sources_and_reload_VM_arrays
+
+  else
+
+    refresh_conf_vars_and_values
+    ConfSettingsAdjusted=1
+
+  fi
+
 }
 
 function refresh_conf_vars_and_values {
@@ -902,51 +915,55 @@ function refresh_conf_vars_and_values {
 
   source "$ConfClearanceLog"
 
-  SecondDrive=
-  SharedDrive=
-  DriveLocationError=
-  SharedDrive_Conf=
-  SecondDriveArgs=
-  SharedDriveArgs=
-  MacLegacyDrive=
-  QemuError_VM_Filter=()
+  if [[ $VM_Conf_File ]]; then
 
-  source "$VM_Conf_File"
+    SecondDrive=
+    SharedDrive=
+    DriveLocationError=
+    SharedDrive_Conf=
+    SecondDriveArgs=
+    SharedDriveArgs=
+    MacLegacyDrive=
+    QemuError_VM_Filter=()
 
-  # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
+    source "$VM_Conf_File"
 
-  printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
+    # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
-  mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+    printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
 
-  for Line in "${ConfClearance_Arr[@]}"; do
+    mapfile -t ConfClearance_Arr < "$VM_Conf_File"
 
-    if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
+    for Line in "${ConfClearance_Arr[@]}"; do
 
-      if [[ "$Line" == *'QemuError_VM_Filter'* ]]; then Line='QemuError_VM_Filter=()'
+      if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
 
-      else
+        if [[ "$Line" == *'QemuError_VM_Filter'* ]]; then Line='QemuError_VM_Filter=()'
 
-        Line="$(cut -d'=' -f1 <<< "$Line")"
-        Line="$Line""="
-        [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+        else
+
+          Line="$(cut -d'=' -f1 <<< "$Line")"
+          Line="$Line""="
+          [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+
+        fi
+        
+        printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
+
+        # Note that commented out lines need including, in case the comment marker gets removed
 
       fi
-      
-      printf "\n\n%s" "$Line" >> "$ConfClearanceLog"
 
-      # Note that commented out lines need including, in case the comment marker gets removed
+    done
 
-    fi
+    # check any menu values that are based on the file .conf 
 
-  done
+    check_screen_percentage_and_output
+    find_main_drive_and_img_iso
+    set_drive_paths
+    check_disk_is_okay
 
-  # check any menu values that are based on the file .conf 
-
-  check_screen_percentage_and_output
-  find_main_drive_and_img_iso
-  set_drive_paths
-  check_disk_is_okay
+  fi
 
 }
 

@@ -28,8 +28,6 @@
 
 [[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="A"
 
-[[ ! $VM_Select_ItemsPerLine ]]  &&  VM_Select_ItemsPerLine="4"
-
 
 function_create_VM_folderList() {
 

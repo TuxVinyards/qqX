@@ -79,13 +79,13 @@ fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-ModVersion="1.6.03"
+ModVersion="1.7.01"
 
 ModName="$(basename "$0")"
 if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi    # deprecated
 
 #  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
-NoClear=
+NoClear="0.1"
 
 #  CODING STYLE 
 
@@ -188,6 +188,10 @@ source "$qqX_MainFolder/qqX_selfcheck_and_update"
 
 source "$qqX_MainFolder/qqX_main_menu_routines"
 
+source "$qqX_MainFolder/qqX_main_menu_interface"
+
+source "$qqX_MainFolder/qqX_main_menu_actions"
+
 
 ##  START:  QUICKEMU-WRAP  menu interface  &  API DIVIDER  ###
 
@@ -234,6 +238,7 @@ if [[ $1 ]]; then
 
   fi
 
+  # only $1 starts
 
   if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
 
@@ -243,9 +248,9 @@ if [[ $1 ]]; then
 
       printColor "\n\n  %s  not found "  "$VM_Conf_Dir "
     
-      function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
+      function_conf_error  " COMMAND LINE Path Instruction,"
 
-    else  cd "$VM_Conf_Dir"  || function_conf_error  "Q-wrap COMMAND LINE Path Instruction,"
+    else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
 
     fi
 
@@ -255,7 +260,7 @@ if [[ $1 ]]; then
 
     printColor "\n\n  %s  not found "  "$VM_Conf_File"
   
-    function_conf_error  "Q-wrap COMMAND LINE .Conf Instruction,"
+    function_conf_error  " COMMAND LINE .Conf Instruction,"
 
   fi
 
@@ -265,14 +270,17 @@ if [[ $1 ]]; then
 fi
 
 
-##  Start main menu :   
+##  General pre-menu checks  
 
 tput civis
 printf "\033c"
 show_qmod_title
+
+printf "\n  Running initial checks .... \n"
+
 multi_instance_checks
 
-# quietly check for qqX updates, in the background. Once only, at the start.
+# Quietly check for qqX updates, in the background. Once only, at the start.
 
 if [[ ! $Disable_qqX_upd_Checks ]]; then
   check_for_qqX_updates &   
@@ -280,785 +288,107 @@ if [[ ! $Disable_qqX_upd_Checks ]]; then
 fi
 
 
-## MAIN MENU LOOP  (select VM then choose actions to do)
+
+## MAIN MENU  
+
+function main_menu {
+
+  while true ; do
+
+    MainMenuChoice=
+    SnapTitle=
+    SnapNumber=
+    SnapName=
+
+    show_main_menu_header
+
+    if [[ $XDG_QcowRightClick_NO_qqX ]] || [[ $XDG_QcowRightClick ]]; then
+
+      check_disk_is_okay "$XDG_QcowRightClick_VM_Dir_Name"  "$XDG_QcowRightClick_DiskName"
+
+      if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
+
+      if [[ $XDG_QcowRightClick_NO_qqX ]]; then 
+        
+        [[ $DiskChkStatus == "Okay" ]] && printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
+
+      else
+        
+        printColor  "\n\n  qqX/quickemu bootable: \n\n"
+
+        if [[ $DiskChkStatus != "Okay" ]]; then  
+          printColor "  BUT has errors: Try qqX [disk] utils " 
+          printf "\n\n Also see  https://qemu.readthedocs.io  "
+          printf  "> QEMU disk image utility notes\n\n"
+        fi
+
+      fi
+
+      "$QEMU_IMG" info "$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName"
+          
+      if [[ $XDG_QcowRightClick_NO_qqX ]]; then  
+
+        printColor "\n\n See  https://qemu.readthedocs.io  "
+        printf  "> QEMU disk image utility may be useful"
+        printf "\n\n  [enter] to quit  "
+        
+      else  printColor "\n\n  [enter] to continue  "
+        
+      fi
+
+      read -rp  "  >  "
+      
+      if [[ ! $XDG_QcowRightClick_NO_qqX ]]; then XDG_QcowRightClick=  ; show_main_menu_header
+      else  exit directly 
+      fi
+
+    elif [[ $KillPID_Menu_Exited ]] || [[ $Select_VM ]] ; then
+
+      if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
+        printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
+      else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
+      fi
+
+      [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=  
+      [[ $UseCustomBootArgs ]] && UseCustomBootArgs=  
+
+    fi
+
+    main_menu_interface
+    main_menu_actions
+
+    if [[ ! $VM_InstanceName ]];  then break ; fi 
+
+  done
+
+  # end of main menu
+
+}
+
+
+# Dev
+GeneralLoopCheck=   
+
+tput civis
 
 while true ; do
 
-  MainMenuChoice=
-  SnapTitle=
-  SnapNumber=
-  SnapName=
-
-  function_show_main_menu_header
-
-  if [[ $XDG_QcowRightClick_NO_qqX ]] || [[ $XDG_QcowRightClick ]]; then
-
-    check_disk_is_okay "$XDG_QcowRightClick_VM_Dir_Name"  "$XDG_QcowRightClick_DiskName"
-
-    if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
-
-    if [[ $XDG_QcowRightClick_NO_qqX ]]; then 
-      
-      [[ $DiskChkStatus == "Okay" ]] && printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
-
-    else
-      
-      printColor  "\n\n  qqX/quickemu bootable: \n\n"
-
-      if [[ $DiskChkStatus != "Okay" ]]; then  
-
-        printColor "  BUT has errors: Try qqX [disk] utils " 
-        printf "\n\n Also see  https://qemu.readthedocs.io  "
-        printf  "> QEMU disk image utility notes\n\n"
-
-      fi
-
-    fi
-
-    "$QEMU_IMG" info "$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName"
-        
-    if [[ $XDG_QcowRightClick_NO_qqX ]]; then  
-
-      printColor "\n\n See  https://qemu.readthedocs.io  "
-      printf  "> QEMU disk image utility may be useful"
-      printf "\n\n  [enter] to quit  "
-      
-    else  printColor "\n\n  [enter] to continue  "
-      
-    fi
-
-    read -rp  "  >  "
-     
-    if [[ ! $XDG_QcowRightClick_NO_qqX ]]; then
-
-      XDG_QcowRightClick=
-      function_show_main_menu_header
-
-    else
-
-      # XDG_QcowRightClick_NO_qqX=
-      exit directly 
-
-      # REVIEW  add disk conversion utility ??  Or something?
-
-      #refresh_sources_and_reload_VM_arrays
-      #MainMenuChoice="vm"
-      #function_show_main_menu_header
-      #continue
-   
-    fi
-
-  elif [[ $SettingsFileAdjusted ]]; then 
-
-    function_Select_VM
-    MainMenuChoice="vm" 
-
-  elif [[ $KillPID_Menu_Exited ]] || [[ $Select_VM ]] ; then
-
-    if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
-
-      #  REVIEW  add use of PID file
-      printf "\n\n  %s is still running ..." "$VM_InstanceName"
-      function_KillPID_Menu
-      continue
-
-    else 
-
-      InstancePID=
-    
-      if [[ $Select_VM ]]; then  
-
-        #declare -p VM_Array
-        #echo    "  main menu loop - after Select_VM call:"
-        #read -p "  VM_InstanceName is $VM_InstanceName  ByPass_VM_Array_Loader is $ByPass_VM_Array_Loader  ByPass_VM_Array_Selector is $ByPass_VM_Array_Selector"
-        #echo
-
-        function_Select_VM
-        MainMenuChoice="refresh" 
-
-        #declare -p VM_Array
-        #echo    "  main menu loop - after Select_VM run:"
-        #read -p "  VM_InstanceName is $VM_InstanceName  ByPass_VM_Array_Loader is $ByPass_VM_Array_Loader  ByPass_VM_Array_Selector is $ByPass_VM_Array_Selector"
-        #echo
-
-      else
-
-        printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
-
-      fi
-    
-    fi
-
-    [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=  
-    [[ $UseCustomBootArgs ]] && UseCustomBootArgs=  
-
+ if [[ $GeneralLoopCheck ]]; then
+    echo
+    echo "SelectArrayError = $SelectArrayError"
+    echo "VM_Conf_Dir = $VM_Conf_Dir"
+    echo "VM_Conf_File = $VM_Conf_File"
+    echo "VM_InstanceName = $VM_InstanceName"
+    # sleep 1
   fi
 
+  if [[ ! $VM_InstanceName ]]; then vm_selector_menu
 
-  ## Print menu:
-
-  if [[ ! $MainMenuChoice ]]; then
-
-    printf  "\n"
-
-    if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  SELECT " ; fi
-
-    [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && [[ ! $ShowUtilsMenu ]] && printf  "  [m]  msrs help "
-
-    
-    if [[ ! $ShowUtilsMenu ]]; then
-
-      printf  "  [u]  show utils & technical"
-
-    else
-
-      printf "   [del] delete selected VM"
-
-      printColor  "    [u]   hide utils & technical"
-
-      printf "\n"
-
-      printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
-
-      printf "\n\n  [2] create a second  [3] a shared  > virtual hard-drive   [rtv] reset Tiano VMF boot Vars \n"
-
-
-      if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
-
-      else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi
-
-      printf  "   [xa]  edit extra qemu args  "
-
-    
-      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
-    
-      [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
-
-      printf "\n"
-
-    fi
-
-    printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
-
-    printf "\n"
-
-    if [[ -e "$QemuArgsCustomFile" ]]; then 
-
-      #QEMU_Default_SystemType= #QEMU_Default_MachineType=  in the general settings file BUT if not present then = 'qemu-system-x86_64'
-
-      MenuCustomSystem="$(grep 'qemu-system' "$QemuArgsCustomFile" | grep -v '#' )"
-
-      MenuCustomMachine="$(grep -e '-machine' "$QemuArgsCustomFile" | grep -v '#' | cut -d ',' -f 1)"
-
-      MenuCustomSystemBaseName="$(basename "$MenuCustomSystem")"
-
-      MenuCustomSystemBaseName="$(tr -cd '[:graph:]' <<<"$MenuCustomSystemBaseName")"
-
-      # echo; echo " .${QEMU_Default_SystemType}. .${MenuCustomSystemBaseName}."
-
-      if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
-
-      if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootMenu= ; else ShowCustomBootMenu=1 ; fi
-
-      [[ $ForceCustomBootMenu == "hide" ]] && ShowCustomBootMenu=  && ShowDefault_Hybrid=1
-      
-      [[ $ForceCustomBootMenu == "show" ]] && ShowCustomBootMenu=1 && ShowDefault_Hybrid=
-      
-      # echo "ShowCustomBootMenu = $ShowCustomBootMenu  ShowDefault_Hybrid = $ShowDefault_Hybrid  ForceCustomBootMenu = $ForceCustomBootMenu"
-
-    else
-
-      [[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
-
-    fi
-
-    if [[ $XDG_QcowRightClick_NO_qqX ]]; then
-
-      printColor  "\n\n  ?? "
-
-    elif [[ $ShowCustomBootMenu ]] ; then
-
-      # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
-
-      printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
-
-      printf "\n\n  [C]  toggle normal/custom menu  or  use normal:  [d] [df]  sdl   [s] [sf] spice   [g] std gtk "
-
-      printf "\n\n  [cd] edit custom args file    [qd] open Qemu docs in browser"
-
-    else
-
-      if [[ $ShowDefault_Hybrid ]]; then 
-
-        printColor "\n\n  [c]   start VM using custom args" 
-
-        printf "      [cd] edit custom args file    [qd] open Qemu docs in browser"
-
-      fi
-
-      printColor  "\n\n  [d]   start with SDL display"
-      
-      if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)" 
-
-      elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)" 
-
-      elif [[ $SDL_ScrnPcnt_Cmd ]]; then 
-      
-        printColor " (%s%%)    [df]  99%% "  "$SDL_ScreenPercent" 
-        
-        [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    
-
-      elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
-
-      fi
-
-      if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
-
-      else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
-
-      printColor "\n\n  [g]   start with GTK display          "
-
-      if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
-
-      else printColor "[gl] ON > toggle-off" ; fi   
-
-      [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
-
-    fi
-
-    printf "\n"
-
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
-
-    filter_and_flag_qemu_errors
-
-    if [[ $QemuErrorExists ]] ; then printColor "  [ql]  show qemu error log"
-
-    elif [[ $FileManager ]]; then 
-
-      if [[ $(type -p "$FileManager") ]]; then printf "   [f]  open VM folder in file manager"
-    
-      else  printColor "   [set]  ERROR file manager not found" ; fi
-
-    fi
-
-    if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
-    
-      if [[ ! $(du -b -t 500000 "$VM_InstanceName/disk.qcow2" 2>/dev/null) ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]] ; then
-
-        #  Live VMs only, as zsync only updates the iso file.   
-        #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
-
-        if [[ -e "$VM_InstanceName/zsync.date.txt" ]]; then
-
-          SyncDateNow="$(date +%s)"
-
-          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt")"
-
-          LastZsync="$((SyncDateNow - SyncDateOld))"
-
-          #  older than 6hrs (in epoch seconds)
-
-          printf "\n\n"
-
-          if [[ $LastZsync -gt 21600 ]]; then  printColor "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
-
-          else  printf "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
-          
-          fi
-
-        else
-
-          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
-            
-        fi
-
-        ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget  
-
-          # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
-          # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
-
-          # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
-          # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
-          
-          # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-          # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
-
-
-        # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
-        # Expect these to need updating from time to time ...
-
-        Zsync_OS_Name="$VM_InstanceName"
-
-        Zsync_OS_Name="${Zsync_OS_Name/'-daily'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-live'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-canary'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-legacy'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-jammy'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
-
-        Zsync_Release_Name="$VM_InstanceName"
-        Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
-        #echo; echo "$Zsync_OS_Name  $Zsync_Release_Name" 
-
-        Zsync_Updatable_ISO=1
-
-        # zero main menu flag that sets only if updater run from main 
-        MainMenuZsync=
-
-      fi
-
-    else 
-
-      Zsync_Updatable_ISO=
-      Zsync_OS_Name=
-      Zsync_Release_Name=
-
-    fi
-    
-    printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] open .conf file"
-
-    [[ $DriveLocationError ]] &&  printColor "\n\n  %s"  "$DriveLocationError"
-
-    if [[ $ConfSettingsAdjusted ]]; then 
-
-      ConfSettingsAdjusted=
-      printf "\n\n  done - general refresh not normally needed for .conf edits (use [vm] if req'd)"
-
-    fi
-
-    printf  "\n\n"
-
-    if [[ $qqX_UpdaterPID ]]; then
-
-      while true ; do
-
-        if [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then   sleep 1
-
-        else 
-        
-          # shellcheck source=/dev/null
-          source "$qqX_Upd_VarsTmpFile"
-          qqX_UpdaterPID= 
-          break
-          
-        fi
-
-      done
-
-    fi
-
-    if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then 
-
-      printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
-
-    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
-
-    fi
-
-    printf  "  [q]   quit \n\n"
-
-    [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
-
-  fi
-
-  # ACTIONS: 
-
-  if [[ $MainMenuChoice == "h" ]] ; then
-
-    show_quickemu_WRAP_help
-
-   elif [[ $MainMenuChoice == "del" ]]; then 
-
-    function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
-
-  elif [[ $MainMenuChoice == "hdw" ]] ; then
-
-    AddHW_Record=
-
-    if [[ -e "$QemuArgsFile" ]]; then 
-
-      printf "\033c"
-
-      if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n\n  Existing Record: \n\n"; cat "$QemuVirtHardwareRecord"; fi
-
-      printf "\n\n  Current Args / Qemu Virtual Hardware \n\n"
-    
-      cat "$QemuArgsFile"
-      
-      if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n\n"
-
-      else printColor "  Create new Virtual Hardware Record using Current Args?\n\n"
-
-      fi
-
-      read -rp "  [enter] to continue  [b] to go back"  AddHW_Record
-
-      if [[ $AddHW_Record != "b" ]]; then 
-             
-        cat "$QemuArgsFile" >> "$QemuVirtHardwareRecord"
-
-      fi
-
-    else
-
-      printf "\n\n  No Args log found. The virtual machine launch process must be run first. \n\n"
-
-      printf "\n\n  The 'VerboseArgs' option may be used, which will allow checking.  \n\n"
-
-    fi 
-
-  elif [[ $MainMenuChoice == "u" ]] ; then
-
-    if [[ ! $ShowUtilsMenu ]]; then ShowUtilsMenu=1 ; else ShowUtilsMenu= ; fi
-
-  elif [[ $MainMenuChoice == "set" ]] ; then
-
-    qqX_edit_settings
-
-  elif [[ $MainMenuChoice == "rtv" ]] ; then
-
-    RtvBack=
-    printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
-    printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old. \n\n  Your VMF_VARS.fd file(s) will be reinstalled."
-    printf  "\n\n  [enter] to continue  [b] to go back "
-    read -rp "  >  "  RtvBack
-
-    if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
-
-    else
-
-      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/OVMF/OVMF_VARS.fd" ]]; then
-        cp -f "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd.old"
-        cp -f "/usr/share/OVMF/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd"
-        printf "\n\n  Reset/Installed 'OVMF_VARS.fd' "
-      fi
-
-      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/AAVMF/AAVMF_VARS.fd" ]]; then
-        cp -f "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd.old"
-        cp -f "/usr/share/AAVMF/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd"
-        printf "\n\n  Reset/Installed 'AAVMF_VARS.fd' "
-      fi
-
-      printf "\n\n  [enter] to return \n\n "
-      read -rp "  >  "
-
-    fi
-
-  elif [[ $MainMenuChoice == "ql" ]] ; then
-
-    QL_LogView=
-    
-    printf "\n\n"
-
-    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  
-    
-      cat "$QemuErrorLog"
-
-      printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
-
-    else  printf "  No qemu errors were present on the last VM load ...  ?? " ; fi
-
-    printf "\n\n  Also try [rtv] from the utils menu which may help if the distro boot sequence is causing problems"
-
-    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
-
-    #  Avoid any "[W] permanent" type option because it could overwrite something manually placed in the .conf file
-
-    read -rp "  >  "  QL_LogView
-
-    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") 
-
-    [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
-
-
-  elif [[ $MainMenuChoice == "f" ]] ; then
-
-    nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
-
-    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
-    #  As from 'WebBrowser' section and handling of firefox etc
-
-  elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release
-
-  elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
-
-  elif [[ $MainMenuChoice == "cd" ]] ; then qqX_edit_settings  custom
-
-  elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
-
-  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
-
-  elif [[ $MainMenuChoice == "gt" ]] ; then function_quick_get_wrap
-
-  elif [[ $MainMenuChoice == "z" ]] ; then
-
-    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
-
-      MainMenuZsync=1
-      function_quick_get_wrap
-
-    else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
-
-    fi
-
-  elif [[ $MainMenuChoice == "m" ]] ; then
-
-    KVM_MSR_selector_LoadHelp=1
-    select_msr_config
-
-  elif [[ $MainMenuChoice == "gl" ]] ; then
-
-    if [[ $qqX_GL_Mode == "on" ]] ; then qqX_GL_Mode="off"
-
-    elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
-    
-    fi
-
-  elif [[ $MainMenuChoice == "C" ]] ; then 
-
-    if [[ $ShowCustomBootMenu ]]; then  ForceCustomBootMenu="hide" ; else  ForceCustomBootMenu="show" ; fi
-
-    MainMenuChoice=
-  
-  elif [[ $MainMenuChoice == "c" ]] ; then 
-
-    printf "\n\n"
-
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
-    else
-
-      UseCustomBootArgs=1
-      eval quickemu "-vm $VM_Conf_File --vm_boot" 
-      function_KillPID_Menu
-
-    fi
-
-  elif [[ $MainMenuChoice == "g" ]] ; then 
-
-    printf "\n\n"
-
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
-    else
-
-      eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
-      function_KillPID_Menu
-
-    fi
-        
-  elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
-
-    printf "\n\n"
-
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
-    else
-
-      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
-
-      else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
-
-      fi
-
-      [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
-
-      function_KillPID_Menu
-
-    fi
-        
-  elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
-
-    printf "\n\n"
-
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
-    else
-
-      if [[ $HeadlessCmd ]]; then 
-
-        # headless only runs in Spice
-        eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
-
-      elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
-
-      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
-
-      fi
-
-      #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
-
-      [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
-
-      function_KillPID_Menu
-
-    fi
-      
-  elif  [[ $MainMenuChoice == "q" ]] ; then
-
-    printf "\n\n"
-    MainMenuChoice=
-    exit directly	
-
-  elif  [[ $MainMenuChoice == "i" ]] ; then
-
-    drives_and_snapshots  info
-
-    printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-
-    [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-
-    printf "\n\n  [enter] to return to menu \n\n "
-    read -rp "  >  "  
-
-  elif  [[ $MainMenuChoice == "disk" ]] ; then
-
-    manage_and_repair_disks
-
-    drives_and_snapshots  info
-
-  elif  [[ $MainMenuChoice == "sl" ]] ; then
-
-    drives_and_snapshots
-
-    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-    printf "\n\n  [enter] to return to menu \n\n "
-    read -rp "  >  "  
-  
-
-  elif  [[ $MainMenuChoice == "sc" ]] ; then
-
-    drives_and_snapshots  select
-
-    printColor "\n\n  [enter] automatic date.time title  "
-    printf "  [text input] descriptor   [b] back to menu " 
-    SnapTitle=
-    printf "\n\n"
-    read -rp "  >  "  SnapTitle
-    printf "\n\n"	
-
-    [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
-    
-    if [[ $SnapTitle != "b" ]]; then 
-    
-      # remove spaces, make title dot separated, as easier to IFS
-      SnapTitle="${SnapTitle// /.}"
-
-      "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
-
-      "$QEMU_IMG" info "$Selected_Drive"
-
-      printColor "\n\n  Drive Updated ..."
-      printf "\n\n  [enter] to return to menu \n\n "
-      read -rp "  >  "  
-
-    fi
-
-  elif  [[ $MainMenuChoice == "sd" ]] ; then
-
-    drives_and_snapshots  select 
-    snapshot_delete
-          
-  elif  [[ $MainMenuChoice == "sa" ]] ; then
-
-    drives_and_snapshots select
-
-    printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
-    SnapNumber=
-    
-    printf "\n\n"
-    read -rp "  >  "  SnapNumber
-    printf "\n\n"	
-
-    if [[ $SnapNumber ]]; then
-    
-      "$QEMU_IMG" snapshot -q -a "$SnapNumber" "$Selected_Drive" 
-
-      printf "\n\n  May take a moment .... \n\n"
-      printColor "\n\n  Snapshot %s has been applied. \n\n"  "$SnapNumber "
-
-    fi
-  
-  elif [[ $MainMenuChoice == "2" || $MainMenuChoice == "3" ]] ; then
-
-    create_new_drives
-    
-  elif [[ $MainMenuChoice == "v" ]] ; then
-
-    if [[ $VerboseArgs ]]; then VerboseArgs= ; else VerboseArgs=1 ; fi
-  
-  elif [[ $MainMenuChoice == "vm" ]] ; then
-
-    if [[ ! ${VM_Array[0,0]} ]]; then refresh_sources_and_reload_VM_arrays ; fi
-    Select_VM=1
-    ByPass_VM_Array_Selector=
-    ByPass_VM_Array_Loader=
-
-  elif [[ $MainMenuChoice == "xa" ]] ; then
-
-    MenuXA=
-    MenuXA_Correct=
-
-    printColor "\n\n  Give extra qemu arguments to use "
-    printf     "\n\n  Format = grouped & with space separated elements "
-    printf     "\n\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
-
-    [[ $ExtraSetArgs ]] && printf  "\n\n  Extra Set Args:  %s"  "$ExtraSetArgs"
-
-    if [[ $ExtraArgs ]] && [[ "$ExtraArgs" != "$ExtraSetArgs" ]]; then
-    
-      printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
-
-      if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only " ; else printf "\n\n  [r] remove the Extra Args " ; fi
-
-    fi
-
-    printf "\n\n"
-    read -rp "  > "  MenuXA
-
-    if [[ $MenuXA != "r" ]]; then
-
-      printf "\n\n  %s %s"  "$ExtraArgs" " $MenuXA"
-      printf "\n\n  Is this correct y/n ? \n\n"
-      read -rp "  >  "  MenuXA_Correct
-
-    fi
-    
-    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 1.5 
-
-    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1 
-    
-    else  ExtraArgs="$ExtraArgs $MenuXA" ; fi
-
-    printf "\033c\n\n"
-
-  else
-
-    # refresh
-    MainMenuChoice=
-
-  fi
+  else  main_menu  ; fi
 
 done
+
+tput  cnorm
 
 # https://code.visualstudio.com/  (recommended)
 

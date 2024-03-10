@@ -1,0 +1,426 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+#   Licence  GPL3   https://www.gnu.org/licenses 
+
+##  qqX - quickemu quickget X terminal project   
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+function  main_menu_actions {
+
+  if [[ $MainMenuChoice == "h" ]] ; then
+
+    show_quickemu_WRAP_help
+
+  elif [[ $MainMenuChoice == "del" ]]; then 
+
+    function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
+
+  elif [[ $MainMenuChoice == "hdw" ]] ; then
+
+    AddHW_Record=
+
+    if [[ -e "$QemuArgsFile" ]]; then 
+
+      printf "\033c"
+
+      if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n\n  Existing Record: \n\n"; cat "$QemuVirtHardwareRecord"; fi
+
+      printf "\n\n  Current Args / Qemu Virtual Hardware \n\n"
+    
+      cat "$QemuArgsFile"
+      
+      if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n\n"
+
+      else printColor "  Create new Virtual Hardware Record using Current Args?\n\n"
+
+      fi
+
+      read -rp "  [enter] to continue  [b] to go back"  AddHW_Record
+
+      if [[ $AddHW_Record != "b" ]]; then 
+            
+        cat "$QemuArgsFile" >> "$QemuVirtHardwareRecord"
+
+      fi
+
+    else
+
+      printf "\n\n  No Args log found. The virtual machine launch process must be run first. \n\n"
+
+      printf "\n\n  The 'VerboseArgs' option may be used, which will allow checking.  \n\n"
+
+    fi 
+
+  elif [[ $MainMenuChoice == "u" ]] ; then
+
+    if [[ ! $ShowUtilsMenu ]]; then ShowUtilsMenu=1 ; else ShowUtilsMenu= ; fi
+
+  elif [[ $MainMenuChoice == "set" ]] ; then
+
+    qqX_edit_settings
+
+  elif [[ $MainMenuChoice == "rtv" ]] ; then
+
+    RtvBack=
+    printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
+    printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old. \n\n  Your VMF_VARS.fd file(s) will be reinstalled."
+    printf  "\n\n  [enter] to continue  [b] to go back "
+    read -rp "  >  "  RtvBack
+
+    if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
+
+    else
+
+      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/OVMF/OVMF_VARS.fd" ]]; then
+        cp -f "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd.old"
+        cp -f "/usr/share/OVMF/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd"
+        printf "\n\n  Reset/Installed 'OVMF_VARS.fd' "
+      fi
+
+      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/AAVMF/AAVMF_VARS.fd" ]]; then
+        cp -f "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd.old"
+        cp -f "/usr/share/AAVMF/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd"
+        printf "\n\n  Reset/Installed 'AAVMF_VARS.fd' "
+      fi
+
+      printf "\n\n  [enter] to return \n\n "
+      read -rp "  >  "
+
+    fi
+
+  elif [[ $MainMenuChoice == "ql" ]] ; then
+
+    QL_LogView=
+    
+    printf "\n\n"
+
+    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  
+    
+      cat "$QemuErrorLog"
+
+      printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
+
+    else  printf "  No qemu errors were present on the last VM load ...  ?? " ; fi
+
+    printf "\n\n  Also try [rtv] from the utils menu which may help if the distro boot sequence is causing problems"
+
+    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
+
+    #  Avoid any "[W] permanent" type option because it could overwrite something manually placed in the .conf file
+
+    read -rp "  >  "  QL_LogView
+
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") 
+
+    [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
+
+
+  elif [[ $MainMenuChoice == "f" ]] ; then
+
+    nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
+
+    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
+    #  As from 'WebBrowser' section and handling of firefox etc
+
+  elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release
+
+  elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
+
+  elif [[ $MainMenuChoice == "cd" ]] ; then qqX_edit_settings  custom
+
+  elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
+
+  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
+
+  elif [[ $MainMenuChoice == "gt" ]] ; then function_quick_get_wrap
+
+  elif [[ $MainMenuChoice == "z" ]] ; then
+
+    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
+
+      MainMenuZsync=1
+      function_quick_get_wrap
+
+    else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
+
+    fi
+
+  elif [[ $MainMenuChoice == "m" ]] ; then
+
+    KVM_MSR_selector_LoadHelp=1
+    select_msr_config
+
+  elif [[ $MainMenuChoice == "gl" ]] ; then
+
+    if [[ $qqX_GL_Mode == "on" ]] ; then qqX_GL_Mode="off"
+
+    elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
+    
+    fi
+
+  elif [[ $MainMenuChoice == "C" ]] ; then 
+
+    if [[ $ShowCustomBootMenu ]]; then  ForceCustomBootMenu="hide" ; else  ForceCustomBootMenu="show" ; fi
+
+    MainMenuChoice=
+  
+  elif [[ $MainMenuChoice == "c" ]] ; then 
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+
+    else
+
+      UseCustomBootArgs=1
+      eval quickemu "-vm $VM_Conf_File --vm_boot" 
+      vm_pid_kill_menu
+
+    fi
+
+  elif [[ $MainMenuChoice == "g" ]] ; then 
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+
+    else
+
+      eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
+      vm_pid_kill_menu
+
+    fi
+        
+  elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+
+    else
+
+      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
+
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+
+      fi
+
+      [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
+
+      vm_pid_kill_menu
+
+    fi
+        
+  elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
+
+    printf "\n\n"
+
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
+
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+
+    else
+
+      if [[ $HeadlessCmd ]]; then 
+
+        # headless only runs in Spice
+        eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
+
+      elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
+
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
+
+      fi
+
+      #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
+
+      [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
+
+      vm_pid_kill_menu
+
+    fi
+      
+  elif  [[ $MainMenuChoice == "q" ]] ; then
+
+    printf "\n\n"
+    MainMenuChoice=
+    exit directly	
+
+  elif  [[ $MainMenuChoice == "i" ]] ; then
+
+    drives_and_snapshots  info
+
+    printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+
+    [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
+
+    printf "\n\n  [enter] to return to menu \n\n "
+    read -rp "  >  "  
+
+  elif  [[ $MainMenuChoice == "disk" ]] ; then
+
+    manage_and_repair_disks
+
+    drives_and_snapshots  info
+
+  elif  [[ $MainMenuChoice == "sl" ]] ; then
+
+    drives_and_snapshots
+
+    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
+    printf "\n\n  [enter] to return to menu \n\n "
+    read -rp "  >  "  
+  
+
+  elif  [[ $MainMenuChoice == "sc" ]] ; then
+
+    drives_and_snapshots  select
+
+    printColor "\n\n  [enter] automatic date.time title  "
+    printf "  [text input] descriptor   [b] back to menu " 
+    SnapTitle=
+    printf "\n\n"
+    read -rp "  >  "  SnapTitle
+    printf "\n\n"	
+
+    [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
+    
+    if [[ $SnapTitle != "b" ]]; then 
+    
+      # remove spaces, make title dot separated, as easier to IFS
+      SnapTitle="${SnapTitle// /.}"
+
+      "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
+
+      "$QEMU_IMG" info "$Selected_Drive"
+
+      printColor "\n\n  Drive Updated ..."
+      printf "\n\n  [enter] to return to menu \n\n "
+      read -rp "  >  "  
+
+    fi
+
+  elif  [[ $MainMenuChoice == "sd" ]] ; then
+
+    drives_and_snapshots  select 
+    snapshot_delete
+          
+  elif  [[ $MainMenuChoice == "sa" ]] ; then
+
+    drives_and_snapshots select
+
+    printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
+    SnapNumber=
+    
+    printf "\n\n"
+    read -rp "  >  "  SnapNumber
+    printf "\n\n"	
+
+    if [[ $SnapNumber ]]; then
+    
+      "$QEMU_IMG" snapshot -q -a "$SnapNumber" "$Selected_Drive" 
+
+      printf "\n\n  May take a moment .... \n\n"
+      printColor "\n\n  Snapshot %s has been applied. \n\n"  "$SnapNumber "
+
+    fi
+  
+  elif [[ $MainMenuChoice == "2" || $MainMenuChoice == "3" ]] ; then
+
+    create_new_drives
+    
+  elif [[ $MainMenuChoice == "v" ]] ; then
+
+    if [[ $VerboseArgs ]]; then VerboseArgs= ; else VerboseArgs=1 ; fi
+  
+  elif [[ $MainMenuChoice == "vm" ]] ; then
+
+    ByPass_VM_Array_Selector=
+    ByPass_VM_Array_Loader=
+    VM_Conf_Dir=
+    VM_Conf_File=
+    VM_InstanceName=
+    return
+
+  elif [[ $MainMenuChoice == "xa" ]] ; then
+
+    MenuXA=
+    MenuXA_Correct=
+
+    printColor "\n\n  Give extra qemu arguments to use "
+    printf     "\n\n  Format = grouped & with space separated elements "
+    printf     "\n\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
+
+    [[ $ExtraSetArgs ]] && printf  "\n\n  Extra Set Args:  %s"  "$ExtraSetArgs"
+
+    if [[ $ExtraArgs ]] && [[ "$ExtraArgs" != "$ExtraSetArgs" ]]; then
+    
+      printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
+
+      if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only " ; else printf "\n\n  [r] remove the Extra Args " ; fi
+
+    fi
+
+    printf "\n\n"
+    read -rp "  > "  MenuXA
+
+    if [[ $MenuXA != "r" ]]; then
+
+      printf "\n\n  %s %s"  "$ExtraArgs" " $MenuXA"
+      printf "\n\n  Is this correct y/n ? \n\n"
+      read -rp "  >  "  MenuXA_Correct
+
+    fi
+    
+    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 1.5 
+
+    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1 
+    
+    else  ExtraArgs="$ExtraArgs $MenuXA" ; fi
+
+    printf "\033c\n\n"
+
+  else
+
+    # refresh
+    MainMenuChoice=
+
+  fi
+
+}
+
+
