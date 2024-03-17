@@ -93,7 +93,7 @@ fi
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
 #  Further processing is done in the 'qqX_api_and_mouse_tidyup' script, after other functions have been loaded
 
-echo "$@"  ; echo   #   TEMP 
+# echo "$@"  ; echo  
 
 if [[ $1 == "XDG" ]]; then 
 
@@ -105,19 +105,14 @@ if [[ $1 == "XDG" ]]; then
 
     elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
     
-     QCOW_RightClick= #1 ; shift 
+     QCOW_RightClick= 
 
-      #hideme () {
-      echo "$@"  ; echo   #   TEMP 
-
-        # conforms to  -vm | --vm  file.conf
-        VM_Conf_Dir="$(dirname "$2")"
-        [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
-        VM_Conf_File="$(basename "$2")"
-        VM_InstanceName="${VM_Conf_File/'.conf'/}"
-        shift $#
-
-      #}
+      # conforms to  -vm | --vm  file.conf
+      VM_Conf_Dir="$(dirname "$2")"
+      [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
+      VM_Conf_File="$(basename "$2")"
+      VM_InstanceName="${VM_Conf_File/'.conf'/}"
+      shift $#
 
     elif [[ "$XDG_MimeType" == *'text/plain' ]] ; then
     
@@ -177,43 +172,22 @@ if [[ $1 == "XDG" ]]; then
 
   fi
 
-
 elif [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$ModVersion" ; exit 
 
+elif [[ "$1" == *'vm' ]] && [[ $2 == *'.conf' ]]; then  
 
-elif [[ "$1" == *'vm' ]]; then   #  FIXME 
-
-#shift
-echo "$@"  ; echo
-
-#VM_Conf_File="$(basename "$2")"
-#VM_InstanceName="${VM_Conf_File/'.conf'/}"
-#VM_Conf_Dir="$(dirname "$2")"
-#[[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
-
-        # conforms to  -vm | --vm  file.conf
-        VM_Conf_Dir="$(dirname "$2")"
-        [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
-        VM_Conf_File="$(basename "$2")"
-        VM_InstanceName="${VM_Conf_File/'.conf'/}"
-        shift $#
-
-
-echo "VM_InstanceName = $VM_InstanceName"
-
-echo "VM_Conf_File = $VM_Conf_File"
-
-echo "VM_Conf_Dir = $VM_Conf_Dir"
-
-sleep 3    #   TEMP  
-
+  # conforms to  -vm | --vm  file.conf
+  VM_Conf_Dir="$(dirname "$2")"
+  [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
+  VM_Conf_File="$(basename "$2")"
+  VM_InstanceName="${VM_Conf_File/'.conf'/}"
+  shift $#
 
 else 
 
   CurrentFolder="$(pwd)"
   
 fi
-
 
 
 #  Pick up the SETTINGS file: 
