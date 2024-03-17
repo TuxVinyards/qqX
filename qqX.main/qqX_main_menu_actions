@@ -369,6 +369,8 @@ function  main_menu_actions {
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
+    refresh_sources_and_load_VM_arrays
+
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
     VM_Conf_Dir=

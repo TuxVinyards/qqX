@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+#   Licence  GPL3   https://www.gnu.org/licenses 
+
+##  qqX - quickemu quickget X terminal project   
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154 
+
+
+#  Sorts out any MOUSE CLICK or COMMAND LINE parameters and reads any flags set during 'qqX_initialize' 
+#  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
+
+
+show_CLI_usage () {
+
+  printColor  "\n  Command line Usage"  
+
+  printf     "\n\n  qqX --version  &  qqX --help  as standard"
+ 
+  printf     "\n\n\n  Plain 'qqX' to start the distro/vm selector menu"    
+
+  printf     "\n\n  Or qqX --vm  [path/to/vms-folder/]vm-name.conf to start something specific."
+
+  printColor "\n\n\n  Mouse"
+
+  printf     "\n\n  Simple left clicking on an edited .conf file or by right clicking and using 'open-with'"
+
+  printf     "\n\n  Edit the first line of the .conf to point to qqX instead of quickemu"   
+
+  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/qqX --vm  or similar (VM name not needed)" 
+
+}
+
+if [[ $XDG_MimeType_is_QCOW ]]; then  
+
+  # should haved changed to the right directory at this point
+
+  if grep -q -s "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
+
+    VM_Conf_Dir="$(pwd)"
+    VM_Conf_File="$QCOW_RightClick_VM_Dir_Name.conf"
+    VM_InstanceName="$QCOW_RightClick_VM_Dir_Name"
+    QCOW_RightClick_NON_qqX=
+    shift
+
+  else  QCOW_RightClick_NON_qqX=1 ; shift
+
+  fi
+
+fi
+
+right_click_re_route () {
+
+  printf "\n\n  [enter] to run qqX   [c] to close \n\n"
+  read -rp "  >  "  XDG_StartVariant
+
+  if [[ $XDG_StartVariant != "c" ]]; then 
+ 
+    VM_InstanceName=
+    VM_Conf_Dir=
+    VM_Conf_File=
+    XDG_MimeType_is_QCOW=
+    refresh_sources_and_load_VM_arrays
+
+  else  exit directly
+
+  fi
+}
+
+if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]]; then
+
+  if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1 "  "$XDG_MimeType"
+  else  show_CLI_usage 
+  fi
+
+  RightClickReRouted=1
+  right_click_re_route
+
+fi
+
+#
+
+if [[ $XDG_MimeType_is_QCOW ]]; then  
+
+  check_disk_is_okay "$QCOW_RightClick_VM_Dir_Name"  "$QCOW_RightClick_DiskName"
+
+  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
+
+  if [[ $QCOW_RightClick_NON_qqX ]]; then 
+
+    if [[ $DiskChkStatus == "Okay" ]]; then printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
+    else printColor  "\n\n QEMU qcow2 disk found \n\n BUT not configured as qqX/quickemu bootable \n\n AND has ERRORS .... \n\n"
+    fi
+
+  else
+
+    show_qqX_title_bar
+    printColor  "\n\n  qqX/quickemu bootable: \n\n"
+    if [[ $DiskChkStatus != "Okay" ]]; then  
+      printColor "  BUT has errors: Try qqX [disk] utils " 
+      printf "\n\n Also see  https://qemu.readthedocs.io  "
+      printf  "> QEMU disk image utility notes\n\n"
+    fi
+
+  fi
+
+  "$QEMU_IMG" info "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName"
+      
+  if [[ $QCOW_RightClick_NON_qqX ]]; then  
+
+    printColor "\n\n See  https://qemu.readthedocs.io  "
+    printf  "> QEMU disk image utility may be useful"
+
+    RightClickReRouted=1
+    right_click_re_route
+    
+  else  printColor "\n\n  [enter] to continue  \n\n"  ; read -rp  "  >  "
+    
+  fi
+  
+  
+  if [[ ! $QCOW_RightClick_NON_qqX ]]; then 
+  
+    QCOW_RightClick= 
+    ByPass_VM_Array_Selector=1
+    
+    if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
+
+    else
+
+      if [[ ! -d  "$VM_Conf_Dir"  ]]; then 
+
+        printColor "\n\n  Directory:  %s  not found "  "$VM_Conf_Dir "
+        function_conf_error  " COMMAND LINE Path Instruction,"
+
+      else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
+
+      fi
+
+    fi
+
+    if [[ ! -f "$VM_Conf_Dir/$VM_Conf_File" ]]; then 
+
+      printColor "\n\n  Conf:  %s  not found "  "$VM_Conf_File"
+      function_conf_error  " COMMAND LINE .Conf Instruction,"
+
+    fi
+
+  elif [[ $RightClickReRouted ]]; then true
+
+  else  exit directly 
+
+  fi
+
+fi  
+
+if [[ -f "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
+
+  source "$VM_Conf_Dir/$VM_Conf_File"
+  read_main_drive_and_img_iso_conf_vars
+
+else
+
+  refresh_sources_and_load_VM_arrays
+
+fi
+
+

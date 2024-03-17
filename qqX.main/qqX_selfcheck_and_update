@@ -177,7 +177,7 @@ function download_new_release {
 
     printf "\033c \n\n"
 
-    function_qqX_printf_logo_title  "qqX updater"
+    qqX_logo_printf_title  "qqX updater"
 
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 

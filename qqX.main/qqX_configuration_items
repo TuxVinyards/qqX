@@ -150,9 +150,9 @@ function set_drive_paths {
   #  SHARED DRIVE
   #  This drive should be availble to all VMs and act as a shared resource.  See main settings.
 
-  if [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
+  if [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
-      eval "$(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' )"
+      eval "$(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' )"
 
   fi
 
@@ -187,7 +187,7 @@ function set_drive_paths {
 #  everytime a different VM is selected or the .conf file is reconfigured
 #  Quickemu uses 'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
 
-function find_main_drive_and_img_iso {
+function read_main_drive_and_img_iso_conf_vars {
 
   MainDrive=
   IsoImg=
@@ -195,6 +195,8 @@ function find_main_drive_and_img_iso {
   [[ -e "$disk_img" ]] && MainDrive="$disk_img"
   [[ -e "$img" ]] && IsoImg="$img"
   [[ -e "$iso" ]] && IsoImg="$iso"
+
+  #echo "MainDrive = $MainDrive  IsoImg = $IsoImg" ; sleep 3
 
 }  
 
@@ -224,7 +226,7 @@ function_conf_error () {
   else printf "\n\n  Check the settings and re-run this script ... " ; fi
 
 
-  printf "\n\n  Settings file:  %s \n\n" "$Q_Mod_SettingsFile"
+  printf "\n\n  Settings file:  %s \n\n" "$qqX_SettingsFile"
 
   
   if [[ "$1" == *'COMMAND'* ]]; then 
@@ -233,6 +235,7 @@ function_conf_error () {
 
     printf "  [enter] to view/edit settings file \n\n"
 
+
   elif [[ $1 == "new" ]]; then 
 
     printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
@@ -240,13 +243,14 @@ function_conf_error () {
     cat "$VM_Conf_File"
 
     NewSetupFlag=1
-    IgnoreFolderCheck=1  
+    IgnoreFolderCheck=1
+    SelectArrayError=  
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     
     printColor "\n\n  [c] continue  (with current settings) looks okay "
 
-    printf "\\n\n  [e] to edit %s general settings   [q] to quit \n\n"   "$ModName"
+    printf "\\n\n  [e] to edit qqX general settings   [q] to quit \n\n"  
 
     
   elif [[ $1 == "folder" ]] ; then 
@@ -259,7 +263,15 @@ function_conf_error () {
     
     printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
 
-    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit %s general settings " "$ModName"
+    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings " 
+    
+    printf "\n\n  [q] to quit \n\n"   
+
+  elif [[ $1 == "qqX_SettingsFile" ]] ; then 
+
+    printf "\n  INTERNAL ERROR: "
+
+    printColor "\n\n\n  Settings file not found: %s"  "$qqX_SettingsFile"
     
     printf "\n\n  [q] to quit \n\n"   
     
@@ -267,7 +279,7 @@ function_conf_error () {
 
     # includes "$1" = "config"
   
-    printColor "\n\n  [Enter] to edit %s general settings"  "$ModName" 
+    printColor "\n\n  [Enter] to edit qqX general settings"  
 
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
 
@@ -290,11 +302,11 @@ function_conf_error () {
   
     IgnoreFolderCheck=1
 
-    if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; return
+    if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; return
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
-      if [[ $NewSetupFlag || $FolderConfigFlag ]]; then qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
+      if [[ $NewSetupFlag || $FolderConfigFlag ]]; then VM_InstanceName= ; qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
 
     elif [[ $ErrorMenuSelect == "gt" ]]; then 
 
@@ -353,7 +365,7 @@ qqX_edit_settings() {
 
     printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
 
-    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$Q_Mod_SettingsFile"
+    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
 
     read -rp "  >  "
 
@@ -400,9 +412,9 @@ qqX_edit_settings() {
 
     else 
 
-      nohup &> /dev/null   "$TextEditor" "$Q_Mod_SettingsFile"  
+      nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile"  
       SettingsFileAdjusted=1
-      refresh_sources_and_reload_VM_arrays
+      refresh_sources_and_load_VM_arrays
 
     fi
 
@@ -883,6 +895,9 @@ function_config_tune_up ()  {
 
       cp "$TuneUpTargetDraft" "$TuneUpTargetFile"
 
+      SelectArrayError=
+      IgnoreSecondCheckNew=1
+
       break
 
     fi
@@ -894,7 +909,10 @@ function_config_tune_up ()  {
   if [[ $NewFileTuneUp ]]; then 
 
     VM_InstanceName=
-    refresh_sources_and_reload_VM_arrays
+    refresh_sources_and_load_VM_arrays
+    SettingsFileAdjusted=1
+    SelectArrayError=
+    IgnoreSecondCheckNew=1
 
   else
 
@@ -915,7 +933,7 @@ function refresh_conf_vars_and_values {
 
   source "$ConfClearanceLog"
 
-  if [[ $VM_Conf_File ]]; then
+  if [[ -e $VM_Conf_File ]]; then
 
     SecondDrive=
     SharedDrive=
@@ -959,7 +977,7 @@ function refresh_conf_vars_and_values {
     # check any menu values that are based on the file .conf 
 
     check_screen_percentage_and_output
-    find_main_drive_and_img_iso
+    read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
 

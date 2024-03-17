@@ -26,7 +26,9 @@
 
 ## VM selector style default
 
-[[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="A"
+Default_VM_SelectorStyle="E"
+
+[[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="$Default_VM_SelectorStyle"
 
 
 function_create_VM_folderList() {
@@ -41,15 +43,13 @@ function_create_VM_folderList() {
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
 
   
-  # set and clear the folder array, current first but don't scan twice
+  # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
 
-  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]]; then
- 
+  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]] && [[ "$(ls "$CurrentFolder/"*.conf 2> /dev/null)" ]] ; then   
+  
     declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
 
-  else
-
-    declare -ga VM_Folder_List=("$Default_VM_Folder")
+  else  declare -ga VM_Folder_List=("$Default_VM_Folder")
 
   fi
 
@@ -69,6 +69,8 @@ function_create_VM_folderList() {
     fi
 
   done
+
+  #  declare -p VM_Folder_List ; echo
 
 }
 
@@ -136,7 +138,7 @@ function find_xdgopen_settings()  {
 
 }
 
-# Also needs calling if re-loading the settings file  See refresh_sources_and_reload_VM_arrays
+# Also needs calling if re-loading the settings file  See refresh_sources_and_load_VM_arrays
 find_xdgopen_settings
 
 

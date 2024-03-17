@@ -271,7 +271,7 @@ printf "\033c"
 
 echo
 
-function_qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $qqX_Version "
 
 
 if [[ "$(whoami)" == root ]]; then 
@@ -311,7 +311,7 @@ fi
 printf "\033c"
 echo
 
-function_qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
 
 if [[ $1 != "Upgrade" ]]; then 
 
@@ -591,7 +591,7 @@ if [[ ! $SkipMkLauncher ]]; then
   printf "\033c"
   echo
 
-  function_qqX_logo_title  "Setting up the desktop:"
+  qqX_logo_title  "Setting up the desktop:"
 
   printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
 

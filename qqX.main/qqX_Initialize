@@ -24,6 +24,17 @@
 #  shellcheck disable=SC2154 
 
 
+qqX_logo_plain() {
+  
+  # early loader 
+
+  echo "  _    _   \/   "
+  echo " (_|  (_|  /\ "
+  echo "   |.   |.    "
+
+}
+
+
 if  [[ $NoClear ]]; then 
 
 	printf () {
@@ -78,30 +89,82 @@ if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]] || [[ ! $(type -p zsync)
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
-if [[ $1 == "XDG" ]]; then 
 
-  # set xdg flags for now, deal with details after the basic initializing is done
+#  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
+#  Further processing is done in the 'qqX_api_and_mouse_tidyup' script, after other functions have been loaded
+
+echo "$@"  ; echo   #   TEMP 
+
+if [[ $1 == "XDG" ]]; then 
 
   if [[ -e "$2" ]]; then
 
     XDG_MimeType="$(mimetype "$2" 2>/dev/null)"
    
-    if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_Valid=1
+    if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_is_QCOW=1
 
-    else XDG_MimeType_Valid=  ; fi
+    elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
+    
+     QCOW_RightClick= #1 ; shift 
+
+      #hideme () {
+      echo "$@"  ; echo   #   TEMP 
+
+        # conforms to  -vm | --vm  file.conf
+        VM_Conf_Dir="$(dirname "$2")"
+        [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
+        VM_Conf_File="$(basename "$2")"
+        VM_InstanceName="${VM_Conf_File/'.conf'/}"
+        shift $#
+
+      #}
+
+    elif [[ "$XDG_MimeType" == *'text/plain' ]] ; then
+    
+      QCOW_RightClick= 
+      XDG_MimeType_is_QCOW=  
+      QCOW_RightClick_Conf_Dir=
+      echo
+      qqX_logo_plain
+      echo; echo " $2"; echo
+      echo " qqX has been associated to open .conf (text) files via the file properties 'open-with' option."
+      echo; echo; echo "<<" 
+      head -20 "$2"
+      echo ">>" ; echo
+      FileLines="$(wc -l < "$2")"
+      printf "\n This current file is plain text only. " 
+      [[ $FileLines -gt 20 ]] && printf " File length %s lines \n"  "$FileLines"  &&  TextAll="[a] view full text & quit   "
+      echo
+      echo " [enter] to run qqX   $TextAll [q]  quit"
+      echo
+      read -rp " >  "   ConfOpener
+      echo  
+
+      if [[ $ConfOpener == "a" ]]; then  cat "$2"; echo; echo " [enter] to quit  "; echo; read -rp " >  "; exit 
+      elif [[ $ConfOpener == "q" ]]; then exit
+      else VM_InstanceName= ; XDG_MimeType_Recognised=1
+      fi
+
+    else
+
+      XDG_StartVariant=1
+      XDG_MimeType_Recognised=
+      XDG_MimeType_is_QCOW=  
+      
+    fi
 
   fi
 
-  if [[ $XDG_MimeType_Valid ]]; then
+  if [[ $XDG_MimeType_is_QCOW ]]; then
 
-    # is a right-click start on a qcow2 disk (set flag for later) 
-    XDG_QcowRightClick=1
+    # is a right-click start on a qcow2 disk (flag is set for later)  
     shift
     
   elif [[ $2 ]]; then
 
-    # is right click XDG but at this stage needs flagging for later analysis or other type of handling
+    # is right click XDG but at this stage needs flagging for later analysis or other type of handling 
     XDG_StartVariant=1
+    XDG_MimeType_is_QCOW= 
     shift
 
   else
@@ -115,16 +178,35 @@ if [[ $1 == "XDG" ]]; then
   fi
 
 
-elif [[ $ModName_qqX ]] && [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$ModVersion" ; exit 
+elif [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$ModVersion" ; exit 
 
 
-elif [[ ! $ModName_qqX ]] && [[ "$1" == *'vm' ]]; then  
+elif [[ "$1" == *'vm' ]]; then   #  FIXME 
 
-  # quickemu-wrap only  &  where test [[ $Conf_TriggerFolder ]] will also flag up if the script was .conf target started
+#shift
+echo "$@"  ; echo
 
-  Conf_TriggerFolder="$(dirname "$0")"
-  
-  CurrentFolder="$(dirname "$2")"
+#VM_Conf_File="$(basename "$2")"
+#VM_InstanceName="${VM_Conf_File/'.conf'/}"
+#VM_Conf_Dir="$(dirname "$2")"
+#[[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
+
+        # conforms to  -vm | --vm  file.conf
+        VM_Conf_Dir="$(dirname "$2")"
+        [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
+        VM_Conf_File="$(basename "$2")"
+        VM_InstanceName="${VM_Conf_File/'.conf'/}"
+        shift $#
+
+
+echo "VM_InstanceName = $VM_InstanceName"
+
+echo "VM_Conf_File = $VM_Conf_File"
+
+echo "VM_Conf_Dir = $VM_Conf_Dir"
+
+sleep 3    #   TEMP  
+
 
 else 
 
@@ -132,67 +214,28 @@ else
   
 fi
 
-#  Pick up the SETTINGS file:  If placing the main file in /usr/bin,"
-#  then place the settings file as "/$HOME/.qmod_settings, OR if qqX in "/$HOME/.qqX/qqX_settings"
-
-#  For details, see notes at start of the settings file ...
-
-#  Use full quoted path & name if adding in a additional folder to this script or different to these defaults
-#  For .conf click starts, the Positional parameters need reading to check the settings file location;
-#  this would be expected to be where the specified wrap script is located as a first check
 
 
-if [[ $ModName_qqX ]]; then SettingsName="qqX_settings"
+#  Pick up the SETTINGS file: 
 
-else SettingsName="qmod_settings" ; fi
+#  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines. 
+
+#  A possibilty to have a local 'dev' version setting file is retained.  May be .dot hidden or plain
+
+[[ -e "$HOME/.qqX/qqX_settings" ]] && qqX_SettingsFile="$HOME/.qqX/qqX_settings"
 
 
-if [[ $ModName_qqX ]]; then 
+if [[ -e "$qqX_SettingsFile" ]]; then  source "$qqX_SettingsFile" 
 
-  [[ -e "$HOME/.qqX/qqX_settings" ]] && Q_Mod_SettingsFile="$HOME/.qqX/qqX_settings"
+elif [[ -e "$CurrentFolder/qqX_settings" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
 
-#
+  qqX_SettingsFile="$CurrentFolder/qqX_settings" ; source "$qqX_SettingsFile" 
 
-elif [[ $Conf_TriggerFolder ]] && [[ -e "$Conf_TriggerFolder/${SettingsName}" ]]; then  
+elif [[ -e "$CurrentFolder/.qqX_settings" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
 
-  Q_Mod_SettingsFile="$Conf_TriggerFolder/${SettingsName}"
-
-#
-
-elif [[ -e "$CurrentFolder/${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  Q_Mod_SettingsFile="$CurrentFolder/${SettingsName}"
-
-elif [[ -e "$CurrentFolder/.${SettingsName}" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  Q_Mod_SettingsFile="$CurrentFolder/.${SettingsName}"
-
-#  
-
-elif [[ -e "$HOME/.qmod_settings" ]] && [[ ! $ModName_qqX ]] ; then  
-
-  Q_Mod_SettingsFile="$HOME/.qmod_settings"
-
-elif [[ -e "$HOME/qmod_settings" ]] && [[ ! $ModName_qqX ]] ; then 
-
-  Q_Mod_SettingsFile="$HOME/qmod_settings"
-
-else  
-
-  Q_Mod_SettingsFile=  
-
-  echo; echo "  No settings file found .... " ; echo ; sleep 2
+  qqX_SettingsFile="$CurrentFolder/.qqX_settings" ; source "$qqX_SettingsFile" 
   
-fi
-
-
-if [[ -e "$Q_Mod_SettingsFile" ]]; then
-    
-  if [[ $ModName_qqX ]]; then source "$Q_Mod_SettingsFile" ; else source "$Q_Mod_SettingsFile"  QWRAP ; fi
-
-else 
-
-  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
+else  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
   
 fi
 
@@ -211,18 +254,15 @@ fi
 function_xdg_start_folder () {
 
   #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
-  #  Also can be called (belt & braces) at the other command line $1 trap towards end of script ...  REVIEW 
 
   if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
 
     cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found " 
-
     CurrentFolder="$Default_VM_Folder"
 
   else
 
     cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
-
     CurrentFolder="$HOME"
 
   fi
@@ -233,19 +273,23 @@ function_xdg_start_folder () {
 [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
 
 
-if [[ $XDG_QcowRightClick ]]; then
+if [[ $XDG_MimeType_is_QCOW ]]; then
 
-  XDG_QcowRightClick_Conf_Dir="$(dirname "$1")"
-  XDG_QcowRightClick_DiskName="$(basename "$1")"
-  XDG_QcowRightClick_VM_Dir_Name="$(basename "$XDG_QcowRightClick_Conf_Dir")"
+  QCOW_RightClick_Conf_Dir="$(dirname "$1")"
+  [[ "$QCOW_RightClick_Conf_Dir" == '.' ]] && QCOW_RightClick_Conf_Dir="$(pwd)"
 
+  QCOW_RightClick_DiskName="$(basename "$1")"  
+  
+  QCOW_RightClick_VM_Dir_Name="$(basename "$QCOW_RightClick_Conf_Dir")"
+ 
   # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
+  #  standard right-click open-with actions will use the current folder
 
-  cd "$XDG_QcowRightClick_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+  cd "$QCOW_RightClick_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
 
   cd ..  || printf "\n\n XDG .desktop starter  >  Disk's root Folder not found " 
 
-  CurrentFolder="$XDG_QcowRightClick_Conf_Dir"
+  CurrentFolder="$QCOW_RightClick_Conf_Dir"
 
 fi
 

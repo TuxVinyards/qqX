@@ -1,0 +1,319 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+#   Licence  GPL3   https://www.gnu.org/licenses 
+
+##  qqX - quickemu quickget X terminal project   
+
+## ShellCheck global disables:
+
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242
+#  shellcheck disable=SC1090 
+#  shellcheck disable=SC2034
+#  shellcheck disable=SC2154  
+
+
+
+## Variant styles of VM display & their common function units
+
+# For notes on custom vm menus see "Custom styles" at the end of this script
+
+vm_selector_init_common () {
+
+  VM_ElementCount="${#VM_Array[@]}" 
+  VM_PairsCount="$((VM_ElementCount/2))"
+  VM_Array_LastIndex="$((VM_PairsCount-1))"
+
+  ZsyncDistrosFound=
+  LiveDistrosFound=
+  MSR_DistrosFound=
+
+}
+
+function_vm_folder_item_text () {
+
+  ArrayConf_Item="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+  ArrayConf_Item_Listing="${VM_Array[$i,1]}"
+  ArrayConf_Item_Listing="${ArrayConf_Item_Listing/'.conf'/}"
+
+  [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
+
+  [[ ${#ArrayConf_Item_Listing} -gt "24" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:24}"
+
+  ## Decide on item text to print
+
+  QcowTarget=
+  QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
+  QcowTarget="${QcowTarget/'disk_img='/}"  
+  QcowTarget="${QcowTarget//'"'/}"
+
+  # Newly downloaded VMs will have a qcow disk path in the .conf file 
+  # BUT the disk won't be be there yet, not until quickemu has done a first run against the .conf
+
+  if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
+
+    ArrayConf_Item_Listing+=" (new)"
+
+  elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
+
+    #  Live VM qcow2 disks are as little as only 196k. 
+    #  But set test ceiling is set at 1,000,000k (1G) to allow for meta preallocation etc REVIEW 
+
+    if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
+      #  Are Live VMs only, as zsync only updates the iso file.   
+      ArrayConf_Item_Listing+=" (Z)"
+      ZsyncDistrosFound=1
+    else
+      #  Live VMs only, in general, running off the iso file.   
+      ArrayConf_Item_Listing+=" (L)"
+      LiveDistrosFound=1
+    fi
+
+  fi
+
+}
+
+print_selector_array_A_style () {
+
+  i=0
+  ListTitleFolder=
+  VM_List_LineItemCount=0
+
+  vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_A_PerLine ]] && VM_Select_Items_style_A_PerLine="4"
+
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
+
+      if [[ $ListTitleFolder ]]; then 
+      
+        # won't print first time if value has been initialized as empty ...
+        printf " >>  %s\n\n\n  "  "$ListTitleFolder"
+        VM_List_LineItemCount=0
+
+      else  printf "\n\n  "
+
+      fi
+
+      ListTitleFolder="${VM_Array[$i,0]}"
+
+    fi
+
+    function_vm_folder_item_text
+
+    if [[ $i -gt 9 ]]; then printf "[%d]  " "$i" ; else printf " [%d]  " "$i" ; fi
+    printColor "%-29s" "$ArrayConf_Item_Listing"
+    ((VM_List_LineItemCount+=1))   
+
+    # Move to new line when number of items per line reached  (default 4, see main settings)
+    if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_A_PerLine" ]]; then
+      VM_List_LineItemCount=0
+      printf "\n\n  "
+    fi
+
+    ((i+=1))
+
+  done
+
+  [[ $i == "$VM_PairsCount" ]] && printf " >>  %s"  "$ListTitleFolder"
+
+  printf "\n"
+
+}
+
+print_selector_array_B_style () {
+
+  i=0
+  VM_List_LineItemCount=0
+  ListTitleFolder="${VM_Array[0,0]}"
+
+  vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_B_PerLine ]] && VM_Select_Items_style_B_PerLine="1"
+
+  printf "\n  "
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+   
+    function_vm_folder_item_text
+
+    if [[ $i -gt 9 ]]; then printf "[%d] " "$i" ; else printf "[%d]  " "$i" ; fi
+    printColor "%-30s" "$ArrayConf_Item_Listing"
+
+    # Move to new line when number of items per line reached  (default 4, see main settings)
+    if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_B_PerLine" ]]; then  VM_List_LineItemCount=0 
+
+    else  ((VM_List_LineItemCount+=1))  ; fi
+
+    ListTitleFolder="${VM_Array[$i,0]}"
+    ((i+=1))
+
+    if [[ $ListTitleFolder != "${VM_Array[$i,0]}" ]]; then
+
+      if [[ $VM_List_LineItemCount == "0" ]]; then Spaces=0
+      else Spaces="$(((VM_Select_Items_style_B_PerLine+1)-VM_List_LineItemCount))" ; fi
+      Spacer="                                   "   # 35
+
+      while [[ $Spaces -gt 0 ]]; do  printf "%s" "$Spacer" ; ((Spaces-=1)) ; done 
+      printf " >>  %s\n"  "$ListTitleFolder"
+      [[ $i != "$VM_PairsCount" ]] && printf "\n  "
+      VM_List_LineItemCount=0
+
+    else  [[ $VM_List_LineItemCount == 0 ]] && printf "\n  "
+    
+    fi  
+    
+  done
+ 
+}
+
+print_selector_array_C_style () {
+
+  i=0
+  VM_List_LineItemCount=1
+  ListTitleFolder=
+
+  if [[ $1 == "invert" ]]; then InvertStyleColors=1 ; else InvertStyleColors= ; fi
+
+  vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_C_PerLine ]] && VM_Select_Items_style_C_PerLine="3"
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    function_vm_folder_item_text
+
+    ListTitleFolder="${VM_Array[$i,0]}"
+
+    if [[ $ListTitleFolder != "$ListTitleFolderOld" ]]; then
+
+      if [[ ${#ListTitleFolder} -gt 28 ]]; then
+
+        ListTitleFolderDisplay="${ListTitleFolder:(-28)}"
+        ListTitleFolderDisplay="${ListTitleFolderDisplay#*/}"
+        [[ "$ListTitleFolderDisplay" != '/'* ]] && ListTitleFolderDisplay="/$ListTitleFolderDisplay"
+
+      else  ListTitleFolderDisplay="$ListTitleFolder"
+
+      fi
+
+      [[ $ListTitleFolderOld ]] && printf "\n"
+
+      if [[ $InvertStyleColors ]]; then  printColor "\n\n  %-35s"  "$ListTitleFolderDisplay"
+      else  printf "\n\n  %-35s"  "$ListTitleFolderDisplay" ; fi
+
+      VM_List_LineItemCount=1
+
+    else
+
+      if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_C_PerLine" ]]; then  printf "\n\n  " ;  VM_List_LineItemCount=0 
+      else  ((VM_List_LineItemCount+=1))  
+      fi
+    
+    fi
+
+    if [[ $InvertStyleColors ]]; then
+
+      if [[ $i -le 9 ]]; then printf "[%d]  " "$i" ; printf "%-30s" "$ArrayConf_Item_Listing"
+      else printf "[%d] " "$i" ;  printf "%-30s" "$ArrayConf_Item_Listing" ; fi
+
+    else
+
+      if [[ $i -le 9 ]]; then printf "[%d]  " "$i" ; printColor "%-30s" "$ArrayConf_Item_Listing"
+      else printf "[%d] " "$i" ;  printColor "%-30s" "$ArrayConf_Item_Listing" ; fi
+
+    fi
+
+    ListTitleFolderOld="${VM_Array[$i,0]}"
+
+    ((i+=1))
+
+  done
+
+  printf "\n"
+  
+}
+
+print_selector_array_D_style () { print_selector_array_C_style  invert ; }
+
+print_selector_array_E_style () {
+
+  i=0
+  VM_List_LineItemCount=1
+  ListTitleFolder=
+
+  vm_selector_init_common
+
+  [[ ! $VM_Select_Items_style_E_PerLine ]] && VM_Select_Items_style_E_PerLine="2"
+
+  while [[ ${VM_Array[$i,0]} ]] ; do
+
+    function_vm_folder_item_text
+
+    ListTitleFolder="${VM_Array[$i,0]}"
+
+    if [[ $ListTitleFolder != "$ListTitleFolderOld" ]]; then
+
+      # sneak in the new folder name & nudge up the line item count before printing the VM item
+
+      if [[ ${#ListTitleFolder} -gt 28 ]]; then
+
+        ListTitleFolderDisplay="${ListTitleFolder:(-28)}"
+        ListTitleFolderDisplay="${ListTitleFolderDisplay#*/}"
+        [[ "$ListTitleFolderDisplay" != '/'* ]] && ListTitleFolderDisplay="/$ListTitleFolderDisplay"
+
+      else  ListTitleFolderDisplay="$ListTitleFolder"
+
+      fi
+
+      [[ $ListTitleFolderOld ]] && printf "\n"
+      printColor "\n  %-35s"  "$ListTitleFolderDisplay" 
+      VM_List_LineItemCount=1
+
+    else
+
+      # print the item, but move to new line first if needed
+      if [[ $VM_List_LineItemCount == "$VM_Select_Items_style_E_PerLine" ]]; then  
+        printf "\n  %-35s" " " ;  VM_List_LineItemCount=1 
+      else  ((VM_List_LineItemCount+=1))  
+
+      fi
+    
+    fi
+
+    if [[ $i -le 9 ]]; then printf "[%d]  " "$i" ; printf "%-30s" "$ArrayConf_Item_Listing"
+    else printf "[%d] " "$i" ;  printf "%-30s" "$ArrayConf_Item_Listing" 
+    fi
+
+    ListTitleFolderOld="${VM_Array[$i,0]}"
+    ((i+=1))
+
+  done
+
+  printf "\n"
+  
+}
+
+##  Custom styles
+
+if [[ -e "$Default_VM_Folder/qqX.custom/custom_vm_selectors" ]]; then source "$Default_VM_Folder/qqX.custom/custom_vm_selectors" ; fi
+
+# Method: Use an existing style as a template. More than one function may be created. 
+# Create above stated folder & file. Add "#!/usr/bin/env bash" to line 1 then paste-in and edit the functions. 
+# Use style letters from end of alphabet eg R to Z   Letters must be CAPS but sequence may be non-contiguous. 
+
+

@@ -52,7 +52,7 @@ Number_start=${#LIST_start[@]}
 
 # Variant on   http://www.figlet.org/  -f mini  (-k)   (c)  Alex Genovese
 
-function_qqX_logo() {
+qqX_logo() {
 echColor "  _    _   \/   "
 echColor " (_|  (_|  /\ "
 echColor "   |.   |.    "
@@ -64,7 +64,7 @@ TITLEmain="[quickemu quickget X terminal project] - Ver: $qqX_Version "
 #
 
 
-function_qqX_logo_title() {
+qqX_logo_title() {
 
 if [[ $1 ]]; then
 

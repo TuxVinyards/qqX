@@ -82,10 +82,12 @@ fi
 ModVersion="1.7.01"
 
 ModName="$(basename "$0")"
-if [[ $ModName == "qqx" || $ModName == "qqX" ]]; then ModName_qqX=1 ; else  ModName_qqX=  ; fi    # deprecated
+if [[ $ModName != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
+
+#  TODO  ModName  %s  printf remove deprecated usages
 
 #  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
-NoClear="0.1"
+NoClear=1
 
 #  CODING STYLE 
 
@@ -180,6 +182,8 @@ source "$qqX_MainFolder/qqX_quick_reroute_get"
 
 source "$qqX_MainFolder/qqX_configuration_items"
 
+source "$qqX_MainFolder/qqX_VM_selector_styles"
+
 source "$qqX_MainFolder/qqX_VM_array_and_Select"
 
 source "$qqX_MainFolder/qqX_disk_maintenance"
@@ -193,88 +197,44 @@ source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
 
-##  START:  QUICKEMU-WRAP  menu interface  &  API DIVIDER  ###
+function main_menu {
 
-#   NB   Also see initial $1 flag setting traps   &&  TODO   qwrap is now deprecated  
+  while true ; do
 
-if [[ $1 ]]; then
+    MainMenuChoice=
+    SnapTitle=
+    SnapNumber=
+    SnapName=
 
-  # simple API for command line or .conf starts  ie.  --vm  "path/folder/file.conf"   
+    show_main_menu_header
 
-  if [[ $XDG_QcowRightClick ]]; then
+    if [[ $KillPID_Menu_Exited ]] ; then
 
-    # should haved changed to the parent directory at this point
+      if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
+        printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
+      else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
+      fi
 
-    if grep -q -s "disk_img="'"'"$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName" "$XDG_QcowRightClick_VM_Dir_Name.conf" ; then
-
-      VM_Conf_Dir="$(pwd)"
-      VM_Conf_File="$XDG_QcowRightClick_VM_Dir_Name.conf"
-      VM_InstanceName="$XDG_QcowRightClick_VM_Dir_Name"
-      shift
-
-    else  XDG_QcowRightClick_NO_qqX=1 ; shift
+      [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=  
+      [[ $UseCustomBootArgs ]] && UseCustomBootArgs=  
 
     fi
 
-  elif [[ $XDG_StartVariant ]]; then
+    [[ ! $MainMenuChoice ]] && main_menu_interface
 
-    echo
-    function_qqX_logo
-    printColor "\n\n  %s  not understood \n\n  Or non valid file type %s \n\n"  "$1 "  "$XDG_MimeType"
-    sleep 5 
-
-  elif [[ "$1" == *'vm' ]] && [[ "$2" == *'.conf' ]]; then
-
-    # conforms to  -vm | --vm  file.conf
-    VM_Conf_Dir="$(dirname "$2")"
-    VM_Conf_File="$(basename "$2")"
-    shift $#
-
-  else 
-  
-    show_wrap_CLI_usage 
-    printf "\n\n"
-    exit directly
-
-  fi
-
-  # only $1 starts
-
-  if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
-
-  else
-
-    if [[ ! -e  "$VM_Conf_Dir"  ]]; then 
-
-      printColor "\n\n  %s  not found "  "$VM_Conf_Dir "
+    main_menu_actions
     
-      function_conf_error  " COMMAND LINE Path Instruction,"
+    [[ ! $VM_InstanceName ]] && break
 
-    else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
+  done
 
-    fi
+} 
 
-  fi
-
-  if [[ ! -e "$VM_Conf_Dir/$VM_Conf_File" ]]; then 
-
-    printColor "\n\n  %s  not found "  "$VM_Conf_File"
-  
-    function_conf_error  " COMMAND LINE .Conf Instruction,"
-
-  fi
-
-   # Selection now made, but array must still be loaded as may be needed for reselecting later ...
-   ByPass_VM_Array_Selector=1
-
-fi
-
-
-##  General pre-menu checks  
+##  General pre-menu-loop checks  
 
 tput civis
 printf "\033c"
-show_qmod_title
+show_qqX_title_bar
 
 printf "\n  Running initial checks .... \n"
 
@@ -288,88 +248,21 @@ if [[ ! $Disable_qqX_upd_Checks ]]; then
 fi
 
 
+#  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
+#  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
-## MAIN MENU  
+if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
 
-function main_menu {
-
-  while true ; do
-
-    MainMenuChoice=
-    SnapTitle=
-    SnapNumber=
-    SnapName=
-
-    show_main_menu_header
-
-    if [[ $XDG_QcowRightClick_NO_qqX ]] || [[ $XDG_QcowRightClick ]]; then
-
-      check_disk_is_okay "$XDG_QcowRightClick_VM_Dir_Name"  "$XDG_QcowRightClick_DiskName"
-
-      if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
-
-      if [[ $XDG_QcowRightClick_NO_qqX ]]; then 
-        
-        [[ $DiskChkStatus == "Okay" ]] && printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
-
-      else
-        
-        printColor  "\n\n  qqX/quickemu bootable: \n\n"
-
-        if [[ $DiskChkStatus != "Okay" ]]; then  
-          printColor "  BUT has errors: Try qqX [disk] utils " 
-          printf "\n\n Also see  https://qemu.readthedocs.io  "
-          printf  "> QEMU disk image utility notes\n\n"
-        fi
-
-      fi
-
-      "$QEMU_IMG" info "$XDG_QcowRightClick_VM_Dir_Name/$XDG_QcowRightClick_DiskName"
-          
-      if [[ $XDG_QcowRightClick_NO_qqX ]]; then  
-
-        printColor "\n\n See  https://qemu.readthedocs.io  "
-        printf  "> QEMU disk image utility may be useful"
-        printf "\n\n  [enter] to quit  "
-        
-      else  printColor "\n\n  [enter] to continue  "
-        
-      fi
-
-      read -rp  "  >  "
-      
-      if [[ ! $XDG_QcowRightClick_NO_qqX ]]; then XDG_QcowRightClick=  ; show_main_menu_header
-      else  exit directly 
-      fi
-
-    elif [[ $KillPID_Menu_Exited ]] || [[ $Select_VM ]] ; then
-
-      if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
-        printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
-      else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
-      fi
-
-      [[ $KillPID_Menu_Exited ]] && KillPID_Menu_Exited=  
-      [[ $UseCustomBootArgs ]] && UseCustomBootArgs=  
-
-    fi
-
-    main_menu_interface
-    main_menu_actions
-
-    if [[ ! $VM_InstanceName ]];  then break ; fi 
-
-  done
-
-  # end of main menu
-
-}
+# Selection now possibly have been made via api or mouse, but array must still be loaded as may be needed for reselecting later ...
+[[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
 
 
 # Dev
-GeneralLoopCheck=   
+GeneralLoopCheck=1   
 
 tput civis
+
+## MAIN LOOP
 
 while true ; do
 
@@ -382,13 +275,18 @@ while true ; do
     # sleep 1
   fi
 
-  if [[ ! $VM_InstanceName ]]; then vm_selector_menu
+  # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
 
-  else  main_menu  ; fi
+  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  VM_loader_selector_and_menu
+
+  else   main_menu 
+  
+  fi
 
 done
 
 tput  cnorm
+
 
 # https://code.visualstudio.com/  (recommended)
 

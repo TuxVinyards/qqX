@@ -96,7 +96,7 @@ function quickemu {
     shift  $#
 
     # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp" 
-    # BUT from qqX ver. 1.5 this happens at the end of 'vm_selector_menu'
+    # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
     # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 

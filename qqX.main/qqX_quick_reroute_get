@@ -119,11 +119,7 @@ function_quick_get_wrap ()  {
 
   printf "\033c"
 
-  if [[ $ModName_qqX ]]; then  function_qqX_printf_logo_title "$ModVersion"
-
-  else  printColor "\n\n  %s  ver %s"  "$ModName"  "$ModVersion"
-
-  fi
+  qqX_logo_printf_title "$ModVersion"
   
   # shellcheck disable=SC2154
 
@@ -1096,7 +1092,7 @@ function_quick_get_wrap ()  {
 
     # re-load arrays, if not already done
     SettingsFileAdjusted=1
-    refresh_sources_and_reload_VM_arrays
+    refresh_sources_and_load_VM_arrays
     ByPass_VM_Array_Selector=1
 
   fi

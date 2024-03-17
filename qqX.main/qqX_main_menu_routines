@@ -141,7 +141,7 @@ show_main_menu_header () {
 
   [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
 
-  [[ ! $InstancePID ]] && printf "\033c"  && show_qmod_title   
+  [[ ! $InstancePID ]] && printf "\033c"  && show_qqX_title_bar   
 
   printf "\n"
   printColor "    %s " "$VM_InstanceName" 
@@ -265,13 +265,13 @@ filter_and_flag_qemu_errors () {
 
 function multi_instance_checks {
 
-  MultiInstanceCount="$(pgrep -c "$ModName")"
+  MultiInstanceCount="$(pgrep -c -x "qqX")"   # count exact match, ignores sub routines
 
   if [[ $MultiInstanceCount -gt 1 ]]; then 
 
     tput sc
 
-    printColor "\n\n  WARNING: more than one instance of %s appears to be running "  "$ModName"
+    printColor "\n\n  WARNING: more than one instance of qqX appears to be running "  
 
     printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n\n"
 
@@ -299,6 +299,104 @@ function multi_instance_checks {
 
   # clear .conf settings record from any previous/other session, if no other instances are running
   printf "" > "$ConfClearanceLog"
+
+}
+
+
+function_delete_Selected_VM () {
+
+  if [[ ! $1 && ! $2 ]]; then
+
+    # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
+
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+
+    sleep 2 ;  return
+
+  else
+
+    if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
+
+      printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+
+      printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
+
+      sleep 2 ;  return
+
+    fi
+
+    if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
+
+    printColor "\n\n  Folder: %s " "$1"
+  
+    printColor "  & file: %s  to be deleted?"  "$2"
+  
+    printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
+
+    printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+
+    printf "\n\n  Folder content: \n\n"
+
+    ls "$1"
+
+    if [[ $TrashingAvailable ]]; then 
+
+      printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
+      
+      printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
+
+    else
+
+      printColor "\n\n  [enter] use the file manager to move things the trash bin "
+      
+      printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
+
+    fi
+
+    printf "\n\n"
+
+    read -rp "  >  "   Delete_VM_Option
+
+    if [[ $Delete_VM_Option == "y" ]]; then 
+
+      printf "\n\n  Folder & .conf file being deleted ... \n\n"
+      
+      rm -f -r "$1"  
+      echo
+
+      rm -f "$2"
+      echo
+
+    else
+
+      # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
+
+      if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
+
+        printf "\n\n  Moving files to the bin ... \n\n"
+        gio trash "$1"
+        gio trash "$2"
+
+      else  printf "\n\n  NOT deleted ... \n\n"
+
+      fi
+
+    fi
+
+    sleep 1.4
+
+    printColor "\n\n  [enter] to return or continue \n\n" 
+    read -rp "  > "
+
+    VM_InstanceName=
+    VM_Conf_Dir=
+    VM_Conf_File=
+
+    SettingsFileAdjusted=1
+
+    refresh_sources_and_load_VM_arrays
+
+  fi
 
 }
 

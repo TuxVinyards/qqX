@@ -419,7 +419,7 @@ function snapshot_delete {
 
       else         
         printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart" 
-        printf "\n\n  %s" "${SnapListArrRaw[SnapDeleteStart]}" 
+        printf "\n\n  %s \n" "${SnapListArrRaw[SnapDeleteStart]}" 
         SnapDeleteEnd="$SnapDeleteStart"
       fi
 
@@ -539,7 +539,7 @@ function create_new_drives {
 
           printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
 
-          printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$Q_Mod_SettingsFile"
+          printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$qqX_SettingsFile"
 
         fi
 
@@ -578,23 +578,23 @@ function create_new_drives {
             #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
             #  sed -i only works in GNU sed  ... 
 
-            if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
+            if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
               # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
               
-              SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$Q_Mod_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
+              SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
 
               printf "\n\n  Backing up settings file to /tmp and changing line %s \n\n"  "$SharedDriveSettingsLine"
 
-              eval cp "$Q_Mod_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
+              eval cp "$qqX_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
 
-              eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$Q_Mod_SettingsFile"
+              eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$qqX_SettingsFile"
 
             else 
 
               printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n"
 
-              grep 'SharedDrive=' "$Q_Mod_SettingsFile"
+              grep 'SharedDrive=' "$qqX_SettingsFile"
 
               printf "\n\n"
 

@@ -146,7 +146,7 @@ cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
     # Overide specified quickemu defaults,  though not all may be done here.
     
     # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
-    # BUT from qqX ver. 1.5 this happens at the end of 'vm_selector_menu'
+    # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
 
@@ -413,7 +413,7 @@ function load_quickemu_cases_and_actions {
   QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
 
   # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
-  # BUT from qqX ver. 1.5 this happens at the end of 'vm_selector_menu'
+  # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
   tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
   grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
@@ -425,7 +425,7 @@ function load_quickemu_cases_and_actions {
 load_quickemu_cases_and_actions
 
 
-function refresh_and_load_main_sources {
+function refresh_and_load_quickemu_sources {
 
   find_quickemu_source_functions_and_vars
   load_mod_quickemu_boot
