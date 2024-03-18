@@ -346,7 +346,6 @@ VM_loader_selector_and_menu () {
 
   fi
 
-
   if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
 
     ## Check file/folder exists and that we are where we need to be
@@ -363,7 +362,7 @@ VM_loader_selector_and_menu () {
     if [[ $IgnoreFolderCheck ]]; then IgnoreFolderCheck=
     elif [[ ! $(ls "$VM_InstanceName"/*.qcow2 2> /dev/null) ]]; then
       if [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
-        SelectArrayError=1 ; echo "one"; function_conf_error  "new" 
+        SelectArrayError=1; function_conf_error  "new" 
       else
         SelectArrayError=1; function_conf_error  "folder"
       fi

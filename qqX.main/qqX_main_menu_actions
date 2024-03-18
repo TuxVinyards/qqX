@@ -82,6 +82,9 @@ function  main_menu_actions {
     RtvBack=
     printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
     printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old. \n\n  Your VMF_VARS.fd file(s) will be reinstalled."
+    if [[ ! -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]; then
+      printf  "\n\n  Manual update might be required.\n\n  Standard Files '/usr/share/OVMF/OVMF_VARS.fd' and '/usr/share/AAVMF/AAVMF_VARS.fd' only"
+    fi 
     printf  "\n\n  [enter] to continue  [b] to go back "
     read -rp "  >  "  RtvBack
 
@@ -188,8 +191,7 @@ function  main_menu_actions {
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
 
@@ -207,8 +209,7 @@ function  main_menu_actions {
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
-
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
 
@@ -225,7 +226,7 @@ function  main_menu_actions {
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
 
@@ -249,7 +250,7 @@ function  main_menu_actions {
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found)"
+      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
 
