@@ -36,39 +36,28 @@ function find_quickemu_source_functions_and_vars {
   if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$QE_FilePathDefault" ; fi
 
   if [[ ! -e "$QuickEmuSource" ]] ; then
-
-    printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
-
+     printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
     printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s \n\n"  "$QuickEmuSource"
-
     exit  hold
-
   fi
 
   # Ignore first bits, bash check & locale preamble etc.  
   # QE starts into setting out the functions almost straight away.  
 
   QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QuickEmuSource" | cut -d ':' -f 1)
-
   # grep -n : print line number with the output lines   -m : stop after NUM selected lines
 
   ((QE_StartFuncsPoint -= 1))
-
   QE_EOfuncsPoint=$(grep -n '### MAIN' "$QuickEmuSource" | cut -d ':' -f 1)
-
   QE_EOfuncsTrim=$((QE_EOfuncsPoint - QE_StartFuncsPoint -1))
-
   tail +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
-
   source "/tmp/qmod-functions-temp" 
 
   ## Quickemu Variables (set & clear)
   #  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
   QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
-
   QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
-
   tail +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
     
   # BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
@@ -77,36 +66,24 @@ function find_quickemu_source_functions_and_vars {
 
   SpecialVarCheckArr=("LAUNCHER" "DISK_MIN_SIZE" "VERSION")
 
-
-  # Separate the re-writeable vars   
-
-  # NB not all vars are listed by the quickemu script ...  
-
+  # Separate the re-writeable vars  # NB not all vars are listed by the quickemu script ...  
   # Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
 
   QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
-
-  ((QE_rw_Vars_StartPoint -=2))
-
+ ((QE_rw_Vars_StartPoint -=2))
   head -"$QE_rw_Vars_StartPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
 
 }
 
 find_quickemu_source_functions_and_vars
 
-
 function refresh_and_load_quickemu_vars {
 
   source  "/tmp/qmod-qe-rw-vars-temp"
-
   for SpecialLine in "${SpecialVarCheckArr[@]}"; do
-
     SpecialLine="$(grep "${SpecialLine}=" "/tmp/qmod-qe-all-vars-temp")"
-
     SpecialLine="${SpecialLine/'readonly '/}"
-
     eval "$SpecialLine"
-
   done
 
 }
@@ -117,7 +94,6 @@ function refresh_and_load_quickemu_vars {
 
 refresh_and_load_quickemu_vars
 
-
 function  load_mod_quickemu_boot {
 
   ## OVERWRITE ORIGINAL Functions Source, as required
@@ -125,35 +101,25 @@ function  load_mod_quickemu_boot {
   declare -f vm_boot  >  "/tmp/qmod-function-vm_boot-orig-temp"
 
   # shellcheck disable=SC2016
-
   QE_args_DeclarePoint=$(grep -n -m 1 -e 'local args=()' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
-
   QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-orig-temp")
-
   QE_vm_bootCutOff=$((QE_vm_bootLength-QE_args_DeclarePoint+1))
-
-  #echo "QE_args_DeclarePoint  $QE_args_DeclarePoint  QE_vm_bootLength  $QE_vm_bootLength  QE_vm_bootCutOff  $QE_vm_bootCutOff"
-
   head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-orig-temp"  >  "/tmp/qmod-function-vm_boot-interim-temp"
 
 
 # add-in CUSTOM VARS here, as replacement values, using same method as for the final boot section
-
 # no indent on 'cat' & EOV lines or it fails:
 
 cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
 
     # Overide specified quickemu defaults,  though not all may be done here.
-    
     # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
     # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
     [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
 
     if [[ $QEMU_Default_SystemType ]] && [[ ! $UseCustomBootArgs ]]; then 
-    
       printf "\nQEMU_SystemType =  %s   QEMU_MachineType =  %s \n\n" "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile" 
-
     fi
 
 EOV
@@ -161,22 +127,13 @@ EOV
 # no indent on 'cat' & EOV or it fails
 
   # then continue with the remainder
-
   tail +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
 
-
   # shellcheck disable=SC2016
-
   QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
-
   QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-interim-temp")
-
-
   QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
-
   head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-interim-temp" >  "/tmp/qmod-function-vm_boot-new-temp"
-
-
 
 
 ## ADD-IN extra code  ( place between the first EOF line & the brace that closes the tail trimmed boot function, just before the second EOF)
@@ -191,33 +148,26 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     # @2023/08  in qqX, the quickemu screen output now gets logged
 
     # @2023 the quickemu .sh file gets to be more readable in version 4.8 here:  
-    
     # https://github.com/quickemu-project/quickemu/pull/707
 
     # BUT  sed -i only seems to work in GNU sed  >  fix errored fix here ....  REVIEW 
-
     #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
 
 
     # Using $VERSION $VMDIR and other internal quickemu variables  & adding the qqX extra args:
 
     { printf "\n#  qqX:  This file is NOT used by quickemu to run the VM but could run it if the script is placed"
-
       printf "\n\n#  in the calling folder, where the .conf file is located, and if it is given execute permission"
-
       printf "\n\n#  You may need to cross check with qqX Args file as qqX may have issued a modified version ... \n\n"
-    
     } >> "${VMDIR}/${VMNAME}.sh"
 
     echo "${QEMU}" "${SHELL_ARGS}${ExtraArgs}${SharedDriveArgs}${SecondDriveArgs}" >> "${VMDIR}/${VMNAME}.sh"
 
     [[ "$(sed --version | head -1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
 
-    { 
-      printf   "\n  # This file may be used as the basis for a qqX Custom Boot File" 
+    { printf   "\n  # This file may be used as the basis for a qqX Custom Boot File" 
       printf "\n\n  # Comments and blank lines may be safely used & will be ignored." 
       printf "\n\n  %s \n" "$QEMU" 
-      
     }  > "$QemuArgsShortFile"
 
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
@@ -238,13 +188,10 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     while [[ "${args[i]}" ]]; do
 
       # fixes for quickemu deprecated code, to be updated from time to time REVIEW 
-
       if [[ $FixArgs_hpet ]] && [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
-
       if [[ $FixArgs_smartcard ]] && [[ "${args[i]}" == *ccid* ]] && [[ $NoSmartcardSupport ]]; then 
 
-          args[i]=" " 
-          args[i-1]=" " 
+          args[i]=" " ;  args[i-1]=" " 
           
       else
 
@@ -325,9 +272,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
         if [[ "$Line" == *'-name'* ]]; then
         
           printf "\n\n\n%s" "$Line"
-
           printf "\n\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
-
           printf "\n\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
 
         elif [[ "$Line" == *'/usr/bin/env bas'* ]]; then true

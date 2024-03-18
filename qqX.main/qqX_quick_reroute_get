@@ -1005,9 +1005,9 @@ function_quick_get_wrap ()  {
 
   elif [[ $New_VM_Folder ]]; then
   
-    printColor "\n   Folder created:     %s "  "$New_VM_Folder"
+    printColor "\n        Folder created:  %s "  "$New_VM_Folder"
 
-    [[ $New_VM_File ]] && printColor "\n  .conf file created:  %s "  "$(basename "$New_VM_File")"
+    [[ $New_VM_File ]] && printColor "\n .conf file created:  %s "  "$(basename "$New_VM_File")"
 
     if [[ ! $New_VM_File ]] || [[ $QGW_DownloadStopped ]]; then
 

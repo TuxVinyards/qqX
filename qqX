@@ -69,7 +69,7 @@ ModVersion="1.7.01"
 if [[ "$(basename "$0")" != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
 
 #  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
-NoClear=
+NoClear=1
 
 ## INITIALIZE
 
@@ -186,7 +186,7 @@ if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
 
 
 # Dev
-GeneralLoopCheck=   
+GeneralLoopCheck=1   
 
 tput civis
 
