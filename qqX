@@ -68,8 +68,9 @@ ModVersion="1.7.01"
 
 if [[ "$(basename "$0")" != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
 
-#  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
-NoClear=1
+## Dev: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
+NoClear=
+GeneralLoopCheck=  
 
 ## INITIALIZE
 
@@ -160,6 +161,19 @@ function main_menu {
 
 } 
 
+function dev_loop_check () {
+
+    if [[ $GeneralLoopCheck ]]; then
+    echo
+    echo "SelectArrayError = $SelectArrayError"
+    echo "VM_Conf_Dir = $VM_Conf_Dir"
+    echo "VM_Conf_File = $VM_Conf_File"
+    echo "VM_InstanceName = $VM_InstanceName"
+    sleep "$GeneralLoopCheck"
+  fi
+
+}
+
 ##  General pre-menu-loop checks  
 
 tput civis
@@ -187,31 +201,17 @@ if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
 
 
-# Dev
-GeneralLoopCheck=1   
+## MAIN LOOP
+
+# Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
 
 tput civis
 
-## MAIN LOOP
-
 while true ; do
 
- if [[ $GeneralLoopCheck ]]; then
-    echo
-    echo "SelectArrayError = $SelectArrayError"
-    echo "VM_Conf_Dir = $VM_Conf_Dir"
-    echo "VM_Conf_File = $VM_Conf_File"
-    echo "VM_InstanceName = $VM_InstanceName"
-    sleep 3
-  fi
+  dev_loop_check
 
-  # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
-
-  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  VM_loader_selector_and_menu
-
-  else   main_menu 
-  
-  fi
+  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  VM_loader_selector_and_menu ; else  main_menu ; fi   
 
 done
 
