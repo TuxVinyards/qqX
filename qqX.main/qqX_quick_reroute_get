@@ -717,7 +717,7 @@ function_quick_get_wrap ()  {
 
     if [[ $ZsyncDownload ]]; then
 
-      printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that %s will remove."  "$ModName"
+      printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
 
       printf "\n\n  To resume stopped downloads, any \".iso.part\" files should be retained."
 

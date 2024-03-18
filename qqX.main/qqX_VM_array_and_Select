@@ -44,17 +44,13 @@ add_unlisted_vm_to_vm_array () {
     else 
     
       New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
-
       local i=0
 
       while [[ ${VM_Array[$i,0]} ]]; do
 
         ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-
         if [[ $ArrFolderFile == "$TestFolderFile" ]]; then return  # already exists, stop searching, quit function:
-
         else  ((i+=1))  # carry on interating the array
-
         fi
         
       done
@@ -169,22 +165,17 @@ scan_folders_list_and_add_VMs () {
   while [[ ${VM_Folder_List[i]} ]]; do
 
     FolderPathName="${VM_Folder_List[i]}"
-
     Folder_Conf_String="$(ls "$FolderPathName/"*.conf 2> /dev/null)"      # list all .confs in the folder  
-
     Folder_Conf_String=${Folder_Conf_String//"$FolderPathName/"/}         # remove all paths, one from each entry in the string
-
     mapfile -t  Folder_Conf_Array  <<< "$Folder_Conf_String"              # convert the line separated string to an array   
 
     if [[ ${Folder_Conf_Array[0]} ]]; then 
 
       for TestFile in "${Folder_Conf_Array[@]}"; do 
-
         # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
         if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
           add_unlisted_vm_to_vm_array  "$FolderPathName" "$TestFile" 
         fi
-      
       done
 
     fi
@@ -208,7 +199,8 @@ VM_loader_selector_and_menu () {
   ShowDefault_Hybrid=
   ForceCustomBootMenu=
 
-  # Loader should be run on first start up. But otherwise may be bypassed if nothing new added, or if settings not changed ... 
+  # Loader should be run on first start up. 
+  # But otherwise may be bypassed if array present and nothing new added, or if settings not changed ... 
      
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then  ByPass_VM_Array_Loader=
   else   refresh_sources_and_load_VM_arrays
@@ -229,9 +221,7 @@ VM_loader_selector_and_menu () {
       if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="$Default_VM_SelectorStyle" ; fi  
 
       for Style in {A..Z} ; do
-
         if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
-
       done
 
       [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
@@ -239,11 +229,8 @@ VM_loader_selector_and_menu () {
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 
         printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
-
         [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit " 
-
         [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY %s \n\n  [enter] to edit settings file  [q] to quit "  "$ExtraFolderError"
-
         [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s \n\n  [enter] to edit settings file  [q] to quit " "$SelectArrayError"
 
       else
@@ -382,52 +369,59 @@ VM_loader_selector_and_menu () {
       fi
     fi
 
-   ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
+    ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
 
-    # Check KVM parameter settings & advise according to guest OS
-    KVM_MSR_selector=
-    find_kvm_msr_default_and_status
+    if [[ ! $SelectArrayError ]]; then
 
-    if [[ $Verbose_MSR_dialog ]] || [[ ! $Verbose_MSR_dialog ]] && [[ "$VM_InstanceName" == *windows* || "$VM_InstanceName" == *macos* ]]; then 
-      msrs_conflict_check_resolver
+      # Check KVM parameter settings of new selection & advise accordingly
+      KVM_MSR_selector=
+      find_kvm_msr_default_and_status
+
+      if [[ $Verbose_MSR_dialog ]] || [[ ! $Verbose_MSR_dialog ]] && [[ "$VM_InstanceName" == *windows* || "$VM_InstanceName" == *macos* ]]; then 
+        msrs_conflict_check_resolver
+      fi
+
     fi
 
-  fi   
+  fi  
 
-  # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
-  # otherwise any items specified in the previous config, but not in the new one, will remain.
-  refresh_conf_vars_and_values
 
-  ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
-
-  QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
-  QemuArgsShortFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_List.txt"
-  QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
-  QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
-
-  # Qemu_IMG log > eg. for disk repair functions 
-  Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
-  if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
-
-  # Qemu SYSTEM log
-  QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
-  [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
-
- 
-  # clear any no-longer needed flags
-  VM_Selection=
-  ByPass_VM_Array_Loader=
-  ByPass_VM_Array_Selector=
-  MenuStylePreviewed=
-
-  # reload if the editor was called, or called due to settings error
-  if [[ $SelectArrayError || $SettingsFileAdjusted ]]; then VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=  
-
-  fi
-    
-  if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]]; then  
+  if [[ $SelectArrayError || $SettingsFileAdjusted ]]; then 
   
-    if [[ $IgnoreSecondCheckNew ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
+    VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=  
+    # reload if the editor was called, or called due to settings error > zero vars triggers the main qqX loop
+
+  elif [[ ! $SelectArrayError ]]; then
+
+    # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+    # otherwise any items specified in the previous config, but not in the new one, will remain.
+    refresh_conf_vars_and_values
+
+    ##  Set or adjust any VM_Conf_Dir related globals  (VM is now selected OR has been re-selected)
+
+    QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
+    QemuArgsShortFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_List.txt"
+    QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
+    QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
+
+    # clear any no-longer needed flags
+    VM_Selection=
+    ByPass_VM_Array_Loader=
+    ByPass_VM_Array_Selector=
+    MenuStylePreviewed=
+
+    # Qemu_IMG log > eg. for disk repair functions 
+    Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
+    if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+
+    # Qemu SYSTEM log
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
+
+    # test for 'new' - will have have an iso/img but not a main drive, yet
+    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]]; then  
+      if [[ $IgnoreSecondCheckNew ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
+    fi
 
   fi
 

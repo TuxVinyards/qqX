@@ -81,7 +81,7 @@ function quickemu {
 
   if [[ ! -e "/tmp/qmod-case-temp" ]] || [[ ! -e "/tmp/qmod-actions-temp" ]] || [[ ! -e "/tmp/qmod-boot-temp" ]]; then
 
-    printColor "\n\n ERROR %s restart needed \n\n"  "$ModName"
+    printColor "\n\n ERROR qqX restart needed \n\n"  
     sleep 5
 
   else

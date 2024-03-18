@@ -238,7 +238,7 @@ function check_disk_is_okay {
 
 filter_and_flag_qemu_errors () {
 
-  if [[ ! -e "$QemuErrorLog" ]]; then  printColor "\n\n  Internal ERROR:  QemuErrorLog not found.  A %s re-start may be needed."  "$ModName"
+  if [[ ! -e "$QemuErrorLog" ]]; then  printColor "\n\n  Internal ERROR:  QemuErrorLog not found.  A qqX re-start may be needed."  
   
   elif [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
 

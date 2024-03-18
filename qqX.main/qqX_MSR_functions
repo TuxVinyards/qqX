@@ -150,7 +150,7 @@ toggle_msr_defaults () {
     find_kvm_msr_default_and_status
     printf "\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
 
-    printf "\n\n  A %s may be required"  "$ModName"
+    printf "\n\n  A qqX restart may be required"  
 
   fi
 
@@ -161,7 +161,7 @@ show_kvm_msr_general_note () {
 
   printColor "\n  If expecting to use Windows or MacOS, you should modify the system boot settings. "
   
-  printf   "\n\n  %s has a built in function that can do this for you & allow for future adjustments." "$ModName"
+  printf   "\n\n  qqX has a built in function that can do this for you & allow for future adjustments." 
   
   printf   "\n\n  "
  
@@ -177,7 +177,7 @@ show_kvm_msr_general_note () {
 
 show_kvm_sudo_security_note () {
 
-  printColor "\n  For session adjustments %s requires 'sudo' permissions to echo true or false to 'ignore_msrs'" "$ModName"
+  printColor "\n  For session adjustments qqX requires 'sudo' permissions to echo true or false to 'ignore_msrs'" 
   
   printf   "\n\n  This allows you to create a temporary MSRS status that may be changed at any time,"
   
@@ -199,7 +199,7 @@ show_kvm_sudo_security_note () {
 
   printf   "\n\n\n  Run the command & close the terminal."
 
-  printf   "\n\n  Return to %s & select 'leave as ...'  The msrs settings will auto-update. "   "$ModName" 
+  printf   "\n\n  Return to qqX & select 'leave as ...'  The msrs settings will auto-update. " 
 
   printf   "\n\n"
   
@@ -280,7 +280,7 @@ select_msr_config () {
       find_kvm_msr_default_and_status
       printf "\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
 
-      printf "\n\n  A %s may be required"  "$ModName"
+      printf "\n\n  A qqX restart may be required"  
 
       printColor "\n\n  [enter]  to return \n\n"
       read -rp  "  > "

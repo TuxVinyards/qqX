@@ -223,7 +223,7 @@ cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
     printf "\n\n  Qemu:      %s  %s" "$QEMU" "$QEMU_VER_LONG" >> "$QemuArgsFile"
     printf "\n\n  QuickEmu:  %s" "$VERSION"  >> "$QemuArgsFile"
-    printf "\n\n  %s:       %s" "$ModName" "$ModVersion" >> "$QemuArgsFile"
+    printf "\n\n  qqX:       %s" "$ModVersion" >> "$QemuArgsFile"
     printf "\n\n  Date:      %s \n" "$(date)" >> "$QemuArgsFile"
 
     [[ $UseCustomBootArgs ]] && printf "\n  REPLACING THE FOLLOWING with CUSTOM ARGS > See End of File for details \n\n"  >> "$QemuArgsFile"

@@ -218,13 +218,12 @@ function_conf_error () {
 
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
-  printf "\n\n  %s Settings, VM folder & conf file(s)"  "$ModName"
+  printf "\n\n  qqX Settings, VM folder & conf file(s)"  
 
 
   if [[ $1 ]] ; then printf "\n\n  Check %s settings, location & content ... "  "$1"
 
   else printf "\n\n  Check the settings and re-run this script ... " ; fi
-
 
   printf "\n\n  Settings file:  %s \n\n" "$qqX_SettingsFile"
 
@@ -481,15 +480,15 @@ function_config_tune_up ()  {
 
     # some kind of line is needed
 
-    printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft" 
+    printf "#!/usr/bin/qqX --vm \n\n" > "$TuneUpTargetDraft" 
 
-  elif [[ $ConfPointer != "$ModName" ]]; then
+  elif [[ $ConfPointer != "qqX" ]]; then
 
-    printColor "\n\n  The start line may be edited to point to %s"  "$ModName"
+    printColor "\n\n  The start line may be edited to point to qqX"  
 
     ConfEdit_Qstart=
 
-    printf "\n\n  Change the start line to point to %s ?"  "$ModName"
+    printf "\n\n  Change the start line to point to qqX ?"  
 
     printf "\n\n  [enter] yes, go for it    [no] maybe not ...  [q] quit tune-up \n\n"
 
@@ -497,7 +496,7 @@ function_config_tune_up ()  {
 
     [[ $ConfEdit_Qstart == "q" ]] && return
 
-    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/%s --vm \n\n" "$ModName"  > "$TuneUpTargetDraft" 
+    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/qqX --vm \n\n"   > "$TuneUpTargetDraft" 
 
     else printf "%s\n" "$ConfLine" > "$TuneUpTargetDraft" 
 

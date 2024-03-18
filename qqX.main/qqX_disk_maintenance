@@ -337,7 +337,7 @@ function manage_and_repair_disks {
 
 function snapshot_delete {
 
-  printColor "\n\n %s Snapshot Delete function "  "$ModName"
+  printColor "\n\n qqX Snapshot Delete function "  
 
   printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
 

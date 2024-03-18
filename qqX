@@ -2,8 +2,14 @@
 
 # NB Avoid use of "#!/usr/bin/env bash" in this script as it will mask process names & inhibit process controls.
 
-# See notes in the Setup & Install script 
+##  qqX - quickemu quickget X terminal project  https://github.com/TuxVinyards/qqX
 
+# A text based Virtual Machine Manager for use with the 'quickemu' project  
+# https://github.com/quickemu-project/quickemu  
+
+# Users should install 'quickemu' and may set up Virtual Machines as normal.
+
+# See notes in the Setup & Install script 
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
@@ -26,29 +32,8 @@
 
 # https://www.gnu.org/licenses 
 
-
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-
 # THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
-
-
-##  A text menu interface for the 'quickemu' project  https://github.com/quickemu-project/quickemu  
-
-#   Users should install 'quickemu' and may set up Virtual Machines as normal.
-
-#  Originally part of quickemu-mod suite of scripts. 
-#  @2023/10  qmod/qwrap probably to be phased out & focus only on qqX
-
-#  @2023/08 this script forms the base for qqX - quickemu quickget X terminal project  
-#  qqX may be installed alongside quickemu in /usr/bin  & run by typing either qqX or qqx. Or by mouse
-
-#  @2023/08  Work on quickemu-wrap is now being frozen but this script attempts to maintain backward compatibility
-#  during the initial qqX release.  In theory it may second install as qwrap. YMMV
-
-#  Concurrent qwrap & qqX will have different settings files which may or may not be advantageous.  
-#  See:  https://github.com/TuxVinyards/qqX  &  https://github.com/TuxVinyards/quickemu-mod
-
-#  Also see https://gitlab.com/qemu-project/qemu
 
 
 ## ShellCheck global disables:
@@ -81,67 +66,10 @@ fi
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
 ModVersion="1.7.01"
 
-ModName="$(basename "$0")"
-if [[ $ModName != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
-
-#  TODO  ModName  %s  printf remove deprecated usages
+if [[ "$(basename "$0")" != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
 
 #  Screen clears; set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
-NoClear=1
-
-#  CODING STYLE 
-
-#  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
-
-#  All code should be SHELLCHECK linted & disables avoided where possible.  
-#  The VS Code shellcheck extension is recommended.  It works well if set to 'check-on-save'.
-
-
-#  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
-#  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
-
-#  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
-
-#  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text. 
-#  Modern editors, such as VS Code or Sublime have auto-suggesting which enables longer & more helpful VariableNames.
-
-#  In some places ** quickemu's given variable names ** have to be used. These are generally CAPS and very brief, eg '$QEMU'.
-#  Except when working with the .conf file, where quickemu chooses to use lowercase.
-#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, 
-#  eg. the ambiguous quickemu var '$VERSION'
-
-#  Likewise care must be taken not to confuse lowercase vars with standard application commands, 
-#  especially in non-highlighting editors. 
-
-#  Note that Shellcheck will not continuity follow all-caps variables. https://www.shellcheck.net/wiki/SC2154
-
-
-#  BRACKETS: The more powerful [[ double bracket ]] system that was introduced in Bash 3.2 
-#  is now the standard method recommended in the Bash Manual.
-#  See https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  
-#  See https://github.com/bminor/bash/blob/master/COMPAT item 32
-
-#  Use: if [[ $Foo ]] && [[ ! $Bar ]] ...    Avoid:   if [ -n ${FOO} ] && [ -z ${bar} ] ....
-
-#  Further notes:  https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
-
-
-#  COMMENTS: Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
-#  Also add links to any how-to's that you used.  If you needed to check, then others may do also. 
-#  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
-#  It makes it easier for everyone, especially later on.
-
-#  SPACE:  Give your code some room to breathe.  Break it up into logic blocks.  
-#  Make it easy to follow & easy to see what is happening.  
-
-#  SED & AWK:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
-#  If you must use them, keep things very simple & explain the sections.  
-#  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
-
-#  ECHO: Beyond basic one-liners, the use of printf should generally be preferred.  See https://ss64.com/bash/printf.html
-#  However & specifically, echo within the main section of the actual qqX script *must* be avoided
-#  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
-
+NoClear=
 
 ## INITIALIZE
 
@@ -258,7 +186,7 @@ if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
 
 
 # Dev
-GeneralLoopCheck=1   
+GeneralLoopCheck=   
 
 tput civis
 
@@ -286,6 +214,57 @@ while true ; do
 done
 
 tput  cnorm
+
+
+#  CODING STYLE 
+
+#  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
+
+#  All code should be SHELLCHECK linted & disables avoided where possible.  
+#  The VS Code shellcheck extension is recommended.  It works well if set to 'check-on-save'.
+
+#  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
+#  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
+
+#  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
+
+#  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text. 
+#  Modern editors, such as VS Code or Sublime have auto-suggesting which enables longer & more helpful VariableNames.
+
+#  In some places ** quickemu's given variable names ** have to be used. These are generally CAPS and very brief, eg '$QEMU'.
+#  Except when working with the .conf file, where quickemu chooses to use lowercase.
+#  Care should be taken not to confuse them with Bash's BUILT_IN vars, or to confuse their scope, 
+#  eg. the ambiguous quickemu var '$VERSION'
+
+#  Likewise care must be taken not to confuse lowercase vars with standard application commands, 
+#  especially in non-highlighting editors. 
+
+#  Note that Shellcheck will not continuity follow all-caps variables. https://www.shellcheck.net/wiki/SC2154
+
+#  BRACKETS: The more powerful [[ double bracket ]] system that was introduced in Bash 3.2 
+#  is now the standard method recommended in the Bash Manual.
+#  See https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  
+#  See https://github.com/bminor/bash/blob/master/COMPAT item 32
+
+#  Use: if [[ $Foo ]] && [[ ! $Bar ]] ...    Avoid:   if [ -n ${FOO} ] && [ -z ${bar} ] ....
+
+#  Further notes:  https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
+
+#  COMMENTS: Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
+#  Also add links to any how-to's that you used.  If you needed to check, then others may do also. 
+#  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
+#  It makes it easier for everyone, especially later on.
+
+#  SPACE:  Give your code some room to breathe.  Break it up into logic blocks.  
+#  Make it easy to follow & easy to see what is happening.  
+
+#  SED & AWK:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
+#  If you must use them, keep things very simple & explain the sections.  
+#  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
+
+#  ECHO: Beyond basic one-liners, the use of printf should generally be preferred.  See https://ss64.com/bash/printf.html
+#  However & specifically, echo within the main section of the actual qqX script *must* be avoided
+#  as an echo trap is used to tee quickemu screen output to the qqX boot log.   
 
 
 # https://code.visualstudio.com/  (recommended)
