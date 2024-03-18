@@ -385,8 +385,8 @@ VM_loader_selector_and_menu () {
 
   fi  
 
-
-  if [[ $SelectArrayError || $SettingsFileAdjusted ]]; then 
+  
+  if [[ $SelectArrayError || $SettingsFileAdjusted ]] && [[ ! $NewFileTuneUp_JustDone ]]; then 
   
     VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=  
     # reload if the editor was called, or called due to settings error > zero vars triggers the main qqX loop
@@ -409,6 +409,8 @@ VM_loader_selector_and_menu () {
     ByPass_VM_Array_Loader=
     ByPass_VM_Array_Selector=
     MenuStylePreviewed=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
 
     # Qemu_IMG log > eg. for disk repair functions 
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"

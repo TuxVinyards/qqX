@@ -110,6 +110,8 @@ source "$qqX_MainFolder/qqX_quick_reroute_get"
 
 source "$qqX_MainFolder/qqX_configuration_items"
 
+source "$qqX_MainFolder/qqX_configuration_tune_up"
+
 source "$qqX_MainFolder/qqX_VM_selector_styles"
 
 source "$qqX_MainFolder/qqX_VM_array_and_Select"
@@ -200,7 +202,7 @@ while true ; do
     echo "VM_Conf_Dir = $VM_Conf_Dir"
     echo "VM_Conf_File = $VM_Conf_File"
     echo "VM_InstanceName = $VM_InstanceName"
-    # sleep 1
+    sleep 3
   fi
 
   # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)

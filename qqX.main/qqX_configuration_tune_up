@@ -397,16 +397,15 @@ function_config_tune_up ()  {
   
   if [[ $NewFileTuneUp ]]; then 
 
-    VM_InstanceName=
-    refresh_sources_and_load_VM_arrays
     SettingsFileAdjusted=1
     SelectArrayError=
     IgnoreSecondCheckNew=1
+    refresh_sources_and_load_VM_arrays
 
   else
 
-    refresh_conf_vars_and_values
     ConfSettingsAdjusted=1
+    refresh_conf_vars_and_values
 
   fi
 

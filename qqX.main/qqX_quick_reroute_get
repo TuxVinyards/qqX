@@ -1005,7 +1005,7 @@ function_quick_get_wrap ()  {
 
   elif [[ $New_VM_Folder ]]; then
   
-    printColor "\n        Folder created:  %s "  "$New_VM_Folder"
+    printColor "\n     Folder created:  %s "  "$New_VM_Folder"
 
     [[ $New_VM_File ]] && printColor "\n .conf file created:  %s "  "$(basename "$New_VM_File")"
 
@@ -1055,7 +1055,7 @@ function_quick_get_wrap ()  {
 
   if [[ $New_VM_File ]] && [[ ! $QGW_DownloadStopped ]]; then
 
-    # clear any accidental initial double pressing of the enter key occuring while experiencing the error
+    # clear any accidental initial double pressing of the enter key occuring while experiencing any error or pause
 
     read -r -t 0.1  
     read -r -t 0.1  
@@ -1077,25 +1077,16 @@ function_quick_get_wrap ()  {
 
   fi
 
+  VM_InstanceName="$New_VM_Folder"   
+  VM_Conf_Dir="$QWG_DownLoadFolder"
+  VM_Conf_File="$New_VM_File"
   
-  # return back to any working directory if one had already been set  ( REVIEW is this right in all cases?)
+  # return back to or change to any working directory if one had already been set or is new ( REVIEW is this right in all cases?)
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget-Wrap Working Directory NOT FOUND ," ; fi
-
   
-  if [[ $MainMenuZsync ]] && [[ $ZsyncDownload ]]; then 
-
-    SettingsFileAdjusted=
-    ByPass_VM_Array_Selector=1
-
-  else
-
-    # re-load arrays, if not already done
-    SettingsFileAdjusted=1
-    refresh_sources_and_load_VM_arrays
-    ByPass_VM_Array_Selector=1
-
-  fi
+  SettingsFileAdjusted=
+  ByPass_VM_Array_Selector=1
 
 }
 
