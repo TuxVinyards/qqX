@@ -342,12 +342,10 @@ function snapshot_delete {
   printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
 
   # Create range-selectable array 
-  #SnapListString="$(drives_and_snapshots | grep '[0-9][0-9]:')"
   
   SnapListString="$("$QEMU_IMG" info "$Selected_Drive" | grep '[0-9][0-9]:')"
 
   # turns the multiline string into raw array with one whole line for each entry making each array element
-
   # then line by line extract the snap number and its title:
 
   mapfile -t SnapListArrRaw <<< "$SnapListString"

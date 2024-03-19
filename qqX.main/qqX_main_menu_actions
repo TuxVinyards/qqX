@@ -40,31 +40,21 @@ function  main_menu_actions {
     if [[ -e "$QemuArgsFile" ]]; then 
 
       printf "\033c"
-
       if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n\n  Existing Record: \n\n"; cat "$QemuVirtHardwareRecord"; fi
-
       printf "\n\n  Current Args / Qemu Virtual Hardware \n\n"
-    
       cat "$QemuArgsFile"
       
       if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n\n"
-
       else printColor "  Create new Virtual Hardware Record using Current Args?\n\n"
-
       fi
 
       read -rp "  [enter] to continue  [b] to go back"  AddHW_Record
 
-      if [[ $AddHW_Record != "b" ]]; then 
-            
-        cat "$QemuArgsFile" >> "$QemuVirtHardwareRecord"
-
-      fi
+      [[ $AddHW_Record != "b" ]] && cat "$QemuArgsFile" >> "$QemuVirtHardwareRecord"
 
     else
 
       printf "\n\n  No Args log found. The virtual machine launch process must be run first. \n\n"
-
       printf "\n\n  The 'VerboseArgs' option may be used, which will allow checking.  \n\n"
 
     fi 
@@ -112,29 +102,21 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
     QL_LogView=
-    
     printf "\n\n"
-
     if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  
-    
       cat "$QemuErrorLog"
-
       printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
-
-    else  printf "  No qemu errors were present on the last VM load ...  ?? " ; fi
-
-    printf "\n\n  Also try [rtv] from the utils menu which may help if the distro boot sequence is causing problems"
-
-    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
+    else  printf "  No qemu errors were present on the last VM load ...  ?? " 
+    fi
 
     #  Avoid any "[W] permanent" type option because it could overwrite something manually placed in the .conf file
+    printf "\n\n  Also try [rtv] from the utils menu which may help if the distro boot sequence is causing problems"
+    printColor "\n\n  [enter] to return  [c] clear & return  [w] hide non-critical warnings, for this VM session \n\n"
 
     read -rp "  >  "  QL_LogView
 
     [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") 
-
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
-
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
@@ -157,32 +139,21 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 
-    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
-
-      MainMenuZsync=1
-      function_quick_get_wrap
-
+    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then MainMenuZsync=1 ; function_quick_get_wrap
     else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
-
     fi
 
-  elif [[ $MainMenuChoice == "m" ]] ; then
-
-    KVM_MSR_selector_LoadHelp=1
-    select_msr_config
+  elif [[ $MainMenuChoice == "m" ]] ; then KVM_MSR_selector_LoadHelp=1 ; select_msr_config
 
   elif [[ $MainMenuChoice == "gl" ]] ; then
 
     if [[ $qqX_GL_Mode == "on" ]] ; then qqX_GL_Mode="off"
-
     elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
-    
     fi
 
   elif [[ $MainMenuChoice == "C" ]] ; then 
 
     if [[ $ShowCustomBootMenu ]]; then  ForceCustomBootMenu="hide" ; else  ForceCustomBootMenu="show" ; fi
-
     MainMenuChoice=
   
   elif [[ $MainMenuChoice == "c" ]] ; then 
@@ -190,17 +161,13 @@ function  main_menu_actions {
     printf "\n\n"
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
-
     else
-
       UseCustomBootArgs=1
       eval quickemu "-vm $VM_Conf_File --vm_boot" 
       vm_pid_kill_menu
-
     fi
 
   elif [[ $MainMenuChoice == "g" ]] ; then 
@@ -208,16 +175,12 @@ function  main_menu_actions {
     printf "\n\n"
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
       printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
       printf "\n\n [enter] to return \n\n"
       read -rp "  >  "
-
     else
-
       eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
       vm_pid_kill_menu
-
     fi
         
   elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
@@ -233,13 +196,10 @@ function  main_menu_actions {
     else
 
       if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
-
       else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
-
       fi
 
       [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
-
       vm_pid_kill_menu
 
     fi
@@ -256,10 +216,7 @@ function  main_menu_actions {
 
     else
 
-      if [[ $HeadlessCmd ]]; then 
-
-        # headless only runs in Spice
-        eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
+      if [[ $HeadlessCmd ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
 
       elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
 
@@ -267,6 +224,7 @@ function  main_menu_actions {
 
       fi
 
+      #  headless only runs in Spice
       #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
 
       [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
@@ -286,16 +244,13 @@ function  main_menu_actions {
     drives_and_snapshots  info
 
     printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-
     [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
     manage_and_repair_disks
-
     drives_and_snapshots  info
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
@@ -305,7 +260,6 @@ function  main_menu_actions {
     [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  
-  
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then
 
@@ -343,10 +297,9 @@ function  main_menu_actions {
   elif  [[ $MainMenuChoice == "sa" ]] ; then
 
     drives_and_snapshots select
+    SnapNumber=
 
     printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
-    SnapNumber=
-    
     printf "\n\n"
     read -rp "  >  "  SnapNumber
     printf "\n\n"	
@@ -393,7 +346,6 @@ function  main_menu_actions {
     if [[ $ExtraArgs ]] && [[ "$ExtraArgs" != "$ExtraSetArgs" ]]; then
     
       printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
-
       if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only " ; else printf "\n\n  [r] remove the Extra Args " ; fi
 
     fi

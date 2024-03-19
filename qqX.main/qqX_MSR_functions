@@ -106,24 +106,17 @@ toggle_msr_defaults () {
   else
 
     printColor "\n\n  Configure default, boot-up, KVM behaviour "
-    
     printf "for unhandled machine-specific registers "
-
     printf "\n\n  Although the normal Linux setting is N, both Windows and MacOS require Y (true) 'ignore'"
-
     printf "\n\n  But as Linux distros can generally use either, set to Y if Windows or MacOS are present."
 
     find_kvm_msr_default_and_status
     printf "\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
 
     [[ ! $KVM_MSR_ModProbeFile ]] && KVM_MSR_ModProbeFile="/etc/modprobe.d/kvm-quickemu.conf"
-
-    if [[ ! -e "$KVM_MSR_ModProbeFile" ]]; then  printf "\n\n  \'%s\'  needs to be created "  "$KVM_MSR_ModProbeFile" 
-
-    fi
-
+   
+    [[ ! -e "$KVM_MSR_ModProbeFile" ]] && printf "\n\n  \'%s\'  needs to be created "  "$KVM_MSR_ModProbeFile" 
     printf "\n\n  [y] to set Y  [n] to set N  [b] to go back \n\n"
-
     read -rp  "  > "  Set_MSR_defaults
 
     # set .conf file content & update initramfs in all kernels (y/n or none)
@@ -132,7 +125,7 @@ toggle_msr_defaults () {
 
       printf "\n\n  Updating 'initramfs' may take a moment or two ... \n\n"
 
-      # As per Martin's solution in original quickemu, needs 'tee' to get this to work, 
+      # As per flexiondotorg solution in original quickemu, needs 'tee' to get this to work, 
       # but route tee's stdout to null to tidy the screen 
 
       echo "options kvm ignore_msrs=Y" | sudo tee "$KVM_MSR_ModProbeFile" 1> /dev/null
@@ -160,17 +153,12 @@ toggle_msr_defaults () {
 show_kvm_msr_general_note () {
 
   printColor "\n  If expecting to use Windows or MacOS, you should modify the system boot settings. "
-  
   printf   "\n\n  qqX has a built in function that can do this for you & allow for future adjustments." 
-  
   printf   "\n\n  "
- 
   [[ $MSR_DistrosFound ]] &&  printColor "Windows or MacOS distros appear present.  "
- 
   printf   "See the further notes for details."
- 
+
   printColor "\n\n\n  Status:  /sys/module/kvm/parameters/ignore_msrs = %s   Current Default = %s"   "$KVM_MSR_status"  "$KVM_MSR_default"
- 
   printf "\n\n  Windows or MacOS should be set to 'Y' whilst Linux distros can generally use either."
 
 }
@@ -178,29 +166,20 @@ show_kvm_msr_general_note () {
 show_kvm_sudo_security_note () {
 
   printColor "\n  For session adjustments qqX requires 'sudo' permissions to echo true or false to 'ignore_msrs'" 
-  
   printf   "\n\n  This allows you to create a temporary MSRS status that may be changed at any time,"
-  
   printf   "\n\n  allowing you to match the selected guest VM that you want to run."
-
 
   printf "\n\n\n  Linux distros don't *seem* to be affected when set as true \n\n  but KVM does have a default of false ..."
 
   printColor "\n\n\n  If you have concerns about this script, or about giving elevated permissions, "
-  
   printf   "\n\n  then the script should be checked or you should issue these commands manually:"
 
-    printf   "\n\n\n  Use shift-crtl-c (or your distros variant) to copy the displayed sudo command, then"
-  
+  printf   "\n\n\n  Use shift-crtl-c (or your distros variant) to copy the displayed sudo command, then"
   printf   "\n\n  open a side terminal & use shift-crtl-v to paste it.  In this way, elevated permissions"
-  
   printf   "\n\n  will only exist in the side terminal & will cease as soon as it is closed."
-  
 
   printf   "\n\n\n  Run the command & close the terminal."
-
   printf   "\n\n  Return to qqX & select 'leave as ...'  The msrs settings will auto-update. " 
-
   printf   "\n\n"
   
 }
@@ -221,33 +200,25 @@ select_msr_config () {
     if [[ $MSR_DistrosFound && $KVM_MSR_status == "N" ]]; then
 
       printf "\n\n  Sudo command to set as Y:  echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-
       printColor "\n\n  [y] to set session to Y "
-
       printf "  [enter]  leave as N"
 
     elif [[ $MSR_DistrosFound && $KVM_MSR_status == "Y" ]]; then
 
       printf "\n\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-
       printColor "\n\n  [enter]  leave as Y "
-
       printf "  [n] to set session to N"
 
     elif [[ ! $MSR_DistrosFound && $KVM_MSR_status == "N" ]]; then
 
       printf "\n\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-
       printColor "\n\n  [enter]  leave as N"
-
       printf "  [y] to set session to Y"
 
     elif [[ ! $MSR_DistrosFound && $KVM_MSR_status == "Y" ]]; then
 
       printf "\n\n  Sudo command to set as N:  echo 0 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-
       printColor "\n\n  [n] to set session to N "
-
       printf "  [enter]  leave as Y"
 
     fi
@@ -255,7 +226,6 @@ select_msr_config () {
     if [[ $KVM_MSR_selector == "h" ]] || [[ $KVM_MSR_selector_LoadHelp ]] ; then 
     
       if [[ $FurtherNoteFlag ]]; then FurtherNoteFlag= ; else  printf "   [f] see further notes" ; fi
-      
       printf "   [d] to set the defaults (on boot up) \n\n"
 
     else  printf "   [h] see help  \n\n" 
@@ -263,7 +233,6 @@ select_msr_config () {
     fi
     
     read -rp "  >  "  KVM_MSR_selector
-    
     printf "\n"
 
     [[ ! $KVM_MSR_selector ]]  &&  break  
@@ -307,7 +276,6 @@ select_msr_config () {
     elif [[ $KVM_MSR_selector == "f" ]]; then
 
       show_kvm_sudo_security_note
-
       FurtherNoteFlag=1
 
     fi
@@ -321,44 +289,32 @@ select_msr_config () {
 
 msrs_conflict_check_resolver() {  
 
-  # Do a check ...
-
   find_kvm_msr_default_and_status
     
-  # Display & Offer config settings if MSRS/OS CONFLICT exists
+  # Display & Offer config settings if MSRS/OS CONFLICT exists   # normal untweaked system default = N
 
   if [[ $KVM_MSR_status == "N" ]] ; then
-
-    # usual system default = N
 
     if [[ "$VM_InstanceName" == *windows*  ]] ||	[[ "$VM_InstanceName" == *macos*  ]] ; then 
 
       [[ ! $ByPass_VM_Array_Selector ]] && printf "\033c"
-    
       printColor "\n\n  Selected: %s "  "$VM_InstanceName"
-      
       printf " 'ignore_msrs' is set & is recommended for Windows and Mac"  
 
-      select_msr_config
-
+      select_msr_config    
       if [[ $KVM_MSR_status == "N" ]]; then KVM_MSR_Error=1 ; else KVM_MSR_Error= ; fi
 
     fi
     
-  else
-
-    #  Status = Y  &  which is recommended for Windows & Mac 
+  else  #  Then status = Y, which is only needed for Windows & Mac
 
     if [[ "$VM_InstanceName" != *windows*  ]] &&	[[ "$VM_InstanceName" != *macos*  ]] ; then
 
       [[ ! $ByPass_VM_Array_Selector ]] && printf "\033c"
-
       printColor "\n\n  Selected: %s "  "$VM_InstanceName"
-    
       printf "\n\n 'ignore_msrs' is set:  can be okay for other OS's but is normally used only with Windows and Mac"  
 
       select_msr_config
-
       if [[ $KVM_MSR_status == "Y" ]]; then KVM_MSR_Error=1 ; else KVM_MSR_Error= ; fi
 
     fi

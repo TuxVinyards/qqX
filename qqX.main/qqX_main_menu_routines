@@ -219,11 +219,9 @@ function check_disk_is_okay {
       1) DiskChkStatus="Check not completed because of internal errors" ;;
 
       2) DiskChkStatus="Check completed, image is corrupted" 
-      
          DiskChkExitCode=2 ;;
 
       3) DiskChkStatus="Check completed, image has leaked clusters, but is not corrupted" 
-      
          DiskChkExitCode=3  ;;
 
       63) DiskChkStatus="Checks are not supported by the image format -- not qcow2 ??" ;;
@@ -270,15 +268,11 @@ function multi_instance_checks {
   if [[ $MultiInstanceCount -gt 1 ]]; then 
 
     tput sc
-
     printColor "\n\n  WARNING: more than one instance of qqX appears to be running "  
-
     printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed \n\n"
-
     read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
 
     [[ $MultiQuit == "q" ]] && exit directly
-
     tput rc ; tput ed  #  clear back the last lines to sc (set cursor)
     
   fi
@@ -286,11 +280,8 @@ function multi_instance_checks {
   if [[ "$(pgrep quickgui)" ]] ; then
 
     printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running " 
-
     printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"
-    
     printf "\n\n  Stopping an instance shown as running in QuickGUI may stop an instance started in qqX. \n\n"
-
     read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit
 
     [[ $MultiQuit == "q" ]] && exit directly
@@ -308,78 +299,54 @@ function_delete_Selected_VM () {
   if [[ ! $1 && ! $2 ]]; then
 
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
-
     printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
-
     sleep 2 ;  return
 
   else
 
     if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
-
-      printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
-
+       printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
       printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
-
       sleep 2 ;  return
-
     fi
 
     if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
 
     printColor "\n\n  Folder: %s " "$1"
-  
     printColor "  & file: %s  to be deleted?"  "$2"
-  
     printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
-
     printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
-
     printf "\n\n  Folder content: \n\n"
 
     ls "$1"
 
     if [[ $TrashingAvailable ]]; then 
-
       printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
-      
       printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
-
     else
-
       printColor "\n\n  [enter] use the file manager to move things the trash bin "
-      
       printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
-
     fi
 
     printf "\n\n"
-
     read -rp "  >  "   Delete_VM_Option
 
     if [[ $Delete_VM_Option == "y" ]]; then 
 
       printf "\n\n  Folder & .conf file being deleted ... \n\n"
-      
       rm -f -r "$1"  
       echo
-
       rm -f "$2"
       echo
 
     else
 
-      # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
-
       if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
-
         printf "\n\n  Moving files to the bin ... \n\n"
         gio trash "$1"
         gio trash "$2"
-
       else  printf "\n\n  NOT deleted ... \n\n"
-
-      fi
+      fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 
     fi
 
@@ -391,7 +358,6 @@ function_delete_Selected_VM () {
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
-
     SettingsFileAdjusted=1
 
     refresh_sources_and_load_VM_arrays
