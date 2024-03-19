@@ -128,6 +128,28 @@ source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
 
+# Temps usually get removed with reboot 
+# BUT can get removed by time (eg 24hrs) so check they are there still ( REVIEW  if causes problems )
+# See https://serverfault.com/questions/377348/when-does-tmp-get-cleared#377349
+
+## The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
+QG_VerNumber="$(quickget "--version")"
+
+# Quick EMU uses its internal var '$VERSION'
+QE_VerNumber="$VERSION"
+
+#  4.9.2 (still numbered 4.9.1) changes fedora releases to 'echo 38 39' from
+
+quickget "filepath"  
+
+if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then 
+
+  [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
+  [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
+
+fi
+
+
 function main_menu {
 
   while true ; do

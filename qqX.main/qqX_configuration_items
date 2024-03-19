@@ -64,7 +64,8 @@ function check_screen_percentage_and_output {
   SDL_ScrnPcnt_Cmd=
   HeadlessCmd=
   
-  # function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
+  #  Function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
+  #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  
 
   if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
 
@@ -76,6 +77,9 @@ function check_screen_percentage_and_output {
 
   fi
 
+
+  #  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
+  #  But check the source to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
 
   [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
 
@@ -89,15 +93,16 @@ function check_screen_percentage_and_output {
     if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
       if grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then   SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
-
       else
         printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
         SDL_ScrnPcnt_Error="> not possible with this qe-version"
       fi
 
     else
+
       printColor "\n\n  ERROR:  SDL_ScreenPercent = %s  Range is 25 to 99 \n\n "  "$SDL_ScreenPercent"
       SDL_ScrnPcnt_Error="Out of Range"
+      
     fi
 
   fi

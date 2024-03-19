@@ -193,7 +193,6 @@ fi
 #  Pick up the SETTINGS file: 
 
 #  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines. 
-
 #  A possibilty to have a local 'dev' version setting file is retained.  May be .dot hidden or plain
 
 [[ -e "$HOME/.qqX/qqX_settings" ]] && qqX_SettingsFile="$HOME/.qqX/qqX_settings"

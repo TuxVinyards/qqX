@@ -131,20 +131,4 @@ function quickemu {
 
 }
 
-# Temps usually get removed with reboot 
-# BUT can get removed by time (eg 24hrs) so check they are there still ( REVIEW  if causes problems )
-# See https://serverfault.com/questions/377348/when-does-tmp-get-cleared#377349
-
-## The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
-QG_VerNumber="$(quickget "--version")"
-
-# Quick EMU uses its internal var '$VERSION'
-QE_VerNumber="$VERSION"
-
-#  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
-#  But check the to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
-
-#  Runnning this function when loading the main menu, and after a VM has been selected, enables individual per .conf values, as well as default
-#  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  (See main settings)
-
 
