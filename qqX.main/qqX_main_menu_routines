@@ -366,3 +366,112 @@ function_delete_Selected_VM () {
 
 }
 
+read_x86_tiano_vars_list () {
+
+  # current std list
+  String="$(grep -A 20 -m 1 'ovmfs=' /usr/bin/quickemu | grep '"')"    
+
+  String="$(tr -cd '[:print:]' <<< "$String")"
+  String="${String//'ovmfs=('/}"
+  String="${String//','/' '}"
+
+  # shellcheck disable=SC1003 
+  String="${String//'\'/' '}"
+  String="$(tr -s '[= =]' <<< "$String")"
+
+  # shellcheck disable=SC2206
+  Tiano_x86_FilesList=($String)
+  Tiano_x86_CodeList=()
+  Tiano_x86_VarsList=()
+
+  i=0    
+  while [[ "${Tiano_x86_FilesList[i]}" ]]; do Tiano_x86_CodeList+=("${Tiano_x86_FilesList[i]}"); ((i+=2)); done
+  i=1    
+  while [[ "${Tiano_x86_FilesList[i]}" ]]; do Tiano_x86_VarsList+=("${Tiano_x86_FilesList[i]}"); ((i+=2)); done
+
+}
+
+
+refresh_tiano_vars () {  
+
+  RtvBack= ; RtvArm=
+  read_x86_tiano_vars_list
+
+  printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
+  printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old etc \n\n  Your *VMF_VARS.fd file(s) will be reinstalled."
+  if [[ "$VM_InstanceName" == *macos* ]]; then 
+    printf "\n\n  MacOS refreshes require an internet connection. The small boot drive 'OpenCore.qcow2' is also needed."
+    printf "\n\n  For security reasons, these Mac specific files should generally be updated at regular intervals...."
+  fi
+
+  if [[ $(ls "$VM_Conf_Dir/$VM_InstanceName/AAVMF"* 2>/dev/null) ]]; then
+    RtvArm=1
+    if [[ ! $RtvArmFolder ]]; then
+      printf  "\n\n  Using Standard Folder '/usr/share/AAVMF' >> Variations may be placed in main settings"
+      RtvArmFolder="/usr/share/AAVMF"
+    else
+      printf  "\n\n  Using Folder '%s' >>  From variation placed in main settings" "$RtvArmFolder"
+    fi
+  fi 
+
+  printf  "\n\n  [enter] to continue  [b] to go back "
+  read -rp "  >  "  RtvBack
+
+  if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
+
+  else
+
+    if [[ $RtvArm ]]; then 
+
+      AA_VarsList=("AAVMF_VARS.fd"  "AAVMF32_VARS.fd"  "AAVMF_VARS.ms.fd"  "AAVMF_VARS.snakeoil.fd")
+
+      printf "\n\n  Checking: %s" "${AA_VarsList[*]}"
+
+      for AA_Var in "${AA_VarsList[@]}"; do
+        if [[ -e "$VM_Conf_Dir/$VM_InstanceName/$AA_Var" ]]  &&  [[ -e "/usr/share/AAVMF/$AA_Var" ]]; then
+          mv "$VM_Conf_Dir/$VM_InstanceName/$AA_Var" "$VM_Conf_Dir/$VM_InstanceName/${AA_Var}.old"
+          cp -f "/usr/share/AAVMF/$AA_Var" "$VM_Conf_Dir/$VM_InstanceName/$AA_Var"
+          printColor "\n\n  Reset/Installed '%s' "  "$AA_Var"
+        fi
+      done
+
+    elif [[ "$VM_InstanceName" == *macos* ]]; then
+
+      printf "\n\n"
+      [[ -e "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2" ]] &&  mv "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2" "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2.old"
+      [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_CODE.fd" ]] &&  mv "$VM_Conf_Dir/$VM_InstanceName/OVMF_CODE.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_CODE.fd.old"
+      [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS-1920x1080.fd" ]] &&  mv "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS-1920x1080.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS-1920x1080.fd.old"
+
+      # as per quickget 4.9.2
+      wget -t 3 -T 2 "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" -O "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2"
+      wget -t 3 -T 2 "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" -O "$VM_Conf_Dir/$VM_InstanceName/OVMF_CODE.fd"
+      wget -t 3 -T 2 "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" -O "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS-1920x1080.fd"
+
+    else
+
+      i=0 
+      while [[ "${Tiano_x86_VarsList[i]}" ]]; do
+
+        x86_VarPath="${Tiano_x86_VarsList[i]}"
+        x86_VarPath="${x86_VarPath//'"'/}"
+
+        x86_Var="$(basename "${Tiano_x86_VarsList[i]}")"
+        x86_Var="${x86_Var//'"'/}"
+
+        if [[ -e "$VM_Conf_Dir/$VM_InstanceName/$x86_Var" ]]; then 
+          mv "$VM_Conf_Dir/$VM_InstanceName/$x86_Var" "$VM_Conf_Dir/$VM_InstanceName/${x86_Var}.old"
+          printColor "\n\n  Reset '%s' >> Quickemu will now auto-update your VM on its next boot"  "$x86_Var"
+        fi
+
+        ((i+=1))
+      done
+
+    fi
+
+    date +%s > "$VM_InstanceName/rtv.date.txt"
+
+    printf "\n\n  [enter] to return \n\n "
+    read -rp "  >  "
+    
+  fi
+}

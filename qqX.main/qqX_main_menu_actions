@@ -69,35 +69,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "rtv" ]] ; then
 
-    RtvBack=
-    printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
-    printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old. \n\n  Your VMF_VARS.fd file(s) will be reinstalled."
-    if [[ ! -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]; then
-      printf  "\n\n  Manual update might be required.\n\n  Standard Files '/usr/share/OVMF/OVMF_VARS.fd' and '/usr/share/AAVMF/AAVMF_VARS.fd' only"
-    fi 
-    printf  "\n\n  [enter] to continue  [b] to go back "
-    read -rp "  >  "  RtvBack
-
-    if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
-
-    else
-
-      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/OVMF/OVMF_VARS.fd" ]]; then
-        cp -f "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd.old"
-        cp -f "/usr/share/OVMF/OVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS.fd"
-        printf "\n\n  Reset/Installed 'OVMF_VARS.fd' "
-      fi
-
-      if [[ -e "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" ]]  &&  [[ -e "/usr/share/AAVMF/AAVMF_VARS.fd" ]]; then
-        cp -f "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd.old"
-        cp -f "/usr/share/AAVMF/AAVMF_VARS.fd" "$VM_Conf_Dir/$VM_InstanceName/AAVMF_VARS.fd"
-        printf "\n\n  Reset/Installed 'AAVMF_VARS.fd' "
-      fi
-
-      printf "\n\n  [enter] to return \n\n "
-      read -rp "  >  "
-
-    fi
+    refresh_tiano_vars
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 

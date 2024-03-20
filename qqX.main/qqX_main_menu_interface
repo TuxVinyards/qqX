@@ -149,8 +149,23 @@ else
     elif [[ $FileManager ]]; then 
 
       if [[ $(type -p "$FileManager") ]]; then printf "   [f]  open VM folder in file manager"
-      else  printColor "   [set]  ERROR file manager not found" ; fi
+      else  printColor "   [set]  ERROR file manager not found" 
+      fi
 
+    fi
+
+    if [[ -f "$VM_InstanceName/rtv.date.txt" ]]; then
+
+      SyncDateNow="$(date +%s)"
+      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt")"
+      LastRtvUpd="$((SyncDateNow - SyncDateOld))"
+
+      if [[ "$VM_InstanceName" == *macos* ]] && [[ $LastRtvUpd -gt 2592000 ]]; then  printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
+      elif [[ $LastRtvUpd -gt 10368000 ]]; then  printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
+      fi  #  older than 120 days std vars or 30 for mac as has binaries (in epoch seconds)  REVIEW  some Linux variants may have binaries too ??
+
+    else [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/rtv.date.txt"
+        
     fi
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
@@ -160,7 +175,7 @@ else
         #  Live VMs only, as zsync only updates the iso file.   
         #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
 
-        if [[ -e "$VM_InstanceName/zsync.date.txt" ]]; then
+        if [[ -f "$VM_InstanceName/zsync.date.txt" ]]; then
 
           SyncDateNow="$(date +%s)"
           SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt")"
