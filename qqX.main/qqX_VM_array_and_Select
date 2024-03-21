@@ -453,8 +453,10 @@ refresh_sources_and_load_VM_arrays() {
 
   refresh_and_load_quickemu_sources
   quickget filepath
+  
+  find_file_openers
 
-  [[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder && find_xdgopen_settings
+  [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 
 
   function_create_VM_folderList  
   scan_folders_list_and_add_VMs  

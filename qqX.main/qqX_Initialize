@@ -224,7 +224,7 @@ fi
 
 # Determine possible XDG folders 
 
-function_xdg_start_folder () {
+find_xdg_start_folder () {
 
   #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
 
@@ -243,7 +243,7 @@ function_xdg_start_folder () {
 }
 
 
-[[ $XDG_GeneralDesktopStart ]] &&  function_xdg_start_folder
+[[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder
 
 
 if [[ $XDG_MimeType_is_QCOW ]]; then

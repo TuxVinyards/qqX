@@ -140,11 +140,50 @@ else
 
     fi
 
+    if [[ -f "$VM_InstanceName/rtv.date.txt" ]]; then
+
+      SyncDateNow="$(date +%s)"
+      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt")"
+      LastRtvUpd="$((SyncDateNow - SyncDateOld))"
+
+      if [[ $RtvManualOnly ]]; then 
+
+        if [[ "$VM_InstanceName" == *macos* ]]; then 
+          [[ ! $RtvMacosRmdOff ]] && [[ $LastRtvUpd -gt 2592000 ]] && printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
+        elif [[ ! $RtvStdRmdOff ]] && [[ $LastRtvUpd -gt 10368000 ]]; then  
+          printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
+        fi  
+        
+        #  Reminders @ older than 120 days std vars or 30 for mac as has binaries (in epoch seconds)  
+        #  Auto-updates: do all at 30 days.  Status message for std vars probably OTT, not needed (?)   REVIEW 
+
+      elif [[ $LastRtvUpd -gt 2592000 ]]; then
+
+         if [[ "$VM_InstanceName" == *macos* ]]; then 
+
+          printf "\n\n  Tiano Core Updater .....  "
+          refresh_tiano_vars &
+          wait "$!" 
+          RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log")"
+          [[ $RtvMacGet == "Okay" ]] && printf "All Good"
+          [[ $RtvMacGet == "Fail" ]] && printColor "\n\n  Failed to update. See rtv logs in the VM folder ...."
+
+        else  refresh_tiano_vars &
+
+        fi 
+
+      fi
+
+    else  date +%s > "$VM_InstanceName/rtv.date.txt"
+        
+    fi
+
+
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
     filter_and_flag_qemu_errors
 
-    if [[ $QemuErrorExists ]] ; then printColor "  [ql]  show qemu error log"
+    if [[ $QemuErrorAlert ]]; then printColor "  [ql]  show qemu error log"
 
     elif [[ $FileManager ]]; then 
 
@@ -154,19 +193,6 @@ else
 
     fi
 
-    if [[ -f "$VM_InstanceName/rtv.date.txt" ]]; then
-
-      SyncDateNow="$(date +%s)"
-      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt")"
-      LastRtvUpd="$((SyncDateNow - SyncDateOld))"
-
-      if [[ "$VM_InstanceName" == *macos* ]] && [[ $LastRtvUpd -gt 2592000 ]]; then  printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
-      elif [[ $LastRtvUpd -gt 10368000 ]]; then  printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
-      fi  #  older than 120 days std vars or 30 for mac as has binaries (in epoch seconds)  REVIEW  some Linux variants may have binaries too ??
-
-    else [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/rtv.date.txt"
-        
-    fi
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
     
@@ -186,7 +212,7 @@ else
           else  printf "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
           fi  #  older than 6hrs (in epoch seconds)
 
-        else [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
+        else  date +%s > "$VM_InstanceName/zsync.date.txt"
             
         fi
 

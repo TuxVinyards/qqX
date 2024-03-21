@@ -69,7 +69,9 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "rtv" ]] ; then
 
+    RunRtvCheck=1
     refresh_tiano_vars
+    RunRtvCheck=
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
@@ -87,8 +89,8 @@ function  main_menu_actions {
 
     read -rp "  >  "  QL_LogView
 
-    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") 
-    [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" 
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") && QemuErrorAlert=
+    [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 

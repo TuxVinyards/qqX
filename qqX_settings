@@ -69,7 +69,7 @@ X_Shade="3"
 #  For custom vm selector styles:  see notes in qqX.main, file "qqX_VM_array_and_Select"
 #  For custom main menu, see  file  "/qqX_main_menu_interface"
 
-VM_SelectorStyle="B"
+VM_SelectorStyle="E"
 
 # Style A setting, default ="4"   (Number counts starts at 0)
 VM_Select_Items_style_A_PerLine=
@@ -102,9 +102,9 @@ TextEditor=
 ##  FILE MANAGER:
 
 #  Allows opening of the VM folder into new window, to view log files and contents (distro behaviour may vary)
-#  Give quoted name eg  caja, nautilus, dolphin, pcmanfm, etc  if  menu options are not showing. 
+#  Popular names selected in the following order:  caja, nautilus, dolphin, pcmanfm, followed by XDG default
 
-#  XDG default is checked first, then popular names (above).  Terminal command  'xdg-mime query default inode/directory' may help.
+#  Terminal command  'xdg-mime query default inode/directory' may help.
 #  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
 
 FileManager=
@@ -113,11 +113,12 @@ FileManager=
 ##  WEB BROWSER:
 
 #  Allows opening of VM homepages and other URL's  (distro behaviour may vary).
+#  Terminal command 'xdg-settings get default-web-browser' may help.
+
 #  Known issue  https://discourse.ubuntu.com/t/firefox-snap-testing-2021-2022/24663/93
 
-#  Give quoted name eg  firefox, google-chrome, falkon etc  if  menu options are not showing.  
-#  XDG default is checked first, then popular names (above).  Terminal command 'xdg-settings get default-web-browser' may help.
-#  May be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
+#  Popular names selected in the following order: firefox, google-chrome, falkon, followed by XDG default
+#  Give quoted name or may be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
 
 WebBrowser=
 
@@ -288,8 +289,28 @@ QEMU_Default_MachineType=
 # Comments and blank lines may be used, and will be ignored.
 # See qqX wiki for further how to details and discussion
 
-# Standard Arm AAVMF source folder = "/usr/share/AAVMF"  >>  Variations may be placed here.
+# Standard Arm AAVMF source folder = "/usr/share/AAVMF"  >>  Variations may be placed here.  
+# Defaults to auto-update, as below.
  RtvArmFolder=
+
+
+## TIANO Boot updates
+
+# The Tiano boot system that is used by quickemu will require updating if there are feature or security changes made to the code.
+# (03/2024) Quickemu, currently places edk.fd vars into the VM folder. And there they remain.
+# It is theoretically possible that system updates containing feature changes may seek variables in these files that don't exist.
+# Quickemu will also place binary files, in the case of MacOS, which are only downloaded by running Quickget. 
+# There are also .bin files listed in the Quickemu code for use by some Linux distros .... 
+
+# qqX features an [rtv] option which may be run manually, to Refresh (the) Tiano Variables (and such).
+# But to avoid tedium, this feature defaults to periodically auto-running. Set = 1 to turn this off, if required (?)
+RtvManualOnly=
+
+# In manual-only mode, qqX will remind you, from time to time, to run the updater. 
+# The MacOS reminder runs more frequently, as this is viewed as more critical.
+# As above, set = 1 to turn these off too, if required (?)  
+RtvStdRmdOff=
+RtvMacosRmdOff=
 
 
 ##  qqX UPDATES
