@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+#  qqX project: early stage display add-ins     
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses 
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+# shellcheck disable=SC1090,SC2034,SC2154
+
+X_Shade="3"
+
+
+source "$(pwd)/qqX.system/Func_echo_colors"
+
+
+# Variant on   http://www.figlet.org/  -f mini  (-k)   (c)  Alex Genovese
+
+qqX_logo() {
+echColor "  _    _   \/   "
+echColor " (_|  (_|  /\ "
+echColor "   |.   |.    "
+}
+
+
+#
+TITLEmain="[quickemu quickget X terminal project] - Ver: $qqX_Version "
+#
+
+
+qqX_logo_title() {
+
+if [[ $1 ]]; then
+
+	LogoTitle="$1"
+
+else
+
+	LogoTitle="$TITLEmain"
+
+fi
+
+echColor "  _    _   \/   "
+echColor " (_|  (_|  /\ "
+echColor "   |.   |.     $LogoTitle"
+
+}
+
+
+
+
+

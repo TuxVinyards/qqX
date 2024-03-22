@@ -334,12 +334,13 @@ function_config_tune_up ()  {
     elif [[ $guest_os == "macos" ]]; then 
 
       ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then  printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft" ; fi
 
-      if [[ ! $ConfLine ]]; then 
-        printColor "\n\n  WARNING a line:  macos_release=\"catalina\" or similar should be present"
-        printf "\n\n  This instructs Quickemu how to optimise & should be added manually.\n"
-        printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft"
-      fi
+      ConfLine="$(grep -s 'mouse=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then printf "mouse=\"virtio\"\n"  >> "$TuneUpTargetDraft" ; fi
+
+      ConfLine="$(grep -s 'keyboard=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then  printf "keyboard=\"usb\"\n"  >> "$TuneUpTargetDraft" ; fi
 
     fi
 
@@ -353,6 +354,32 @@ function_config_tune_up ()  {
     cat "$TuneUpTargetDraft"
 
     TuneUpConfConfirm=
+
+    if [[ $guest_os == "macos" ]]; then 
+
+      ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then 
+        printColor "\n\n  MacOS WARNING: A line macos_release=\"catalina\" or similar should be present"
+        printf "\n\n  This instructs Quickemu how to optimise & should be added manually.\n"
+      fi
+
+      ConfLine="$(grep -s 'mouse=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then 
+        printColor "\n\n  MacOS WARNING: A line mouse=\"virtio\" or similar is recommended,"
+        printColor "\n\n  especially with newer releases. Older ones may need =\"usb\" .... "
+        printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
+      fi
+
+      ConfLine="$(grep -s 'keyboard=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then 
+        printColor "\n\n  MacOS WARNING: A line keyboard=\"usb\" or similar is recommended,"
+        printColor "\n\n  some newer releases may need =\"virtio\" .... "
+        printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
+      fi
+
+    fi
+
+
 
     printColor "\n\n  [enter] all good, continue    [r] revert back to the old config"
     printf "\n\n  [e]  edit the config file in more detail   "

@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+
+##  qqX - quickemu quickget X terminal project   
+
+#   Helper file for qqX settings file updates
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses 
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+function  update_old_settings_file_with_new_options {
+
+  Old_SettingsFile="$1" 
+  Template_SettingsFile="$2"
+  Old_SettingsFileFolder="$3"
+  
+  # USAGE: presumes this file to be run from a qqX release folder ... 
+ 
+  [[ ! $Old_SettingsFile ]] &&  Old_SettingsFile="qqX_settings"
+  [[ ! $Template_SettingsFile ]] &&  Template_SettingsFile="qqX_settings"
+  [[ ! $Old_SettingsFileFolder ]] &&  Old_SettingsFileFolder="$HOME/.qqX"
+
+  #  The VM & extra folder lists are of unknown length & number so store as separate to add later.
+
+  Grep_OLD_VM_Arrays_File="/tmp/grep.old.vm.arrays.txt"
+  Grep_OLD_XF_Arrays_File="/tmp/grep.old.xf.arrays.txt"
+
+  printf "" > "$Grep_OLD_VM_Arrays_File"
+  printf "" > "$Grep_OLD_XF_Arrays_File"
+
+  
+  ## 1: OLD FILE  (std or as params)  Separate up the array lists & the one-liners
+
+  mapfile -t GrepArr_OLD_OneLine_Settings  <<< "$(grep "=" "$Old_SettingsFileFolder/$Old_SettingsFile")"
+
+  for i in "${!GrepArr_OLD_OneLine_Settings[@]}"; do
+
+    case "${GrepArr_OLD_OneLine_Settings[i]}" in
+    
+      '#'*|' #'*|'  #'*|'   #'*|'    #'*)  
+        unset "GrepArr_OLD_OneLine_Settings[i]"  
+        ;;
+      
+      *'VM_Array['*)  
+        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_VM_Arrays_File" 
+        unset "GrepArr_OLD_OneLine_Settings[i]"  
+        ;;
+      
+      *'Extra_VM_Folder+='*)  
+        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_XF_Arrays_File"  
+        unset "GrepArr_OLD_OneLine_Settings[i]"  
+        ;;
+      
+    esac
+
+  done	
+
+  #  Re-index as sections have been removed
+  GrepArr_OLD_OneLine_Settings=("${GrepArr_OLD_OneLine_Settings[@]}")
+
+  #  Find & store the Base Name of each setting ie the Var= instead of the whole var & value
+  GrepArr_OLD_BaseNameSettings=()
+  for i in "${!GrepArr_OLD_OneLine_Settings[@]}" ; do
+    GrepArr_OLD_BaseNameSettings+=( "$(cut -d '=' -f1 <<< "${GrepArr_OLD_OneLine_Settings[i]}")""=" )
+  done
+
+
+  ## 2: TEMPLATE  FILE  (from the new release)  find & store all the one-line settings 
+
+  mapfile -t GrepArr_TEMPLATE_OneLine_Settings  <<< "$(grep "=" "$Template_SettingsFile")"
+
+  for i in "${!GrepArr_TEMPLATE_OneLine_Settings[@]}"; do
+
+    case "${GrepArr_TEMPLATE_OneLine_Settings[i]}" in
+    
+      '#'*|' #'*|'  #'*|'   #'*|'    #'*)  
+        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
+        ;;
+      
+      *'VM_Array['*)  
+        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
+        ;;
+      
+      *'Extra_VM_Folder+='*)  
+        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
+        ;;
+      
+    esac
+
+  done	
+
+  # Re-index, as previous in section 1
+  GrepArr_TEMPLATE_OneLine_Settings=("${GrepArr_TEMPLATE_OneLine_Settings[@]}")
+
+  # Plus find and store their base names too (for easy matching)
+  GrepArr_TEMPLATE_BaseNameSettings=()
+  for i in "${!GrepArr_TEMPLATE_OneLine_Settings[@]}" ; do
+    GrepArr_TEMPLATE_BaseNameSettings+=( "$(cut -d '=' -f1 <<< "${GrepArr_TEMPLATE_OneLine_Settings[i]}")""=" )
+  done
+
+
+  ## 3: NEW FILE OUTPUT 
+  
+  # The template file with it's possibly new added sections or changed notes 
+  # but with any officially recognised old customised settings  (custom entries are separate)
+
+  ## Make a backup to the installer folder (& check that it is a faithful copy)
+  # Dev: move to trash to stop clutter.
+  
+  D_Stamp=".""$(date +%a.%d.%b.%G.%H.%M)"
+
+  if [[ -d ".git" ]] && [[ $(type -p gio 2>/dev/null) ]]; then 
+
+    gio trash "$Old_SettingsFileFolder/$Old_SettingsFile"
+    printf "\n\n  OLD SETTINGS file has been moved TO THE TRASH BIN (for recovery, if needed)\n\n"
+
+  else
+
+    cp "$Old_SettingsFileFolder/$Old_SettingsFile" "$(pwd)/qqX_settings.$D_Stamp.old.txt" 
+
+    ChkSumOld="$(md5sum "$Old_SettingsFileFolder/$Old_SettingsFile" 2>/dev/null | head -c 32)"
+    ChkSumBackup="$(md5sum "$(pwd)/qqX_settings.$D_Stamp.old.txt" 2>/dev/null | head -c 32)"
+
+    if [[ $ChkSumOld != "$ChkSumBackup" ]]; then 
+      printColor "\n\n  ERROR:  unable to make a backup of the settings file."
+      printf "\n\n  Aborting update.  Please check at https://github.com/TuxVinyards/qqX/issues"
+      printf "\n\n\n  [enter] to exit ... \n\n"
+      read -rp "  >  "
+      printf "\n\n"
+      exit
+    else  printf "\n\n  A backup of the original settings file has been made & verified \n\n"
+    fi
+
+  fi
+
+  ## Create new composite file, in place of the old
+  TargetNew="$Old_SettingsFileFolder/$Old_SettingsFile" 
+  printf "" > "$TargetNew"
+
+  # Map all of update file lines to an array for outputting the new 
+  mapfile -t GrepArr_NEW  < "$Template_SettingsFile"
+
+  VM_Old_TxDone=
+  XF_Old_TxDone=
+
+  for i in "${!GrepArr_NEW[@]}"; do 
+
+    MatchNewOld=
+    SkipCopy=
+
+    case "${GrepArr_NEW[i]}" in
+
+      #  Detect non-commented array zones and copy the stored customised block to the new file
+      #  Extra_VM_Folder's entries in the template are 'live' ie not commented out
+
+      *'Extra_VM_Folder+='*)  
+
+        if [[ ! $XF_Old_TxDone ]]; then
+          if grep -q 'Extra_VM_Folder+=' "$Grep_OLD_XF_Arrays_File" ; then
+            cat "$Grep_OLD_XF_Arrays_File" >> "$TargetNew" 
+            XF_Old_TxDone=1
+          fi
+        fi
+        # one set only avoid accumulating more new ones (also the line spaces between the extra statements)
+        [[ $XF_Old_TxDone ]] && SkipCopy=1 && SkipLineSpace=1
+        ;;
+      
+      '# ADD here:') 
+
+        if [[ ! $VM_Old_TxDone ]]; then
+          printf "%s\n\n" "${GrepArr_NEW[i]}" >> "$TargetNew"
+          SkipCopy=1 
+          if grep -q 'VM_Array' "$Grep_OLD_VM_Arrays_File" ; then
+            cat "$Grep_OLD_VM_Arrays_File" >> "$TargetNew" 
+            VM_Old_TxDone=1
+          fi
+        fi
+        ;;
+      
+    esac
+
+
+    # one set only avoid accumulating more new ones
+    [[ $VM_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'M_Array['* ]]  && SkipCopy=1 && SkipLineSpace=1
+
+    if [[ ! $SkipCopy ]] && [[ ! $SkipCopy ]] && [[ "${GrepArr_NEW[i]}" == *=* ]]; then
+
+      ProposedNew_BaseNameSetting="$(cut -d '=' -f1 <<< "${GrepArr_NEW[i]}")""="
+
+      for n in "${!GrepArr_OLD_BaseNameSettings[@]}" ; do
+
+        if [[ "$ProposedNew_BaseNameSetting" == "${GrepArr_OLD_BaseNameSettings[n]}" ]]; then
+          MatchNewOld=1
+          echo "${GrepArr_OLD_OneLine_Settings[n]}" >> "$TargetNew"
+          break
+        fi 
+
+      done
+
+      [[ ! $MatchNewOld ]] && echo "${GrepArr_NEW[i]}"  >> "$TargetNew"
+
+    elif [[ ! $SkipCopy ]]; then
+
+      if [[ $SkipLineSpace ]]; then SkipLineSpace=; else  echo "${GrepArr_NEW[i]}"  >> "$TargetNew"; fi
+
+    fi
+
+  done
+
+  printf "  The settings file has now been updated. \n\n  All recognised original settings have been transferred. \n\n"
+  
+}
+
+# vim:tabstop=2:shiftwidth=2:expandtab
+
+##

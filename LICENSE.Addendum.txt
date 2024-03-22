@@ -3,7 +3,6 @@
 
 
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
-
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
 # 	Otherwise:  
@@ -25,7 +24,6 @@
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-
 # THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
 
 

@@ -131,12 +131,6 @@ WebBrowser=
 P_Kill_WaitSecs="6"
 
 
-##  Overide to handle future quickemu errors from changes to Qemu numbering format
-#   Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
-
-QemuShortVerOveride=
-
-
 ## EXTRA OPTIONS 
 
 #  Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.  
@@ -273,6 +267,11 @@ QG_Version=
 
 ## QEMU VERSION
 
+#  Overide to handle future quickemu errors from changes to Qemu numbering format
+#  Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
+
+QemuShortVerOveride=
+
 # Hardcoded quickemu default is 'qemu-system-x86_64' with machine 'q35'
 # For unexpected QEMU changes, system may be set here, if required.
 # At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options  
@@ -330,6 +329,16 @@ Specified_Updates_Location=
 #  Setting to =1  will increase the use of more locale-centric language/typeface features, if needed
 #  BUT this may upset some input/output filters ....  
 AllowMoreLocale=
+
+
+## CUSTOM SETTINGS FILE
+
+# The qqX upgrader utility will tidy up and possibly remove any 'obsolete' code and comments from this file ...
+
+# For advanced custom tweaks or things that you want to keep safe, you should make a custom settings file,
+# next door to this one, in '.qqX' in your home folder (normally use ctrl-h to unhide) "$HOME/.qqX/custom_settings"
+
+
 
 ## End of Settings
 

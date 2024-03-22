@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+
+##  qqX - quickemu quickget X terminal project   
+
+#   Helper file for qqX settings file updates
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# 	Otherwise:  
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses 
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+
+
+##  Older code from 'ffX project' (c)  Alex Genovese  Refactored @ 03/2024
+
+
+printf "\033c"
+printColor "\n\n  The name of your Terminal Emulator is needed \n\n"
+
+# 'UserTerm' may be supplied by a calling script or setup installer settings
+
+if [[ ! $UserTerm ]]; then
+
+  echo "  Checking ...."; echo
+
+  ## Almost all terminal emulators have 'term' as part of the name. 
+  #  Check here for notable exceptions:
+
+  UserTerm="$(pgrep -li  "konsole" )"
+
+  if [[ "$UserTerm" == *konsole* ]]; then
+
+    UserTerm="konsole"
+    echo "  UserTerm is $UserTerm" ; echo
+    echo "  Is this correct?  [enter] yes  [n] no " ; echo
+    read -rp "   >  "   
+    echo
+
+    if [[ $REPLY == "n" ]]; then UserTerm=; else UserTerm_Found=1; fi
+
+  fi
+
+fi
+
+if [[ ! $UserTerm ]]; then 
+
+  echo "  Checking ...."; echo
+
+  # Scan for processes with 'term' as part of the name  (& ignore lines with scriptname ) 
+  # https://stackoverflow.com/questions/35006457/choosing-between-0-and-bash-source & http://mywiki.wooledge.org/BashFAQ/001  
+
+  TermGrep=()
+  
+  while IFS= read -r Line; do
+  
+    [[ "$Line" == *"qqX_termfind"* ]] && continue
+
+    TermGrep+=("$Line") 
+
+  done  <  <(pgrep -li "term")
+  
+  TermCount="${#TermGrep[*]}" 
+
+
+  if [[ "$TermCount" -eq 1 ]]; then
+   
+    UserTerm_PID="${TermGrep[0]}"
+    UserTerm_PID="$(echo "$UserTerm_PID" | tr -cd '[:digit:]')"
+ 
+  elif [[ "$TermCount" -gt 1 ]]; then
+
+    printf "\n  %s\n\n" "${TermGrep[@]}"
+    printf "  Some lightweight terminals may not be compatible (See 'known-issues')"
+    printf "\n\n  Enter the number of your Terminal Emulator [n] if none of these \n"
+    read -rp "  >  "  UserTerm_PID
+    echo
+
+    if [[ $UserTerm_PID == "n" ]]; then UserTerm_PID= ; UserTerm_Found= ; fi
+
+  fi
+
+  if [[ $UserTerm_PID ]]; then
+
+    if [[ -d "/proc/$UserTerm_PID" ]]; then
+
+      UserTerm="$(realpath /proc/"$UserTerm_PID"/exe)"
+      UserTerm="${UserTerm##*/}"
+
+    else
+
+      echo "  Error:  PID not found"; echo
+      UserTerm=
+      UserTerm_PID=
+      UserTerm_Found=
+
+    fi
+
+  fi
+
+fi
+
+
+while [[ ! $UserTerm_Found ]]; do
+
+  if [[ ! $UserTerm ]]; then 
+
+    PID_Term_ProbeArr=()
+
+    echo
+    echColor "  Basic tests unable to find name of your terminal emulator"; echo
+
+    # LOAD NOTES from function at start of calling script qqX installer
+    print_terminal_notes
+    echo
+    echo "  Further tests: "
+
+    if [[ $TermFind_ReRun ]]; then
+
+      echo; echo
+      echo "  SHELL is $SHELL" ; echo
+      head "/proc/$PPID/status"
+      echo
+
+    fi
+    
+
+    UserTerm="$(realpath /proc/$PPID/exe)"
+    UserTerm="${UserTerm##*/}"
+    PID_Term_ProbeArr+=("$UserTerm")
+
+    if [[ $TermFind_ReRun ]]; then
+
+      echo "  UserTerm is $UserTerm" ; echo
+      echo "  Parent PID is $PPID" ; echo
+      echo "  Process Command is $(cat "/proc/$PPID/comm")"; echo
+      echo
+
+    fi
+
+
+    while [[ "${GrandParentPID:-$PPID}" -gt 1 ]]; do
+
+      GrandParentPID="$(grep -i -e "PPid:" "/proc/${GrandParentPID:-$PPID}/status")"
+      GrandParentPID="$(echo "$GrandParentPID" | tr -cd '[:digit:]')"
+      #  See  http://mywiki.wooledge.org/BashFAQ/073
+      
+      [[ $TermFind_ReRun ]] && echo "  *******************************" && echo
+      
+      if [[ "$GrandParentPID" -gt 1 ]]; then
+
+        if [[ $TermFind_ReRun ]]; then
+
+          echo
+          head "/proc/$GrandParentPID/status"
+          echo
+          echo "  GrandParentPID is $GrandParentPID"; echo
+          echo "  Process Command is $(cat "/proc/$GrandParentPID/comm")"; echo
+
+        fi
+
+        GrandParent_Name="$(realpath /proc/"$GrandParentPID"/exe)"
+        GrandParent_Name="${GrandParent_Name##*/}"
+        UserTerm="$GrandParent_Name"
+        PID_Term_ProbeArr+=("$UserTerm")
+        [[ $TermFind_ReRun ]] && echo "  GrandParent_Name is $GrandParent_Name"; echo
+        
+      fi
+      
+    done
+
+
+    if [[ $TermFind_ReRun ]]; then
+
+      if [[ $ErrorPID ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= ; fi
+
+      echo
+      echo "  Unfortunately, a name is needed ....   Check/Recheck the script output"; echo
+      echo "  You can enter the name here, if you know the correct command name"; echo
+      echo "  Or use a different method & manually add 'UserTerm' "; echo
+      echo "  to the 'setup and install' script, at the start."; echo; echo
+
+      echColor "  Enter the PID number of your Terminal Emulator, [n] if you know the name, [q] to quit "; echo
+      read -rp "  >  "  UserTerm_PID
+      echo
+
+      ProbTerm=" Possibly"
+
+      if [[ $UserTerm_PID == "q" ]]; then  exit
+
+      elif [[ $UserTerm_PID == "n" ]]; then
+
+        # Unlikely but with so many Linux distro & desktop combinations and customisations ...
+        read -rp "  Command Name for you terminal is:  "  UserTerm
+        UserTerm_Found=1
+        ProbTerm=
+        echo
+
+      else
+
+        if [[ -d "/proc/$UserTerm_PID" ]]; then
+
+          UserTerm="$(realpath /proc/"$UserTerm_PID"/exe)"
+          UserTerm="${UserTerm##*/}"
+
+        else
+
+          UserTerm=
+          UserTerm_PID=
+          UserTerm_Found=
+          ErrorPID=1
+
+        fi
+
+      fi
+
+    else
+
+      echo
+      i=0
+
+      for  ProcessName in "${PID_Term_ProbeArr[@]}" ; do
+
+        [[ $ProcessName == "bash" ]] || [[ $ProcessName == "dash" ]] || [[ $ProcessName == "sh" ]] && ProcessShellpoint="$i"  &&  ((ProcessShellpoint+=1))
+        ((i+=1))
+
+      done
+      
+      if [[ $ProcessShellpoint ]]; then  UserTerm="${PID_Term_ProbeArr[$ProcessShellpoint]}"; else  UserTerm="${PID_Term_ProbeArr[0]}"; fi
+     
+      # Usually either the first one or the one after the first occurance of 'sh'
+      ProbTerm=" Probably"
+
+    fi
+
+    TermFind_ReRun=1
+    GrandParentPID=
+    
+  fi
+
+
+
+  # Add any modifiers here, if needed
+
+  [[ "$UserTerm" == gnome-terminal* ]] &&  UserTerm="gnome-terminal"
+
+
+  if [[ $UserTerm ]] ; then
+
+    echColor " $ProbTerm UserTerm is $UserTerm" ; echo
+    echo "  Is this correct?  [enter] yes  [n] no " ; echo
+    read -rp "  >  "   
+    echo
+
+    if [[ $REPLY == "n" ]]; then UserTerm= ; UserTerm_Found= ; else  UserTerm_Found=1 ; fi
+
+  fi
+
+  if [[ ! $UserTerm ]]; then printf "\033c"; echo; echo ; fi
+
+  ProbTerm=
+
+done
+
+
+# LOAD NOTES from function at start of calling script qqX installer
+
+print_terminal_notes
+
+echo
+echo; echColor "  Terminal = $UserTerm"; echo
+read -rp "  [enter] to continue > "
+echo
+

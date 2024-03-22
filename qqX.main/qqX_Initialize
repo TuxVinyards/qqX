@@ -172,7 +172,7 @@ if [[ $1 == "XDG" ]]; then
 
   fi
 
-elif [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$ModVersion" ; exit 
+elif [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$qqX_Version" ; exit 
 
 elif [[ "$1" == *'vm' ]] && [[ $2 == *'.conf' ]]; then  
 
@@ -190,37 +190,23 @@ else
 fi
 
 
-#  Pick up the SETTINGS file: 
+#  Pick up the SETTINGS file 
+#  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines and introduces a custom settings file
 
-#  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines. 
-#  A possibilty to have a local 'dev' version setting file is retained.  May be .dot hidden or plain
+if [[ ! -f "$HOME/.qqX/qqX_settings" ]]; then 
 
-[[ -e "$HOME/.qqX/qqX_settings" ]] && qqX_SettingsFile="$HOME/.qqX/qqX_settings"
+  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
 
+else
 
-if [[ -e "$qqX_SettingsFile" ]]; then  source "$qqX_SettingsFile" 
-
-elif [[ -e "$CurrentFolder/qqX_settings" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  qqX_SettingsFile="$CurrentFolder/qqX_settings" ; source "$qqX_SettingsFile" 
-
-elif [[ -e "$CurrentFolder/.qqX_settings" ]] && [[ "$CurrentFolder" != '/usr'* ]]; then  
-
-  qqX_SettingsFile="$CurrentFolder/.qqX_settings" ; source "$qqX_SettingsFile" 
-  
-else  printf "\n\n  ERROR with settings file detection \n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
-  
-fi
-
-
-if [[ $AllowMoreLocale ]]; then
-
-  export "LC_NUMERIC=C"
-  export "LC_COLLATE=C"
-
-else  export "LC_ALL=C"
+  qqX_SettingsFile="$HOME/.qqX/qqX_settings"
+  source "$qqX_SettingsFile" 
+  [[ -f "$HOME/.qqX/custom_settings" ]] && source "$HOME/.qqX/custom_settings"
 
 fi
+
+if [[ $AllowMoreLocale ]]; then export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; else  export "LC_ALL=C" ; fi
+
 
 # Determine possible XDG folders 
 

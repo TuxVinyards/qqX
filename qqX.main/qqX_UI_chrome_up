@@ -93,7 +93,7 @@ printColor () {
 
 ## General default title:
 
-qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $ModVersion "
+qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $qqX_Version "
 
 
 ## qqX chrome up  

@@ -37,20 +37,14 @@ function_create_VM_folderList() {
   ExtraFolderError=
 
   # Make sure that 'Default_VM_Folder' has a value and it exists
-
   [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
-
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
-
   
   # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
 
   if [[ "$CurrentFolder" != "$Default_VM_Folder" ]] && [[ "$(ls "$CurrentFolder/"*.conf 2> /dev/null)" ]] ; then   
-  
     declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
-
   else  declare -ga VM_Folder_List=("$Default_VM_Folder")
-
   fi
 
   for xF in "${Extra_VM_Folder[@]}"; do
@@ -61,9 +55,7 @@ function_create_VM_folderList() {
 
       # if .conf targeted start, then no need to print this, 
       # unless re-selecting, in which case the error flag will create a later highlight.
-    
       if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
-
       ExtraFolderError="$xF"
 
     fi
@@ -153,43 +145,31 @@ QG_FilePathDefault="$(type -p quickget)"
 
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
-IFS='.' read -ra qqX_CurrentVer_Arr <<< "$ModVersion"
+IFS='.' read -ra qqX_CurrentVer_Arr <<< "$qqX_Version"
 
 # qqX_CurrentVer_Arr[0] remains unpadded  (& to the left of the decimal point)
 
 [[ ${#qqX_CurrentVer_Arr[1]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[1] "%.2d" "${qqX_CurrentVer_Arr[1]}"
-
 [[ ${#qqX_CurrentVer_Arr[2]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[2] "%.2d" "${qqX_CurrentVer_Arr[2]}"
 
 #legacy 3dp pre "0.09.00.017"
-
 [[ ${#qqX_CurrentVer_Arr[3]} -gt 2 ]] && qqX_CurrentVer_Arr[3]="${qqX_CurrentVer_Arr[3]:(-2)}"
-
 [[ ${#qqX_CurrentVer_Arr[3]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[3] "%.2d" "${qqX_CurrentVer_Arr[3]}"
 
 qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
 
-if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then 
-
-  qqX_CurrentReleaseType="beta"
-
+if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then  qqX_CurrentReleaseType="beta"
 else qqX_CurrentReleaseType="release"
-
 fi
 
-
 # Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
-
 # Sets defaults, if not given in main settings. But also for later, so systems can be swapped out.
 
 [[ ! $QEMU_Default_SystemType ]] &&  QEMU_Default_SystemType="qemu-system-x86_64"
-
 [[ ! $QEMU_Default_MachineType ]] &&  QEMU_Default_MachineType="q35"
 
 QEMU="$(type -p "$QEMU_Default_SystemType")"
-
 QEMU_IMG="$(type -p qemu-img)"
-   
 
 function qemu_version_check {
 
@@ -203,9 +183,7 @@ function qemu_version_check {
   fi
 
   QEMU_VER_LONG=$( "$QEMU" -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 )
-
   QEMU_VER_SHORT="${QEMU_VER_LONG//./}"
-
   QEMU_VER_SHORT="${QEMU_VER_SHORT:0:2}"
 
   if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="61"

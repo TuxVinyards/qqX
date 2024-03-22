@@ -64,10 +64,11 @@ fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-ModVersion="1.7.01"
+qqX_Version="1.7.01"
 
-if [[ "$(basename "$0")" != "qqX" ]]; then echo; echo "Main File Name ERROR"; echo exit 1 ; fi   # check name is okay   
-
+# Check name is okay. qqX but also lc qqx symlink.
+if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
+  
 ## Dev: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
 NoClear=
 GeneralLoopCheck=  
@@ -148,7 +149,6 @@ if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then
   [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
 
 fi
-
 
 function main_menu {
 

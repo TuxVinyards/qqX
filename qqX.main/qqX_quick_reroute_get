@@ -103,7 +103,7 @@ print_quickget_choices () {
 function_quick_get_wrap ()  {
 
   printf "\033c"
-  qqX_logo_printf_title "$ModVersion"
+  qqX_logo_printf_title "$qqX_Version"
   printf "  Wrapping quickget version %s  (needs internet, including for some menu items & for tests) \n\n\n" "$QG_VerNumber"
 
   tput sc
