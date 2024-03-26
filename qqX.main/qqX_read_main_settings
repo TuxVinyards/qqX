@@ -51,18 +51,9 @@ function_create_VM_folderList() {
 
     [[ $xF ]] && VM_Folder_List+=("$xF")
 
-    if [[ $xF ]] &&  [[ ! -d "$xF" ]] ; then 
-
-      # if .conf targeted start, then no need to print this, 
-      # unless re-selecting, in which case the error flag will create a later highlight.
-      if [[ ! $Conf_TriggerFolder ]]; then  printf "\n\n  Settings ERROR:\n\n  Extra Folder %s NOT found \n\n"  "$xF" ; sleep 2 ; fi
-      ExtraFolderError="$xF"
-
-    fi
+    [[ $xF ]] &&  [[ ! -d "$xF" ]] && ExtraFolderError="$xF"
 
   done
-
-  #  declare -p VM_Folder_List ; echo
 
 }
 

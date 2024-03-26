@@ -89,7 +89,7 @@ if [[ ! $UserTerm ]]; then
 
     printf "\n  %s\n\n" "${TermGrep[@]}"
     printf "  Some lightweight terminals may not be compatible (See 'known-issues')"
-    printf "\n\n  Enter the number of your Terminal Emulator [n] if none of these \n"
+    printf "\n\n  Enter the number of your Terminal Emulator [n] if none of these \n\n"
     read -rp "  >  "  UserTerm_PID
     echo
 

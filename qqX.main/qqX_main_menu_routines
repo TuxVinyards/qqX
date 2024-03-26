@@ -333,7 +333,7 @@ function_delete_Selected_VM () {
 
     if [[ $Delete_VM_Option == "y" ]]; then 
 
-      printf "\n\n  Folder & .conf file being deleted ... \n\n"
+      printf "\n\n  Folder & .conf file being deleted ... "
       rm -f -r "$1"  
       echo
       rm -f "$2"

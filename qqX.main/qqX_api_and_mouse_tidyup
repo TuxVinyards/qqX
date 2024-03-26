@@ -171,6 +171,187 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
 fi  
 
+if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
+
+  while true; do
+
+    New_ISO_Start=
+    Cancel_ISO=
+    ISO_NewVM_Name=
+    ISO_OvWr=
+    ISO_NewFolder=
+    MoveIso=
+
+    printColor "\n\n  Set up this ISO as a qqX/quickemu VM? "
+    printf "\n\n  %s\n" "$XDG_ISO_Name"
+    printf "\n\n  Standard LINUX ISO's only."
+    printColor "\n\n  [enter] yes   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
+    read -rp "  >  "  Cancel_ISO
+
+    if [[ $Cancel_ISO == "c" ]]; then exit directly
+  
+    elif [[ $Cancel_ISO == "vm" ]]; then 
+  
+      VM_InstanceName=
+      VM_Conf_Dir=
+      VM_Conf_File=
+      XDG_MimeType_is_QCOW=
+      refresh_sources_and_load_VM_arrays
+      break
+
+    else  
+
+      printColor "\n\n  Please give a short VM name for the folder."
+      printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"
+      read -rp "  >  "  ISO_NewVM_Name
+
+      [[ ! $ISO_NewVM_Name ]] && ISO_NewVM_Name="$(basename "$XDG_ISO_Name" .iso)"
+
+      [[ $ISO_NewVM_Name == "b" ]] && break
+
+    fi
+
+    # If name then start 
+
+    if [[ $ISO_NewVM_Name == "b" ]]; then 
+  
+      ISO_NewVM_Name=
+
+    elif [[ $ISO_NewVM_Name ]]; then
+
+      CurrentFolder="$(dirname "$XDG_ISO_Name")"
+      QWG_GroupFolder="$CurrentFolder"
+      QGW_OverWriteAllow=
+      QGW_OverWriteAlert=
+
+      printColor "\n  New VM Name =  %s" "$ISO_NewVM_Name"
+      printf "\n\n  Preset Group Folders:"
+      show_current_group_folder_list
+      printf "\n\n"
+
+      # Selector GROUP Folder
+    
+      while true ; do
+
+        printColor "  Installation target folder:  %s "   "$QWG_GroupFolder"  
+
+        QWG_NewVM_Name="$ISO_NewVM_Name"
+        QGW_OS_Arr_NameSelected="$ISO_NewVM_Name"
+        check_new_vm_folder_name
+
+        if [[ $QGW_OverWriteAlert ]];then  
+
+          printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_GroupFolder"
+          printf  "\n\n  [enter] Start the Setup  "
+          printColor "?? BACKUP ??  " 
+        
+        else  printColor  "\n\n  [enter] Start the Setup  " 
+        
+        fi
+          
+        if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
+        else printf "[number] select a different (preset or current) folder  "
+        fi
+        
+        printf " [h] help  [b] go back \n\n"
+        read -rp "  >  " New_ISO_Start
+        printf "\n"
+
+        case "$New_ISO_Start" in
+
+          b)
+            New_ISO_Start= ; ISO_NewVM_Name=
+            break
+          ;;
+
+          [0-9]|[0-9][0-9]) 
+            QWG_GroupFolder="${VM_Folder_List[New_ISO_Start]}" 
+            QGW_OverWriteAlert=
+            CurrentFolder_Recognised=1
+          ;;
+
+          h)  
+            printf     "  Once the initial setup up has finished, "
+            printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running." 
+            printf "\n\n  For new preset group folders, edit the main settings.\n" 
+            show_current_group_folder_list
+            printf "\n\n"
+          ;;
+
+          *)
+            if [[ $QGW_OverWriteAlert ]]; then 
+              printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
+              printColor "\n\n  [enter] to go back" ; printf "   [yes] to confirm \n\n"
+              read -rp "  >  "  ISO_OvWr
+              [[ $ISO_OvWr ]] && QGW_OverWriteAllow=1 && New_ISO_Start="start" && break
+              show_current_group_folder_list
+            else New_ISO_Start="start" ; break
+            fi
+          ;;
+
+        esac
+
+        if [[ ! $QWG_GroupFolder ]]; then
+          QWG_GroupFolder="$Default_VM_Folder" 
+          printColor " \n\n  Using %s for now.  \n\n  Selected Group Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder" 
+        fi
+
+      done
+
+      if [[ $New_ISO_Start == "start" ]]; then 
+
+        if [[ ! "$CurrentFolder_Recognised" ]]; then  
+          printColor "\n\n  Confirm installation in non-recognised folder."
+          printf "\n\n  Folder may be added to presets afterwards, via settings edit ... "
+          printColor "\n\n  [enter] to go back" ; printf "   [yes] to confirm \n\n"
+          read -rp "  >  "  ISO_NewFolder
+          printf "\n\n"
+          if [[ $ISO_NewFolder ]]; then true ; else continue ; fi
+        fi
+     
+        printf "  Folder Creation: %s" "$QWG_GroupFolder/$QWG_NewVM_Name"
+
+        printf "\n\n  Copy the ISO to the new folder, or move it?  [enter] copy   [m] move \n\n"
+        read -rp "  >  "  MoveIso
+
+        mkdir -p  "$QWG_GroupFolder/$QWG_NewVM_Name"
+
+        if [[ $MoveIso == "m" ]]; then 
+          printf "\n  Moving the ISO .... "  
+          mv "$XDG_ISO_Name" "$QWG_GroupFolder/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
+        else
+          printf "\n  Copying the ISO ...."
+          cp "$XDG_ISO_Name" "$QWG_GroupFolder/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
+        fi
+
+        {
+          printf "#!/usr/bin/qqX --vm"
+          printf "\n\nguest_os=\"linux\""
+          printf "\ndisk_img=\"%s/disk.qcow2\"" "$QWG_NewVM_Name"
+          printf "\ndisk_size=\"64G\""
+          printf "\niso=\"%s\"" "$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
+
+        } > "$QWG_GroupFolder/$QWG_NewVM_Name.conf"
+
+        chmod +x "$QWG_GroupFolder/$QWG_NewVM_Name.conf"
+
+        VM_Conf_Dir="$QWG_GroupFolder"
+        VM_Conf_File="$QWG_NewVM_Name.conf"
+        VM_InstanceName="$QWG_NewVM_Name"
+
+        cd "$QWG_GroupFolder" || printColor "\n\n  ERROR changing to New VM Location"
+
+        refresh_sources_and_load_VM_arrays
+        break
+      
+      fi
+    
+    fi
+
+  done
+
+fi
+
 if [[ -f "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
 
   source "$VM_Conf_Dir/$VM_Conf_File"

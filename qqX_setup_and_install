@@ -439,13 +439,19 @@ SkipMkLauncher=
 
 if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
-  printColor "\n\n  A desktop launcher already exists >> "  
-  printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
+  printColor "\n\n  A desktop launcher already exists >> " 
+
+  if grep -q -s 'x-cd-image' "$XDG_GUI_ItemPathName" ; then
+    printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
+  else
+    printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
+    ForceReconfigure=1 
+  fi
   printColor "\n\n  [enter] to skip   " 
   printf "[r] to reconfigure \n\n"
   read -rp "  >  "  SkipMkLauncher
 
-  if [[ $SkipMkLauncher == "r" ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 ; fi
+  if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 ; fi
 
 fi
 
@@ -621,7 +627,7 @@ if [[ ! $SkipMkLauncher ]]; then
       # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
       # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
 
-      printf "MimeType=application/x-qemu-disk\n"
+      printf "MimeType=application/x-qemu-disk;application/x-cd-image\n"
       echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
       echo "#"
       echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"

@@ -86,7 +86,7 @@ VM_Select_Items_style_E_PerLine=
 
 ##  QuickGet SELECTOR:  
 
-#   Normally set internally at ="7"  but certain internal functions may reduce this setting to as low as "3"
+#   Normally set internally at ="7"  but certain internal functions may reduce this setting to as low as 2 or 3
 #   Use with caution.  Suggest 5 or 6 as lowest setting.  Normally leave blank.
 
 Force_GetList_NewLinePoint=

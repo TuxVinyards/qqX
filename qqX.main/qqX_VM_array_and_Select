@@ -225,6 +225,9 @@ VM_loader_selector_and_menu () {
       done
 
       [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
+
+      [[ ! "$CurrentFolder_Recognised" ]] && printColor "\n\n  For future display, add the Current Folder to the VM array in general settings ..."
+
     
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 

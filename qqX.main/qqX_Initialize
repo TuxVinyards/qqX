@@ -103,6 +103,12 @@ if [[ $1 == "XDG" ]]; then
    
     if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_is_QCOW=1
 
+    elif [[ "$XDG_MimeType" == *'application/x-cd-image' ]] && [[ "$2" == *'.iso' ]]; then 
+
+      XDG_MimeType_is_ISO=1
+      XDG_ISO_Name="$2"
+      XDG_MimeType_Recognised=1
+
     elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
     
      QCOW_RightClick= 

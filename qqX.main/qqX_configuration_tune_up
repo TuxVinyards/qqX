@@ -52,11 +52,11 @@ function_config_tune_up ()  {
 
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
-  printColor "\n\n\n  CHECK ME: \n\n"
+  printColor "\n\n  CHECK ME: \n\n"
 
   cat "$TuneUpTmpCopy"
 
-  printColor "\n  All changes made here, may be reversed:"
+  printColor "\n\n  All changes made here, may be reversed:"
     
   printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
