@@ -27,7 +27,7 @@ function  main_menu_actions {
 
   if [[ $MainMenuChoice == "h" ]] ; then
 
-    show_quickemu_WRAP_help
+    show_qqX_general_help
 
   elif [[ $MainMenuChoice == "del" ]]; then 
 

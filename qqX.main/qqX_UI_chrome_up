@@ -135,15 +135,7 @@ qqX_logo_title() {
 
   # not for use during vm boot sequences
 
-  if [[ $1 ]]; then
-
-    qqX_LogoTxt="$1"
-
-  else
-
-    qqX_LogoTxt="$qqX_title"
-
-  fi
+  if [[ $1 ]]; then qqX_LogoTxt="$1" ; else qqX_LogoTxt="$qqX_title" ; fi
 
   echColor "  _    _   \/   "
   echColor " (_|  (_|  /\ "
@@ -155,15 +147,7 @@ qqX_logo_printf_title() {
 
   # printf version (no end line feed & also avoids the quickemu echo trap)
 
-  if [[ $1 ]]; then
-
-    qqX_LogoTxt="$1"
-
-  else
-
-    qqX_LogoTxt="$qqX_title"
-
-  fi
+  if [[ $1 ]]; then qqX_LogoTxt="$1" ; else qqX_LogoTxt="$qqX_title" ; fi
 
   printColor "\n  _    _   \/   "
   printColor "\n (_|  (_|  /\ "
@@ -175,35 +159,28 @@ qqX_logo_printf_title() {
 function exit {
 
   # trap to keep terminal open if started by mouse click  -t secs
-
   # or to stop sourced quickemu quitting as 'normal' procedure   (tput resets any hidden cursors)
+  # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
 
   if [[ $1 == "directly" ]]; then
 
     tput cnorm
-
     command exit
 
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
 
     printf "\n\n"
-
     printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n\n"
-  
     read -rp  "  >  "  -t 30  ExitTrap
 
     [[ $ExitTrap == "h" ]] &&  printf "\n\n  Holding terminal open  [Enter] to quit  \n\n"  && read -rp "  >  "
 
     tput cnorm
-
-    # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
-
     command exit "$@"
 
   fi
 
   # zero the optional 'exit 1' bypass flag (if it has been set)
-
   NoExit=
 
 }
@@ -212,32 +189,23 @@ function exit {
 show_qqX_title_bar() {
 
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
-
   printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
 
   quickget filepath
-
   QE_FilePath_Short=
   QG_FilePath_Short=
 
   if [[ $QuickEmuSource != "$QE_FilePathDefault" ]]; then
-
     if [[ "${#QuickEmuSource}" -gt 40 ]]; then QE_FilePath_Short=".... ${QuickEmuSource:(-35)}" ; else QE_FilePath_Short="$QuickEmuSource" ; fi
-
   fi
 
   if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]]; then
-
     if [[ "${#QG_FilePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_FilePath:(-35)}" ; else QG_FilePath_Short="$QG_FilePath" ; fi
-
   fi
 
   [[ $QE_FilePath_Short && $QG_FilePath_Short ]] && printf "\n\n  Custom Source:"
-
   [[ $QE_FilePath_Short ]] &&  printf "  %s"  "$QE_FilePath_Short"
-
   [[ $QG_FilePath_Short ]] &&  printf "  %s"  "$QG_FilePath_Short"
-
 
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
   
@@ -252,40 +220,32 @@ show_qqX_title_bar() {
   done
 
   if [[ ! $HideFolderTitleBar ]]; then  
-  
     printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$(pwd)"
-
-  else
-
+  else  
     printf "\n"
-
   fi
 
 }
 
-function show_quickemu_WRAP_help {
+function show_qqX_general_help {
 
   HelpSelect=
 
   printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
-
   printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
-
   printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
+
+  cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
  
-  printf "\n\n\n  [w] to OPEN qqX WIKI PAGES with %s    [a] qqX command line API    [enter] to return"  "$WebBrowser" 
-
+  printColor  "\n\n\n  [w] to OPEN qqX WIKI PAGES with %s    [c] qqX command line & mouse    [enter] to return"  "$WebBrowser" 
   printf "\n\n"
-
   read -rp "  >  "  HelpSelect
 
-  if [[ $HelpSelect == "a" ]]; then   
+  if [[ $HelpSelect == "c" ]]; then   
   
     show_CLI_usage  
-
-    printf "\n\n\n"
-  
-    read -rp  "  [enter] to return >  " 
+    printf "\n\n\n  [enter] to return \n\n"
+    read -rp  "   >  " 
 
   elif [[ $HelpSelect == "w" ]]; then
   

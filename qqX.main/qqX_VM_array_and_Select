@@ -226,7 +226,7 @@ VM_loader_selector_and_menu () {
 
       [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
-      [[ ! "$CurrentFolder_Recognised" ]] && printColor "\n\n  For future display, add the Current Folder to the VM array in general settings ..."
+      [[ ! "$CurrentFolder_Recognised" ]] && printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
 
     
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
@@ -406,14 +406,6 @@ VM_loader_selector_and_menu () {
     QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
-    # clear any no-longer needed flags
-    VM_Selection=
-    ByPass_VM_Array_Loader=
-    ByPass_VM_Array_Selector=
-    MenuStylePreviewed=
-    NewFileTuneUp=
-    NewFileTuneUp_JustDone=
-
     # Qemu_IMG log > eg. for disk repair functions 
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
     if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
@@ -422,10 +414,18 @@ VM_loader_selector_and_menu () {
     QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
     [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
 
-    # test for 'new' - will have have an iso/img but not a main drive, yet
-    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]]; then  
+    # test for 'new' - will have have an iso/img but not a main drive, yet (but also double check if 'just done')
+    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then  
       if [[ $IgnoreSecondCheckNew ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
     fi
+
+    # clear any no-longer needed flags
+    VM_Selection=
+    ByPass_VM_Array_Loader=
+    ByPass_VM_Array_Selector=
+    MenuStylePreviewed=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
 
   fi
 

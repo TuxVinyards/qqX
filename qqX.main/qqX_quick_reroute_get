@@ -119,8 +119,18 @@ function_test_iso_url () {
     quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
     cat "/tmp/qqX_get.test.iso.url.log"
 
-    if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then  printColor "  ERROR  Bad link or server down ... \n\n" ; QGW_Download_BadLink=1
-    else printColor "  Links look good ... \n\n"; QGW_Download_BadLink=
+    if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then  
+      printColor "  ERROR  Bad link or server down ... " ; QGW_Download_BadLink=1
+      iso_get_message
+      if [[ $QGW_OS_HomePage ]]; then 
+        printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+        if wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
+      else
+        printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??"  
+      fi
+
+    else 
+      printColor "  Links look good ... \n\n"; QGW_Download_BadLink=
     fi
 
   else printf "\n\n"
@@ -220,7 +230,8 @@ function_quick_get_wrap ()  {
 
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
-  printf "  Wrapping quickget version %s  (needs internet, including for some menu items & for tests) \n\n\n" "$QG_VerNumber"
+  printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber" 
+  printf "(needs internet, including for some menu items & for tests) \n\n\n" 
 
   tput sc
   echo 
@@ -358,16 +369,27 @@ function_quick_get_wrap ()  {
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
+    iso_get_message () {
+      printColor "\n\n  qqX can also install ISO's downloaded directly from the distro's Web Pages"
+      printf "\n\n  Right click, open-with.  Not all distro sites can be scanned for the 'latest' releases."
+    }
+
     while true ; do
 
       if [[ ! ${QGW_Releases_Array[*]} ]] ; then  printColor "\n\n  Quickemu or internet ERROR, no releases found "
      
-      elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  printColor "\n\n  [enter] to continue, only one current release found "
+      elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
+
+        iso_get_message
+        printColor "\n\n\n  [enter] to continue, only one current release found "
 
       else
+
         printf "\n\n"
         print_quickget_choices  "QGW_Releases_Array"
-        printColor "\n\n  Give LIST number of Release"   
+        iso_get_message
+        printColor "\n\n\n  Give LIST number of Release"   
+
       fi  
 
       if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
@@ -538,6 +560,7 @@ function_quick_get_wrap ()  {
     if [[ $QGW_Download_BadLink ]]; then
 
       printColor "\n\n  [enter]  re-test the download link "
+      [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]] && printf "  [w] try opening the listed web page with %s  "  "$WebBrowser"
 
     else
 
@@ -545,7 +568,7 @@ function_quick_get_wrap ()  {
 
         printColor  "\n\n\n  Installation target folder:  %s\n"  "$QWG_GroupFolder"
         printf  "\n\n  [enter] Start the download  "
-        printColor " ?? BACKUP > " 
+        printColor " ?? BACKUP ??  " 
       
       else  printColor  "\n\n  [enter] Start the download  " 
       
@@ -601,13 +624,18 @@ function_quick_get_wrap ()  {
         printf "\n\n"
       ;;
 
+      w)  
+        nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+      ;;
+
       *)
         if [[ $QGW_Download_BadLink ]]; then  QGW_BadLink_ReTest=1 ; function_test_iso_url
         else
-          if [[ $QGW_OverWrite ]]; then 
+          if [[ $QGW_OverWriteAlert ]]; then 
             printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
-            printColor " \n\n  ** may install with some kind of NAMING variance **  \n\n"
-            QGW_OverWriteAllow=1
+            printf "\n\n  [enter] to go back" ; printColor "   [yes] to confirm \n\n"
+            read -rp "  >  "  ISO_OvWr
+            [[ $ISO_OvWr ]] && QGW_OverWriteAllow=1 && New_ISO_Start="start" && break    
           else QGW_DownloadStart="start" ; break
           fi
         fi
@@ -621,7 +649,8 @@ function_quick_get_wrap ()  {
     fi
 
   done
-
+  
+  if [[ $QWG_GroupFolder ]]; then cd "$QWG_GroupFolder" || printColor "\n\n  ERROR changing to New VM Location" ; fi
 
   if [[ $QGW_DownloadStart == "start" ]]; then
 

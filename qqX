@@ -76,8 +76,7 @@ GeneralLoopCheck=
 ## INITIALIZE
 
 # Respect standard FHS locations but allow local overide for Dev work or for Custom installs.  
-qqX_MainFolder="/usr/share/qqX/qqX.main"
-[[ -d "./qqX.main" ]] &&  qqX_MainFolder="$(realpath "./qqX.main")"
+if [[ -d "./qqX.main" ]]; then qqX_MainFolder="$(realpath "./qqX.main")" ; else qqX_MainFolder="/usr/share/qqX/qqX.main"; fi
 if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.

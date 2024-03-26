@@ -289,7 +289,6 @@ else
   printf "   [m] use manual installation"
   printf "   [q] to quit \n\n"
   read -rp "   >  "  InstallSelect
-  printf "\n\n"
 
   if [[ $InstallSelect == "q" ]]; then  
   
@@ -297,6 +296,7 @@ else
 
   elif [[ $InstallSelect == "u" ]]; then
 
+    printf "\n\n"
     print_manual_uninstall_notes
 
     qqX_RemovalTarget="$(type -p qqx)"
@@ -336,7 +336,7 @@ else
 
     if  [[ $InstallSelect == "m" ]] ; then 
 
-      printf "  Open another terminal IN THE SOURCE FOLDER"
+      printf "\n\n  Open another terminal IN THE SOURCE FOLDER"
       printf "\n\n  The following commands should be issued:"
 
       printColor "\n\n  sudo cp \"qqX\" \"%s\" " "$qqX_Std_File_Path"
@@ -356,11 +356,13 @@ else
 
     if [[  $SeparateSudo != "y" ]]; then
 
+      cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
+
       printColor "  Auto-Installing .... \n\n"
       sudo cp "qqX" "$qqX_Std_File_Path"
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
       [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
-      sudo cp "./qqX.main/qqX_"*  "$qqX_Std_Share_Path/qqX.main/"
+      sudo cp "./qqX.main/qqX_"*  "$qqX_Std_Share_Path/qqX.main"
 
     fi
     
@@ -370,7 +372,7 @@ else
 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
     
-      printColor "\n\n  All good  \n\n" 
+      printColor "\n  👍️ All good " 
 
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000  
     fi
@@ -404,6 +406,10 @@ else
     
       update_old_settings_file_with_new_options  
 
+      if [[ ! -e "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt" ]]; then  # added with version 1.7
+        cp "qqX.system/icons/qqX.ascii"* "$HOME/.qqX/icons"
+      fi
+
     else
 
       cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
@@ -411,6 +417,7 @@ else
       printColor "\n\n  Installing settings file and desktop icons \n\n"
 
     fi
+
 
     if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]]; then
     
@@ -660,7 +667,7 @@ GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
 
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
 
-DontStart_qqX=
+End_Install=
 printColor  "\n\n  Install process finished:  "
 
 printf "\n\n\n  qqX may be started from the main system menu"
@@ -669,13 +676,12 @@ printf "\n\n\n  The settings file may be edited both via the internal qqX menu"
 printf "\n\n  or before starting at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
 [[ $GrepExecLine ]] && printColor "  [enter] to close current window and start"
-printf "  [q] to quit  \n\n "
-read -rp "  > "  DontStart_qqX
+printf "   [q] to quit  \n\n "
+read -rp "  > "  End_Install
 
-if [[ $DontStart_qqX ]]; then exit
-else
-  if [[ $GrepExecLine ]]; then exec bash -c "$Start_qqX" ; else  exit ;  fi
-fi
+if [[ $End_Install == "q" ]]; then exit; fi
+
+if [[ $GrepExecLine ]]; then exec bash -c "$Start_qqX" ; else  exit ;  fi
 
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
