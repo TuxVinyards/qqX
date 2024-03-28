@@ -27,10 +27,9 @@
 function_config_tune_up ()  {
 
   # $1 should be the full path/filename.conf
-  # &  $2 the VM Folder name
-
+  
   TuneUpTargetFile="$1" 
-  TuneUpDistroFolder="$2"
+  TuneUp_InstanceName="$(basename "$TuneUpTargetFile" .conf)"
   TuneUpDate="$(date +%b%d.%H.%M)"
 
   if [[ ! -e $TuneUpTargetFile ]]; then 
@@ -38,12 +37,24 @@ function_config_tune_up ()  {
     sleep 100
   fi
 
-  if [[ ! -d $TuneUpDistroFolder ]]; then 
-    printColor "\n\n  Internal ERROR  tune up DistroFolder not found \n\n  %s \n\n"
+  # Should be in the group folder but make sure we are. 
+  # Could happen if tune up follows a download that was started in a different folder to the target new one.
+  TuneUp_Conf_Dir="$(dirname "$TuneUpTargetFile")"
+
+  if [[ ! -d $TuneUp_Conf_Dir ]]; then 
+    printColor "\n\n  Internal ERROR  tune up Group Folder not found \n\n  %s \n\n"
     sleep 100
   fi
 
-  TuneUpOldFile="$TuneUpDistroFolder/OldConfig.$TuneUpDate.conf"
+  cd "$TuneUp_Conf_Dir" || printColor "\n\n  ERROR changing to Tuning Group Folder "
+
+  # standard procedure is to makes this match the .conf 
+  if [[ ! -d $TuneUp_InstanceName ]]; then 
+    printColor "\n\n  Internal ERROR  tune up Distro Name Folder not found \n\n  %s \n\n"
+    sleep 100
+  fi
+
+  TuneUpOldFile="$TuneUp_InstanceName/OldConfig.$TuneUpDate.conf"
 
   cp "$TuneUpTargetFile"  "$TuneUpOldFile"
 
@@ -52,12 +63,11 @@ function_config_tune_up ()  {
 
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
+  dev_loop_check
+
   printColor "\n\n  CHECK ME: \n\n"
-
   cat "$TuneUpTmpCopy"
-
   printColor "\n\n  All changes made here, may be reversed:"
-    
   printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
   [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
@@ -93,6 +103,8 @@ function_config_tune_up ()  {
   else  printf "%s\n\n" "$ConfLine" > "$TuneUpTargetDraft"
 
   fi
+
+  dev_loop_check
 
   # disk size  (for existing installs use the 'disk' util)
 
@@ -397,7 +409,7 @@ function_config_tune_up ()  {
   
     elif [[ $TuneUpConfConfirm == "r" ]]; then 
 
-      printColor "\n\n  Undoing changes to config file \n\n"
+      printColor "\n\n  Undoing changes to config file \n\n"  
       cat "$TuneUpTargetFile"
       printf "\n\n"
       read -rp "  [enter] to continue  >  "
@@ -405,7 +417,7 @@ function_config_tune_up ()  {
     
     elif [[ $NewFileTuneUp ]] && [[ $TuneUpConfConfirm == "d" ]]; then 
     
-      function_delete_Selected_VM  "$TuneUpDistroFolder" "$TuneUpTargetFile"
+      function_delete_Selected_VM  "$TuneUp_InstanceName" "$TuneUpTargetFile"
       break
 
     else
@@ -427,6 +439,12 @@ function_config_tune_up ()  {
     SettingsFileAdjusted=1
     SelectArrayError=
     IgnoreSecondCheckNew=1
+
+    # set here, before refresh
+    VM_Conf_Dir="$TuneUpGroupFolderGroupFolder"
+    VM_Conf_File="$TuneUpTargetFile"
+    VM_InstanceName="$TuneUp_InstanceName"
+
     refresh_sources_and_load_VM_arrays
 
   else

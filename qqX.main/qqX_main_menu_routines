@@ -149,10 +149,8 @@ show_main_menu_header () {
   #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
 
   #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
-  
-  if [[ $Select_VM ]]; then  BootAlert=   
 
-  elif  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
+  if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
 
   elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
   
@@ -170,7 +168,9 @@ show_main_menu_header () {
 
   # Note .conf won't exist at first load, at VM selector menu
 
-  [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] && printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
+  if [[ ! $NewFileTuneUp && ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] ; then 
+    printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
+  fi
 
 }
 
@@ -316,8 +316,7 @@ function_delete_Selected_VM () {
     printColor "  & file: %s  to be deleted?"  "$2"
     printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
     printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
-    printf "\n\n  Folder content: \n\n"
-
+    printColor "\n\n\n  Folder content: \n\n"
     ls "$1"
 
     if [[ $TrashingAvailable ]]; then 
@@ -333,19 +332,17 @@ function_delete_Selected_VM () {
 
     if [[ $Delete_VM_Option == "y" ]]; then 
 
-      printf "\n\n  Folder & .conf file being deleted ... "
+      printf "\n\n  Folder & .conf file being deleted ... \n"
       rm -f -r "$1"  
-      echo
       rm -f "$2"
-      echo
 
     else
 
       if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
-        printf "\n\n  Moving files to the bin ... \n\n"
+        printf "\n\n  Moving files to the bin ... \n"
         gio trash "$1"
         gio trash "$2"
-      else  printf "\n\n  NOT deleted ... \n\n"
+      else  printf "\n\n  NOT deleted ... \n"
       fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 
     fi
@@ -358,6 +355,8 @@ function_delete_Selected_VM () {
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
+    MainDrive=
+    IsoImg=
     SettingsFileAdjusted=1
 
     refresh_sources_and_load_VM_arrays

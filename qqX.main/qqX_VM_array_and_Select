@@ -212,6 +212,8 @@ VM_loader_selector_and_menu () {
     VM_Conf_Dir=
     VM_Conf_File=
     VM_InstanceName=
+    MainDrive=
+    IsoImg=
 
     while true; do
 
@@ -226,9 +228,12 @@ VM_loader_selector_and_menu () {
 
       [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
-      [[ ! "$CurrentFolder_Recognised" ]] && printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
-
+      if [[ $New_VM_Conf_File ]] && [[ ! $CurrentFolder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
+        printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
+      fi
     
+      dev_loop_check
+
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 
         printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
@@ -255,7 +260,7 @@ VM_loader_selector_and_menu () {
 
         printColor "\n\n  [Enter]  "
         printf "%s  "  "${VM_Array_NameZero^^}"
-        printf "     [gt] quickget a new distro    [f] refresh  [q] quit"
+        printf "    [gt] quickget a new distro     [f] refresh  [q] quit"
 
         if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "    preview only - use [set] for menu permanency"
         elif [[ $SettingsFileAdjusted ]]; then printColor "    ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
@@ -457,14 +462,12 @@ refresh_sources_and_load_VM_arrays() {
   refresh_and_load_quickemu_sources
   quickget filepath
   
-  find_file_openers
+  find_file_manager_browser
 
   [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 
 
   function_create_VM_folderList  
   scan_folders_list_and_add_VMs  
-  # echo declare -p VM_Array ; echo
-
   refresh_conf_vars_and_values
 
 }

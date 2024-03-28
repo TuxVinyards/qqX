@@ -201,8 +201,6 @@ function read_main_drive_and_img_iso_conf_vars {
   [[ -e "$img" ]] && IsoImg="$img"
   [[ -e "$iso" ]] && IsoImg="$iso"
 
-  #echo "MainDrive = $MainDrive  IsoImg = $IsoImg" ; sleep 3
-
 }  
 
 
@@ -280,7 +278,7 @@ function_conf_error () {
 
   if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit 
 
-  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_File" "$VM_InstanceName" 
+  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_File" 
 
   elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
   

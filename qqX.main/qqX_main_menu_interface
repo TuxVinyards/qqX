@@ -174,10 +174,11 @@ else
 
       fi
 
-    else  date +%s > "$VM_InstanceName/rtv.date.txt"
+    else  date +%s > "$VM_Conf_Dir/$VM_InstanceName/rtv.date.txt"
         
     fi
 
+    dev_loop_check 
 
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
@@ -276,7 +277,7 @@ else
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
-    printf  "  [q]   quit \n\n"
+    printf  "  [enter] refresh    [q] quit \n\n"
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }

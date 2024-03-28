@@ -107,7 +107,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
-  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" "$VM_InstanceName"
+  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" 
 
   elif [[ $MainMenuChoice == "gt" ]] ; then function_quick_get_wrap
 
@@ -304,6 +304,8 @@ function  main_menu_actions {
     VM_Conf_Dir=
     VM_Conf_File=
     VM_InstanceName=
+    MainDrive=
+    IsoImg=
     return
 
   elif [[ $MainMenuChoice == "xa" ]] ; then
@@ -347,6 +349,7 @@ function  main_menu_actions {
 
     # refresh
     MainMenuChoice=
+    refresh_conf_vars_and_values
 
   fi
 

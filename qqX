@@ -69,7 +69,7 @@ qqX_Version="1.7.01"
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-## Dev: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
+## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
 NoClear=
 GeneralLoopCheck=  
 
@@ -92,61 +92,40 @@ Extra_QE_Params=
 ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 [[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
 
-
 # LOAD qqX main  
-
 source "$qqX_MainFolder/qqX_Initialize"
-
 source "$qqX_MainFolder/qqX_read_main_settings"
-
 source "$qqX_MainFolder/qqX_UI_chrome_up"
-
 source "$qqX_MainFolder/qqX_MSR_functions"
-
 source "$qqX_MainFolder/qqX_wrap_quickemu"
-
 source "$qqX_MainFolder/qqX_quick_reroute_emu"
-
 source "$qqX_MainFolder/qqX_quick_reroute_get"
-
 source "$qqX_MainFolder/qqX_configuration_items"
-
 source "$qqX_MainFolder/qqX_configuration_tune_up"
-
 source "$qqX_MainFolder/qqX_VM_selector_styles"
-
 source "$qqX_MainFolder/qqX_VM_array_and_Select"
-
 source "$qqX_MainFolder/qqX_disk_maintenance"
-
 source "$qqX_MainFolder/qqX_selfcheck_and_update"
-
 source "$qqX_MainFolder/qqX_main_menu_routines"
-
 source "$qqX_MainFolder/qqX_main_menu_interface"
-
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
 
-# Temps usually get removed with reboot 
-# BUT can get removed by time (eg 24hrs) so check they are there still ( REVIEW  if causes problems )
-# See https://serverfault.com/questions/377348/when-does-tmp-get-cleared#377349
-
-## The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
-QG_VerNumber="$(quickget "--version")"
-
-# Quick EMU uses its internal var '$VERSION'
+# The quick EMU/GET version numbers, now that rerouting functions quickemu & quickget are in place & code has been sourced
+# QuickEMU uses its internal variable '$VERSION'
 QE_VerNumber="$VERSION"
 
-#  4.9.2 (still numbered 4.9.1) changes fedora releases to 'echo 38 39' from
+# Vanilla QuickGET as @ ver 4.9.2  actually makes a call on to EMU to find the number. 
+# But use a full call, as the 'quickget' call goes to the qqX function of the same name, 
+# allowing re-routes to custom versions that may work differently.
+QG_VerNumber="$(quickget "--version")"
 
 quickget "filepath"  
 
+#  4.9.2 (still numbered 4.9.1) changes fedora releases to 'echo 38 39' from
 if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then 
-
   [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
   [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
-
 fi
 
 function main_menu {
@@ -173,16 +152,14 @@ function main_menu {
     fi
 
     [[ ! $MainMenuChoice ]] && main_menu_interface
-
     main_menu_actions
-    
     [[ ! $VM_InstanceName ]] && break
 
   done
 
 } 
 
-function dev_loop_check () {
+function dev_loop_check {
 
     if [[ $GeneralLoopCheck ]]; then
     echo
@@ -190,6 +167,9 @@ function dev_loop_check () {
     echo "VM_Conf_Dir = $VM_Conf_Dir"
     echo "VM_Conf_File = $VM_Conf_File"
     echo "VM_InstanceName = $VM_InstanceName"
+    PwD="$(pwd)"
+    echo "pwd: $PwD"
+    echo "MainDrive = $MainDrive  IsoImg = $IsoImg"
     sleep "$GeneralLoopCheck"
   fi
 
@@ -232,14 +212,30 @@ while true ; do
 
   dev_loop_check
 
-  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  VM_loader_selector_and_menu ; else  main_menu ; fi   
+  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  
+  
+    VM_loader_selector_and_menu 
+  
+  else  
+
+    # Should be in the conf directory but make sure we are. Otherwise, go to the VM Selector. 
+    # Could happen if tune up follows a download that was started in a different folder to the target new one.
+
+    if [[ -d "$VM_Conf_Dir" ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then 
+      cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder " 
+      main_menu
+    else
+      VM_InstanceName=
+    fi
+    
+  fi   
 
 done
 
 tput  cnorm
 
 
-#  CODING STYLE 
+## CODING STYLE 
 
 #  Although qqX wraps quickemu, the quickemu-project's 'style' should not be followed.
 

@@ -177,26 +177,26 @@ function check_new_vm_folder_name {
   SimilarVM_Arr=()
   SimilarVM_Arr_Display=()
 
-  if [[ -d "$QWG_GroupFolder/$QWG_NewVM_Name" ]]; then
+  if [[ -d "$QWG_Conf_Dir/$QWG_NewVM_Name" ]]; then
 
     printColor "\n\n  ERROR?  VM is already present? "
-    printf "\n\n  %s / %s "    "$QWG_GroupFolder" "$QWG_NewVM_Name"
+    printf "\n\n  %s / %s "    "$QWG_Conf_Dir" "$QWG_NewVM_Name"
     [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
     
   else
 
     # main naming component match
-    SimilarVMs="$(ls "$QWG_GroupFolder/${QGW_OS_Arr_NameSelected}"*.conf 2>/dev/null )"
+    SimilarVMs="$(ls "$QWG_Conf_Dir/${QGW_OS_Arr_NameSelected}"*.conf 2>/dev/null )"
 
     # first dash separated section match
     if [[ "$QGW_OS_Arr_NameSelected" == *'-'* ]]; then 
       SimilarVM_ShorterCheck="$(echo "$QGW_OS_Arr_NameSelected" | cut -d '-' -f1)"
-      SimilarVMs+="$(ls "$QWG_GroupFolder/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+      SimilarVMs+="$(ls "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
     fi
 
     # first chars in new name match to somewhere in something existing
     SimilarVM_ShorterCheck="${QGW_OS_Arr_NameSelected:0:5}"
-    SimilarVMs+="$(ls "$QWG_GroupFolder/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+    SimilarVMs+="$(ls "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
 
     if [[ $SimilarVMs ]]; then
 
@@ -228,10 +228,18 @@ function check_new_vm_folder_name {
 
 function_quick_get_wrap ()  {
 
+  VM_Conf_File=
+  VM_Conf_Dir=
+  VM_InstanceName=
+  MainDrive=
+  IsoImg=
+
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
   printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber" 
   printf "(needs internet, including for some menu items & for tests) \n\n\n" 
+
+  dev_loop_check
 
   tput sc
   echo 
@@ -527,13 +535,14 @@ function_quick_get_wrap ()  {
   fi
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then 
-      QWG_GroupFolder="$VM_Conf_Dir"
+      QWG_Conf_Dir="$VM_Conf_Dir"
       ZsyncDownload=1
   else
     printf "\n"
+    dev_loop_check
     show_current_group_folder_list
     printf "\n\n\n"
-    QWG_GroupFolder="$Default_VM_Folder"
+    QWG_Conf_Dir="$Default_VM_Folder"
   fi
 
  
@@ -543,7 +552,7 @@ function_quick_get_wrap ()  {
   
   while true ; do
 
-    printf "  Installation target folder:  %s "   "$QWG_GroupFolder"  
+    printf "  Installation target folder:  %s "   "$QWG_Conf_Dir"  
 
     # If not sync updating, list other copies of similar VM's in the target folder
 
@@ -566,7 +575,7 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_OverWriteAlert ]];then  
 
-        printColor  "\n\n\n  Installation target folder:  %s\n"  "$QWG_GroupFolder"
+        printColor  "\n\n\n  Installation target folder:  %s\n"  "$QWG_Conf_Dir"
         printf  "\n\n  [enter] Start the download  "
         printColor " ?? BACKUP ??  " 
       
@@ -577,7 +586,7 @@ function_quick_get_wrap ()  {
       if [[ ! $ZsyncDownload ]]; then
 
         if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
-        else printColor "[number] select a different (preset or current) folder  "
+        else printf "[number] select a different (preset or current) folder  "
         fi
 
       fi
@@ -605,7 +614,7 @@ function_quick_get_wrap ()  {
       ;;
 
       [0-9]|[0-9][0-9]) 
-        QWG_GroupFolder="${VM_Folder_List[QGW_DownloadStart]}"
+        QWG_Conf_Dir="${VM_Folder_List[QGW_DownloadStart]}"
       ;;
 
       h)  
@@ -643,22 +652,22 @@ function_quick_get_wrap ()  {
 
     esac
 
-    if [[ ! $QWG_GroupFolder ]]; then
-      QWG_GroupFolder="$Default_VM_Folder" 
+    if [[ ! $QWG_Conf_Dir ]]; then
+      QWG_Conf_Dir="$Default_VM_Folder" 
       printColor " \n\n  Using %s for now.  \n\n  Selected Download Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder" 
     fi
 
   done
   
-  if [[ $QWG_GroupFolder ]]; then cd "$QWG_GroupFolder" || printColor "\n\n  ERROR changing to New VM Location" ; fi
+  if [[ $QWG_Conf_Dir ]]; then cd "$QWG_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location" ; fi
+
+  dev_loop_check
 
   if [[ $QGW_DownloadStart == "start" ]]; then
 
     QGW_DownloadStart=
     QGW_DownloadStopped=
-    
-    cd "$QWG_GroupFolder"  ||  function_conf_error  "FOLDER not accessible: $QWG_GroupFolder"
-
+   
     if [[ $ZsyncDownload ]]; then
 
       printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
@@ -738,13 +747,10 @@ function_quick_get_wrap ()  {
       done
     }
 
-    # wait for background things to start happening
-    sleep 4   
-
-    while true ; do mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 2; [[ ${Jobs_Arr[*]} ]] && break
-
+    ##  WAIT for background things to start happening, then wait for an enter key press
+    sleep 3   
+    while true ; do mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 1; [[ ${Jobs_Arr[*]} ]] && break
     done
-
 
     while true ; do    
 
@@ -799,11 +805,11 @@ function_quick_get_wrap ()  {
           pkill curl   2> /dev/null
           pkill wget   2> /dev/null
           pkill zsync  2> /dev/null
-          sleep 2
+          sleep 1
 
           if [[ ! $(pgrep aria2) && ! $(pgrep curl) && ! $(pgrep wget) && ! $(pgrep zsync) ]]; then
             QGW_DownloadStopped=1
-            sleep 2 ; break
+            sleep 1 ; break
           fi
 
         done
@@ -819,40 +825,40 @@ function_quick_get_wrap ()  {
   #  sleep/pauses needed to give different processes time to output their summaries & finish up
   sleep 1
 
-  New_VM_Folder=
-  New_VM_File=
+  New_VM_InstanceName=
+  New_VM_Conf_File=
 
   if [[ ! $ZsyncDownload ]]; then
 
     # folder check
 
-    if [[ -d "${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
+    if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
 
-      New_VM_Folder="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
+      New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
 
-    elif [[ -d "${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
+    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
 
-      New_VM_Folder="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}"
+      New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}"
 
-    elif [[ -d "${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}" ]]; then 
+    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}" ]]; then 
 
-      New_VM_Folder="${QGW_OS_Arr_NameSelected}"
+      New_VM_InstanceName="${QGW_OS_Arr_NameSelected}"
 
     fi
 
     #  file check  .conf 
 
-    if [[ -f "${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then 
+    if [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then 
 
-      New_VM_File="${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf"
+      New_VM_Conf_File="${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf"
 
-    elif [[ -f "${QWG_GroupFolder}/${QGW_OS_Arr_NameSelected}.conf" ]]; then 
+    elif [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}.conf" ]]; then 
 
-      New_VM_File="${QGW_OS_Arr_NameSelected}.conf"
+      New_VM_Conf_File="${QGW_OS_Arr_NameSelected}.conf"
 
-    elif [[ -f "${QWG_GroupFolder}/${New_VM_Folder}.conf" ]]; then 
+    elif [[ -f "${QWG_Conf_Dir}/${New_VM_InstanceName}.conf" ]]; then 
 
-      New_VM_File="${New_VM_Folder}.conf"
+      New_VM_Conf_File="${New_VM_InstanceName}.conf"
 
     fi
 
@@ -892,46 +898,44 @@ function_quick_get_wrap ()  {
     ZsyncDownload=
 
 
-  elif [[ $New_VM_Folder ]]; then
+  elif [[ $New_VM_InstanceName ]]; then
   
-    printColor "\n     Folder created:  %s "  "$New_VM_Folder"
+    printColor "     Folder created:  %s "  "$New_VM_InstanceName"
 
-    [[ $New_VM_File ]] && printColor "\n .conf file created:  %s "  "$(basename "$New_VM_File")"
+    [[ $New_VM_Conf_File ]] && printColor "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
 
-    if [[ ! $New_VM_File ]] || [[ $QGW_DownloadStopped ]]; then
+    if [[ ! $New_VM_Conf_File ]] || [[ $QGW_DownloadStopped ]]; then
 
       if [[ $QGW_DownloadStopped ]]; then
         printf "\n\n  Download Stopped > Residual files are present"
         printf "\n\n  Part downloads can usually be re-started if the folder is retained."
       fi
     
-      [[ ! $New_VM_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >" 
+      [[ ! $New_VM_Conf_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >" 
 
       printColor "\n\n  Folder contents: \n\n"
-      ls "$New_VM_Folder"
+      ls "$New_VM_InstanceName"
 
       printColor "\n\n  [d] delete the folder" 
-      [[ $New_VM_File ]] && printColor " and .conf" 
+      [[ $New_VM_Conf_File ]] && printColor " and .conf" 
 
       printf "  [enter] to retain & continue "
       printf "\n\n\n"
       read -rp "  >  "    QGW_FolderDelete
 
       if [[ $QGW_FolderDelete == "d" ]]; then
-      
         printf "\n  Folder/file being deleted ... "
-        rm -f -r "$New_VM_Folder"
-        rm -f "$New_VM_File"
-
-      else  printf  "  Folder/file retained"
-
+        rm -f -r "$New_VM_InstanceName"
+        rm -f "$New_VM_Conf_File"
+      else  
+        printf  "  Folder/file retained"
       fi
 
     fi
 
   fi
 
-  if [[ $New_VM_File ]] && [[ ! $QGW_DownloadStopped ]]; then
+  if [[ $New_VM_Conf_File ]] && [[ ! $QGW_DownloadStopped ]]; then
 
     # clear any accidental initial double pressing of the enter key occuring while experiencing any error or pause
     read -r -t 0.1  
@@ -941,8 +945,17 @@ function_quick_get_wrap ()  {
     read -r -t 0.1  
     read -r -t 0.1 
 
+    VM_InstanceName="$New_VM_InstanceName"   
+    VM_Conf_Dir="$QWG_Conf_Dir"
+    VM_Conf_File="$(basename "$New_VM_Conf_File")"
+
+    if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget Working Directory NOT FOUND ," ; fi
+
+    # add at least basic values here, in case the tune up util gets skipped
+    refresh_conf_vars_and_values
+
     NewFileTuneUp=1
-    function_config_tune_up  "$New_VM_File"  "$New_VM_Folder"
+    function_config_tune_up  "$New_VM_Conf_File"  
     NewFileTuneUp=
     NewFileTuneUp_JustDone=1
 
@@ -952,13 +965,8 @@ function_quick_get_wrap ()  {
 
   fi
 
-  VM_InstanceName="$New_VM_Folder"   
-  VM_Conf_Dir="$QWG_GroupFolder"
-  VM_Conf_File="$New_VM_File"
-  
-  # return back to or change to any working directory if one had already been set or is new ( REVIEW is this right in all cases?)
-  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget-Wrap Working Directory NOT FOUND ," ; fi
-  
+  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget Working Directory NOT FOUND ," ; fi
+
   SettingsFileAdjusted=
   ByPass_VM_Array_Selector=1
 

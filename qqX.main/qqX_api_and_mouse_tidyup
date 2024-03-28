@@ -56,6 +56,8 @@ right_click_re_route () {
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
+    MainDrive=
+    IsoImg=
     XDG_MimeType_is_QCOW=
     refresh_sources_and_load_VM_arrays
 
@@ -200,7 +202,7 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
     elif [[ $ISO_NewVM_Name ]]; then
 
       CurrentFolder="$(dirname "$XDG_ISO_Name")"
-      QWG_GroupFolder="$CurrentFolder"
+      QWG_Conf_Dir="$CurrentFolder"
       QGW_OverWriteAllow=
       QGW_OverWriteAlert=
 
@@ -213,7 +215,7 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
     
       while true ; do
 
-        printColor "  Installation target folder:  %s "   "$QWG_GroupFolder"  
+        printColor "  Installation target folder:  %s "   "$QWG_Conf_Dir"  
 
         QWG_NewVM_Name="$ISO_NewVM_Name"
         QGW_OS_Arr_NameSelected="$ISO_NewVM_Name"
@@ -221,7 +223,7 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
 
         if [[ $QGW_OverWriteAlert ]];then  
 
-          printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_GroupFolder"
+          printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_Conf_Dir"
           printf  "\n\n  [enter] Start the Setup  "
           printColor "?? BACKUP ??  " 
         
@@ -245,7 +247,7 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
           ;;
 
           [0-9]|[0-9][0-9]) 
-            QWG_GroupFolder="${VM_Folder_List[New_ISO_Start]}" 
+            QWG_Conf_Dir="${VM_Folder_List[New_ISO_Start]}" 
             QGW_OverWriteAlert=
             CurrentFolder_Recognised=1
           ;;
@@ -271,8 +273,8 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
 
         esac
 
-        if [[ ! $QWG_GroupFolder ]]; then
-          QWG_GroupFolder="$Default_VM_Folder" 
+        if [[ ! $QWG_Conf_Dir ]]; then
+          QWG_Conf_Dir="$Default_VM_Folder" 
           printColor " \n\n  Using %s for now.  \n\n  Selected Group Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder" 
         fi
 
@@ -289,21 +291,21 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
           if [[ $ISO_NewFolder ]]; then true ; else continue ; fi
         fi
      
-        printf "  Folder Creation: %s" "$QWG_GroupFolder/$QWG_NewVM_Name"
+        printf "  Folder Creation: %s" "$QWG_Conf_Dir/$QWG_NewVM_Name"
 
         printf "\n\n  Copy the ISO to the new folder, or move it?  [enter] copy   [m] move \n\n"
         read -rp "  >  "  MoveIso
 
-        mkdir -p  "$QWG_GroupFolder/$QWG_NewVM_Name"
+        mkdir -p  "$QWG_Conf_Dir/$QWG_NewVM_Name"
 
         cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
         if [[ $MoveIso == "m" ]]; then 
           printf "\n  Moving the ISO .... \n\n"  
-          mv "$XDG_ISO_Name" "$QWG_GroupFolder/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
+          mv "$XDG_ISO_Name" "$QWG_Conf_Dir/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
         else
           printf "\n  Copying the ISO ....\n\n"
-          cp "$XDG_ISO_Name" "$QWG_GroupFolder/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
+          cp "$XDG_ISO_Name" "$QWG_Conf_Dir/$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
         fi
         
         {
@@ -313,15 +315,15 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
           printf "\ndisk_size=\"64G\""
           printf "\niso=\"%s\"" "$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
 
-        } > "$QWG_GroupFolder/$QWG_NewVM_Name.conf"
+        } > "$QWG_Conf_Dir/$QWG_NewVM_Name.conf"
 
-        chmod +x "$QWG_GroupFolder/$QWG_NewVM_Name.conf"
+        chmod +x "$QWG_Conf_Dir/$QWG_NewVM_Name.conf"
 
-        VM_Conf_Dir="$QWG_GroupFolder"
+        VM_Conf_Dir="$QWG_Conf_Dir"
         VM_Conf_File="$QWG_NewVM_Name.conf"
         VM_InstanceName="$QWG_NewVM_Name"
 
-        cd "$QWG_GroupFolder" || printColor "\n\n  ERROR changing to New VM Location"
+        cd "$QWG_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
 
         refresh_sources_and_load_VM_arrays
         break

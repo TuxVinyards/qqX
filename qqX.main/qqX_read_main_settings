@@ -73,7 +73,7 @@ img=
 iso=
 
 
-function find_file_openers()  {
+function find_file_manager_browser()  {
 
   ## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
 
@@ -121,7 +121,7 @@ function find_file_openers()  {
 }
 
 # NB Also needs calling if re-loading the settings file  See refresh_sources_and_load_VM_arrays
-find_file_openers
+find_file_manager_browser
 
 
 # Check custom QE & QG, plus set the 'quickget' version
