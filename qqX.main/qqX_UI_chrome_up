@@ -236,15 +236,16 @@ function show_qqX_general_help {
   printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
 
   cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
- 
-  printColor  "\n\n\n  [w] to OPEN qqX WIKI PAGES with %s    [c] qqX command line & mouse    [enter] to return"  "$WebBrowser" 
+
+  printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation "
+  printColor  "\n\n  [w] to OPEN qqX WIKI PAGES with %s    [c] qqX command line & mouse    [enter] to return"  "$WebBrowser" 
   printf "\n\n"
   read -rp "  >  "  HelpSelect
 
   if [[ $HelpSelect == "c" ]]; then   
   
     show_CLI_usage  
-    printf "\n\n\n  [enter] to return \n\n"
+    printf "\n  [enter] to return \n\n"
     read -rp  "   >  " 
 
   elif [[ $HelpSelect == "w" ]]; then

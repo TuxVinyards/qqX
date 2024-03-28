@@ -260,7 +260,7 @@ VM_loader_selector_and_menu () {
 
         printColor "\n\n  [Enter]  "
         printf "%s  "  "${VM_Array_NameZero^^}"
-        printf "    [gt] quickget a new distro     [f] refresh  [q] quit"
+        printf "    [gt] quickget a new distro     [h] help   [f] refresh     [q] quit"
 
         if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "    preview only - use [set] for menu permanency"
         elif [[ $SettingsFileAdjusted ]]; then printColor "    ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
@@ -314,6 +314,12 @@ VM_loader_selector_and_menu () {
 
         VM_Selection=
         qqX_edit_settings 
+        return
+
+      elif [[ $VM_Selection == "h" ]];then
+
+        VM_Selection=
+        show_qqX_general_help 
         return
 
       elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then

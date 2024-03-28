@@ -92,23 +92,23 @@ fi
 # Usage needs to be loaded early on, so it can be shown if initial help is required
 show_CLI_usage () {
 
-  printColor  "\n  Command line Usage"  
+  printf     "\n  Command line Usage"  
   printf     "\n\n  qqX --version  &  qqX --help  as standard"
   printf     "\n\n\n  Plain 'qqX' to start the distro/vm selector menu"    
   printf     "\n\n  Or qqX --vm  [path/to/vms-folder/]vm-name.conf to start something specific."
 
-  printColor "\n\n\n  Mouse click - Right:"
+  printf     "\n\n\n  Mouse click - Right:"
   printf     "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."
   printf     "\n\n  On a .qcow2 disk will 'open-with' into the qqX disk analyser."
   printf     "\n\n  Also the .conf and using 'open-with' may also be enabled. See the qqX wiki."
 
-  printColor "\n\n\n  Mouse click - Left:"
+  printf    "\n\n\n  Mouse click - Left:"
   printf     "\n\n  On a .conf file and 'run in terminal' will open directly to the distro's individual menu"
   printf     "\n\n  The first line of the .conf must have been edited to point to qqX instead of quickemu,"   
   printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/qqX --vm  or similar (VM name not needed)" 
   printf     "\n\n  and the .conf file permissions must have been set to executable. See qqX [tune] utiility." 
 
-  printf    "\n\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse"
+  printf    "\n\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
 
 }
 
@@ -201,6 +201,8 @@ if [[ $1 == "XDG" ]]; then
   fi
 
 elif [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$qqX_Version" ; exit 
+
+elif [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit 
 
 elif [[ "$1" == *'vm' ]] && [[ $2 == *'.conf' ]]; then  
 
