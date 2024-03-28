@@ -92,12 +92,7 @@ function  main_menu_actions {
     [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") && QemuErrorAlert=
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
-  elif [[ $MainMenuChoice == "f" ]] ; then
-
-    nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
-
-    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of mixed gtk2 and gtk3 etc ....  
-    #  As from 'WebBrowser' section and handling of firefox etc
+  elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release
 

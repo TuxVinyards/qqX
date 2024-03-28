@@ -105,18 +105,24 @@ function find_file_manager_browser()  {
 
     if [[ ! $WebBrowser ]]; then
 
-      if [[ $(type -p firefox) ]]; then  WebBrowser="firefox"
-      elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
-      elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
-      elif [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
-      else WebBrowser=
+      WebBrowser="$(xdg-settings get default-web-browser)"
+
+      if [[ $WebBrowser ]]; then
+
+        WebBrowser="${WebBrowser/'.desktop'/}"
+
+        if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
+        elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
+        elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
+        elif [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
+        else WebBrowser=
+        fi
+
       fi
 
     fi
 
   fi
-
-  printf "\n Handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc .... \n\n"  > "/tmp/qqX_nohup.txt"
 
 }
 

@@ -238,7 +238,7 @@ function show_qqX_general_help {
   cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
   printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation "
-  printColor  "\n\n  [w] to OPEN qqX WIKI PAGES with %s    [c] qqX command line & mouse    [enter] to return"  "$WebBrowser" 
+  printColor  "\n\n  [w] to OPEN qqX WIKI PAGES with browser    [c] qqX command line & mouse    [enter] to return"  
   printf "\n\n"
   read -rp "  >  "  HelpSelect
 

@@ -392,9 +392,6 @@ qqX_edit_settings() {
     # Note, app opening commands can throw a complaint if 'xapps' has not not been installed.
     # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
 
-    # > "/tmp/qqX_nohup.txt" handles the output that tells us about handling of gtk2 and gtk3 etc ....  
-    #  As from 'WebBrowser' section and handling of firefox etc
-
     # NB  don't set to run the editor in the background, as the web browser does, as qqX needs to take the new settings 
 
   fi

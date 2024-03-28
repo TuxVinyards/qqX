@@ -234,7 +234,7 @@ function download_new_release {
 
       printf "\n\n"
 
-      [[ $WebBrowser ]] && printColor "  [w] popup qqX web pages with %s"  "$WebBrowser"
+      [[ $WebBrowser ]] && printColor "  [w] popup qqX web pages with browser" 
 
       printf "   or [b] to go back \n\n"
 
@@ -252,9 +252,6 @@ function download_new_release {
       elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
       
         nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
-
-        # https://unix.stackexchange.com/questions/103483/opening-firefox-from-terminal#103486
-        # > "/tmp/qqX_nohup.txt" handles the output that tells us how firefox etc has handled mixing of gtk2 and gtk3 etc ....
 
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
 

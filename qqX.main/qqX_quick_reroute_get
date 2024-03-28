@@ -400,7 +400,7 @@ function_quick_get_wrap ()  {
 
       fi  
 
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed web page with %s"  "$WebBrowser"
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed page with web browser" 
       else  printf "\n\n" ; fi
 
       printf "  [b] to go back \n\n"   
@@ -569,7 +569,7 @@ function_quick_get_wrap ()  {
     if [[ $QGW_Download_BadLink ]]; then
 
       printColor "\n\n  [enter]  re-test the download link "
-      [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]] && printf "  [w] try opening the listed web page with %s  "  "$WebBrowser"
+      [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]] && printf "  [w] try opening the listed page with web browser "  
 
     else
 
