@@ -26,7 +26,7 @@
 
 ## VM selector style default
 
-Default_VM_SelectorStyle="E"
+Default_VM_SelectorStyle="A"
 
 [[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="$Default_VM_SelectorStyle"
 

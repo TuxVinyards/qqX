@@ -263,7 +263,7 @@ VM_loader_selector_and_menu () {
         printf "    [gt] quickget a new distro     [h] help   [f] refresh     [q] quit"
 
         if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "    preview only - use [set] for menu permanency"
-        elif [[ $SettingsFileAdjusted ]]; then printColor "    ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
+        elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
         fi
 
       fi

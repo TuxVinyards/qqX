@@ -66,23 +66,15 @@ function check_screen_percentage_and_output {
   
   #  Function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
   #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  
-
-  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
-
-  else
-
-    if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off"
-    else qqX_GL_Mode="on" 
-    fi
-
-  fi
-
-
   #  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
   #  But check the source to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
 
-  [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
+  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
+  else
+    if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off" ; else qqX_GL_Mode="on" ; fi
+  fi
 
+  [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
   [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
 
   if [[ $SDL_ScreenPercent ]]; then 
@@ -108,13 +100,9 @@ function check_screen_percentage_and_output {
   fi
 
   [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
-
   [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
 
 }  
-
-
-
 
 function set_drive_paths {
 
@@ -156,9 +144,7 @@ function set_drive_paths {
   #  This drive should be availble to all VMs and act as a shared resource.  See main settings.
 
   if [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
-
       eval "$(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' )"
-
   fi
 
   if [[ $SharedDrive ]]; then 
@@ -173,7 +159,6 @@ function set_drive_paths {
     elif [[ -e "$SharedDrive" ]]; then
 
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
-
       SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
 
     elif [[ $SharedDrive ]]; then 
@@ -210,7 +195,6 @@ function_conf_error () {
   NewSetupFlag=
 
   # clear any accidental initial double pressing of the enter key occuring while experiencing the error
-
   read -r -t 0.1  
   read -r -t 0.1  
   read -r -t 0.1  
@@ -218,11 +202,9 @@ function_conf_error () {
   read -r -t 0.1  
   read -r -t 0.1 	
 
-
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
   printf "\n\n  qqX Settings, VM folder & conf file(s)"  
-
 
   if [[ $1 ]] ; then 
     printf "\n\n  Check %s settings, location & content ... "  "$1"

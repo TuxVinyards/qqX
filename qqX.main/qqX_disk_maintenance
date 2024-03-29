@@ -143,9 +143,7 @@ drives_and_snapshots() {
     if [[ $2 != "as_disk_util" ]]; then
 
       printf "\n\n  Health Status:  %s  (%s)"  "$DiskChkStatus"  "$Selected_DriveName"
-
       if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-
       printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
 
     fi
@@ -177,11 +175,8 @@ function manage_and_repair_disks {
     [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
 
     DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
-
-    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
-
     DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
-
+    DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
     DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
 
     if [[ $DiskChkStatus == "Okay" ]]; then
@@ -195,7 +190,6 @@ function manage_and_repair_disks {
     if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
 
       printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
-
       [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
       
     fi
@@ -206,9 +200,8 @@ function manage_and_repair_disks {
 
     else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" ; fi
 
-    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
-
-    DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
+      DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+      DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
 
     if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
 
@@ -262,9 +255,7 @@ function manage_and_repair_disks {
     fi
 
     DiskDate="$(date +%b%d.%H.%M)"
-
     DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
-  
     mv "$Selected_Drive" "$DiskBackup" 
 
     printf  "  Original drive: %s \n\n" "$Selected_Drive"
@@ -301,12 +292,9 @@ function manage_and_repair_disks {
       }
 
       dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
-
-      # https://web.archive.org/web/20230412163832/https://wiki.bash-hackers.org/howto/redirection_tutorial#order_of_redirection_ie_file_2_1_vs_2_1_file
-
-      "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
-
       printColor "\n\n  Attemping repair .... \n\n"
+      
+      "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
 
     else  "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
 
@@ -338,16 +326,13 @@ function manage_and_repair_disks {
 function snapshot_delete {
 
   printColor "\n\n qqX Snapshot Delete function "  
-
   printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
 
   # Create range-selectable array 
-  
   SnapListString="$("$QEMU_IMG" info "$Selected_Drive" | grep '[0-9][0-9]:')"
 
   # turns the multiline string into raw array with one whole line for each entry making each array element
   # then line by line extract the snap number and its title:
-
   mapfile -t SnapListArrRaw <<< "$SnapListString"
 
   i=0
@@ -424,7 +409,6 @@ function snapshot_delete {
     fi
 
     printColor "\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
-
     read -rp " >  "  SnapDeleteConfirm
 
 
@@ -443,6 +427,7 @@ function snapshot_delete {
         SnapDeleteRangeCounter=$SnapDeleteStart
 
         while [[ $SnapDeleteRangeCounter -le $SnapDeleteEnd ]]; do
+
           IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[$SnapDeleteRangeCounter]}"
           SnapName="${SnapListArrSeparated[1]}"
 
@@ -452,11 +437,10 @@ function snapshot_delete {
             exit 1
           else
             printColor "\n\n Deleting SnapShot %2d   %2d  %s \n\n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
-
             "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive" 
-
           fi
           ((SnapDeleteRangeCounter+=1))
+
         done
 
       fi
@@ -471,10 +455,8 @@ function snapshot_delete {
   fi
 
   #  REVIEW  see if tiano core bios can be set to select 'misc device' instead of 'windows boot manager' 
-  #          as this can cause problems when rebooting on updates
-  
+  #  as this can cause problems when rebooting on updates
   #  https://github.com/tianocore/tianocore.github.io/wiki/UEFI-application
-
   #  https://github.com/theopolis/uefi-firmware-parser
 
 }
@@ -500,15 +482,10 @@ function create_new_drives {
     [[ $MainMenuChoice == "3" ]] && printColor "\n\n  Create a SHARED virtual hard-drive for this VM instance:"
     
     printf "\n\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that" 
-
     printf "\n\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
-    
     printf "\n\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
-    
     printf "\n\n  It is easier make them larger now than to resize later ... " 
-
     printColor "\n\n\n  [enter] create 64G   [integer] create int G   [b] go back \n\n"
-
     read -rp "  >  "  SecondDriveCreateSize
 
     [[ ! $SecondDriveCreateSize ]]  && SecondDriveCreateSize="64"
@@ -520,7 +497,6 @@ function create_new_drives {
       if [[ $MainMenuChoice == "2" ]] && grep -s -q SecondDrive "$VM_Conf_File" ; then
 
         printColor "\n\n  ERROR: A SecondDrive entry is already present in your .conf file ??"
-
         printf "\n\n  Check general settings & notes on drives set up.  Edit the configuration. \n\n"
 
       elif [[ $MainMenuChoice == "3" ]] && [[ ! -d "$Default_VM_Folder" ]]; then
@@ -536,7 +512,6 @@ function create_new_drives {
         elif [[ $MainMenuChoice == "3" ]]; then 
 
           printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
-
           printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$qqX_SettingsFile"
 
         fi
@@ -581,19 +556,15 @@ function create_new_drives {
               # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
               
               SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
-
               printf "\n\n  Backing up settings file to /tmp and changing line %s \n\n"  "$SharedDriveSettingsLine"
 
               eval cp "$qqX_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
-
               eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$qqX_SettingsFile"
 
             else 
 
               printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n"
-
               grep 'SharedDrive=' "$qqX_SettingsFile"
-
               printf "\n\n"
 
             fi
@@ -603,11 +574,8 @@ function create_new_drives {
           if [[ $DriveCreated ]]; then
 
             refresh_conf_vars_and_values
-
             printColor "\n  The Created Drive should now be formatted from inside a VM:"
-
             printf "\n\n  Use Gparted or similar to set a device table and add partition(s)"
-
             printf "\n\n  Read notes in main settings if older MacOS or if Windows present."
 
           else
@@ -625,7 +593,6 @@ function create_new_drives {
   fi
 
   printf "\n\n"
-
   read -rp "  [enter] to return > "
   
 }

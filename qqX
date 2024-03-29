@@ -274,8 +274,8 @@ tput  cnorm
 #  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
 #  It makes it easier for everyone, especially later on.
 
-#  SPACE:  Give your code some room to breathe.  Break it up into logic blocks.  
-#  Make it easy to follow & easy to see what is happening.  
+#  SPACE:  Give your code some room to breathe. But also keep your code tight enough to view on smaller screens.    
+#  Place it into clear logic blocks. Make it easy to follow & easy to see what is happening.  
 
 #  SED & AWK:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
 #  If you must use them, keep things very simple & explain the sections.  

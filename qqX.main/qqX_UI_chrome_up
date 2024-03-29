@@ -29,24 +29,35 @@
 [[ ! $X_Shade ]] &&  X_Shade="3"
 
 #  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1
-
 #  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-
 #  https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x405.html
-
 #  if source without declared shade, set default shade
 
-[[ ! $X_Shade ]]  && X_Shade=3
 
+# non-color ECHO TRAP, mainly designed to capture the technical output that quickemu doesn't send to log file
+printf "\n"  > "/tmp/qqX_echo_output.log"
+
+echo () { 
+
+  if [[ $UseCustomBootArgs ]]; then
+    command echo "$@" >>  "/tmp/qqX_echo_output.log" ; 
+  else 
+    command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; 
+  fi
+
+}
+
+printColor () {
+	tput setaf "$X_Shade"
+	# shellcheck disable=SC2059
+	printf "$@"
+	tput sgr0
+}
+
+# avoid use of echo near the vm boot section, to avoid clashes with the log file
 
 echColor () {
-
-	# for X_Shade see qqX configs
-
-  # deprecated > use printColor 
-
 	if [[ $2 ]] ; then
-
 		if [[ "$1" == "-n" ]] ; then
 			tput setaf "$X_Shade"
 			echo -n "$2"
@@ -56,125 +67,74 @@ echColor () {
 			echo "$@"          			
 			tput sgr0
 		fi
-
 	else
 		tput setaf "$X_Shade"
 		echo "$1"
 		tput sgr0
 	fi
-
 }
 
 
-# initiate a non-color echo trap, mainly designed to capture the technical output that quickemu doesn't send to log file
-
-printf "\n"  > "/tmp/qqX_echo_output.log"
-
-#
-
-echo () { 
-
-  if [[ $UseCustomBootArgs ]]; then
-    command echo "$@" >>  "/tmp/qqX_echo_output.log" ; 
-  else 
-    command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; 
-  fi
-}
-
-printColor () {
-
-	tput setaf "$X_Shade"
-	# shellcheck disable=SC2059
-	printf "$@"
-	tput sgr0
-
-}
-
-
-## General default title:
-
+# General default title:
 qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $qqX_Version "
-
 
 ## qqX chrome up  
 
 qqX_logo() {
-  
   # not for use during vm boot sequences
-
   echColor "  _    _   \/   "
   echColor " (_|  (_|  /\ "
   echColor "   |.   |.    "
-
 }
 
 qqX_logo_plain() {
-  
   # early loader 
-
   echo "  _    _   \/   "
   echo " (_|  (_|  /\ "
   echo "   |.   |.    "
-
 }
 
 qqX_logo_printf() {
-
   # printf version (no end line feed)
-
   printColor "  _    _   \/   "
   printColor " (_|  (_|  /\ "
   printColor "   |.   |.    "
-
 }
 
 # Variant on   http://www.figlet.org/  -f mini  (-k)   (c)  Alex Genovese
 
-
 qqX_logo_title() {
-
   # not for use during vm boot sequences
-
   if [[ $1 ]]; then qqX_LogoTxt="$1" ; else qqX_LogoTxt="$qqX_title" ; fi
-
   echColor "  _    _   \/   "
   echColor " (_|  (_|  /\ "
   echColor "   |.   |.     $qqX_LogoTxt"
-
 }
 
 qqX_logo_printf_title() {
-
   # printf version (no end line feed & also avoids the quickemu echo trap)
-
   if [[ $1 ]]; then qqX_LogoTxt="$1" ; else qqX_LogoTxt="$qqX_title" ; fi
-
   printColor "\n  _    _   \/   "
   printColor "\n (_|  (_|  /\ "
   printColor "\n   |.   |.     %s"  "$qqX_LogoTxt"
-
 }
 
 
 function exit {
-
+  
   # trap to keep terminal open if started by mouse click  -t secs
   # or to stop sourced quickemu quitting as 'normal' procedure   (tput resets any hidden cursors)
   # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
 
   if [[ $1 == "directly" ]]; then
-
     tput cnorm
     command exit
 
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
-
     printf "\n\n"
     printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n\n"
     read -rp  "  >  "  -t 30  ExitTrap
-
     [[ $ExitTrap == "h" ]] &&  printf "\n\n  Holding terminal open  [Enter] to quit  \n\n"  && read -rp "  >  "
-
     tput cnorm
     command exit "$@"
 
@@ -182,7 +142,6 @@ function exit {
 
   # zero the optional 'exit 1' bypass flag (if it has been set)
   NoExit=
-
 }
 
 
