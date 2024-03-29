@@ -228,7 +228,7 @@ function  update_old_settings_file_with_new_options {
 
   done
 
-  printf "  The settings file has now been updated. \n\n  All recognised original settings have been transferred. \n\n"
+  printf "  The settings file has now been updated. \n  All recognised original settings have been transferred. \n\n"
   
 }
 

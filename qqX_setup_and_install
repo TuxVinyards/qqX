@@ -146,15 +146,12 @@ function print_manual_uninstall_notes {
 
   cat << Notes
 
-  #  Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME 
-  
-  #  and any desktop items in (hidden) User folder:  $HOME/.local/share/applications  
+  Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME 
+  and any desktop items in (hidden) User folder:  $HOME/.local/share/applications  
+  followed by:  update-desktop-database  ~/.local/share/applications  
 
-  #  followed by:  update-desktop-database  ~/.local/share/applications  
-
-  #  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
-
-  #  From qqX 1.6 onwards also remove  sudo rm -r /usr/share/qqX
+  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
+  From qqX 1.6 onwards also remove  sudo rm -r /usr/share/qqX
 
 Notes
 
@@ -165,19 +162,15 @@ Notes
 function print_terminal_notes {
 
   cat << Notes
+ 
+  Add 'UserTerm' located near the script start to manually specify the terminal name
 
-  #  If the install script is not auto detecting correctly or if a specific profile is needed,
+  Edit the script's custom profile if actual 'Xterm' itself is to be used,
+  eg  xterm -geometry 150x50 -fa truetype -fs 12
 
-  #  the terminal name may be specified by editing 'UserTerm' located near the script start. 
-    
+  XFCE users may like to install mate-terminal > Some XFCE distros default to this.
 
-  #  Actual base level 'Xterm' itself, if installed, will need a bit of custom tweaking
-
-  #  eg  xterm -geometry 150x50 -fa truetype -fs 12
-
-  #  Some XFCE distros default to mate-terminal >  XFCE users may like to install this.
-
-  #  Also remember that column width units are based on the size of your terminal font.
+  Remember also that column width units are based on the size of your terminal font.
 
 Notes
 
@@ -261,7 +254,7 @@ echo
 qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
 
 if [[ $1 != "Upgrade" ]]; then 
-  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  a standard release of quickemu has been found " 
+  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  A standard release of quickemu has been found " 
   else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu " 
   fi
 fi  
@@ -284,8 +277,10 @@ else
   else  printColor  "\n\n   Install a settings file to %s & add program scripts?"   "$HOME" 
   fi
 
-  printColor "\n\n  [enter] to auto-install from this terminal"
-  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n\n  [u] un-install   [enter] re-install/upgrade"
+  cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
+
+  printColor "\n  [enter] to auto-install from this terminal"
+  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [enter] re-install/upgrade"
   printf "   [m] use manual installation"
   printf "   [q] to quit \n\n"
   read -rp "   >  "  InstallSelect
@@ -337,28 +332,26 @@ else
     if  [[ $InstallSelect == "m" ]] ; then 
 
       printf "\n\n  Open another terminal IN THE SOURCE FOLDER"
-      printf "\n\n  The following commands should be issued:"
+      printf   "\n  where the following commands should be issued:"
 
       printColor "\n\n  sudo cp \"qqX\" \"%s\" " "$qqX_Std_File_Path"
       printColor "\n\n  sudo ln -s \"%s\" \"%s\" " "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
 
       printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
-      printf "\n\n  for the subfolder and files of qqX.main."
+      printf   "\n  for the subfolder and files of qqX.main."
 
       printColor "\n\n  sudo mkdir -p \"%s/qqX.main\" " "$qqX_Std_Share_Path"
       printColor "\n\n  sudo cp \"./qqX.main/qqX_\"*  \"%s/qqX.main/\" " "$qqX_Std_Share_Path" 
 
-      printf "\n\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
+      printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
       read -rp  "  >  "  SeparateSudo
-      printf "\n\n"
+      printf "\n"
 
     fi
 
     if [[  $SeparateSudo != "y" ]]; then
 
-      cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
-
-      printColor "  Auto-Installing .... \n\n"
+      printColor "\n\n  Auto-Installing .... \n\n"
       sudo cp "qqX" "$qqX_Std_File_Path"
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
       [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
@@ -372,7 +365,7 @@ else
 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
     
-      printColor "\n  👍️ All good " 
+      printColor "\n  ...... All good " 
 
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000  
     fi
@@ -479,18 +472,16 @@ if [[ ! $SkipMkLauncher ]]; then
   if [[ ! $CustomTerminalProfile ]]; then 
 
     printf "\n\n  Use extra height (%s) to help show multifile or quickget output better"  "$Term_Taller"
-    printf "\n\n  but be aware this will hide more of the file manager output"
-    printf "\n\n  while some menu screens may contain empty space."
-    printf "\n\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
+    printf   "\n  but be aware this will hide more of the file manager output"
+    printf   "\n  while some menu screens may contain empty space."
+    printf "\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
 
   fi
 
   printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
-  printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
-
-  printf "\n\n\n  Remember that column width units are based on the size of your terminal font,"
-  printf "\n\n  so changing the font will also change the physical terminal size."
-
+  printf   "\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+  printf "\n\n  Remember that column width units are based on the size of your terminal font,"
+  printf   "\n  so changing the font will also change the physical terminal size."
   printf "\n\n\n"
 
   # REVIEW add W H number entry?
@@ -506,7 +497,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   elif [[ $TerminalHeightChoice == "t" ]]; then
 
-    printf "\n\n  Height selected = %s " "$Term_Taller"
+    printf "\n  Height selected = %s " "$Term_Taller"
 
     MateTerminalProfile="$MateTerminalProfile_Taller"
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
@@ -514,7 +505,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   else
 
-    printf "\n\n  Height selected = %s " "$Term_Height"
+    printf "\n  Height selected = %s " "$Term_Height"
 
     MateTerminalProfile="$MateTerminalProfile_Standard"
     GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
@@ -530,7 +521,7 @@ if [[ ! $SkipMkLauncher ]]; then
   elif [[ $UserTerm == "konsole" ]]; then SelectedTerminalProfile="$KonsoleTerminalProfile"
   fi
 
-  printf "\n\n"
+  printf "\n"
 
   # Select Icon colour (to go with text shade)
 
@@ -670,10 +661,10 @@ if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX
 End_Install=
 printColor  "\n\n  Install process finished:  "
 
-printf "\n\n\n  qqX may be started from the main system menu"
-printf "\n\n  by right clicking on qcow2 files, or straight from the terminal."
-printf "\n\n\n  The settings file may be edited both via the internal qqX menu"
-printf "\n\n  or before starting at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
+printf "\n\n\n  qqX may be started from the main system menu,"
+printf   "\n  by mouse clicks on files, or straight from the terminal."
+printf "\n\n  The settings file may be edited both via the internal qqX menu"
+printf   "\n  or before starting at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
 [[ $GrepExecLine ]] && printColor "  [enter] to close current window and start"
 printf "   [q] to quit  \n\n "
