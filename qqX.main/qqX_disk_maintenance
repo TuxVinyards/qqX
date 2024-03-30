@@ -323,7 +323,9 @@ function manage_and_repair_disks {
 
 }
 
-function snapshot_delete {
+function qqX_snapshot_delete {
+
+  # NB qqX prefix to avoid cross-linking with the quickemu one
 
   printColor "\n\n qqX Snapshot Delete function "  
   printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
@@ -373,7 +375,7 @@ function snapshot_delete {
 
     else
 
-      printColor "\n [enter] for an individual snapshot  or give ARRAY [number] for end of range (inclusive) \n\n"
+      printColor "\n [enter] for an individual snapshot or to correct an error \n\n Or ARRAY [number] for end of range (inclusive) \n\n"
       read -rp " >  "  SnapDeleteEnd
 
       if [[ $SnapDeleteEnd ]]; then 

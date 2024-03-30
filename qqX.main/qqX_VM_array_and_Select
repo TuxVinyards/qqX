@@ -214,6 +214,8 @@ VM_loader_selector_and_menu () {
     VM_InstanceName=
     MainDrive=
     IsoImg=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
 
     while true; do
 
@@ -436,7 +438,6 @@ VM_loader_selector_and_menu () {
     ByPass_VM_Array_Selector=
     MenuStylePreviewed=
     NewFileTuneUp=
-    NewFileTuneUp_JustDone=
 
   fi
 

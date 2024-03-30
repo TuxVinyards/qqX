@@ -347,19 +347,22 @@ function_delete_Selected_VM () {
 
     fi
 
-    sleep 1.4
-
+    sleep 1
     printColor "\n\n  [enter] to return or continue \n\n" 
     read -rp "  > "
-
+    
+    ByPass_VM_Array_Selector=
+    ByPass_VM_Array_Loader=
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
     MainDrive=
     IsoImg=
-    SettingsFileAdjusted=1
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
 
     refresh_sources_and_load_VM_arrays
+    return
 
   fi
 

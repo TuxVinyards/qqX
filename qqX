@@ -64,14 +64,14 @@ fi
 
 # # This script:   major.minor.point[.dev-point]  x.x.2dp[.2dp]  where x = any whole number and the last register always being 2dp.
 # The 2nd register becomes printf'ed to 2dp for upgrade valuation while a single 0 in the third register indicates beta  [with fourth register at 2dp]
-qqX_Version="1.7.01"
+qqX_Version="1.7.0.01"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less.
+## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less. Or "0" for none.
 NoClear=
-GeneralLoopCheck=  
+GeneralLoopCheck=
 
 ## INITIALIZE
 
@@ -204,17 +204,16 @@ if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
 
 ## MAIN LOOP
 
-# Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
-
 tput civis
 
 while true ; do
 
+  [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop: \n"
   dev_loop_check
 
-  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then  
-  
-    VM_loader_selector_and_menu 
+  # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
+
+  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then   VM_loader_selector_and_menu 
   
   else  
 

@@ -110,7 +110,7 @@ function_test_iso_url () {
 
   if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
 
-    if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else  printf "\n\n" ; fi
+    if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else [[ ! $Zsync_Updatable_ISO ]] && printf "\n\n" ; fi
 
     printf "  Checking download sources ... \n\n"
 
@@ -228,12 +228,6 @@ function check_new_vm_folder_name {
 
 function_quick_get_wrap ()  {
 
-  VM_Conf_File=
-  VM_Conf_Dir=
-  VM_InstanceName=
-  MainDrive=
-  IsoImg=
-
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
   printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber" 
@@ -284,6 +278,12 @@ function_quick_get_wrap ()  {
     QGW_Release_Arr_NameSelected="$Zsync_Release_Name"
 
   else
+
+    VM_Conf_File=
+    VM_Conf_Dir=
+    VM_InstanceName=
+    MainDrive=
+    IsoImg=
 
     tput rc; tput ed  
 
@@ -518,7 +518,7 @@ function_quick_get_wrap ()  {
     else
 
       printf "\n\n  Updating the live boot development iso with any changes"
-      printColor "\n\n  May take a while to synchronise"
+      printColor "\n\n  May take a while to compare & synchronize"
       [[ $LastZsync -gt 200000 ]] && printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
       printf "\n\n"
       ZsyncDownload=1
@@ -760,7 +760,7 @@ function_quick_get_wrap ()  {
 
         if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
         
-          printf "\n  Comparing images \n\n" 
+          printf "\n  Comparing images .... \n\n" 
           LastZsync="0" 
           [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
 
@@ -882,21 +882,18 @@ function_quick_get_wrap ()  {
       fi
 
     else  
-    
-      printf "\n  End of Quickget processes ..." 
 
-      # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-      # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
-
-      if [[ ! $Zsync_Updatable_ISO ]]; then  
+      if [[ ! $Zsync_Updatable_ISO ]]; then 
+        printf   "\n  End of Quickget processes ..." 
         printf "\n\n  as Dev downloads usually undergo some kind of NAMING variance" 
         printf "\n\n  checking of files & folders should to be completed manually"
       fi
       
     fi
-
-    ZsyncDownload=
-
+        
+    # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
+    # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
+      ZsyncDownload=
 
   elif [[ $New_VM_InstanceName ]]; then
   
@@ -961,7 +958,10 @@ function_quick_get_wrap ()  {
 
   elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
 
-  else  printColor "\n\n  [enter] to return or continue \n\n" ; read -rp "  > "
+  else  
+  
+    [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
+    printColor "\n\n  [enter] to return or continue \n\n" ; read -rp "  > "
 
   fi
 

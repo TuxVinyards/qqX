@@ -441,9 +441,12 @@ function_config_tune_up ()  {
     IgnoreSecondCheckNew=1
 
     # set here, before refresh
-    VM_Conf_Dir="$TuneUpGroupFolderGroupFolder"
+    VM_Conf_Dir="$TuneUp_Conf_Dir"
     VM_Conf_File="$TuneUpTargetFile"
     VM_InstanceName="$TuneUp_InstanceName"
+
+    # ByPass_VM_Array_Loader=1
+    # ByPass_VM_Array_Selector=1
 
     refresh_sources_and_load_VM_arrays
 

@@ -261,7 +261,7 @@ function  main_menu_actions {
   elif  [[ $MainMenuChoice == "sd" ]] ; then
 
     drives_and_snapshots  select 
-    snapshot_delete
+    qqX_snapshot_delete
           
   elif  [[ $MainMenuChoice == "sa" ]] ; then
 
@@ -292,8 +292,6 @@ function  main_menu_actions {
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
-    refresh_sources_and_load_VM_arrays
-
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
     VM_Conf_Dir=
@@ -301,6 +299,10 @@ function  main_menu_actions {
     VM_InstanceName=
     MainDrive=
     IsoImg=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
+
+    refresh_sources_and_load_VM_arrays
     return
 
   elif [[ $MainMenuChoice == "xa" ]] ; then
