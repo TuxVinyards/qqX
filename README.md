@@ -8,6 +8,12 @@ Plus a couple of UI tweaks and minor bug fixes.
 
 See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
 
+Expect Wiki pages to be added for release 1.7.01 over the next few days.
+
+This new release is good to go though :rocket:  
+
+Also fixes the minor 1.6 installer glitch, that some may have noticed. Apologies if you were affected.
+
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
