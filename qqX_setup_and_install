@@ -271,9 +271,9 @@ if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" 
 else
 
   InstallSelect=
-  Current_qqX_Version="$(qqX --version)"
+  if [[ $(type -p qqX) ]]; then Current_qqX_Version="$(qqX --version)" ; else Current_qqX_Version= ; fi
 
-  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n\n   Upgrade qqX %s program scripts:"   "$Current_qqX_Version"
+  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n\n   Upgrade current release %s ..."   "$Current_qqX_Version"
   else  printColor  "\n\n   Install a settings file to %s & add program scripts?"   "$HOME" 
   fi
 
