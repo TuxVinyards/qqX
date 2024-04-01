@@ -65,7 +65,6 @@
 # shellcheck disable=SC2317
 
 if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
-  # @2023: we have been at ver 5 for quite a few years
   echo; echo "  Sorry, you probably need Bash 5.0 or newer to run this script."; echo
   echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
   echo "  Your version: "; echo
@@ -92,7 +91,6 @@ if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/share"  ]]; then
   [[ $FHS_Alert ]] &&  exit 
 
 fi
-
 
 # Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem 
 # will need more adjustments than just this, so flag up for them to read the notes & probably other:
