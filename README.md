@@ -20,7 +20,7 @@ To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main setting
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-[Translation](https://github.com/TuxVinyards/qqX/wiki/Translation) using Google Chrome is recommended as more accurate.
+- Simple translatable interface > [Translation Wiki](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Why quickemu?
 
@@ -28,33 +28,42 @@ To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main setting
 
 It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
-It's not without its flaws. But its flaws can be fixed and it can be made to work.
-
 VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
+
+Qemu front-ends based on LibVirt can be quite abstract and complex, for example Virt Manager. 
 
 Gnome Boxes (with QEMU) has a very polished interface. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
 
+Quickemu is not without its flaws. But its flaws can be fixed and it can be made to work.
+
+
 ## Why qqX?
 
-qqX offers an alternative menu system that has lots of power and functions. More even than quickemu.
+qqX offers an alternative menu system to the traditional quickemu interface.
 
-It has an easy installation. No additional software or dependencies are required.
+- It has lots of power and functions. More even than quickemu. 
+
+- An easy installation with no additional software or dependencies required.
 
 Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. Safely test out the qqX difference. Both may be installed. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools...
+- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. 
 
-### Why the text interface?
+Safely test out the qqX difference. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools...
 
-Less is more:
+### Not just a text interface
 
-By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding.
+Less can be more. By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API.
+qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API. Anything within quickemu can be easily pulled, shaped and improved.
 
-Anything within quickemu can be easily pulled, shaped and improved.
+### Install the latest ISO's at the click of a mouse
+
+No need to wait for Quickget to add in the distros you want, or to update its release data.
+
+### Get the latest fixes too
 
 There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
