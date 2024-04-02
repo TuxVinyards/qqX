@@ -30,24 +30,23 @@ It has an active community and is the only virtual machine manager that makes ea
 
 VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
 
-Qemu front-ends based on LibVirt can be quite abstract and complex, for example Virt Manager. 
+Qemu front-ends based on LibVirt can be quite abstract and complex, for example Virt Manager.
 
 Gnome Boxes (with QEMU) has a very polished interface. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
 
 Quickemu is not without its flaws. But its flaws can be fixed and it can be made to work.
 
-
 ## Why qqX?
 
 qqX offers an alternative menu system to the traditional quickemu interface.
 
-- It has lots of power and functions. More even than quickemu. 
+- It has lots of power and functions. More even than quickemu.
 
 - An easy installation with no additional software or dependencies required.
 
 Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. 
+- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system.
 
 Safely test out the qqX difference. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools...
 
@@ -58,6 +57,8 @@ Less can be more. By using the same, simple and well-known scripting language th
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
 qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API. Anything within quickemu can be easily pulled, shaped and improved.
+
+Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
 
 ### Install the latest ISO's at the click of a mouse
 
