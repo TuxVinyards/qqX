@@ -61,6 +61,8 @@ qqX goes far beyond being a simple front-end that is restricted to the basic qui
 
 ### Install the latest ISO's at the click of a mouse
 
+![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
+
 No need to wait for Quickget to add in the distros you want, or to update its release data.
 
 ### Get the latest fixes too
