@@ -2,17 +2,15 @@
 
 ## " quickemu quickget X terminal project "
 
-1.6.02 introduces a new Custom Boot system that can run Arm64, Risc-V and others.
+1.6.02 introduced a new Custom Boot system that can run Arm64, Risc-V and others.
 
-Plus a couple of UI tweaks and minor bug fixes.
+Release [1.7.01](https://github.com/TuxVinyards/qqX/releases/tag/1.7.0.02) has lots of new interface features and is now good to go :rocket:
 
-See the new Wiki pages <https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters>
+It also fixes the minor glitch in the 1.6 installer that some may have noticed. Apologies if you were affected.
 
-Expect Wiki pages to be added for release 1.7.01 over the next few days.
+However, explanation [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages do need to be added over the next few days before going to general release.
 
-This new release is good to go though :rocket:  
-
-Also fixes the minor 1.6 installer glitch, that some may have noticed. Apologies if you were affected.
+To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main settings.
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
@@ -40,11 +38,11 @@ Gnome Boxes (with QEMU) has a very polished interface. But even something simple
 
 qqX offers an alternative menu system that has lots of power and functions. More even than quickemu.
 
-It has an easy installation. No additional software or dependancies are required.
+It has an easy installation. No additional software or dependencies are required.
 
 Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. Both may be installed. Safely test out the qqX difference on your existing quickgui VM's with multiple options of display modes, utilities, optimizers and tools...
+qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system. Safely test out the qqX difference. Both may be installed. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools...
 
 ### Why the text interface?
 
@@ -112,7 +110,7 @@ qqX will work happily alongside quickgui or any quickemu shortcuts. But these ar
 
 - The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the very latest tweaks and bug fixes.
 
-  No other software, support structures or dependancies are needed.
+  No other software, support structures or dependencies are needed.
 
 See the Wiki for more details <https://github.com/TuxVinyards/qqX/wiki>
 
