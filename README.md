@@ -20,7 +20,7 @@ To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main setting
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Simple translatable interface > [Translation Wiki](https://github.com/TuxVinyards/qqX/wiki/Translation)
+- Text based interface for easy [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Why quickemu?
 
@@ -34,7 +34,7 @@ Unfortunately, Qemu front-ends are often enterprise orientated and based on LibV
 
 And even beneath Gnome Boxes' initially simple interface, for example, something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala 
 
-Quickemu, on the other hand, is simply a capable and straightforward Bash script. Much easier for community contributions. Much easier to edit and easy to fix.
+Quickemu, on the other hand, is a simple and capable Bash script. Much easier for community contributions. Much easier to edit and easy to fix.
 
 ## Why qqX?
 
@@ -46,9 +46,9 @@ qqX offers an alternative menu system to the traditional quickemu interface.
 
 Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
 
-- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system.
+- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if it is already installed on your system. Safely test out the qqX difference.
 
-Safely test out the qqX difference. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools.
+Give your existing VM's a power up with qqX's multiple display modes, utilities, optimizers and tools.
 
 ### Not just a text interface
 
