@@ -32,7 +32,7 @@ VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu
 
 But Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-Whilst beneath Gnome Boxes' paradoxically polished and simple general user interface, even something basic like moving the VM folder contains a huge learning curve. Forget anything more unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
+Whilst beneath Gnome Boxes' paradoxically polished and simple general user interface, even something basic like moving the VM folder contains a whole learning curve. Forget anything more unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
 
 Quickemu, on the other hand, is a capable and straightforward script. Much easier for community contributions. Much easier to edit and easy to fix ....
 
