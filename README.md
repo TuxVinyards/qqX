@@ -88,25 +88,21 @@ Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://
 
 Earlier releases have added:
 
+- Distro homepage browser and link checker
+
 - qcow2 repair & resize
 
 - configuration tune-up wizard
 
 - Quick screen percentage switching (default & individual)
 
-- Easy secondary storage creation
+- Secondary storage creation
 
 - Multiple snapshot management, including of shared disks.  
 
-- Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
+- Progress reporting on distro downloads zsync iso's.  
 
-- Clear fully annotated and Shellcheck linted scripting
-
-- Extra process logging and diagnostics
-
-- Full MSRS controls.
-
-- Guided settings editor and auto-update checker
+- Process logging and diagnostics
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
@@ -120,11 +116,9 @@ Start from scratch. Or safely test out the qqX difference on your existing quick
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may newer and may have the very latest tweaks and bug fixes too ...
+- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
   No other software, support structures or dependencies are needed.
-
-Installing qqX will give you new display modes, utilities, optimizers and tools that can be used on any setup that you have already created.
 
 See the Wiki for [more details](https://github.com/TuxVinyards/qqX/wiki)
 
