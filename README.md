@@ -116,17 +116,21 @@ Easy process controlled, progress reporting, distro downloads. Time reporting on
 
 ## How to Install
 
-qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary.
+qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary. 
 
-- Start by installing a full normal quickemu setup, if you don't already have a one, complete with all its components and all its dependencies, as in the instructions on the quickemu-project pages. <https://github.com/quickemu-project/quickemu>
+Start from scratch. Or safely test out the qqX difference on your existing quickgui VM's  
+
+- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu) . 
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
-- The latest qqX release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but it is probably best to make your first download via the **code/clone** button. Also use the Github clone button for the very latest tweaks and bug fixes.
+- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may newer and may have the very latest tweaks and bug fixes too ...
 
   No other software, support structures or dependencies are needed.
 
-See the Wiki for more details <https://github.com/TuxVinyards/qqX/wiki>
+Installing qqX will give you new display modes, utilities, optimizers and tools that can be used on any setup that you have already created.
+
+See the Wiki for [more details](https://github.com/TuxVinyards/qqX/wiki)
 
 ## FAQs and Help
 
@@ -140,7 +144,7 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 
 qqX always makes backups, as is *standard good practice* with *any* software.
 
-More details here: <https://github.com/TuxVinyards/qqX/wiki/Change-Log>
+More details in the [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log)
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
