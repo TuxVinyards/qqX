@@ -28,19 +28,19 @@ To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main setting
 
 It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
-VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
+VirtualBox was good in its day .... developers are now moving to [QEMU](https://qemu.readthedocs.io)  
 
-But Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
+Unfortunately, Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-Whilst beneath Gnome Boxes' paradoxically polished and simple general user interface, even something basic like moving the VM folder contains a whole learning curve. Forget anything more unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
+And even beneath Gnome Boxes' initially simple interface, for example, something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala 
 
-Quickemu, on the other hand, is a capable and straightforward script. Much easier for community contributions. Much easier to edit and easy to fix ....
+Quickemu, on the other hand, is simply a capable and straightforward Bash script. Much easier for community contributions. Much easier to edit and easy to fix.
 
 ## Why qqX?
 
 qqX offers an alternative menu system to the traditional quickemu interface.
 
-- It has lots of power and functions. More even than quickemu.
+- It has lots of power and functions. Even more than quickemu.
 
 - An easy installation with no additional software or dependencies required.
 
@@ -57,10 +57,6 @@ Less can be more. By using the same, simple and well-known scripting language th
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
 qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API. Anything within quickemu can be easily pulled, shaped and improved.
-
-Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
-
-![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
 
 ### Install the latest ISO's at the click of a mouse
 
@@ -82,17 +78,19 @@ Release 1.1.03 improved the main menu & added a gtk display option, while 1.5.02
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
+Release 1.5.02 added alphabetical zooming into list sections for the Quick Get multi distro menu:
+
+![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
+
+Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
+
+![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
+
 Earlier releases have added:
 
 - qcow2 repair & resize
 
 - configuration tune-up wizard
-
-![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
-
-Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. Picture of it working lower down, in the release notes section.  Disks can go wrong. 👍 Give it a try.
-
-Plus:
 
 - Quick screen percentage switching (default & individual)
 
@@ -100,11 +98,7 @@ Plus:
 
 - Multiple snapshot management, including of shared disks.  
 
-Release 1.5.02 added alphabetical zooming into list sections for the Quick Get multi distro menu:
-
-![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
-
-Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
+- Easy process controlled, progress reporting, distro downloads. Time reporting on zsync development iso's.  
 
 - Clear fully annotated and Shellcheck linted scripting
 
@@ -113,6 +107,8 @@ Easy process controlled, progress reporting, distro downloads. Time reporting on
 - Full MSRS controls.
 
 - Guided settings editor and auto-update checker
+
+![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
 ## How to Install
 
@@ -143,6 +139,8 @@ Testing has been carried out on a variety of mainstream distros.
 All scripts have been carefully Shellcheck linted & have full error handling routines.
 
 qqX always makes backups, as is *standard good practice* with *any* software.
+
+Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. 
 
 More details in the [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log)
 
