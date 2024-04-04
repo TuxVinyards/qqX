@@ -30,11 +30,11 @@ It has an active community and is the only virtual machine manager that makes ea
 
 VirtualBox was good in its day.  Developers are now moving to QEMU <https://qemu.readthedocs.io>
 
-Qemu front-ends based on LibVirt can be quite abstract and complex, for example Virt Manager.
+But Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-Gnome Boxes (with QEMU) has a very polished interface. But even something simple like moving the VM folder has a learning curve. Forget anything more complex unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
+Whilst beneath Gnome Boxes' paradoxically polished and simple general user interface, even something basic like moving the VM folder contains a huge learning curve. Forget anything more unless you wish to become an expert in xml, gnome3 & vala : <https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads>
 
-Quickemu is not without its flaws. But its flaws can be fixed and it can be made to work.
+Quickemu, on the other hand, is a capable and straightforward script. Much easier for community contributions. Much easier to edit and easy to fix ....
 
 ## Why qqX?
 
@@ -48,7 +48,7 @@ Quickemu works on the command line and traditionally has had a simple menu inter
 
 - qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if is already installed on your system.
 
-Safely test out the qqX difference. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools...
+Safely test out the qqX difference. Give your existing quickgui VM's a power up with qqX's multiple display modes, utilities, optimizers and tools.
 
 ### Not just a text interface
 
