@@ -120,11 +120,11 @@ Start from scratch. Or safely test out the qqX difference on your existing quick
 
   No other software, support structures or dependencies are needed.
 
-See the Wiki for [more details](https://github.com/TuxVinyards/qqX/wiki)
+See the installer [Wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 ## FAQs and Help
 
-See Wiki <https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help>
+FAQ: [Wiki](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
 
 ## Release notes
 
