@@ -38,17 +38,17 @@ Quickemu, on the other hand, is a simple and capable Bash script. Much easier fo
 
 ## Why qqX?
 
-qqX offers an alternative menu system to the traditional quickemu interface.
+qqX is full menu system that improves on the traditional quickemu interfaces.
 
 - It has lots of power and functions. Even more than quickemu.
 
 - An easy installation with no additional software or dependencies required.
 
-Quickemu works on the command line and traditionally has had a simple menu interface called quickgui.
+Quickemu only works on the command line and quickgui is very basic.
 
-- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if it is already installed on your system. Safely test out the qqX difference.
-
-Give your existing VM's a power up with qqX's multiple display modes, utilities, optimizers and tools.
+- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if it is already installed on your system.
+  
+Using qqX will power up existing VM's with improved display modes, utilities, optimizers and tools.
 
 ### Not just a text interface
 
@@ -89,18 +89,18 @@ Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://
 Earlier releases have added:
 
 - Distro homepage browser and link checker
+  
+- Configuration tune-up wizard
+
+- Screen percentage switching (default & individual)
+
+- Multiple snapshot management, including of shared disks.
 
 - qcow2 repair & resize
 
-- configuration tune-up wizard
-
-- Quick screen percentage switching (default & individual)
-
 - Secondary storage creation
 
-- Multiple snapshot management, including of shared disks.  
-
-- Progress reporting on distro downloads zsync iso's.  
+- Progress reporting on distro downloads & zsync iso's.  
 
 - Process logging and diagnostics
 
