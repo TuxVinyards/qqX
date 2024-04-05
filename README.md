@@ -32,7 +32,7 @@ VirtualBox was good in its day .... developers are now moving to [QEMU](https://
 
 Unfortunately, Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-And even beneath Gnome Boxes' initially simple interface, for example, something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala 
+And even beneath Gnome Boxes' initially simple interface, for example, something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala
 
 Quickemu, on the other hand, is a simple and capable Bash script. Much easier for community contributions. Much easier to edit and easy to fix.
 
@@ -108,11 +108,11 @@ Earlier releases have added:
 
 ## How to Install
 
-qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary. 
+qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary.
 
 Start from scratch. Or safely test out the qqX difference on your existing quickgui VM's  
 
-- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu) . 
+- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
   
   You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
 
@@ -134,8 +134,7 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 
 qqX always makes backups, as is *standard good practice* with *any* software.
 
-Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function. 
-
+Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function.
 More details in the [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log)
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
