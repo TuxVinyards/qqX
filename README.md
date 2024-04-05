@@ -141,15 +141,9 @@ Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
 ## Development
 
-You can easily run any new version of qqX directly from the working folder when making clones of the repo to your local machine.  By default, this will pick up the main settings file at `~/.qqX` and automatically locate all your current VMs.
+When making clones of the repo to your local machine, you can easily run any new version of qqX directly from the working folder.
 
-qqX has several layers of backup and fail safe, however do backup critical VMs if tinkering with these systems.
-
-You are recommended to place any development changes to the settings file into a single block so that they can be easily pasted back after carrying out release upgrades to your main qqX installation.
-
-Whilst the release installer will automatically backup your settings file, part of the update procedure is the removal of obsolete and unneeded lines. This will cause a temporary removal of any changes that you may have made.
-
-The code has now been refactored to make readability easier on notebooks and smaller height screens. Release 1.5.02, even with its new added features and script, is more compact and around 500 lines shorter ... :rocket:
+See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
 
 ## Bash
 

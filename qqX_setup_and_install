@@ -114,6 +114,26 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
 
 fi
 
+
+if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
+  printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
+  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  read -rp  "  >  "   FHS_Alert
+  [[ $FHS_Alert ]] &&  exit 
+fi
+
+
+##  Check for 'curl' and 'aria2' etc  as is often omitted from quickemu install recipes
+#   & where $1 test is true if command line is being used 
+
+if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]] || [[ ! $(type -p zsync) ]]; then
+  echo
+  echo "  You may need to install 'curl' & 'aria2' & 'zsync' to run parts of the quickget script ..."
+  echo
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+
+
 qqX_Version="$(./qqX --version 2>/dev/null)"
 
 # Default location is next to quickemu in "/usr/bin" but where qqX_Std_Bin_Dir is set to "/bin" to improve portabilty.
