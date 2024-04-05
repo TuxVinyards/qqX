@@ -8,9 +8,7 @@ Release [1.7.01](https://github.com/TuxVinyards/qqX/releases/tag/1.7.0.02) has l
 
 It also fixes the minor glitch in the 1.6 installer that some may have noticed. Apologies if you were affected.
 
-However, explanation [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages do need to be added over the next few days before going to general release.
-
-To upgrade from 1.6, make sure 'BetaUpdates' are enabled in the qqX main settings.
+Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
