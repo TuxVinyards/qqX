@@ -66,29 +66,6 @@ if  [[ $NoClear ]]; then
 fi
 
 
-if ! tput -V | grep -q ncurses 2> /dev/null; then
-  printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
-  sleep 5
-  exit 1
-fi
-
-if [[ ! -d "/tmp" ]]; then
-  printf "\n\n  Check for your OS >  \n\n  A directory '/tmp' should be present. A symbolic link may be needed. "
-  printf "\n\n  See:  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard"
-  sleep 5
-  exit 1
-fi
-
-##  Check for 'curl' and 'aria2' etc  as is often omitted from quickemu install recipes
-#   & where $1 test is true if command line is being used 
-
-if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]] || [[ ! $(type -p zsync) ]]; then
-  echo
-  echo "  You need to install 'curl' & 'aria2' & 'zsync' to run parts of the quickget script ..."
-  echo
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
-fi
-
 # Usage needs to be loaded early on, so it can be shown if initial help is required
 show_CLI_usage () {
 
