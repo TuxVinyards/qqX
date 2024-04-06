@@ -64,11 +64,11 @@ And anything within quickemu can be easily taken, shaped and improved.
 
 ![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
 
-No need to wait for Quickget to add in the distros you want, or to update its release data.
+No need to wait for Quickget to add in the distros or releases that you want.
 
 ### Get the latest fixes too
 
-There is no needed to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
+There is no need to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
 Confident Linux users should quickly find themselves at home.
 
