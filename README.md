@@ -133,7 +133,8 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 qqX always makes backups, as is *standard good practice* with *any* software.
 
 Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function.
-More details in the [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log)
+
+![disk error alert crop](https://github.com/TuxVinyards/qqX/assets/3956806/7edf972c-3c18-4f33-8096-2c1cbc5ba4f5)
 
 Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
 
