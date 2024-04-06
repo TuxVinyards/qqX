@@ -36,9 +36,11 @@ Quickemu, on the other hand, is a simple and capable Bash script. Much easier fo
 
 ## Why qqX?
 
-qqX is full menu system that improves on the traditional quickemu interfaces.
+qqX goes far beyond a front-end restricted to the basic quickemu API
 
-- It has lots of power and functions. Even more than quickemu.
+- A full menu system that improves on the traditional quickemu interfaces
+
+- Lots of power and functions. Even more than quickemu.
 
 - An easy installation with no additional software or dependencies required.
 
@@ -50,11 +52,13 @@ Using qqX will power up existing VM's with improved display modes, utilities, op
 
 ### Not just a text interface
 
-Less can be more. By using the same, simple and well-known scripting language that is used by quickemu, qqX is able to achieve complete quickemu script absorption and modding.
+Less can be more.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-qqX goes far beyond being a simple front-end that is restricted to the basic quickemu API. Anything within quickemu can be easily pulled, shaped and improved.
+qqX uses the same well-known scripting language that is used by quickemu.
+
+And anything within quickemu can be easily taken, shaped and improved.
 
 ### Install the latest ISO's at the click of a mouse
 
