@@ -6,7 +6,9 @@
 
 Release [1.7.01](https://github.com/TuxVinyards/qqX/releases/tag/1.7.0.02) has lots of new interface features and is now good to go :rocket:
 
-It also fixes the minor glitch in the 1.6 installer that some may have noticed. Apologies if you were affected.
+Except, on Fedora 39, expect a point release shortly to fix a problem with the coreutils  ...
+
+That said, 1.7 does fix the minor glitch in the 1.6 installer that some may have noticed. Apologies if you were affected.
 
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
 
