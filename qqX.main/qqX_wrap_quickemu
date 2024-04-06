@@ -50,7 +50,7 @@ function find_quickemu_source_functions_and_vars {
   ((QE_StartFuncsPoint -= 1))
   QE_EOfuncsPoint=$(grep -n '### MAIN' "$QuickEmuSource" | cut -d ':' -f 1)
   QE_EOfuncsTrim=$((QE_EOfuncsPoint - QE_StartFuncsPoint -1))
-  tail +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
+  tail -n +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
   source "/tmp/qmod-functions-temp" 
 
   ## Quickemu Variables (set & clear)
@@ -58,7 +58,7 @@ function find_quickemu_source_functions_and_vars {
 
   QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
   QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
-  tail +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
+  tail -n +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
     
   # BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
   # with QEMU_IMG checker which has been replaced (at the start of qqX)
@@ -127,7 +127,7 @@ EOV
 # no indent on 'cat' & EOV or it fails
 
   # then continue with the remainder
-  tail +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
+  tail -n +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
 
   # shellcheck disable=SC2016
   QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
@@ -342,12 +342,12 @@ function load_quickemu_cases_and_actions {
 
   ## Add in the standard parameter cases 
 
-  tail +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
+  tail -n +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
   # note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
   QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
   QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
   ((QE_EoCasePoint -= (QE_StartCasePoint -1) ))
-  tail "+$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
+  tail -n +"$QE_StartCasePoint" "/tmp/qmod-endof-file-temp" | head -"$QE_EoCasePoint"  > "/tmp/qmod-case-temp"
 
   ##  Add in the standard actions ( also where quickemu sources in the .conf file )
 
@@ -360,10 +360,10 @@ function load_quickemu_cases_and_actions {
   # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
   # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
-  tail "+$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
+  tail -n +"$QE_EoCasePoint" "/tmp/qmod-endof-file-temp" | head -n -"$QE_BootRemainder" > "/tmp/qmod-actions-conf-source-temp"
   grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
 
-  tail "+$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
+  tail -n +"$QE_vm_bootPoint" "/tmp/qmod-endof-file-temp" | head -n -1 > "/tmp/qmod-boot-temp"
 
 }
 
