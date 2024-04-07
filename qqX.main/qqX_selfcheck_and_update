@@ -206,7 +206,9 @@ function download_new_release {
 
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
 
-      for Line in "${AboutReleaseArray[@]}" ; do  printColor "\n\n  %s"  "$Line"  ; done
+      for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n * %s"  "$Line" ; fi ; done
+
+      # as long as there are no trailing colons or spaces in release list, prints a tidied up bullet-point summary
 
     fi
 
