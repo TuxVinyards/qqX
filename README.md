@@ -2,7 +2,7 @@
 
 ## " quickemu quickget X terminal project "
 
-Release [1.7.02](https://github.com/TuxVinyards/qqX/releases/tag/1.7.02) has lots of new interface features and is good to go :rocket:
+Release [1.7.02](https://github.com/TuxVinyards/qqX/releases/tag/1.7.02) has lots of NEW INTERFACE FEATURES and is good to go :rocket:
 
 The point release for the Fedora 39 coreutils/tail error with is now out.
 
