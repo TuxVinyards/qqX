@@ -2,13 +2,13 @@
 
 ## " quickemu quickget X terminal project "
 
-1.6.02 introduced a new Custom Boot system that can run Arm64, Risc-V and others.
+Release [1.7.02](https://github.com/TuxVinyards/qqX/releases/tag/1.7.02) has lots of new interface features and is good to go :rocket:
 
-Release [1.7.01](https://github.com/TuxVinyards/qqX/releases/tag/1.7.0.02) has lots of new interface features and is now good to go :rocket:
+The point release for the Fedora 39 coreutils/tail error with is now out.
 
-Except, on Fedora 39, expect a point release shortly to fix a problem with the coreutils  ...
+And the 1.7.01 release also fixed the minor glitch in the 1.6 installer that some may have noticed.
 
-That said, 1.7 does fix the minor glitch in the 1.6 installer that some may have noticed. Apologies if you were affected.
+Apologies if you were affected.
 
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
 
@@ -89,6 +89,8 @@ Release 1.5.02 added alphabetical zooming into list sections for the Quick Get m
 Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
 
 ![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
+
+And 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
 Earlier releases have added:
 
