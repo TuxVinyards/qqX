@@ -110,7 +110,7 @@ function  load_mod_quickemu_boot {
 # add-in CUSTOM VARS here, as replacement values, using same method as for the final boot section
 # no indent on 'cat' & EOV lines or it fails:
 
-cat << \EOV >> "/tmp/qmod-function-vm_boot-interim-temp"
+cat << 'EOV' >> "/tmp/qmod-function-vm_boot-interim-temp"
 
     # Overide specified quickemu defaults,  though not all may be done here.
     # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
@@ -138,9 +138,9 @@ EOV
 
 ## ADD-IN extra code  ( place between the first EOF line & the brace that closes the tail trimmed boot function, just before the second EOF)
 
-# See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     ( NB use escape EOF, not quotes )
+# See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     (@ 2024/04 use quote EOF, not escape)
 
-cat << \EOF >> "/tmp/qmod-function-vm_boot-new-temp"
+cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     # Show all the compiled qemu & swmtp arguments as a human readable list 
     # both to a log file and to screen   (Args & Args/HW record are defined after the VM selection or re-selection)
