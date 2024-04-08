@@ -365,7 +365,7 @@ VM_loader_selector_and_menu () {
   if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
 
     ## Check file/folder exists and that we are where we need to be
-    [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder"  && SelectArrayError=1
+    [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder" "$VM_Conf_Dir" && SelectArrayError=1
 
     # change directory to where the VM is
     ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1

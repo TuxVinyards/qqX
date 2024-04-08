@@ -175,12 +175,17 @@ function set_drive_paths {
 #  MAIN DRIVE & BOOT
 # 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
 #  everytime a different VM is selected or the .conf file is reconfigured
-#  Quickemu uses 'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
+#  Quickemu uses vars:  'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
+#  Error handling for this function is also actioned by 'show_main_menu_header' 
 
 function read_main_drive_and_img_iso_conf_vars {
 
   MainDrive=
   IsoImg=
+
+  [[ $disk_img ]] && [[ ! -d  "$(dirname "$disk_img")" ]] && function_conf_error  folder  "disk_img:  $(dirname "$disk_img")"
+  [[ $img ]] && [[ ! -d  "$(dirname "$img")" ]] && function_conf_error  folder  "img:  $(dirname "$img")"
+  [[ $iso ]] && [[ ! -d  "$(dirname "$iso")" ]] && function_conf_error  folder  "iso:  $(dirname "$iso")" 
 
   [[ -e "$disk_img" ]] && MainDrive="$disk_img"
   [[ -e "$img" ]] && IsoImg="$img"
@@ -212,6 +217,9 @@ function_conf_error () {
     printf "\n\n  Check the settings and re-run this script ... " 
   fi
 
+ [[ $GeneralLoopCheck ]] && echo
+  dev_loop_check
+
   printf "\n\n  Settings file:  %s \n\n" "$qqX_SettingsFile"
   
   if [[ "$1" == *'COMMAND'* ]]; then 
@@ -234,7 +242,8 @@ function_conf_error () {
   elif [[ $1 == "folder" ]] ; then 
 
     FolderConfigFlag=1
-    printf "\n  Folder config ERROR: "
+    printf "\n  Folder config ERROR:"
+    [[ $2 ]] && printf "  '%s'"  "$2"
     printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
     printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
     printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings " 
