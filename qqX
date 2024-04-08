@@ -114,12 +114,10 @@ function dev_loop_check {
 
     if [[ $GeneralLoopCheck ]]; then
     echo
-    echo "SelectArrayError = $SelectArrayError"
-    echo "VM_Conf_Dir = $VM_Conf_Dir"
-    echo "VM_Conf_File = $VM_Conf_File"
-    echo "VM_InstanceName = $VM_InstanceName"
-    echo "pwd: $(pwd)"
+    echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+    echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone"
     echo "MainDrive = $MainDrive  IsoImg = $IsoImg"
+    echo "pwd: $(pwd)"
     sleep "$GeneralLoopCheck"
   fi
 }

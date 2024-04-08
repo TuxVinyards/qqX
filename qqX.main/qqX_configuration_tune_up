@@ -63,6 +63,7 @@ function_config_tune_up ()  {
 
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
+  [[ $GeneralLoopCheck ]] && echo
   dev_loop_check
 
   printColor "\n\n  CHECK ME: \n\n"

@@ -233,7 +233,7 @@ function_quick_get_wrap ()  {
   printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber" 
   printf "(needs internet, including for some menu items & for tests) \n\n\n" 
 
-  dev_loop_check
+  dev_loop_check ; [[ $GeneralLoopCheck ]] && echo
 
   tput sc
   echo 

@@ -221,7 +221,7 @@ function_conf_error () {
 
   elif [[ $1 == "new" ]]; then 
 
-    printColor "\n  CHECK ME, NOW: \n\n"    #  REVIEW   
+    printColor "\n  Starting NEW VIRTUAL MACHINE: \n\n"    #  REVIEW   
     cat "$VM_Conf_File"
     NewSetupFlag=1
     IgnoreFolderCheck=1
