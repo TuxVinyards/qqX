@@ -45,10 +45,11 @@ function quickget {
 }
 
 
-print_quickget_choices () {
+print_quickget_and_folder_choices () {
 
-  # listing function for use inside 'function_quick_get_wrap'  
-  # adapted with $2 EITHER as number per line  or for alpha filter
+  # listing function, originally for use inside 'function_quick_get_wrap'  
+  # adapted with $2 EITHER as number per line OR for alpha filter
+  # and for use for listing target folder selections for installing or moving VM's
 
   declare -n QGW_List_ArrName="$1"
 
@@ -217,7 +218,7 @@ function check_new_vm_folder_name {
 
       printColor "\n\n   %s  >>  similar name match(es) found: \n\n"  "$QWG_NewVM_Name"
     
-      print_quickget_choices  "SimilarVM_Arr_Display" 6
+      print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
 
     fi
 
@@ -291,7 +292,7 @@ function_quick_get_wrap ()  {
     QGW_OS_ListString="${QGW_OS_ListRaw/'- Operating Systems: '/}"
     read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
 
-    print_quickget_choices  "QGW_OS_Array"
+    print_quickget_and_folder_choices  "QGW_OS_Array"
 
 
     while true ; do
@@ -307,11 +308,11 @@ function_quick_get_wrap ()  {
       elif [[ "$QGW_List_NumSelected" == [a-z] ]]; then 
 
         printf "\n"
-        print_quickget_choices  "QGW_OS_Array" "$QGW_List_NumSelected"
+        print_quickget_and_folder_choices  "QGW_OS_Array" "$QGW_List_NumSelected"
 
         if [[ $QGW_List_NumSelected == "u" ]]; then
           printf "  and ... \n\n"
-          print_quickget_choices  "QGW_OS_Array" "UbuntuOthers"
+          print_quickget_and_folder_choices  "QGW_OS_Array" "UbuntuOthers"
         fi
 
         QGW_List_NumSelected=
@@ -323,7 +324,7 @@ function_quick_get_wrap ()  {
         if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then
 
           printf "\n"
-          print_quickget_choices  "QGW_OS_Array" 
+          print_quickget_and_folder_choices  "QGW_OS_Array" 
           QGW_List_NumSelected=
 
         else
@@ -394,7 +395,7 @@ function_quick_get_wrap ()  {
       else
 
         printf "\n\n"
-        print_quickget_choices  "QGW_Releases_Array"
+        print_quickget_and_folder_choices  "QGW_Releases_Array"
         iso_get_message
         printColor "\n\n\n  Give LIST number of Release"   
 
@@ -455,7 +456,7 @@ function_quick_get_wrap ()  {
       else
 
         printf "\n\n"
-        print_quickget_choices  "QGW_Editions_Array"
+        print_quickget_and_folder_choices  "QGW_Editions_Array"
         printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"  
         read -rp "  >  "  QGW_List_NumSelected   
 

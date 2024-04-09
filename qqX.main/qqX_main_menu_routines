@@ -297,75 +297,259 @@ function multi_instance_checks {
 function_delete_Selected_VM () {
 
   if [[ ! $1 && ! $2 ]]; then
-
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
     sleep 2 ;  return
+  fi
+
+  if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+    printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
+    sleep 2 ;  return
+  fi
+
+  if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
+
+  printColor "\n\n  Folder: %s " "$1"
+  printColor "  & file: %s  to be deleted?"  "$2"
+  printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
+  printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+  printColor "\n\n\n  Folder content: \n\n"
+  ls "$1"
+
+  if [[ $TrashingAvailable ]]; then 
+    printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
+    printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
+  else
+    printColor "\n\n  [enter] use the file manager to move things the trash bin "
+    printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
+  fi
+
+  printf "\n\n"
+  read -rp "  >  "   Delete_VM_Option
+
+  if [[ $Delete_VM_Option == "y" ]]; then 
+
+    printf "\n\n  Folder & .conf file being deleted ... \n"
+    rm -f -r "$1"  
+    rm -f "$2"
 
   else
 
-    if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
-       printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
-      printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
-      sleep 2 ;  return
-    fi
-
-    if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
-
-    printColor "\n\n  Folder: %s " "$1"
-    printColor "  & file: %s  to be deleted?"  "$2"
-    printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
-    printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
-    printColor "\n\n\n  Folder content: \n\n"
-    ls "$1"
-
-    if [[ $TrashingAvailable ]]; then 
-      printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
-      printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
-    else
-      printColor "\n\n  [enter] use the file manager to move things the trash bin "
-      printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
-    fi
-
-    printf "\n\n"
-    read -rp "  >  "   Delete_VM_Option
-
-    if [[ $Delete_VM_Option == "y" ]]; then 
-
-      printf "\n\n  Folder & .conf file being deleted ... \n"
-      rm -f -r "$1"  
-      rm -f "$2"
-
-    else
-
-      if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
-        printf "\n\n  Moving files to the bin ... \n"
-        gio trash "$1"
-        gio trash "$2"
-      else  printf "\n\n  NOT deleted ... \n"
-      fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
-
-    fi
-
-    sleep 1
-    printColor "\n\n  [enter] to return or continue \n\n" 
-    read -rp "  > "
-    
-    ByPass_VM_Array_Selector=
-    ByPass_VM_Array_Loader=
-    VM_InstanceName=
-    VM_Conf_Dir=
-    VM_Conf_File=
-    MainDrive=
-    IsoImg=
-    NewFileTuneUp=
-    NewFileTuneUp_JustDone=
-
-    refresh_sources_and_load_VM_arrays
-    return
+    if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
+      printf "\n\n  Moving files to the bin ... \n"
+      gio trash "$1"
+      gio trash "$2"
+    else  printf "\n\n  NOT deleted ... \n"
+    fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 
   fi
 
+  printColor "\n\n  [enter] to return or continue \n\n" 
+  read -rp "  > "
+  
+  ByPass_VM_Array_Selector=
+  ByPass_VM_Array_Loader=
+  VM_InstanceName=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  MainDrive=
+  IsoImg=
+  NewFileTuneUp=
+  NewFileTuneUp_JustDone=
+  refresh_sources_and_load_VM_arrays
+
+}
+
+
+function_rename_conf_dirnames () {  
+
+  if [[ ! $1 ]]; then
+    # Normally: "${Mv_NewName}.conf"  "VM Old Name"  "$Mv_NewName"  And conf has been backed up.  
+    printColor "\n\n  Conf Rename Internal Params: VM config file (NO PATH) must be given"
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    sleep 2 ;  return
+  fi
+
+  mapfile -t ConfRenameArray < "$1"
+  printf "" > "$1"
+
+  for Line in "${ConfRenameArray[@]}"; do
+    [[ "$Line" == *"$2"* ]] && Line="${Line//"$2"/"$3"}"
+    printf "%s\n" "$Line" >> "$1"
+  done
+}
+
+list_current_folder_instance_names () {
+
+  CurrentFolderNames=()
+  CurrentFolderNameError=
+  mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
+  for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
+
+  printf "\n  Folders:   "
+  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor " NONE FOUND \n\n" 
+  else 
+    printf "\n\n" 
+    print_quickget_and_folder_choices  "CurrentFolderNames"  6 
+  fi
+}
+
+
+move_rename_Selected_VM () {  
+
+  if [[ ! $1 && ! $2 ]]; then
+    # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
+    printColor "\n\n  Move Rename Internal Params: VM Name & VM config file (NO PATH) must be given"
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    sleep 2 ;  return
+  fi
+
+  if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+    printColor "\n\n  Move Rename Internal Params: VM Name / VM config file  NOT FOUND " 
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    sleep 2 ;  return
+  fi
+
+  MoveFail=
+
+  printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
+  printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
+  printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
+  printColor "\n\n  [r] to rename  [m] to move  "; printf "[b] to go back"   
+  printf "\n\n"
+  read -rp "  >  "   Move_VM_Option
+
+  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" ]]; then 
+
+    printf "\n  Folder '%s' & .conf file to be MOVED and edited"  "$1"
+    printf "\n\n  For new preset group folders, edit the main settings" 
+    printColor "\n\n  Current Folder: '%s'" "$(pwd)"
+    show_current_group_folder_list
+
+    while true; do
+
+      printColor "\n\n  [number] select a different group folder "
+      printf " [b] to go back\n\n"
+      read -rp  "  >  "  Move_FolderOption
+
+      case "$Move_FolderOption" in
+
+        b)
+          Move_FolderOption= ; Move_VM_Option=
+          return
+        ;;
+
+        [0-9]|[0-9][0-9]) 
+          Mv_NewConf_Dir="${VM_Folder_List[Move_FolderOption]}" 
+          if [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then  Move_FolderOption= 
+          else printf "\n  Selected: '%s'"  "$Mv_NewConf_Dir"  
+          fi
+          printColor "\n\n  [enter] to confirm " ; printf " [r] re-select \n\n"
+          [[ $Move_FolderOption ]] && read -rp "  >  " Move_FolderOption
+          if [[ $Move_FolderOption == "r" ]]; then Move_FolderOption= 
+          elif [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then printf "\n  ERROR  Same Folder "; Move_FolderOption= 
+          else break
+          fi
+        ;;
+
+      esac
+
+    done
+
+    Mv_OldFolderPath="$(realpath "$VM_InstanceName")"
+    Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
+
+    Move_VM_Option="r"
+    if cd "$Mv_NewConf_Dir"; then printf "\n  Changing to folder '%s'\n"  "$Mv_NewConf_Dir"
+    else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
+    fi
+
+  fi
+
+  if [[ $Move_VM_Option == "r" ]]; then  
+
+    list_current_folder_instance_names
+
+    while true; do
+
+      Mv_NewName=
+      CurrentFolderNameError=
+      printf "\n\n  Folder '%s' & .conf file to be RE-NAMED and edited"  "$1"
+      printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change"
+      printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
+      read -rp "  >  "  Mv_NewName 
+
+      [[ ! $Mv_NewName || $Mv_NewName == "n" ]] && Mv_NewName="$VM_InstanceName"  && break
+      
+      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1; done
+      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break ; fi
+
+    done
+
+    if [[ $Mv_NewName == "b" ]]; then  Move_VM_Option= ; Mv_NewName= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return ; fi
+
+    Mv_NewName_Return=
+    if [[ $Mv_NewName != "$VM_InstanceName" ]]; then printf "\n\n  Renaming to '%s' " "$Mv_NewName"
+    else printf "\n\n  Keeping old name '%s' " "$Mv_NewName"
+    fi
+    printColor "\n\n  [enter] to make this happen  [b] to go back \n\n"
+    read -rp "  >  "  Mv_NewName_Return
+
+    if [[ $Mv_NewName_Return ]]; then  
+      Mv_NewName_Return= ; Move_VM_Option= ; Mv_NewName= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
+    fi
+
+    if [[ $Mv_NewConf_Dir ]]; then 
+      mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
+      mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
+      set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
+    fi
+
+    if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
+
+      if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
+        mv "$1" "$Mv_NewName" || MoveFail=1
+        mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
+      fi
+
+      if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
+
+    fi
+  
+  else  
+
+    Move_VM_Option= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
+
+  fi
+
+  [[ ! $MoveFail ]] && printColor "\n  Success  '%s'\n"  "$(pwd)"
+  list_current_folder_instance_names
+  printColor "\n\n  [enter] to return or continue \n\n" 
+  read -rp "  > "
+
+  ByPass_VM_Array_Selector=
+  ByPass_VM_Array_Loader=
+  VM_InstanceName=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  MainDrive=
+  IsoImg=
+  NewFileTuneUp=
+  NewFileTuneUp_JustDone=
+  MoveFail=
+  Move_FolderOption=
+  Move_VM_Option=
+  Mv_NewName=
+
+  # Current behaviour is to return to the VM selector and see the results of what we have done.
+  # This basically duplicates the 'function_delete_Selected_VM' which was used as a template.
+  # To return to a new current main menu would require instating 'VM_InstanceName' etc with the new values,
+  # which is feasible as the move section does do a 'cd' to the new conf folder  REVIEW  
+
+  refresh_sources_and_load_VM_arrays
+  
 }
 
 read_x86_tiano_vars_list () {

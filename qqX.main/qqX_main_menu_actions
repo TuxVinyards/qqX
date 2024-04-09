@@ -33,6 +33,10 @@ function  main_menu_actions {
 
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
 
+  elif [[ $MainMenuChoice == "mv" ]]; then 
+
+    move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
+
   elif [[ $MainMenuChoice == "hdw" ]] ; then
 
     AddHW_Record=

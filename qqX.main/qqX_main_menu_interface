@@ -49,7 +49,7 @@ else
 
     else
 
-      printf "   [del] delete selected VM"
+      printf "   [del] delete selected VM   [mv] move or rename"
       printColor  "    [u]   hide utils & technical"
       printf "\n"
 

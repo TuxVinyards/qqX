@@ -528,7 +528,7 @@ function create_new_drives {
 
           if [[ $MainMenuChoice == "2" ]]; then 
 
-            printf "SecondDrive=\"%s/%s/storage.qcow2\"" "$VM_Conf_Dir" "$VM_InstanceName"  >> "$VM_Conf_File"
+            printf "SecondDrive=\"%s/storage.qcow2\"" "$VM_InstanceName"  >> "$VM_Conf_File"
 
             "$QEMU_IMG"  create -q -f qcow2 "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" "${SecondDriveCreateSize}G"
 
