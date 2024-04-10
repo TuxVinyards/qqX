@@ -330,17 +330,17 @@ function_delete_Selected_VM () {
 
   if [[ $Delete_VM_Option == "y" ]]; then 
 
-    printf "\n\n  Folder & .conf file being deleted ... \n"
+    printf "\n\n  Folder & .conf file being deleted ... "
     rm -f -r "$1"  
     rm -f "$2"
 
   else
 
     if [[ $TrashingAvailable ]] && [[ $Delete_VM_Option != "n" ]]; then
-      printf "\n\n  Moving files to the bin ... \n"
+      printf "\n\n  Moving files to the bin ... "
       gio trash "$1"
       gio trash "$2"
-    else  printf "\n\n  NOT deleted ... \n"
+    else  printf "\n\n  NOT deleted ... "
     fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 
   fi

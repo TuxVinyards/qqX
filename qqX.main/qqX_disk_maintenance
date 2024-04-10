@@ -469,6 +469,8 @@ function create_new_drives {
   SecondDriveCreateSize=
   DriveCreated=
 
+  [[ $MainMenuChoice == "2c" ]] && MainMenuChoice="2"
+
   if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs || $SharedDrive_Conf == "no-shared" ]] ; then 
     
     printColor "\n\n  ERROR:  a shared drive already exists. Check VM conf and general settings.\n\n"
@@ -594,8 +596,8 @@ function create_new_drives {
       
   fi
 
-  printf "\n\n"
-  read -rp "  [enter] to return > "
+  printf "\n\n  [enter] to return \n\n"
+  read -rp "  >  "
   
 }
 
@@ -626,15 +628,15 @@ function_delete_SecondDrive () {
 
     if [[ $DeleteSecond == "y" ]]; then 
 
-      printf "\n\n  Second Drive being deleted ... \n"
+      printf "\n\n  Second Drive being deleted ... "
       rm -f "$SecondDrive"
 
     else
 
       if [[ $TrashingAvailable ]] && [[ $DeleteSecond != "n" ]]; then
-        printf "\n\n  Moving files to the bin ... \n"
+        printf "\n\n  Moving files to the bin ... "
         gio trash "$SecondDrive"
-      else  printf "\n\n  NOT deleted ... \n"
+      else  printf "\n\n  NOT deleted ... "
       fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 
     fi

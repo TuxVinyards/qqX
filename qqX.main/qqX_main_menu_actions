@@ -217,8 +217,9 @@ function  main_menu_actions {
     drives_and_snapshots  info
 
     printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-    [[ $SharedDriveArgs || $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-    printf "\n\n  [enter] to return to menu \n\n "
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
+      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n "
+    else printColor "\n\n  [enter] to return to menu \n\n " ; fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
@@ -230,8 +231,9 @@ function  main_menu_actions {
 
     drives_and_snapshots
 
-    [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "\n\n  Scroll to View "
-    printf "\n\n  [enter] to return to menu \n\n "
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
+      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n "
+    else printColor "  [enter] to return to menu \n\n " ; fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then
