@@ -413,6 +413,7 @@ move_rename_Selected_VM () {
   fi
 
   MoveFail=
+  Move_VM_Option=
 
   printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
@@ -529,10 +530,12 @@ move_rename_Selected_VM () {
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
 
-  if [[ $Mv_NewConf_Dir ]]; then
+  if [[ ! $MoveFail && $Mv_NewConf_Dir ]]; then
 
+    QemuErrorLog="$Mv_NewConf_Dir/$Mv_NewName/${Mv_NewName}.qemu.error.log"
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
+    SelectArrayError=
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
@@ -547,13 +550,14 @@ move_rename_Selected_VM () {
     Mv_NewConf_Dir=
     Mv_NewName_Return=
 
-  else
+  elif [[ ! $MoveFail ]]; then
 
     ByPass_VM_Array_Selector=1
     VM_Renamed=1
     SelectArrayError=
     VM_InstanceName="$Mv_NewName"
     VM_Conf_File="${Mv_NewName}.conf"
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
     MainDrive=
     IsoImg=
     NewFileTuneUp=
@@ -568,8 +572,8 @@ move_rename_Selected_VM () {
   # Current behaviour, if moved, is to return to the VM selector and see the results of what we have done.
   # Or return back to menu if just renamed, but via the main loop and the configs reloader  
 
-  refresh_sources_and_load_VM_arrays
-  
+  [[ $GeneralLoopCheck ]] && printf "\n\n Move Finish:" &&  dev_loop_check
+
 }
 
 read_x86_tiano_vars_list () {

@@ -216,7 +216,6 @@ VM_loader_selector_and_menu () {
     IsoImg=
     NewFileTuneUp=
     NewFileTuneUp_JustDone=
-    VM_Renamed=
 
     while true; do
 
@@ -363,9 +362,9 @@ VM_loader_selector_and_menu () {
 
   fi
 
-  if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
+  if [[ ! $SelectArrayError ]]; then  
 
-    dev_loop_check
+    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 2:" &&  dev_loop_check
 
     ## Check file/folder exists and that we are where we need to be
     [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder" "$VM_Conf_Dir" && SelectArrayError=1
@@ -411,7 +410,7 @@ VM_loader_selector_and_menu () {
 
   elif [[ ! $SelectArrayError ]]; then
 
-    dev_loop_check
+    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 3:" &&  dev_loop_check
 
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
     # otherwise any items specified in the previous config, but not in the new one, will remain.
@@ -436,7 +435,7 @@ VM_loader_selector_and_menu () {
 
     # test for 'new' - will have have an iso/img but not a main drive, yet (but also double check if 'just done')
     if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then  
-      if [[ $IgnoreSecondCheckNew ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
+      if [[ $IgnoreSecondCheckNew || $VM_Renamed ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
     fi
 
     # clear any no-longer needed flags
@@ -445,6 +444,9 @@ VM_loader_selector_and_menu () {
     ByPass_VM_Array_Selector=
     MenuStylePreviewed=
     NewFileTuneUp=
+    VM_Renamed=
+
+    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 4:" &&  dev_loop_check
 
   fi
 

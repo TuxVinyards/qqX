@@ -411,6 +411,8 @@ function refresh_conf_vars_and_values {
     MacLegacyDrive=
     QemuError_VM_Filter=()
 
+    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
+
     source "$VM_Conf_File"
 
     # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
@@ -443,10 +445,15 @@ function refresh_conf_vars_and_values {
 
     # check any menu values that are based on the file .conf 
 
+    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
+
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
+
+    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
+
 
   fi
 
