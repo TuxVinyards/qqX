@@ -49,8 +49,8 @@ qqX_Version="1.7.03"
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
 ## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less. Or "0" for none.
-NoClear=0
-GeneralLoopCheck=0
+NoClear=
+GeneralLoopCheck=
 
 ## INITIALIZE
 
