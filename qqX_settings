@@ -32,8 +32,8 @@ Extra_VM_Folder+=("")
 
 X_Shade="3" 
 
-#  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1
-#  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+#  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1   
+#  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 
 
 ## VM SELECTOR: 

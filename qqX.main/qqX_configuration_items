@@ -353,6 +353,7 @@ qqX_edit_settings() {
 
         else
 
+          cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
           nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values

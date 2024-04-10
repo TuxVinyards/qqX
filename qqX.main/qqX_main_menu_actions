@@ -286,9 +286,13 @@ function  main_menu_actions {
 
     fi
   
-  elif [[ $MainMenuChoice == "2" || $MainMenuChoice == "3" ]] ; then
+  elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3" ]] ; then
 
     create_new_drives
+
+  elif [[ $MainMenuChoice == "2d" ]]; then
+
+    function_delete_SecondDrive
     
   elif [[ $MainMenuChoice == "v" ]] ; then
 

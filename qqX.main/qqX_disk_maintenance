@@ -599,3 +599,60 @@ function create_new_drives {
   
 }
 
+function_delete_SecondDrive () {
+
+  # To be run from the VM's main menu, which should have 'VM_Conf_File' etc present as a variables.
+
+  if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
+
+  if [[ ! -e "$SecondDrive" ]]; then 
+
+    printf "\n\n  ERROR  a Second Drive  cannot be found"
+
+  else
+
+    printColor "\n\n  Drive '%s' to be deleted and config amended?" "$SecondDrive"
+
+    if [[ $TrashingAvailable ]]; then 
+      printColor "\n\n  [enter] safely move the drive to the recoverable trash bin"  
+      printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
+    else
+      printColor "\n\n  [enter] use the file manager to move things the trash bin "
+      printf "\n\n  [y] yes, PERMANENTLY, I have back-ups ..."
+    fi
+
+    printf "\n\n"
+    read -rp "  >  "   DeleteSecond
+
+    if [[ $DeleteSecond == "y" ]]; then 
+
+      printf "\n\n  Second Drive being deleted ... \n"
+      rm -f "$SecondDrive"
+
+    else
+
+      if [[ $TrashingAvailable ]] && [[ $DeleteSecond != "n" ]]; then
+        printf "\n\n  Moving files to the bin ... \n"
+        gio trash "$SecondDrive"
+      else  printf "\n\n  NOT deleted ... \n"
+      fi  # https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
+
+    fi
+
+    if [[ $DeleteSecond != "n" ]]; then
+
+      cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
+      mapfile -t ConfEditArray < "$VM_Conf_File"
+      printf "" > "$VM_Conf_File"
+      for Line in "${ConfEditArray[@]}"; do [[ "$Line" != *'SecondDrive'* ]] && printf "%s\n" "$Line" >> "$VM_Conf_File" ; done
+      refresh_conf_vars_and_values
+
+    fi
+
+  fi
+  
+  printColor "\n\n  [enter] to return or continue \n\n" 
+  read -rp "  > "
+  
+
+}
