@@ -362,7 +362,7 @@ VM_loader_selector_and_menu () {
 
   fi
 
-  if [[ ! $SelectArrayError ]]; then  
+  if  [[ $VM_Renamed || ! $ByPass_VM_Array_Selector ]] && [[ ! $SelectArrayError ]]; then  
 
     [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 2:" &&  dev_loop_check
 
