@@ -32,10 +32,12 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "del" ]]; then 
 
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
+    return
 
-  elif [[ $MainMenuChoice == "mv" ]]; then 
+  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" ]]; then 
 
     move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
+    return
 
   elif [[ $MainMenuChoice == "hdw" ]] ; then
 
@@ -218,8 +220,8 @@ function  main_menu_actions {
 
     printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
-      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n "
-    else printColor "\n\n  [enter] to return to menu \n\n " ; fi
+      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
+    else printColor "\n\n  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
@@ -232,8 +234,8 @@ function  main_menu_actions {
     drives_and_snapshots
 
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
-      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n "
-    else printColor "  [enter] to return to menu \n\n " ; fi
+      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
+    else printColor "  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then

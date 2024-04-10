@@ -216,6 +216,7 @@ VM_loader_selector_and_menu () {
     IsoImg=
     NewFileTuneUp=
     NewFileTuneUp_JustDone=
+    VM_Renamed=
 
     while true; do
 
@@ -364,6 +365,8 @@ VM_loader_selector_and_menu () {
 
   if [[ ! $ByPass_VM_Array_Selector  &&  ! $SelectArrayError ]]; then  
 
+    dev_loop_check
+
     ## Check file/folder exists and that we are where we need to be
     [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder" "$VM_Conf_Dir" && SelectArrayError=1
 
@@ -408,6 +411,8 @@ VM_loader_selector_and_menu () {
 
   elif [[ ! $SelectArrayError ]]; then
 
+    dev_loop_check
+
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
     # otherwise any items specified in the previous config, but not in the new one, will remain.
     refresh_conf_vars_and_values
@@ -423,9 +428,11 @@ VM_loader_selector_and_menu () {
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
     if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
 
-    # Qemu SYSTEM log
-    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
-    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
+    # Qemu SYSTEM log  # keep log, only clear if booting up afresh (in menu actions)
+    if [[ -d  "$VM_Conf_Dir/$VM_InstanceName" ]]; then
+      QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+      [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
+    fi
 
     # test for 'new' - will have have an iso/img but not a main drive, yet (but also double check if 'just done')
     if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then  

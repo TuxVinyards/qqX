@@ -347,7 +347,7 @@ function_delete_Selected_VM () {
 
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
-  
+
   ByPass_VM_Array_Selector=
   ByPass_VM_Array_Loader=
   VM_InstanceName=
@@ -524,29 +524,49 @@ move_rename_Selected_VM () {
 
   fi
 
-  [[ ! $MoveFail ]] && printColor "\n  Success  '%s'\n"  "$(pwd)"
+  if [[ $MoveFail ]]; then printColor "\n  Hmm. Something went wrong.  \n"  ; else printColor "\n  Success  '%s'\n"  "$(pwd)" ; fi
   list_current_folder_instance_names
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
 
-  ByPass_VM_Array_Selector=
-  ByPass_VM_Array_Loader=
-  VM_InstanceName=
-  VM_Conf_Dir=
-  VM_Conf_File=
-  MainDrive=
-  IsoImg=
-  NewFileTuneUp=
-  NewFileTuneUp_JustDone=
-  MoveFail=
-  Move_FolderOption=
-  Move_VM_Option=
-  Mv_NewName=
+  if [[ $Mv_NewConf_Dir ]]; then
 
-  # Current behaviour is to return to the VM selector and see the results of what we have done.
-  # This basically duplicates the 'function_delete_Selected_VM' which was used as a template.
-  # To return to a new current main menu would require instating 'VM_InstanceName' etc with the new values,
-  # which is feasible as the move section does do a 'cd' to the new conf folder  REVIEW  
+    ByPass_VM_Array_Selector=
+    ByPass_VM_Array_Loader=
+    VM_InstanceName=
+    VM_Conf_Dir=
+    VM_Conf_File=
+    MainDrive=
+    IsoImg=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
+    MoveFail=
+    Move_FolderOption=
+    Move_VM_Option=
+    Mv_NewName=
+    Mv_NewConf_Dir=
+    Mv_NewName_Return=
+
+  else
+
+    ByPass_VM_Array_Selector=1
+    VM_Renamed=1
+    SelectArrayError=
+    VM_InstanceName="$Mv_NewName"
+    VM_Conf_File="${Mv_NewName}.conf"
+    MainDrive=
+    IsoImg=
+    NewFileTuneUp=
+    NewFileTuneUp_JustDone=
+    MoveFail=
+    Move_FolderOption=
+    Move_VM_Option=
+    Mv_NewName=
+
+  fi
+
+  # Current behaviour, if moved, is to return to the VM selector and see the results of what we have done.
+  # Or return back to menu if just renamed, but via the main loop and the configs reloader  
 
   refresh_sources_and_load_VM_arrays
   
