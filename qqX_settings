@@ -107,7 +107,9 @@ VM_SelectorStyle="A"
 ## OTHER PROGRAMS:
 
 # TEXT EDITOR  
-# Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor eg. gedit, pluma ... 
+# Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor 
+# eg. gedit, pluma, gnome-text-editor, kate ...  If not found qqX will try defaults ...
+# typing 'xdg-mime query default text/plain' at the terminal may help
   TextEditor=
 
 # FILE MANAGER

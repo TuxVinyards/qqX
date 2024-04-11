@@ -305,10 +305,18 @@ function_conf_error () {
 
 }
 
+texteditor_not_found_message () {
+  
+  printColor "\n\n  Unable to open settings with editor: '%s' "  "$TextEditor"
+  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
+  printf "\n\n  Give settings file the command name of a preferred editor."
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to continue \n\n"  "$qqX_SettingsFile"
+  read -rp "  >  "
+}
 
 qqX_edit_settings() {
 
-  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && TextEditor=
+  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
 
   if [[ ! $TextEditor ]]; then
   
@@ -316,8 +324,12 @@ qqX_edit_settings() {
     EditorTest="${DefaultTextEditor/.desktop/}"
     EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
 
+    # orggnomeTextEditor etc will fail
+    [[ $EditorTest ]] && EditorTest="gnome-text-editor"
+
     if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
     elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
+    elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
     elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
     elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
     elif [[ $(type -p nano) ]] ; then   TextEditor="nano"
@@ -325,13 +337,8 @@ qqX_edit_settings() {
 
   fi
 
-  if [[ ! $(type -p "$TextEditor") ]]; then 
-
-    printColor "\n\n  Unable to open settings.  Default or basic text editor not found."
-    printf "\n\n  Try an install of 'nano' or give settings file the command name of a preferred editor ..  "
-    printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
-    read -rp "  >  "
-
+  if [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+  
   else
 
     # Run the editor: 
@@ -354,7 +361,7 @@ qqX_edit_settings() {
         else
 
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
-          nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File"  
+          (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File") || texteditor_not_found_message
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
           break
@@ -365,17 +372,17 @@ qqX_edit_settings() {
       
     elif [[ $1 == "custom" ]]; then
 
-      nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile"  &
+      (nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile"  & )  || texteditor_not_found_message
 
     elif [[ $1 == "tune-up" ]]; then
 
-      nohup &> /dev/null   "$TextEditor" "$TuneUpTargetDraft" 
+      (nohup &> /dev/null   "$TextEditor" "$TuneUpTargetDraft" )  || texteditor_not_found_message
       ConfSettingsAdjusted=1
       refresh_conf_vars_and_values
 
     else 
 
-      nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile"  
+      (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
       SettingsFileAdjusted=1
       refresh_sources_and_load_VM_arrays
 
