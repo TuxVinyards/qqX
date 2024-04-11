@@ -395,21 +395,30 @@ else
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000  
     fi
 
+    Default_VM_Folder=
+
+    if grep -q -s Default_VM_Folder= "$HOME/.qqX/qqX_settings" ; then 
+      TestDefVMs="$(grep -m 1 -s Default_VM_Folder= "$HOME/.qqX/qqX_settings")"
+      if [[ $TestDefVMs ]]; then eval "$TestDefVMs"; fi
+    fi
+
     if [[ -d  "$HOME/VMQs" ]] ; then
 
       printColor "\n\n  Standard default VM directory has been found >> "  
       printf "\n\n  %s " "$HOME/VMQs" 
+
+    elif [[ -d "$Default_VM_Folder" ]]; then
+
+      printColor "\n\n  Custom default VM directory has been found >> "  
+      printf "\n\n  %s " "$Default_VM_Folder"
       
     else
-
-      #  Install pre-set "$HOME/VMQs"  -  May be later reconfigured as appropriate. 
-      #  REVIEW  if $1 as 'Upgrade', then if exist default (from settings?), auto skip ??
 
       MkDefDir=
       printColor "\n\n\n  A default VM directory is required >> "  
       printf "\n\n  %s\n\n  The location can be later edited in the qqX general settings file " "$HOME/VMQs"
-      printColor "\n\n  [enter] skip (if already set-up) " 
-      printf "  [m] make folder \n\n" 
+      printf "\n\n  [enter] skip (if already set-up) " 
+      printColor "  [m] make folder '%s'\n\n" "$HOME/VMQs"
       read -rp "  >  "  MkDefDir
 
       if [[ $MkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
