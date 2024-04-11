@@ -584,7 +584,11 @@ function_quick_get_wrap ()  {
       
       fi
       
-      if [[ ! $ZsyncDownload ]]; then
+      if [[ $ZsyncDownload ]]; then
+
+        [[ ! $(type -p ffzsync) ]] && printf "\n\n  ERROR  Zsync not found.  Screen output may vary. Quickget should hopefully revert to using wget ...\n\n "
+
+      else
 
         if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
         else printf "[number] select a different (preset or current) folder  "

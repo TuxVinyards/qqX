@@ -126,9 +126,16 @@ fi
 ##  Check for 'curl' and 'aria2' etc  as is often omitted from quickemu install recipes
 #   & where $1 test is true if command line is being used 
 
-if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]] || [[ ! $(type -p zsync) ]]; then
+if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]]; then
   echo
-  echo "  You may need to install 'curl' & 'aria2' & 'zsync' to run parts of the quickget script ..."
+  echo "  Quickget prefers 'curl' & 'aria2' instead of'wget' if these packages are installed ..."
+  echo
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+
+if [[ ! $(type -p zsync) ]]; then
+  echo
+  echo "  Zsync not found.  Quickget uses 'zsync' to update Ubuntu Beta ISO's  ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi

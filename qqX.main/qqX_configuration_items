@@ -325,7 +325,7 @@ qqX_edit_settings() {
     EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
 
     # orggnomeTextEditor etc will fail
-    [[ $EditorTest ]] && EditorTest="gnome-text-editor"
+    [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
 
     if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
     elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
