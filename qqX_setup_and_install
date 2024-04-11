@@ -135,7 +135,7 @@ fi
 
 if [[ ! $(type -p zsync) ]]; then
   echo
-  echo "  Zsync not found.  Quickget uses 'zsync' to update Ubuntu Beta ISO's  ..."
+  echo "  Warning: Zsync not found.  Quickget uses 'zsync' to update Ubuntu Beta ISO's  ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
@@ -416,7 +416,8 @@ else
 
       MkDefDir=
       printColor "\n\n\n  A default VM directory is required >> "  
-      printf "\n\n  %s\n\n  The location can be later edited in the qqX general settings file " "$HOME/VMQs"
+      printf "\n\n  %s\n\n  This location can be easily moved and/or renamed later," "$HOME/VMQs"
+      printf "\n\n  simply by using the file manager and by editing the qqX settings."
       printf "\n\n  [enter] skip (if already set-up) " 
       printColor "  [m] make folder '%s'\n\n" "$HOME/VMQs"
       read -rp "  >  "  MkDefDir
