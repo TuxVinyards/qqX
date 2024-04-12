@@ -2,11 +2,14 @@
 
 ## " quickemu quickget X terminal project "
 
-Release [1.7.02](https://github.com/TuxVinyards/qqX/releases/tag/1.7.02) has lots of NEW INTERFACE FEATURES and is good to go :rocket:
+Release [1.7.03](https://github.com/TuxVinyards/qqX/releases/tag/1.7.03) builds on the earlier NEW INTERFACE FEATURES
 
-The point release for the Fedora 39 coreutils/tail error with is now out.
+- now adds a handy distro rename function to take the errors and tedium from .conf edits when upgrading to new releases
+- also adds detection improvements for the Gnome 45 text editor and a few minor general tweaks
 
-And the 1.7.01 release also fixed the minor glitch in the 1.6 installer that some may have noticed.
+The 1.7.02 point release fixed the Fedora 39 coreutils/tail error.
+
+The 1.7.01 release also fixed the minor glitch in the 1.6 installer that some may have noticed.
 
 Apologies if you were affected.
 
