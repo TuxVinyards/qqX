@@ -560,14 +560,14 @@ if [[ ! $SkipMkLauncher ]]; then
 
   # Select Icon colour (to go with text shade)
 
-  printf "\n\n  Select Desktop ICON colour "
-  printColor   "\n\n  [enter] standard yellow icon"
+  printf "\n\n  Select Desktop icon/logo color "
+  printColor   "\n\n  [enter] standard yellow ICON"
   
   tput setaf 6
-  printf  "   [b] alternative blue icon"
+  printf  "   [b] alternative blue ICON"
   tput sgr0
 
-  printf "\n\n  Text colour adjustments are found in the general settings file \n\n"   
+  printf "\n\n  Text color adjustments are found in the general settings file \n\n"   
   read -rp "  >  "  IconSelect
 
 

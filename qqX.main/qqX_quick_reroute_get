@@ -586,7 +586,7 @@ function_quick_get_wrap ()  {
       
       if [[ $ZsyncDownload ]]; then
 
-        [[ ! $(type -p ffzsync) ]] && printf "\n\n  WARNING 'zsync' not found.  Screen output may vary. Quickget should hopefully revert to using wget ...\n\n "
+        [[ ! $(type -p zsync) ]] && printf "\n\n  WARNING 'zsync' not found.  Screen output may vary. Quickget should hopefully revert to using wget ...\n\n "
 
       else
 
