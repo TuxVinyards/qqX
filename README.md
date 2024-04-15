@@ -2,18 +2,20 @@
 
 ## " quickemu quickget X terminal project "
 
-Release [1.7.03](https://github.com/TuxVinyards/qqX/releases/tag/1.7.03) builds on the earlier NEW INTERFACE FEATURES
+Release [1.7.03](https://github.com/TuxVinyards/qqX/releases/tag/1.7.03) builds on the earlier NEW INTERFACE FEATURES and point release bug fixes
 
 - now adds a handy distro rename function to take the errors and tedium from .conf edits when upgrading to new releases
 - also adds detection improvements for the Gnome 45 text editor and a few minor general tweaks
 
-The 1.7.02 point release fixed the Fedora 39 coreutils/tail error.
-
-The 1.7.01 release also fixed the minor glitch in the 1.6 installer that some may have noticed.
-
-Apologies if you were affected.
-
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
+
+### 1.7.04  - Hot Fixes for the pending new quickemu release
+
+- On the 'dev' branch. Download this in preference.
+
+- Adds a few fixes and tweaks needed for quickget.
+
+- Backwardly compatible with quickemu 4.9.2
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
