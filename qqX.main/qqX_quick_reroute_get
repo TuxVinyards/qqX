@@ -134,7 +134,8 @@ function_test_iso_url () {
         printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
         if eval wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
       else
-        printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??\n\n"  
+        #printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??\n\n"  
+        printf "\n\n  HomePage not found. However, downloads still might work ... ??\n\n"  
       fi
 
     # else 
@@ -868,17 +869,6 @@ function_quick_get_wrap ()  {
 
   #  sleep/pauses needed to give different processes time to output their summaries & finish up
   sleep 1
-
-#  TODO   BlendOS needs a tweak here as Path gets changed from release name in 4.9.3 
-
-# https://github.com/quickemu-project/quickemu/pull/995
-
-    #if [[ $OS == "blendos" ]]; then
-       # BlendRelease=${RELEASE/'/'/'-'}
-       # BlendRelease=${BlendRelease/168/}
-      #  VM_PATH="${OS}-${BlendRelease}"
-
-
 
   New_VM_InstanceName=
   New_VM_Conf_File=
