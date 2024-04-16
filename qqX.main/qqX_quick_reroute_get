@@ -322,6 +322,7 @@ function_quick_get_wrap ()  {
     tput rc; tput ed  
 
     QGW_OS_ListRaw="$(quickget "qq-grep" | tail -n +3 )"
+    # filter out display folding
     QGW_OS_ListString="$(tr -cd "[:print:]" <<< "$QGW_OS_ListRaw")"
     read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
 
@@ -415,6 +416,8 @@ function_quick_get_wrap ()  {
     done
 
     QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
+    # filter out display folding  REVIEW 
+    QGW_Releases_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Releases_ListRaw")"
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
@@ -481,6 +484,8 @@ function_quick_get_wrap ()  {
     #
 
     QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+    # filter out display folding  REVIEW 
+    QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
     QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
     QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
 
