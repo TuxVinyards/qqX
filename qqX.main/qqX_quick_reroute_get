@@ -482,61 +482,118 @@ function_quick_get_wrap ()  {
 
     done
 
+    # EDITIONS
 
-    printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
+    if [[ $QGW_OS_Arr_NameSelected  == "windows" ]]; then
 
-    #
+      printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-    QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
-    # filter out display folding  REVIEW 
-    QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
-    QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
-    QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
+      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
+      # filter out display folding  REVIEW 
+      QGW_WinLangs_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_WinLangs_ListRaw")"
+      QGW_WinLangs_ListString="${QGW_WinLangs_ListRaw/'- Languages: '/}"
+      QGW_WinLangs_ListTest="$(tr -d '[:space:]' <<< "$QGW_WinLangs_ListString" )"
 
-    if [[ $QGW_Editions_ListTest ]]; then
+      if [[ $QGW_Editions_ListTest ]]; then
 
-      read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
+        read -ra QGW_WinLangs_Array <<< "$QGW_WinLangs_ListString"
 
-      if [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
+        if [[ ${#QGW_WinLangs_Array[@]} -eq 1 ]] ; then
 
-        printf "\n\n  Only one current edition found: "
-        QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-
-      else
-
-        printf "\n\n"
-        print_quickget_and_folder_choices  "QGW_Editions_Array"
-        printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"  
-        read -rp "  >  "  QGW_List_NumSelected   
-
-        if [[ $QGW_List_NumSelected == "b" ]]; then  
-
-          QGW_List_NumSelected=
-          QGW_OS_Arr_NameSelected=
-          QGW_Release_Arr_NameSelected=
-          function_quick_get_wrap
-          return
+          printf "\n\n  Only one current language found: "
+          QGW_Edition_Arr_NumSelected="${QGW_WinLangs_Array[0]}"
 
         else
 
-          [[ $QGW_List_NumSelected -gt "${#QGW_Editions_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Editions_Array[@]}"
-      
-          QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
-          QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
+          printf "\n\n"
+          print_quickget_and_folder_choices  "QGW_WinLangs_Array"
+          printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
+          read -rp "  >  "  QGW_List_NumSelected   
+
+          if [[ $QGW_List_NumSelected == "b" ]]; then  
+
+            QGW_List_NumSelected=
+            QGW_OS_Arr_NameSelected=
+            QGW_Release_Arr_NameSelected=
+            QGW_Edition_Arr_NameSelected=
+            function_quick_get_wrap
+            return
+
+          else
+
+            [[ $QGW_List_NumSelected -gt "${#QGW_WinLangs_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_WinLangs_Array[@]}"
+            # Uses Lang as edition
+            QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
+            QGW_Edition_Arr_NumSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
+
+          fi
 
         fi
+
+      else
+
+        QGW_Edition_Arr_NumSelected=
+        printf "\n\n  Further language selection not available"
 
       fi
 
     else
 
-      QGW_Edition_Arr_NameSelected=
-      printf "\n\n  Further selection not available"
+      printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
+
+      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+      # filter out display folding  REVIEW 
+      QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
+      QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
+      QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
+
+      if [[ $QGW_Editions_ListTest ]]; then
+
+        read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
+
+        if [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
+
+          printf "\n\n  Only one current edition found: "
+          QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
+
+        else
+
+          printf "\n\n"
+          print_quickget_and_folder_choices  "QGW_Editions_Array"
+          printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"  
+          read -rp "  >  "  QGW_List_NumSelected   
+
+          if [[ $QGW_List_NumSelected == "b" ]]; then  
+
+            QGW_List_NumSelected=
+            QGW_OS_Arr_NameSelected=
+            QGW_Release_Arr_NameSelected=
+            QGW_Edition_Arr_NameSelected=
+            function_quick_get_wrap
+            return
+
+          else
+
+            [[ $QGW_List_NumSelected -gt "${#QGW_Editions_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Editions_Array[@]}"
+        
+            QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
+            QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
+
+          fi
+
+        fi
+
+      else
+
+        QGW_Edition_Arr_NameSelected=
+        printf "\n\n  Further editions selection not available"
+
+      fi
+
 
     fi
 
   fi
-
 
   QGW_DownloadSelection="$QGW_OS_Arr_NameSelected  $QGW_Release_Arr_NameSelected  $QGW_Edition_Arr_NameSelected"
 
