@@ -132,13 +132,14 @@ find_file_manager_browser
 
 # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
 
+QE_FilePathDefault="$(type -p quickemu)"
+QG_FilePathDefault="$(type -p quickget)"
+
 function sort_qqX_builtin_settings () {
 
-  if [[ $QE_Version == "HomeBird" || $QE_Version == "Homebird" || $QE_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
-    FreePath="$qqX_BuiltinsFolder/homebird"
-    QE_Version="$FreePath/quickemu"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_Version == "FreeBirdBird" || $QE_Version == "Freebird" || $QE_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
+  if [[ $QE_Version == "System" || $QE_Version == "system" ]]; then 
+    QE_Version=
+  elif [[ $QE_Version == "FreeBird" || $QE_Version == "Freebird" || $QE_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/freebird"
     QE_Version="$FreePath/quickemu"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
@@ -146,18 +147,24 @@ function sort_qqX_builtin_settings () {
     FreePath="$qqX_BuiltinsFolder/freespirit"
     QE_Version="$FreePath/quickemu"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
+  elif [[ ! $QE_Version ]] || [[ $QE_Version == "HomeBird" || $QE_Version == "Homebird" || $QE_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
+    FreePath="$qqX_BuiltinsFolder/homebird"
+    QE_Version="$FreePath/quickemu"
+    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
   fi
 
-  if [[ $QG_Version == "HomeBird" || $QG_Version == "Homebird" || $QG_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
-    FreePath="$qqX_BuiltinsFolder/homebird"
-    QG_Version="$FreePath/quickget"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QG_Version == "FreeBirdBird" || $QG_Version == "Freebird" || $QG_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
+  if [[ $QG_Version == "System" || $QG_Version == "system" ]]; then
+    QG_Version=
+  elif [[ $QG_Version == "FreeBird" || $QG_Version == "Freebird" || $QG_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/freebird"
     QG_Version="$FreePath/quickget"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
   elif [[ $QG_Version == "FreeSpirit" || $QG_Version == "Freespirit" || $QG_Version == "freespirit" ]] || [[ "$QE_Version" == *'freespirit'* ]]; then
     FreePath="$qqX_BuiltinsFolder/freespirit"
+    QG_Version="$FreePath/quickget"
+    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
+  elif [[ ! $QG_Version ]] || [[ $QG_Version == "HomeBird" || $QG_Version == "Homebird" || $QG_Version == "homebird" ]] || [[ "$QG_Version" == *'homebird'* ]]; then
+    FreePath="$qqX_BuiltinsFolder/homebird"
     QG_Version="$FreePath/quickget"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
   fi
@@ -166,16 +173,13 @@ function sort_qqX_builtin_settings () {
 sort_qqX_builtin_settings
 
 if [[ $QE_Version ]] && [[ ! -e "$QE_Version" ]]; then 
-  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
+  printf "\n\n  ERROR - quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
   printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
 fi        
 if [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]]; then 
-  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions"
+  printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
   printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
 fi       
-
-QE_FilePathDefault="$(type -p quickemu)"
-QG_FilePathDefault="$(type -p quickget)"
 
 
 

@@ -101,9 +101,11 @@ VM_SelectorStyle="A"
 # a consistent source file pattern is required.
 
 # Different names are as follows: 
+# System     - use with caution, new releases may cause problems
 # HomeBird   - last known stable version  (default for release 1.8.01 and = 4.9.2)
 # FreeBird   - the current release version (expected to be availble shortly as Version 5?, and to become new default)
 # FreeSpirit - the official current version but with cherry-picked pre-release proposals (expected following on from V5 release)
+
 
 # In the past, different quickget/quickemu release/custom versions have been generally mix/matchable.  However, a structure
 # similar to quickemu 4.4 onwards has been needed.  
@@ -113,7 +115,9 @@ VM_SelectorStyle="A"
 # D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
 
 # Note that official releases of quickget tend to refer to quickemu for the version number.
-# Leave blank to use system defaults, or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
+# Give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
+
+# A qqX restart is needed if these version settings are changed.
 
   QE_Version="HomeBird"                
   QG_Version="HomeBird"

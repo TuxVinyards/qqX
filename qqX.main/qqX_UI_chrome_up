@@ -154,11 +154,11 @@ show_qqX_title_bar() {
   QE_FilePath_Short=
   QG_FilePath_Short=
 
-  if [[ $QuickEmuSource != "$QE_FilePathDefault" ]]; then
+  if [[ $QuickEmuSource != "$QE_FilePathDefault" ]] && [[ "$QuickEmuSource" != *'qqX.builtins'* ]] ; then
     if [[ "${#QuickEmuSource}" -gt 40 ]]; then QE_FilePath_Short=".... ${QuickEmuSource:(-35)}" ; else QE_FilePath_Short="$QuickEmuSource" ; fi
   fi
 
-  if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]]; then
+  if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]] && [[ "$QG_FilePath" != *'qqX.builtins'* ]]; then
     if [[ "${#QG_FilePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_FilePath:(-35)}" ; else QG_FilePath_Short="$QG_FilePath" ; fi
   fi
 
