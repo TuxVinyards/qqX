@@ -165,8 +165,14 @@ function sort_qqX_builtin_settings () {
 
 sort_qqX_builtin_settings
 
-[[ $QE_Version ]] && [[ ! -e "$QE_Version" ]] &&  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions \n\n"  && sleep 10         
-[[ $QG_Version ]] && [[ ! -e "$QG_Version" ]] &&  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions \n\n"   && sleep 10         
+if [[ $QE_Version ]] && [[ ! -e "$QE_Version" ]]; then 
+  printf "\n\n  ERROR  custom quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
+  printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+fi        
+if [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]]; then 
+  printf "\n\n  ERROR  custom quickget not found \n\n  Re-check Installation &/or Installation instructions"
+  printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+fi       
 
 QE_FilePathDefault="$(type -p quickemu)"
 QG_FilePathDefault="$(type -p quickget)"
