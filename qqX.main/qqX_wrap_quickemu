@@ -33,11 +33,14 @@ function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
 
+  sort_qqX_builtin_settings
+
   if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$QE_FilePathDefault" ; fi
 
   if [[ ! -e "$QuickEmuSource" ]] ; then
-     printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
-    printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s \n\n"  "$QuickEmuSource"
+    printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
+    printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s"  "$QuickEmuSource"
+    printf "\n\n  Settings file: %s \n\n" "$qqX_SettingsFile"
     exit  hold
   fi
 
