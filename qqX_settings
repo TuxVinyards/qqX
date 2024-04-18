@@ -79,9 +79,8 @@ VM_SelectorStyle="A"
 
 # Style E setting, default ="2"  
   VM_Select_Items_style_E_PerLine=
-
-# QUICKGET selector  
-# Normally set internally at ="7"  but certain internal functions may reduce this setting to as low as 2 or 3
+  
+# Default is set internally at ="7"  but certain internal functions may temporarily reduce this to as low as 2 or 3
 # Use with caution.  Suggest 5 or 6 as lowest setting.  Normally leave blank.
   Force_GetList_NewLinePoint=
 
@@ -90,8 +89,37 @@ VM_SelectorStyle="A"
 # Also see qqX wiki.
 
 
+## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
 
-## UPDATES:
+# IMPORTANT @ 2024/04  quickemu has been undergoing major changes. Using system defaults is no longer recommended.
+
+# TO KEEP qqX STABLE, built-in releases are being introduced from qqX version 1.8 onwards.
+# These are identical to the official releases, except for changes to the version number, for identification purposes.
+# The idea is to remain independent and to make sure that sudden changes to quickemu don't have any unexpected results.
+
+# In order for qqX to output extra log files and to make early fixes to known quickemu errors
+# a consistent source file pattern is required.
+
+# Different names are as follows: 
+# HomeBird   - last known stable version  (default for release 1.8.01 and = 4.9.2)
+# FreeBird   - the current release version (expected to be availble shortly as Version 5?, and to become new default)
+# FreeSpirit - the official current version but with cherry-picked pre-release proposals (expected following on from V5 release)
+
+# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable.  However, a structure
+# similar to quickemu 4.4 onwards has been needed.  
+
+# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.  
+# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
+# D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
+
+# Note that official releases of quickget tend to refer to quickemu for the version number.
+# Leave blank to use system defaults, or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
+
+  QE_Version="HomeBird"                
+  QG_Version="HomeBird"
+
+
+## qqX UPDATES:
 
 # Checks quietly for new GitHub releases (set =1 if not required)
   Disable_qqX_upd_Checks=
@@ -205,18 +233,6 @@ VM_SelectorStyle="A"
   FixArgs_hpet=1
   FixArgs_smartcard=1
 
-
-
-## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
-
-# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.    
-# D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
-# Generally, different quickget/quickemu release/custom versions should be mix/matchable.  However, a structure
-# similar to quickemu 4.4 onwards is probably needed.  Also note that quickget will use quickemu to obtain a version number.
-# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
-# LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
-  QE_Version=                 
-  QG_Version= 
 
 ## QEMU VERSION
 
