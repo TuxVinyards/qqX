@@ -30,7 +30,10 @@ function quickget {
 
   if [[ $QG_Version ]]; then 
 
-    # from main settings 
+    # To be run after rerouting functions for quickemu & quickget are in place & code has been sourced.
+    # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
+    # has been, so that the right QE & QG versions have been established and loaded.
+    # See function 'refresh_and_load_quickemu_sources'
   
     if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
     else  eval command "$QG_Version" " $*" ; fi

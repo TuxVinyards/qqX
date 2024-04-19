@@ -93,26 +93,6 @@ source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
 
-# Now that rerouting functions for quickemu & quickget are in place & code has been sourced,
-# find quick EMU/GET version numbers: 
-
-# QuickEMU uses an internal variable '$VERSION'
-QE_VerNumber="$VERSION"
-
-# QuickGET as @ ver 4.9.2 vanilla actually makes a call to EMU to find the number. 
-# But use a full call, as the 'quickget' call goes to a qqX capture function of the same name, 
-# allowing re-routes to custom versions that may work differently. 
-# And where $1 as 'filepath' will return "$QG_FilePath" for whichever script is used.
-QG_VerNumber="$(quickget "--version")"
-quickget "filepath"  
-
-# Release Quickemu 4.9.2 was still numbered 4.9.1  
-# Use the changes to fedora releases 'echo 38 39' as a fixing flag:
-if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then 
-  [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
-  [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
-fi
-
 function dev_loop_check {
 
     if [[ $GeneralLoopCheck ]]; then
@@ -151,7 +131,7 @@ function main_menu {
   done
 } 
 
-
+find_quick_version_numbers
 tput civis
 printf "\033c"
 show_qqX_title_bar

@@ -182,7 +182,6 @@ if [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]]; then
 fi       
 
 
-
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
 IFS='.' read -ra qqX_CurrentVer_Arr <<< "$qqX_Version"

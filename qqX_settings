@@ -117,8 +117,6 @@ VM_SelectorStyle="A"
 # Note that official releases of quickget tend to refer to quickemu for the version number.
 # Give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
 
-# A qqX restart is needed if these version settings are changed.
-
   QE_Version="HomeBird"                
   QG_Version="HomeBird"
 
