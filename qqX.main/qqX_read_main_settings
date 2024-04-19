@@ -139,7 +139,7 @@ function sort_qqX_builtin_settings () {
 
   if [[ $QE_Version == "System" || $QE_Version == "system" ]]; then 
     QE_Version=
-  elif [[ $QE_Version == "FreeBird" || $QE_Version == "Freebird" || $QE_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
+  elif [[ ! $QE_Version ]] || [[ $QE_Version == "FreeBird" || $QE_Version == "Freebird" || $QE_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/freebird"
     QE_Version="$FreePath/quickemu"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
@@ -147,15 +147,19 @@ function sort_qqX_builtin_settings () {
     FreePath="$qqX_BuiltinsFolder/freespirit"
     QE_Version="$FreePath/quickemu"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ ! $QE_Version ]] || [[ $QE_Version == "HomeBird" || $QE_Version == "Homebird" || $QE_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
+  elif [[ $QE_Version == "HomeBird" || $QE_Version == "Homebird" || $QE_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/homebird"
     QE_Version="$FreePath/quickemu"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
+  elif [[ $QE_Version == "Custom" || $QE_Version == "custom" ]] || [[ "$QE_Version" == *'QE.Custom'* ]]; then
+    FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
+    QE_Version="$FreePath/quickemu"
+    [[ "$PATH" != *'QE.Custom'* ]] && export PATH="${FreePath}:${PATH}"
   fi
 
   if [[ $QG_Version == "System" || $QG_Version == "system" ]]; then
     QG_Version=
-  elif [[ $QG_Version == "FreeBird" || $QG_Version == "Freebird" || $QG_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
+  elif [[ ! $QG_Version ]] || [[ $QG_Version == "FreeBird" || $QG_Version == "Freebird" || $QG_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/freebird"
     QG_Version="$FreePath/quickget"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
@@ -163,10 +167,14 @@ function sort_qqX_builtin_settings () {
     FreePath="$qqX_BuiltinsFolder/freespirit"
     QG_Version="$FreePath/quickget"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ ! $QG_Version ]] || [[ $QG_Version == "HomeBird" || $QG_Version == "Homebird" || $QG_Version == "homebird" ]] || [[ "$QG_Version" == *'homebird'* ]]; then
+  elif [[ $QG_Version == "HomeBird" || $QG_Version == "Homebird" || $QG_Version == "homebird" ]] || [[ "$QG_Version" == *'homebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/homebird"
     QG_Version="$FreePath/quickget"
     [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
+  elif [[ $QG_Version == "Custom" || $QG_Version == "custom" ]] || [[ "$QG_Version" == *'QE.Custom'* ]]; then
+    FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
+    QG_Version="$FreePath/quickget"
+    [[ "$PATH" != *'QE.Custom'* ]] && export PATH="${FreePath}:${PATH}"
   fi
 }
 

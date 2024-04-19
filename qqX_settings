@@ -91,34 +91,35 @@ VM_SelectorStyle="A"
 
 ## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
 
-# IMPORTANT @ 2024/04  quickemu has been undergoing major changes. Using system defaults is no longer recommended.
+# IMPORTANT @ 2024/04  quickemu has been undergoing major changes. 
 
 # TO KEEP qqX STABLE, built-in releases are being introduced from qqX version 1.8 onwards.
-# These are identical to the official releases, except for changes to the version number, for identification purposes.
-# The idea is to remain independent and to make sure that sudden changes to quickemu don't have any unexpected results.
+# These are essentially identical to the official releases, except for changes to the version number, for identification purposes.
 
-# In order for qqX to output extra log files and to make early fixes to known quickemu errors
-# a consistent source file pattern is required.
+# Unfortunately, the official Quickemu release cycle can typically be very sudden 
+# and follow on from periods of several months of complete inactivity, during which un-implemented fixes and features 
+# from the quickemu community have accumulated and sat there waiting to be merged.
+
+# The idea is to remain independent, to bring new fixes and features at a more frequent interval,
+# and to make sure that sudden changes to quickemu don't have any unexpected results that could cause failure.
 
 # Different names are as follows: 
-# System     - use with caution, new releases may cause problems
-# HomeBird   - last known stable version  (default for release 1.8.01 and = 4.9.2)
-# FreeBird   - the current release version (expected to be availble shortly as Version 5?, and to become new default)
-# FreeSpirit - the official current version but with cherry-picked pre-release proposals (expected following on from V5 release)
 
+# System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
 
-# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable.  However, a structure
-# similar to quickemu 4.4 onwards has been needed.  
+# HomeBird   - A recent official quickemu release, which may have quickemu/quickget issues, and which may or  
+#              may not have been fixed in the current main, but known to be STABLE with qqX 
 
-# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.  
-# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
-# D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
+# FreeBird   - Either the full current official quickemu release, or a cherry-picked official main branch
+#              that is working towards a new release, if known to be qqX stable. Or a duplicate of HomeBird.
 
-# Note that official releases of quickget tend to refer to quickemu for the version number.
-# Give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
+# FreeSpirit - Either a cherry-picked pre-release current official main branch or the latest official release,
+#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
 
-  QE_Version="HomeBird"                
-  QG_Version="HomeBird"
+# Custom     - Your own customised version.  See the notes towards the end of the settings file.
+
+  QE_Version="FreeBird"                
+  QG_Version="FreeBird"
 
 
 ## qqX UPDATES:
@@ -312,6 +313,22 @@ VM_SelectorStyle="A"
 # The qqX upgrader utility will tidy up and possibly remove any 'obsolete' code and comments from this file ...
 # For advanced custom tweaks or things that you want to keep safe, you should make a custom settings file,
 # next door to this one, in '.qqX' in your home folder (normally use ctrl-h to unhide) "$HOME/.qqX/custom_settings"
+
+
+# CUSTOM QUICKEMU & QUICKGET
+# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.  
+# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
+# D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
+# Remember that official releases of quick-get tend to refer to quick-emu for the version number.
+# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable,  
+# as long as, a structure similar to quickemu 4.4 onwards has been used. 
+
+# Give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/qqX.custom/QE.ScriptFolder/quickemu-42" 
+
+# Or places scripts may in a 'QE.Custom'  sub-folder to "$Default_VM_Folder/qqX.custom" in a similar manner
+# to that used for FreeBird. For this case, all script names should all be as standard. 
+# qqX will select this folder if QE/QG Version, above, is/are set, 
+# and will also add to '$PATH' to make sure any ancilliaries are found, in the same way as FreeBird.
 
 
 ## End of Settings

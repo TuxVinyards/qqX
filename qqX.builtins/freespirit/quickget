@@ -2741,7 +2741,7 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
         # WHERE=$(dirname "${BASH_SOURCE[0]}")
         # "${WHERE}/quickemu" --version
-        echo "HB.4.9.2"
+        echo "FS.4.9.2"
         exit 0
     fi
 else
