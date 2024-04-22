@@ -33,13 +33,10 @@ function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
 
-  sort_qqX_builtin_settings
+  [[ $SettingsFileAdjusted ]] && sort_qqX_builtin_settings
 
-  if [[ $QE_Version ]]; then QuickEmuSource="$QE_Version" ; else QuickEmuSource="$QE_FilePathDefault" ; fi
-
-  if [[ ! -e "$QuickEmuSource" ]] ; then
-    printf "\n\n  QUICKEMU not found. See https://github.com/quickemu-project/quickemu "
-    printColor  "\n\n  ERROR  Settings or Installation FilePath:\n\n  %s"  "$QuickEmuSource"
+  if [[ ! -e "$QE_SourcePath" ]] ; then
+    printColor  "\n\n  ERROR  Settings or Installation FilePath  QUICKEMU not found \n\n  Path = ' %s'"  "$QE_SourcePath"
     printf "\n\n  Settings file: %s \n\n" "$qqX_SettingsFile"
     exit  hold
   fi
@@ -47,21 +44,21 @@ function find_quickemu_source_functions_and_vars {
   # Ignore first bits, bash check & locale preamble etc.  
   # QE starts into setting out the functions almost straight away.  
 
-  QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QuickEmuSource" | cut -d ':' -f 1)
+  QE_StartFuncsPoint=$(grep -n -m 1 'function' "$QE_SourcePath" | cut -d ':' -f 1)
   # grep -n : print line number with the output lines   -m : stop after NUM selected lines
 
   ((QE_StartFuncsPoint -= 1))
-  QE_EOfuncsPoint=$(grep -n '### MAIN' "$QuickEmuSource" | cut -d ':' -f 1)
+  QE_EOfuncsPoint=$(grep -n '### MAIN' "$QE_SourcePath" | cut -d ':' -f 1)
   QE_EOfuncsTrim=$((QE_EOfuncsPoint - QE_StartFuncsPoint -1))
-  tail -n +"$QE_StartFuncsPoint" "$QuickEmuSource" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
+  tail -n +"$QE_StartFuncsPoint" "$QE_SourcePath" | head -"$QE_EOfuncsTrim"  > "/tmp/qmod-functions-temp"
   source "/tmp/qmod-functions-temp" 
 
   ## Quickemu Variables (set & clear)
   #  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
 
-  QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QuickEmuSource" | cut -d ':' -f 1)
+  QE_VarsEndPoint=$(grep -n '# Take command line arguments' "$QE_SourcePath" | cut -d ':' -f 1)
   QE_varsLines=$((QE_VarsEndPoint - QE_EOfuncsPoint))
-  tail -n +"$QE_EOfuncsPoint" "$QuickEmuSource" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
+  tail -n +"$QE_EOfuncsPoint" "$QE_SourcePath" | head -"$QE_varsLines"  > "/tmp/qmod-qe-all-vars-temp"
     
   # BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
   # with QEMU_IMG checker which has been replaced (at the start of qqX)
@@ -345,7 +342,7 @@ function load_quickemu_cases_and_actions {
 
   ## Add in the standard parameter cases 
 
-  tail -n +"$QE_EOfuncsPoint" "$QuickEmuSource" > "/tmp/qmod-endof-file-temp"
+  tail -n +"$QE_EOfuncsPoint" "$QE_SourcePath" > "/tmp/qmod-endof-file-temp"
   # note ' case' with space, otherwise grep picks up the word "Lowercase" on line 3
   QE_StartCasePoint=$(grep -n -m 1 ' case' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
   QE_EoCasePoint=$(grep -n -m 1 'esac' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
@@ -378,8 +375,8 @@ function refresh_and_load_quickemu_sources {
   find_quickemu_source_functions_and_vars
   load_mod_quickemu_boot
   load_quickemu_cases_and_actions
-  quickget "filepath"  
   find_quick_version_numbers
 
 }
+
 

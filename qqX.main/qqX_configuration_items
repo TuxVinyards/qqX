@@ -466,28 +466,3 @@ function refresh_conf_vars_and_values {
 
 }
 
-function find_quick_version_numbers () {
-
-  # To be run only after rerouting functions for quickemu & quickget are in place & code has been sourced.
-
-  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
-  # has been, so that the right QE & QG versions have been established and loaded.
-  # See function 'refresh_and_load_quickemu_sources'
-
-  # QuickEMU uses an internal variable '$VERSION'
-  QE_VerNumber="$VERSION"
-
-  # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number. 
-  # But the 'quickget' call goes to a qqX capture function of the same name, 
-  # and allows re-routes to custom versions that may work differently. 
-  QG_VerNumber="$(quickget "--version")"
-
-  # Release Quickemu 4.9.2 was still numbered 4.9.1  
-  # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
-  if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then 
-    [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
-    [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
-  fi
-
-}
-

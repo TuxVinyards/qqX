@@ -28,22 +28,12 @@
 
 function quickget {
 
-  if [[ $QG_Version ]]; then 
-
-    # To be run after rerouting functions for quickemu & quickget are in place & code has been sourced.
-    # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
-    # has been, so that the right QE & QG versions have been established and loaded.
-    # See function 'refresh_and_load_quickemu_sources'
+  # To be run after rerouting functions for quickemu & quickget are in place & code has been sourced.
+  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
+  # has been, so that the right QE & QG versions have been established and loaded.
+  # See function 'refresh_and_load_quickemu_sources'
   
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_Version"
-    else  eval command "$QG_Version" " $*" ; fi
-
-  else 
-
-    if [[ $1 == "filepath" ]]; then QG_FilePath="$QG_FilePathDefault"
-    else eval command quickget " $*" ; fi
-
-  fi
+  eval command "$QG_SourcePath" " $*"
   
 }
 
@@ -112,7 +102,7 @@ print_quickget_and_folder_choices () {
 
 function_test_iso_url () {
 
-  if grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
+  if grep -q -s -e '--test-iso-url' "$QG_SourcePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath"; then
 
     if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else [[ ! $Zsync_Updatable_ISO ]] && printf "\n\n" ; fi
 
@@ -349,14 +339,14 @@ function_quick_get_wrap ()  {
 
           quickget "filepath"  
 
-          if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
+          if grep -q -s 'os_homepage' "$QG_SourcePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
 
             printColor "Checking ...."
 
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
               # first listing, some may have two
-              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_FilePath" | grep -m 1 'HOMEPAGE=' | cut -d '=' -f 2)"
+              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_SourcePath" | grep -m 1 'HOMEPAGE=' | cut -d '=' -f 2)"
               QGW_OS_HomePage="${QGW_OS_HomePage//';;'/}"
               QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
             fi

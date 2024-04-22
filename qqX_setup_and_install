@@ -691,6 +691,10 @@ fi
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
 #  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
 
+# But must move to $HOME to pick up the new builtins
+
+cd "$HOME"  || echo "A qqX restart is required"  &&  exit 1
+
 GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
 
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi

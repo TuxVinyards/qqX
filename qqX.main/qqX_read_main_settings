@@ -130,65 +130,106 @@ function find_file_manager_browser()  {
 find_file_manager_browser
 
 
-# Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
+# Set the original initial value of paths as found on start up. Check Once.
+OriginalPATH="$PATH"
+QE_SystemFilePath="$(type -p quickemu)"  
+QG_SystemFilePath="$(type -p quickget)"
 
-QE_FilePathDefault="$(type -p quickemu)"
-QG_FilePathDefault="$(type -p quickget)"
 
 function sort_qqX_builtin_settings () {
 
-  if [[ $QE_Version == "System" || $QE_Version == "system" ]]; then 
-    QE_Version=
-  elif [[ ! $QE_Version ]] || [[ $QE_Version == "FreeBird" || $QE_Version == "Freebird" || $QE_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
+  # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
+
+  #  TODO   modify checks & defaults  - as can now run without system
+
+  export PATH="$OriginalPATH"
+
+  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
+    printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+  fi        
+
+  if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "system" ]]; then 
+    if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then  
+      QE_SourcePath="$QE_SystemFilePath" 
+      QG_SourcePath="$QG_SystemFilePath" 
+    else  
+      QE_SourceVersion=
+      QE_SourcePath=
+      QG_SourcePath=
+    fi
+  fi
+  if [[ ! $QE_SourceVersion ]] || [[ $QE_SourceVersion == "FreeBird" || $QE_SourceVersion == "Freebird" || $QE_SourceVersion == "freebird" ]]; then
     FreePath="$qqX_BuiltinsFolder/freebird"
-    QE_Version="$FreePath/quickemu"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_Version == "FreeSpirit" || $QE_Version == "Freespirit" || $QE_Version == "freespirit" ]] || [[ "$QE_Version" == *'freespirit'* ]]; then
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"
+  elif [[ $QE_SourceVersion == "FreeSpirit" || $QE_SourceVersion == "Freespirit" || $QE_SourceVersion == "freespirit" ]]; then
     FreePath="$qqX_BuiltinsFolder/freespirit"
-    QE_Version="$FreePath/quickemu"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_Version == "HomeBird" || $QE_Version == "Homebird" || $QE_Version == "homebird" ]] || [[ "$QE_Version" == *'homebird'* ]]; then
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"
+  elif [[ $QE_SourceVersion == "HomeBird" || $QE_SourceVersion == "Homebird" || "$QE_SourceVersion" == *'homebird'* ]]; then
     FreePath="$qqX_BuiltinsFolder/homebird"
-    QE_Version="$FreePath/quickemu"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_Version == "Custom" || $QE_Version == "custom" ]] || [[ "$QE_Version" == *'QE.Custom'* ]]; then
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"
+  elif [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]]; then
     FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
-    QE_Version="$FreePath/quickemu"
-    [[ "$PATH" != *'QE.Custom'* ]] && export PATH="${FreePath}:${PATH}"
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"   
+  elif [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]]; then
+    FreePath="$QE_DevPath"
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"   
   fi
 
-  if [[ $QG_Version == "System" || $QG_Version == "system" ]]; then
-    QG_Version=
-  elif [[ ! $QG_Version ]] || [[ $QG_Version == "FreeBird" || $QG_Version == "Freebird" || $QG_Version == "freebird" ]] || [[ "$QE_Version" == *'freebird'* ]]; then
-    FreePath="$qqX_BuiltinsFolder/freebird"
-    QG_Version="$FreePath/quickget"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QG_Version == "FreeSpirit" || $QG_Version == "Freespirit" || $QG_Version == "freespirit" ]] || [[ "$QE_Version" == *'freespirit'* ]]; then
-    FreePath="$qqX_BuiltinsFolder/freespirit"
-    QG_Version="$FreePath/quickget"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QG_Version == "HomeBird" || $QG_Version == "Homebird" || $QG_Version == "homebird" ]] || [[ "$QG_Version" == *'homebird'* ]]; then
-    FreePath="$qqX_BuiltinsFolder/homebird"
-    QG_Version="$FreePath/quickget"
-    [[ "$PATH" != *'qqX.builtins'* ]] && export PATH="${FreePath}:${PATH}"
-  elif [[ $QG_Version == "Custom" || $QG_Version == "custom" ]] || [[ "$QG_Version" == *'QE.Custom'* ]]; then
-    FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
-    QG_Version="$FreePath/quickget"
-    [[ "$PATH" != *'QE.Custom'* ]] && export PATH="${FreePath}:${PATH}"
-  fi
+  QE_VerNumber=
+  QG_VerNumber=
+
+  if [[ $QE_SourcePath ]] && [[ ! -e "$QE_SourcePath" ]]; then 
+    printf "\n\n  ERROR - quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+  fi        
+  if [[ $QG_SourcePath ]] && [[ ! -e "$QG_SourcePath" ]]; then 
+    printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+  fi 
+
 }
 
 sort_qqX_builtin_settings
 
-if [[ $QE_Version ]] && [[ ! -e "$QE_Version" ]]; then 
-  printf "\n\n  ERROR - quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
-  printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
-fi        
-if [[ $QG_Version ]] && [[ ! -e "$QG_Version" ]]; then 
-  printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
-  printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
-fi       
+ 
+function find_quick_version_numbers () {
 
+  # To be run only after rerouting functions for quickemu & quickget are in place & code has been sourced.
+  # But place early as emu and get may load initially out of sequence ...
+
+  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
+  # has been, so that the right QE & QG versions have been established and loaded.
+  # See function 'refresh_and_load_quickemu_sources'
+
+  # QuickEMU also uses an internal variable '$VERSION' but this only works after the correct script has been sourced.
+  QE_VerNumber="$(eval "$QE_SourcePath --version")"
+
+  # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number. 
+  # But the 'quickget' call goes to a qqX capture function of the same name, 
+  # and allows re-routes to custom versions that may work differently. 
+  QG_VerNumber="$(eval "$QG_SourcePath --version")"
+
+  # Release Quickemu 4.9.2 was still numbered 4.9.1  
+  # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
+  if grep -q -s -e 'echo 38 39' "$QG_SourcePath" ; then 
+    [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
+    [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
+  fi
+
+}
+
+find_quick_version_numbers
 
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
