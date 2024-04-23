@@ -12,11 +12,16 @@ source "qqX.system/qqX_settings_update_transposer"
 source "qqX.system/Func_echo_colors"
 
 function copy_files {
-
 	printf "\n"
 	sudo cp  qqX.main/*   /usr/share/qqX/qqX.main/  || CopyFail=1
 	sudo cp  qqX   /usr/bin/qqX  || CopyFail=1
 	printf "\n"
+}
+
+function copy_builtins {
+	printf "\n"
+	sudo cp -r qqX.builtins/*   /usr/share/qqX/qqX.builtins/  || CopyFail=1
+	printf " Builtins Copied \n"
 }
 
 Counter=0
@@ -32,17 +37,19 @@ while true ; do
 	
 	copy_files
 
-	if [[ $CopyFail ]]; then printColor " COPY ERROR .... " ; else printf " Copied ... @ %s" "$(date +%H.%M.%S)"  ; fi
+	if [[ $CopyFail ]]; then printColor " COPY ERROR .... " ; else printf " Copied @ %s" "$(date +%H.%M.%S)"  ; fi
 	
 	printf "\n\n Terminal may be kept open. Sudo will stay usable for a while ..."
-	printColor "\n\n COPY > [enter] to re-run" ; printf "    [s] qqX SETTINGS update \n\n" 
+	printColor "\n\n COPY > [enter] for qqX scripts" ; printf "    [s] qqX SETTINGS update    [b] copy /qqX.builtins to /usr/share/qqX \n\n" 
 	read -rp " >  "  UpdSets
 	
 	if [[ $UpdSets ]]; then 
-		update_old_settings_file_with_new_options 
+		[[ $UpdSets == "s" ]] && update_old_settings_file_with_new_options 
+		[[ $UpdSets == "b" ]] && copy_builtins 
 		((Counter+=1)) 
-		printColor "  [enter] to continue \n\n " 
-		read -t 5 -rp "  >  "
+		#printColor "  [enter] to continue \n\n " 
+		#read -t 5 -rp "  >  "
+		sleep 1
 	fi
 	
 	((Counter+=1)) ;  [[ $Counter -ge 4 ]] && Counter=0 ; UpdSets= ; CopyFail=
