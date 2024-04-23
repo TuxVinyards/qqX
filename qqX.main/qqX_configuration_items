@@ -383,8 +383,16 @@ qqX_edit_settings() {
     else 
 
       (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
-      SettingsFileAdjusted=1
-      refresh_sources_and_load_VM_arrays
+
+      if [[ $DefaultFolderError ]]; then 
+        printColor "\n\n  A qqX restart is required ...."
+        printf "\n\n  [enter] to close \n\n"
+        read -rp "  >  "
+        exit directly
+      else
+        SettingsFileAdjusted=1
+        refresh_sources_and_load_VM_arrays
+      fi
 
     fi
 

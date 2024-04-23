@@ -123,19 +123,12 @@ if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
 fi
 
 
-##  Check for 'curl' and 'aria2' etc  as is often omitted from quickemu install recipes
+##  Check for 'curl' etc  as is may be omitted from quickemu install recipes
 #   & where $1 test is true if command line is being used 
 
-if [[ ! $(type -p curl) ]] || [[ ! $(type -p aria2c) ]]; then
+if [[ ! $(type -p curl) ]]; then
   echo
-  echo "  Quickget prefers 'curl' & 'aria2' instead of'wget' if these packages are installed ..."
-  echo
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
-fi
-
-if [[ ! $(type -p zsync) ]]; then
-  echo
-  echo "  Warning: Zsync not found.  Quickget uses 'zsync' to update Ubuntu Beta ISO's  ..."
+  echo "  'Curl' is now a listed dependency of Quickget and will be used instead of 'wget' when installed ..."
   echo
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
@@ -162,6 +155,7 @@ qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
 #  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
+#  And from 1.8 the subfolder qqX.builtins
 #  For non FHS OS's also edit at start of main file 'qqX' ...
 
 qqX_Std_Share_Path="/usr/share/qqX"   
@@ -278,17 +272,7 @@ echo
 
 qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
 
-if [[ $1 != "Upgrade" ]]; then 
-  if [[ $(type -p quickemu) ]] && [[ $(type -p quickget) ]] ; then  printf "\n  A standard release of quickemu has been found " 
-  else  printf "\n  ERROR:  a standard release of quickemu/quickget has NOT been found \n\n  See: https://github.com/quickemu-project/quickemu " 
-  fi
-fi  
-
-# REVIEW  add quickemu release/version checking ? 
-
-printf "\n"
-
-if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" ]] && [[ ! -d  "./qqX.main" ]]; then
+if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" ]] && [[ ! -d  "./qqX.main" ]] && [[ ! -d  "./qqX.builtins" ]]; then
 
   printColor "\n\n  ERROR  qqX source files not found \n\n"
   sleep 5; exit 1
@@ -298,8 +282,8 @@ else
   InstallSelect=
   if [[ $(type -p qqX) ]]; then Current_qqX_Version="$(qqX --version)" ; else Current_qqX_Version= ; fi
 
-  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n\n   Upgrade current release %s ..."   "$Current_qqX_Version"
-  else  printColor  "\n\n   Install a settings file to %s & add program scripts?"   "$HOME" 
+  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade current release %s ..."   "$Current_qqX_Version"
+  else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME" 
   fi
 
   cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
@@ -363,7 +347,7 @@ else
       printColor "\n\n  sudo ln -s \"%s\" \"%s\" " "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
 
       printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
-      printf   "\n  for the subfolder and files of qqX.main."
+      printf   "\n  for the subfolders and files of qqX.main and from 1.8 onwards of qqX.builtins"
 
       printColor "\n\n  sudo mkdir -p \"%s/qqX.main\" " "$qqX_Std_Share_Path"
       printColor "\n\n  sudo cp \"./qqX.main/qqX_\"*  \"%s/qqX.main/\" " "$qqX_Std_Share_Path" 
@@ -377,7 +361,7 @@ else
 
     if [[  $SeparateSudo != "y" ]]; then
 
-      printColor "\n\n  Auto-Installing .... \n\n"
+      printColor "\n  Auto-Installing .... \n\n"
       sudo cp "qqX" "$qqX_Std_File_Path"
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
       [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
@@ -693,11 +677,10 @@ fi
 
 # But must move to $HOME to pick up the new builtins
 
-cd "$HOME"  || echo "A qqX restart is required"  &&  exit 1
-
-GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
-
-if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
+ if cd "$HOME" ; then
+  GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
+  if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
+fi
 
 End_Install=
 printColor  "\n\n  Install process finished:  "

@@ -38,7 +38,7 @@ function_create_VM_folderList() {
 
   # Make sure that 'Default_VM_Folder' has a value and it exists
   [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
-  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings ERROR:  Default Folder NOT found \n\n" ; sleep 2 ; DefaultFolderError=1 ; fi
+  if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings:  Default Folder NOT found \n\n" ; sleep 1 ; DefaultFolderError=1 ; fi
   
   # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
 
