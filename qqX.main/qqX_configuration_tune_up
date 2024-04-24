@@ -29,13 +29,14 @@ function_config_tune_up ()  {
   # $1 should be the full path/filename.conf
   
   TuneUpTargetFile="$1" 
-  TuneUp_InstanceName="$(basename "$TuneUpTargetFile" .conf)"
-  TuneUpDate="$(date +%b%d.%H.%M)"
 
   if [[ ! -e $TuneUpTargetFile ]]; then 
     printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
     sleep 100
   fi
+
+  TuneUp_InstanceName="$(basename "$TuneUpTargetFile" .conf)"
+  TuneUpDate="$(date +%b%d.%H.%M)"
 
   # Should be in the group folder but make sure we are. 
   # Could happen if tune up follows a download that was started in a different folder to the target new one.
@@ -73,35 +74,33 @@ function_config_tune_up ()  {
   
   [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
 
-  # check starter
+  # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
 
-  ConfLine="$(grep '#!/usr/bin' "$TuneUpTmpCopy")"
+  ConfLine="$(grep '#!' "$TuneUpTmpCopy" | grep quickemu )"
+  Conf_qqX_Pointer="$(grep '#!' "$TuneUpTmpCopy" | grep qqX | grep -v 'qqX.builtins')"
 
-  ConfPointer="${ConfLine/"#!/usr/bin/"/}"
-  ConfPointer="${ConfPointer/"--vm"/}"
-  ConfPointer="${ConfPointer// /}"
+  [[ $GeneralLoopCheck ]] && echo && echo "ConfLine = $ConfLine" && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer"
 
   if [[ ! $ConfLine ]]; then 
 
     # some kind of line is needed
+    printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
 
-    printf "#!/usr/bin/qqX --vm \n\n" > "$TuneUpTargetDraft" 
-
-  elif [[ $ConfPointer != "qqX" ]]; then
+  elif [[ ! $Conf_qqX_Pointer ]]; then
 
     ConfEdit_Qstart=
     printColor "\n\n  The start line may be edited to point to qqX"  
     printf "\n\n  Change the start line to point to qqX ?"  
-    printf "\n\n  [enter] yes, go for it    [no] maybe not ...  [q] quit tune-up \n\n"
+    printf "\n\n  [enter] yes, go for it    [no] use System %s  [q] quit tune-up \n\n"  "$QE_SystemFilePath"
     read -rp "  >  "  ConfEdit_Qstart
 
     [[ $ConfEdit_Qstart == "q" ]] && return
 
-    if [[ $ConfEdit_Qstart != "no" ]]; then printf "#!/usr/bin/qqX --vm \n\n"   > "$TuneUpTargetDraft" 
-    else printf "%s\n" "$ConfLine" > "$TuneUpTargetDraft" 
+    if [[ $ConfEdit_Qstart == "no" ]]; then printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetDraft"  
+    else printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
     fi
 
-  else  printf "%s\n\n" "$ConfLine" > "$TuneUpTargetDraft"
+  else  printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
 
   fi
 
@@ -300,7 +299,7 @@ function_config_tune_up ()  {
 
   for Line in "${TuneUpArr[@]}"; do
 
-    if [[ $(tr -cd "[:graph:]" <<< "$Line") ]] && [[ "$Line" != *'/usr/bin'* ]] && [[ "$Line" != 'disk_size='* ]] \
+    if [[ $(tr -cd "[:graph:]" <<< "$Line") ]] && [[ "$Line" != *'#!'* ]] && [[ "$Line" != 'disk_size='* ]] \
     && [[ "$Line" != 'cpu_cores='* ]] && [[ "$Line" != 'ram='* ]] && [[ "$Line" != '#tpm='* ]]  && [[ "$Line" != 'tpm='* ]] \
     && [[ "$Line" != *'cureboot='* ]]; then
 
