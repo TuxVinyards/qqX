@@ -286,6 +286,7 @@ function_quick_get_wrap ()  {
     elif ( ping -w 2  8.8.8.8  | grep -q ttl ) 2> /dev/null ; then InternetUp=1  
 
     # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
+    # No changes to '--spider' in wget2  https://gitlab.com/gnuwget/wget2/-/wikis/home
       
     else
 
@@ -374,10 +375,6 @@ function_quick_get_wrap ()  {
 
           # Also add check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
           # 4.9.2 (still numbered 4.9.1) only has 'echo 38 39' for fedora releases ...
-
-          quickget "filepath"  
-
-          if grep -q -s 'os_homepage' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
 
           printColor "Checking ...."
 
