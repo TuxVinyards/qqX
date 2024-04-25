@@ -11,7 +11,7 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 ### 1.8.02  - Hot Fixes for the pending new quickemu release
 
-- This is the new stable branch.  [Download this](https://github.com/TuxVinyards/qqX/tree/1.8.02) in preference.
+- This is [the new stable branch.](https://github.com/TuxVinyards/qqX/tree/1.8.02) Download [this](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.8.02.zip) in preference.
 
 - Now features quickemu builtins to give much greater control.
 
