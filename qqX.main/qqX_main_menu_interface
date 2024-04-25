@@ -91,6 +91,7 @@ else
 
     fi
 
+    print_kvm_status_warnings
     
     if [[ $ShowCustomBootMenu ]] ; then
 
@@ -279,7 +280,7 @@ else
     fi
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
-    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  download new qqX update: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
+    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
     printf  "  [enter] refresh    [q] quit \n\n"

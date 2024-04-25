@@ -222,7 +222,7 @@ function find_quick_version_numbers () {
 
   # Release Quickemu 4.9.2 was still numbered 4.9.1  
   # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
-  if grep -q -s -e 'echo 38 39' "$QG_SourcePath" ; then 
+  if grep -q -s 'echo 38 39' "$QG_SourcePath" ; then 
     [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
     [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
   fi

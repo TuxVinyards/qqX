@@ -282,7 +282,7 @@ else
   InstallSelect=
   if [[ $(type -p qqX) ]]; then Current_qqX_Version="$(qqX --version)" ; else Current_qqX_Version= ; fi
 
-  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade current release %s ..."   "$Current_qqX_Version"
+  if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade the current release %s ..."   "$Current_qqX_Version"
   else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME" 
   fi
 
@@ -366,7 +366,7 @@ else
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
       [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
       sudo cp "./qqX.main/qqX_"*  "$qqX_Std_Share_Path/qqX.main"
-      sudo cp -r "./qqX.builtins"*  "$qqX_Std_Share_Path/qqX.builtins"
+      sudo cp -r "./qqX.builtins"*  "$qqX_Std_Share_Path/"
 
     fi
     

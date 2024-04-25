@@ -30,11 +30,10 @@
 
 ##  qqX - quickemu quickget X terminal project   
 
-#  A wrapping script for quickemu/quickget  Part of quickemu-mod quickemu-wrap suite of scripts. 
-#  @2023/07/12 also forms the base script for qqX - quickemu quickget X terminal project  and may also be named as qqx or qqX
-
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+
+#  Updated 2024/04 to work with changes to fedora 40 and github
 
 #  Make sure shell is set during session to decimal separator of dot 
 
@@ -61,11 +60,9 @@
 # As check_for_qqX_updates runs in the background, the variables need transfering to the foreground
 
 qqX_LatestRelease=
-
-qqX_LatestTarBall=
-
+qqX_Latest_Secure_TarBall=
+qqX_Latest_Secure_TarSha=
 qqX_UpdateAvail=
-
 qqX_Upd_VarsTmpFile="/tmp/qqX.upd.chk.txt"
 
 echo > "$qqX_Upd_VarsTmpFile"
@@ -77,41 +74,21 @@ check_for_qqX_updates() {
 
   wget -q -T2 -t2 -O "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest" 
 
-  qqX_LatestRelease="$(grep -s tag_name "/tmp/latest-qqX" )"
+  qqX_LatestRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -m 1 tag_name | cut -d ':' -f 2 | tr -d '"' | tr -d ' ')"
 
   
   if [[ $qqX_LatestRelease ]]; then
 
-    # should normally be the case, if internet connection is up
-    qqX_LatestRelease="${qqX_LatestRelease/'"tag_name": "'/}"
-    qqX_LatestRelease="${qqX_LatestRelease//'",'/}"
-    qqX_LatestRelease="$(tr -cd '[:graph:]' <<< "$qqX_LatestRelease")"
+    #qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
 
-    # std downloads: 
-    # eg "tarball_url": "https://api.github.com/repos/TuxVinyards/qqX/tarball/0.09.00.016",
-    qqX_LatestTarBall="$(grep -s tarball "/tmp/latest-qqX" )"
-    qqX_LatestTarBall="${qqX_LatestTarBall/'"tarball_url": "'/}"
-    qqX_LatestTarBall="${qqX_LatestTarBall//'",'/}"
-    qqX_LatestTarBall="$(tr -cd '[:graph:]' <<< "$qqX_LatestTarBall")"
-
-    # assets: 
-    # eg "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz"
-    # &  "browser_download_url": "https://github.com/TuxVinyards/qqX/releases/download/0.09.00.016/qqX-0.09.00.016.tar.gz.sha256"
-
-    qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
-
-    if [[ "$(grep -s -c "$qqX_Latest_Secure_TarTest" "/tmp/latest-qqX")" == "2" ]] ; then
-
-      qqX_Latest_Secure_TarBall="$qqX_Latest_Secure_TarTest"
-      qqX_Latest_Secure_TarSha="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz.sha256"
-           
+    if [[ "$(tr ',' '\n' < "/tmp/latest-qqX" | grep -c 'download_url')" == "2" ]] ; then
+      qqX_Latest_Secure_TarBall="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -m 1 'download_url' | cut -d ':' -f 2- | tr -d '}' | tr -d '"')"
+      qqX_Latest_Secure_TarSha="${qqX_Latest_Secure_TarBall}.sha256"
     fi
-
 
     IFS='.' read -ra qqX_LatestVer_Arr <<< "$qqX_LatestRelease"
 
     # Current Version is carried out at the start, in similar way
-
     # qqX_LatestVer_Arr[0] remains unpadded  (& to the left of the decimal point)
 
     [[ ${#qqX_LatestVer_Arr[1]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[1] "%.2d" "${qqX_LatestVer_Arr[1]}"
@@ -145,24 +122,14 @@ check_for_qqX_updates() {
       if [[ $(bc <<< "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" 2>/dev/null) == "1" ]]; then 
 
         { printf "\n\n qqX_UpdateAvail=\"1\""   
-        
           printf "\n\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease" 
-
-          printf "\n\n qqX_LatestTarBall=\"%s\""  "$qqX_LatestTarBall" 
-        
           printf "\n\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall" 
-        
           printf "\n\n qqX_Latest_Secure_TarSha=\"%s\""  "$qqX_Latest_Secure_TarSha" 
-
           printf "\n\n qqX_LatestReleaseType=\"%s\""  "$qqX_LatestReleaseType" 
-
           printf "\n\n qqX_LatestVer_Float=\"%s\""  "$qqX_LatestVer_Float" 
-        
         } >> "$qqX_Upd_VarsTmpFile"
 
-      else 
-      
-        printf "\n\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
+      else  printf "\n\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
 
       fi
 
@@ -181,21 +148,15 @@ function download_new_release {
 
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    if [[ ! $qqX_LatestTarBall ]] ; then
+    if [[ ! $qqX_Latest_Secure_TarBall ]] ; then
 
       printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
 
     else 
 
-      if [[ $qqX_Latest_Secure_TarBall ]]; then printf "\n\n  %s"  "$qqX_Latest_Secure_TarBall"
+      printf "\n\n %s \n"  "$qqX_Latest_Secure_TarBall"
 
-      else  printf "\n\n  %s"  "$qqX_LatestTarBall"
-      
-      fi
-
-      printf "\n"
-
-      AboutRelease="$(grep -s 'body' "/tmp/latest-qqX")"
+      AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -A 12 'body')"
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
       AboutRelease="${AboutRelease//\"/}"
@@ -219,29 +180,19 @@ function download_new_release {
       printf "  Neatly download the release into its own sub-folder at: "
 
       [[ $Specified_Updates_Location ]] && printf "\n\n  [s] Specified folder  %s"  "$Specified_Updates_Location"
-
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
-      
         printColor "\n\n  [enter] Current/Default folder  %s "  "$Default_VM_Folder" 
-
       else  
-
         printf "\n\n  [c] Current folder    %s "  "$(pwd)"  
-        
         printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
-
       fi 
 
       printf "\n\n"
-
       [[ $WebBrowser ]] && printColor "  [w] popup qqX web pages with browser" 
-
       printf "   or [b] to go back \n\n"
-
       read -rp "  >  "  qqX_LatestTarBall_Folder
-
       printf "\n\n"
 
 
@@ -263,9 +214,7 @@ function download_new_release {
 
     done
 
-    if [[ $qqX_NoReleaseDL ]]; then 
-
-      qqX_NoReleaseDL=
+    if [[ $qqX_NoReleaseDL ]]; then  qqX_NoReleaseDL=
 
     else
 
@@ -302,11 +251,8 @@ function download_new_release {
       fi
 
       printColor "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
-
       printf "\n\n  All option settings, locations and preferences will be kept."
-
       printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
-
       read -rp "  >  "  qqX_UpdateExit
 
       if [[ $qqX_UpdateExit != "r" ]]; then 
@@ -314,7 +260,6 @@ function download_new_release {
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
 
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
-
         cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
 
         # move current execution away from this script and to the installer
