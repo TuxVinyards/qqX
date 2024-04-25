@@ -125,7 +125,7 @@ function_test_iso_url () {
 
       if [[ $QGW_OS_HomePage ]]; then 
         printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-        if eval wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
+        if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage"; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
       else
         #printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??\n\n"  
         printf "\n\n  HomePage not found. However, downloads still might work ... ??\n\n"  
@@ -135,7 +135,7 @@ function_test_iso_url () {
       #printf "\n\n  Download Links cannot be tested with current version of quickget ... \n\n"; QGW_Download_BadLink=
     #fi
 
-  elif grep -q -s -e '--test-iso-url' "$QG_FilePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath"; then
+  elif grep -q -s -e '--test-iso-url' "$QG_SourcePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath"; then
 
     if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else [[ ! $Zsync_Updatable_ISO ]] && printf "\n\n" ; fi
 
@@ -155,7 +155,7 @@ function_test_iso_url () {
       iso_get_message
       if [[ $QGW_OS_HomePage ]]; then 
         printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-        if wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
+        if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage"; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
       else
         printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??"  
       fi
@@ -275,7 +275,7 @@ function_quick_get_wrap ()  {
 
   while [[ ! $InternetUp ]]; do   
 
-    if wget -q -T1 -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
+    if wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
 
     elif wget -q -T2 -t2 --spider cloudflare.com  2> /dev/null ; then InternetUp=1
 
@@ -287,6 +287,8 @@ function_quick_get_wrap ()  {
 
     # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
     # No changes to '--spider' in wget2  https://gitlab.com/gnuwget/wget2/-/wikis/home
+
+    # TODO  add curl routines
       
     else
 
@@ -380,12 +382,12 @@ function_quick_get_wrap ()  {
 
           QGW_OS_HomePage=
 
-          if grep -q -s -e '--os-info' "$QG_FilePath" ; then
+          if grep -q -s '4=Homepage' "$QG_SourcePath" ; then
 
-            QGW_OS_HomePage="$(quickget --os-info "$QGW_OS_Arr_NameSelected" | grep Homepage | cut -d ':' -f 2,3)"
+            QGW_OS_HomePage="$("$QG_SourcePath" -4 "$QGW_OS_Arr_NameSelected")"
             QGW_OS_HomePage="$(tr -cd "[:print:]" <<< "$QGW_OS_HomePage")"
 
-          elif  grep -q -s 'os_homepage' "$QG_FilePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_FilePath" ; then 
+          elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
 
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
@@ -399,8 +401,10 @@ function_quick_get_wrap ()  {
 
           if [[ $QGW_OS_HomePage ]]; then 
             printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-            if eval wget -q -T1 -t2 --spider "$QGW_OS_HomePage"  2>/dev/null ; then  printf " (working)"
-            else  printf "\n\n  Downloads might work but quickget appears to have a bad HOME PAGE link or site is down ??" 
+            if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage" ; then  printf " (working)"
+            else 
+              [[ $QGW_OS_Arr_NameSelected == "windows" ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
+              printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
             fi
           fi
           break
@@ -418,8 +422,10 @@ function_quick_get_wrap ()  {
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
     iso_get_message () {
-      printColor "\n\n  qqX can also install ISO's downloaded directly from the distro's Web Pages"
-      printf "\n\n  Right click, open-with.  Not all distro sites can be scanned for the 'latest' releases."
+      if [[ $QGW_OS_Arr_NameSelected != "windows" && $QGW_OS_Arr_NameSelected != "macos" ]]; then
+        printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
+        printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
+      fi
     }
 
     while true ; do
