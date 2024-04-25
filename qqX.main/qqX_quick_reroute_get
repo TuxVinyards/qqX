@@ -403,7 +403,7 @@ function_quick_get_wrap ()  {
             printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
             if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage" ; then  printf " (working)"
             else 
-              [[ $QGW_OS_Arr_NameSelected == "windows" ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
+              [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
               printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
             fi
           fi
@@ -422,7 +422,7 @@ function_quick_get_wrap ()  {
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
     iso_get_message () {
-      if [[ $QGW_OS_Arr_NameSelected != "windows" && $QGW_OS_Arr_NameSelected != "macos" ]]; then
+      if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
         printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
         printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
       fi
@@ -482,7 +482,7 @@ function_quick_get_wrap ()  {
 
     # EDITIONS
 
-    if [[ $QGW_OS_Arr_NameSelected  == "windows" ]]; then
+    if [[ "$QGW_OS_Arr_NameSelected"  == "xxxwindows" ]]; then
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
@@ -492,9 +492,18 @@ function_quick_get_wrap ()  {
       QGW_WinLangs_ListString="${QGW_WinLangs_ListRaw/'- Languages: '/}"
       QGW_WinLangs_ListTest="$(tr -d '[:space:]' <<< "$QGW_WinLangs_ListString" )"
 
-      if [[ $QGW_Editions_ListTest ]]; then
+      echo "Langs list test $QGW_WinLangs_ListTest"
+      echo "Langs list string $QGW_WinLangs_ListString"
+
+
+      if [[ $QGW_WinLangs_ListTest ]]; then   
+      
+        #  TODO   See https://github.com/quickemu-project/quickemu/issues/1113
 
         read -ra QGW_WinLangs_Array <<< "$QGW_WinLangs_ListString"
+
+        declare -p QGW_WinLangs_Array
+
 
         if [[ ${#QGW_WinLangs_Array[@]} -eq 1 ]] ; then
 
