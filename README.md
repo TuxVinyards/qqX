@@ -17,9 +17,9 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Maintains quickemu 4.9.2 but gives you the [new Quickemu code,](https://github.com/TuxVinyards/qqX/wiki/FreeBird)  as of Apr 25, which people are starting to download and use.
 
-- Quickemu itself still has some problems with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English
+- The Quickemu CLI and API are basically in place. There are still a few problems to sort with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English. MacOS Sonoma can now be downloaded, with a bit of patience.
 
-- Testing has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
+- Testing for qqX has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
 
 - Fixes have been made for spidering of home pages and reporting of updates. This version should move to release shortly.
 
