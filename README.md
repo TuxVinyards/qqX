@@ -2,7 +2,7 @@
 
 ## " quickemu quickget X terminal project "
 
-Release [1.7.03](https://github.com/TuxVinyards/qqX/releases/tag/1.7.03) builds on the earlier NEW INTERFACE FEATURES and point release bug fixes
+Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES and point release bug fixes
 
 - now adds a handy distro rename function to take the errors and tedium from .conf edits when upgrading to new releases
 - also adds detection improvements for the Gnome 45 text editor and a few minor general tweaks
@@ -11,11 +11,11 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 ### 1.8.02  - Hot Fixes for the pending new quickemu release
 
-- This is the new stable branch.  Download [this](https://github.com/TuxVinyards/qqX/tree/1.8.02) in preference.
+- This is the new stable branch.  [Download this](https://github.com/TuxVinyards/qqX/tree/1.8.02) in preference.
 
 - Now features quickemu builtins to give much greater control.
 
-- Maintains quickemu 4.9.2 but gives you the new Quickemu code,  as of Apr 25, which people are starting to download and use.
+- Maintains quickemu 4.9.2 but gives you the [new Quickemu code,](https://github.com/TuxVinyards/qqX/wiki/FreeBird)  as of Apr 25, which people are starting to download and use.
 
 - Quickemu itself still has some problems with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English
 
