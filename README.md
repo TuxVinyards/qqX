@@ -9,13 +9,19 @@ Release [1.7.03](https://github.com/TuxVinyards/qqX/releases/tag/1.7.03) builds 
 
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
 
-### 1.7.04  - Hot Fixes for the pending new quickemu release
+### 1.8.02  - Hot Fixes for the pending new quickemu release
 
-- On the 'dev' branch. Download this in preference.
+- This is the new stable branch.  Download [this](https://github.com/TuxVinyards/qqX/tree/1.8.02) in preference.
 
-- Adds a few fixes and tweaks needed for quickget.
+- Now features quickemu builtins to give much greater control.
 
-- Backwardly compatible with quickemu 4.9.2
+- Maintains quickemu 4.9.2 but gives you the new Quickemu code,  as of Apr 25, which people are starting to download and use.
+
+- Quickemu itself still has some problems with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English
+
+- Testing has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
+
+- Fixes have been made for spidering of home pages and reporting of updates. This version should move to release shortly.
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
