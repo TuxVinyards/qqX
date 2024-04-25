@@ -181,6 +181,10 @@ else
 
     dev_loop_check 
 
+    if [[ "$VM_InstanceName" == *macos* && "$VM_InstanceName" == *sonoma* ]]; then
+     if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
+    fi
+
     printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
 
     filter_and_flag_qemu_errors
