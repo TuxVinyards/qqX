@@ -72,7 +72,11 @@ function_config_tune_up ()  {
   printColor "\n\n  All changes made here, may be reversed:"
   printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
-  [[ $NewFileTuneUp ]] && printf "\n\n  So far, so good  >  "
+  if [[ $NewFileTuneUp ]]; then 
+    printf "\n\n  So far, so good  >  "
+    # Not fully done at this point but this is used a flag to stop repeat conf checks, means the tune-up screen has been done.
+    NewFileTuneUp_JustDone=1
+  fi
 
   # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
 
