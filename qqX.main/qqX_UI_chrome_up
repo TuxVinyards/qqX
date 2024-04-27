@@ -150,16 +150,17 @@ show_qqX_title_bar() {
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
   printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
 
-  quickget filepath
+  [[ $QE_SourcePath == "$QE_SystemFilePath" ]] && printf " 'System'"
+
   QE_FilePath_Short=
   QG_FilePath_Short=
 
-  if [[ $QuickEmuSource != "$QE_FilePathDefault" ]]; then
-    if [[ "${#QuickEmuSource}" -gt 40 ]]; then QE_FilePath_Short=".... ${QuickEmuSource:(-35)}" ; else QE_FilePath_Short="$QuickEmuSource" ; fi
+  if [[ $QE_SourcePath != "$QE_SystemFilePath" ]] && [[ "$QE_SourcePath" != *'qqX.builtins'* ]]  && [[ "$QE_SourcePath" != *'qqX.custom'* ]] ; then
+    if [[ "${#QE_SourcePath}" -gt 40 ]]; then QE_FilePath_Short=".... ${QE_SourcePath:(-35)}" ; else QE_FilePath_Short="$QE_SourcePath" ; fi
   fi
 
-  if [[ "$(dirname "$QG_FilePath")" != "/usr/bin" ]]; then
-    if [[ "${#QG_FilePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_FilePath:(-35)}" ; else QG_FilePath_Short="$QG_FilePath" ; fi
+  if [[ "$(dirname "$QG_SourcePath")" != "/usr/bin" ]] && [[ "$QG_SourcePath" != *'qqX.builtins'* ]] && [[ "$QG_SourcePath" != *'qqX.custom'* ]]; then
+    if [[ "${#QG_SourcePath}" -gt 40 ]]; then QG_FilePath_Short=".... ${QG_SourcePath:(-35)}" ; else QG_FilePath_Short="$QG_SourcePath" ; fi
   fi
 
   [[ $QE_FilePath_Short && $QG_FilePath_Short ]] && printf "\n\n  Custom Source:"

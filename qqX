@@ -43,7 +43,7 @@ export "LC_COLLATE=C"
 
 # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
 # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-qqX_Version="1.7.03"
+qqX_Version="1.8.02"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
@@ -54,9 +54,14 @@ GeneralLoopCheck=
 
 ## INITIALIZE
 
-# Respect standard FHS locations but allow local overide for Dev work or for Custom installs.  
+System_qqX_Path="$(type -p qqX)"
+
+# Respect standard FHS locations but allow local overide for qqX dev work. NB no spaces in qqX dev path, see notes at end of settings file.
 if [[ -d "./qqX.main" ]]; then qqX_MainFolder="$(realpath "./qqX.main")" ; else qqX_MainFolder="/usr/share/qqX/qqX.main"; fi
 if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
+
+if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
+if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
 declare -gA VM_Array=()
@@ -90,26 +95,6 @@ source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
 
-# Now that rerouting functions for quickemu & quickget are in place & code has been sourced,
-# find quick EMU/GET version numbers: 
-
-# QuickEMU uses an internal variable '$VERSION'
-QE_VerNumber="$VERSION"
-
-# QuickGET as @ ver 4.9.2 vanilla actually makes a call to EMU to find the number. 
-# But use a full call, as the 'quickget' call goes to a qqX capture function of the same name, 
-# allowing re-routes to custom versions that may work differently. 
-# And where $1 as 'filepath' will return "$QG_FilePath" for whichever script is used.
-QG_VerNumber="$(quickget "--version")"
-quickget "filepath"  
-
-# Release Quickemu 4.9.2 was still numbered 4.9.1  
-# Use the changes to fedora releases 'echo 38 39' as a fixing flag:
-if grep -q -s -e 'echo 38 39' "$QG_FilePath" ; then 
-  [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
-  [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
-fi
-
 function dev_loop_check {
 
     if [[ $GeneralLoopCheck ]]; then
@@ -117,6 +102,7 @@ function dev_loop_check {
     echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
     echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive  IsoImg = $IsoImg"
+    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
     echo "pwd: $(pwd)"
     sleep "$GeneralLoopCheck"
   fi
@@ -148,7 +134,7 @@ function main_menu {
   done
 } 
 
-
+#find_quick_version_numbers
 tput civis
 printf "\033c"
 show_qqX_title_bar

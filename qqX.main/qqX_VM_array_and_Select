@@ -277,7 +277,6 @@ VM_loader_selector_and_menu () {
 
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
             
-        DefaultFolderError= 
         ExtraFolderError=
         VM_Selection=
         VM_InstanceName=
@@ -476,8 +475,6 @@ refresh_sources_and_load_VM_arrays() {
   source "$qqX_SettingsFile" 
 
   refresh_and_load_quickemu_sources
-  quickget filepath
-  
   find_file_manager_browser
 
   [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 

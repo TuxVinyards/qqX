@@ -79,9 +79,8 @@ VM_SelectorStyle="A"
 
 # Style E setting, default ="2"  
   VM_Select_Items_style_E_PerLine=
-
-# QUICKGET selector  
-# Normally set internally at ="7"  but certain internal functions may reduce this setting to as low as 2 or 3
+  
+# Default is set internally at ="7"  but certain internal functions may temporarily reduce this to as low as 2 or 3
 # Use with caution.  Suggest 5 or 6 as lowest setting.  Normally leave blank.
   Force_GetList_NewLinePoint=
 
@@ -90,8 +89,41 @@ VM_SelectorStyle="A"
 # Also see qqX wiki.
 
 
+## 'QUICKEMU' & 'QUICKGET'  SOURCE:
 
-## UPDATES:
+# IMPORTANT @ 2024/04  quickemu has been undergoing major changes. 
+
+# TO KEEP qqX STABLE, built-in releases are being introduced from qqX version 1.8 onwards.
+# These are essentially identical to the official releases, except for changes to the version number, for identification purposes.
+
+# Quickemu is a good project but it has suffered recently from an intermittent maintenance cycle with
+# short notice releases and often months long periods of community-only activity.
+# 2024/04 IS HOPEFULLY A TURNING POINT. It comes at the end of what was a frustratingly long period for many people,  
+# during which fixes and features from the quickemu community had accumulated and sat there waiting to be merged.
+
+# The idea is to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes, 
+# and to have the possibilty, if needed or wished, of allowing in selected pre-release community contributions.
+
+# Named versions are as follows: 
+
+# System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
+
+# HomeBird   - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
+
+# FreeBird   - The full current official quickemu release, if known to be both stable & qqX stable, or a duplicate of HomeBird.
+#              Or the full current release but with cherry-picked, officially merged but not yet released additions ... 
+
+# FreeSpirit - As FreeBird, as either a cherry-picked pre-release current official main branch or the latest official release,
+#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
+
+# Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
+
+# Set as quoted "name" or may be set blank for default.  Note 'FreeBird' is default. 'System' must be manually set.
+
+  QE_SourceVersion="FreeBird"    
+
+
+## qqX UPDATES:
 
 # Checks quietly for new GitHub releases (set =1 if not required)
   Disable_qqX_upd_Checks=
@@ -206,18 +238,6 @@ VM_SelectorStyle="A"
   FixArgs_smartcard=1
 
 
-
-## 'QUICKEMU' & 'QUICKGET'  VERSIONING:
-
-# For VM compatibility reasons, different quickemu/quickget versions maybe be needed.    
-# D/L at:  https://github.com/quickemu-project/quickemu/releases   May also be used for development beta testing.
-# Generally, different quickget/quickemu release/custom versions should be mix/matchable.  However, a structure
-# similar to quickemu 4.4 onwards is probably needed.  Also note that quickget will use quickemu to obtain a version number.
-# Suggested name format 'quickemu-48' 'quickget-44' 'QE-46' etc  ...  QE = quickemu   QG = quickget
-# LEAVE BLANK TO USE SYSTEM DEFAULTS  or give full path/filename  eg  QE_Version="/media/xxx/Files/VMQs/QE_ScriptFolder/quickemu-42" 
-  QE_Version=                 
-  QG_Version= 
-
 ## QEMU VERSION
 
 # Overide to handle future quickemu errors from changes to Qemu numbering format
@@ -294,6 +314,44 @@ VM_SelectorStyle="A"
 # The qqX upgrader utility will tidy up and possibly remove any 'obsolete' code and comments from this file ...
 # For advanced custom tweaks or things that you want to keep safe, you should make a custom settings file,
 # next door to this one, in '.qqX' in your home folder (normally use ctrl-h to unhide) "$HOME/.qqX/custom_settings"
+
+
+# CUSTOM QUICKEMU & QUICKGET and DEVELOPMENT
+# Sometimes different quickemu/quickget versions maybe be needed, or different custom versions produced.
+
+# Official versions may be downloaded at https://github.com/quickemu-project/quickemu/releases   
+# Remember that official releases of quickget tend to check quickemu for the version number.
+# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable,  
+# as long as, a structure similar to quickemu 4.4 onwards has been used. 
+
+# Place 'Custom' scripts in a 'QE.Custom' sub-folder to "$Default_VM_Folder/qqX.custom" in a similar manner
+# to that used for FreeBird. This preset path will be auto-checked.
+
+# For 'Dev' give full path of your Quickemu source clone here. QE_SourceVersion may be set above or here as an overwrite.
+  #QE_SourceVersion="Dev"
+  #QE_DevPath="~/Files/myClone"
+
+# Inside the folder, all script names should be as standard. Plus, add all ancilliary scripts, such as macrecovery/chunkcheck etc.
+# qqX will select this folder and will also add it to '$PATH' to make sure the correct ancilliaries are found.
+
+# NB no spaces in path, as quoted paths can only be added to the end of $PATH and we need the source path as first.
+
+# Different names are as follows: 
+
+# System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
+
+# HomeBird   - A recent official quickemu release, which may have quickemu/quickget issues, and which may or  
+#              may not have been fixed in the current main, but known to be STABLE with qqX 
+
+# FreeBird   - Either the full current official quickemu release, or a cherry-picked official main branch
+#              that is working towards a new release, if known to be qqX stable. Or a duplicate of HomeBird.
+
+# FreeSpirit - Either a cherry-picked pre-release current official main branch or the latest official release,
+#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
+
+# Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
+
+# FreeBird is default.  Set blank for default.
 
 
 ## End of Settings

@@ -322,7 +322,7 @@ function  main_menu_actions {
     MenuXA=
     MenuXA_Correct=
 
-    printColor "\n\n  Give extra qemu arguments to use "
+    printColor "\n\n  Give extra qemu arguments to use or [enter] for none "
     printf     "\n\n  Format = grouped & with space separated elements "
     printf     "\n\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
 
