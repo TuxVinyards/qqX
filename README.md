@@ -2,12 +2,12 @@
 
 ## " quickemu quickget X terminal project "
 
-Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES and point release bug fixes
+Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES
 
-- now adds a handy distro rename function to take the errors and tedium from .conf edits when upgrading to new releases
-- also adds detection improvements for the Gnome 45 text editor and a few minor general tweaks
+- now adds a _handy distro rename function_ to help when upgrading to new releases
+- makes detection improvements for the Gnome 45 text editor and adds a few minor tweaks
 
-Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
+Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 ### 1.8.03  - Hot Fixes for the pending new quickemu release
 
@@ -15,7 +15,9 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Maintains quickemu 4.9.2 but gives you the [new Quickemu code,](https://github.com/TuxVinyards/qqX/wiki/FreeBird)  as of Apr 25, which people are starting to download and use.
 
-- The Quickemu CLI and API are basically in place. There are still a few problems to sort with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English. MacOS Sonoma can now be downloaded, with a [bit of patience.](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help#macos-hangs-when-running-the-setup)
+- Windows [generally works](https://github.com/quickemu-project/quickemu/issues/1113) for international English and MacOS Sonoma can now be downloaded, with a [bit of patience.](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help#macos-hangs-when-running-the-setup)
+
+- Quickemu's new CLI and API are now usable. 
 
 - Testing for qqX has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
 
