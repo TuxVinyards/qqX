@@ -217,19 +217,22 @@ function check_new_vm_folder_name {
   else
 
     # main naming component match
-    SimilarVMs="$(ls "$QWG_Conf_Dir/${QGW_OS_Arr_NameSelected}"*.conf 2>/dev/null )"
+    SimilarVMs+="$(ls "$QWG_Conf_Dir/${QGW_OS_Arr_NameSelected}"*.conf 2>/dev/null )"
 
     # first dash separated section match
     if [[ "$QGW_OS_Arr_NameSelected" == *'-'* ]]; then 
       SimilarVM_ShorterCheck="$(echo "$QGW_OS_Arr_NameSelected" | cut -d '-' -f1)"
-      SimilarVMs+="$(ls "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+      SimilarVMs+=" $(ls "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
     fi
 
     # first chars in new name match to somewhere in something existing
     SimilarVM_ShorterCheck="${QGW_OS_Arr_NameSelected:0:5}"
-    SimilarVMs+="$(ls "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+    SimilarVMs+=" $(ls "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
 
     if [[ $SimilarVMs ]]; then
+
+      SimilarVMs="$(tr ' ' '\n' <<< "$SimilarVMs" )"
+      SimilarVMs="$(sort -u <<< "$SimilarVMs" | uniq )"
 
       mapfile -t  SimilarVM_Arr  <<< "$SimilarVMs"
 
