@@ -9,19 +9,17 @@ Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES and point release bu
 
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages and in the adjusted main readme.
 
-### 1.8.02  - Hot Fixes for the pending new quickemu release
-
-- This is [the new stable branch.](https://github.com/TuxVinyards/qqX/tree/1.8.02) Download [this](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.8.02.zip) in preference.
+### 1.8.03  - Hot Fixes for the pending new quickemu release
 
 - Now features quickemu builtins to give much greater control.
 
 - Maintains quickemu 4.9.2 but gives you the [new Quickemu code,](https://github.com/TuxVinyards/qqX/wiki/FreeBird)  as of Apr 25, which people are starting to download and use.
 
-- The Quickemu CLI and API are basically in place. There are still a few problems to sort with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English. MacOS Sonoma can now be downloaded, with a bit of patience.
+- The Quickemu CLI and API are basically in place. There are still a few problems to sort with Windows and language support but it [generally works](https://github.com/quickemu-project/quickemu/issues/1113)  for international English. MacOS Sonoma can now be downloaded, with a [bit of patience.](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help#macos-hangs-when-running-the-setup)
 
 - Testing for qqX has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
 
-- Fixes have been made for spidering of home pages and reporting of updates. This version should move to release shortly.
+- Fixes have been made for spidering of home pages and reporting of updates. 
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
