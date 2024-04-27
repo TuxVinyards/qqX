@@ -4,7 +4,7 @@
 
 Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES
 
-- now adds a _handy distro rename function_ to help upgrades
+- now adds a _handy distro rename function_ to help with upgrades
 - makes detection improvements for the Gnome 45 text editor and adds a few minor tweaks
 
 Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
