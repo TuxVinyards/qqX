@@ -140,8 +140,6 @@ function sort_qqX_builtin_settings () {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
 
-  #  TODO   modify checks & defaults  - as can now run without system
-
   export PATH="$OriginalPATH"
 
   if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 

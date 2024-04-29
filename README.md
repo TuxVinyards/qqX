@@ -17,11 +17,15 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Windows [generally works](https://github.com/quickemu-project/quickemu/issues/1113) for international English and MacOS Sonoma can now be downloaded, with a [bit of patience.](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help#macos-hangs-when-running-the-setup)
 
-- Quickemu's new CLI and API are now usable. 
+- Quickemu's new CLI and API are now usable.
 
 - Testing for qqX has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
 
-- Fixes have been made for spidering of home pages and reporting of updates. 
+- Fixes have been made for spidering of home pages and reporting of updates.
+
+- One or two 'no disk messages' from new quickemu code on new installs which a restart of qqX will clear. 
+
+- Stable but work in progress ...
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
@@ -149,7 +153,7 @@ Testing has been carried out on a variety of mainstream distros.
 
 All scripts have been carefully Shellcheck linted & have full error handling routines.
 
-qqX always makes backups, as is *standard good practice* with *any* software.
+qqX always makes backups, as is _standard good practice_ with _any_ software.
 
 Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function.
 

@@ -49,8 +49,8 @@ qqX_Version="1.8.03"
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
 ## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less. Or "0" for none.
-NoClear=
-GeneralLoopCheck=
+NoClear=0
+GeneralLoopCheck=0
 
 ## INITIALIZE
 
@@ -101,7 +101,7 @@ function dev_loop_check {
     echo
     echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
     echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
-    echo "MainDrive = $MainDrive  IsoImg = $IsoImg"
+    echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
     echo "pwd: $(pwd)"
     sleep "$GeneralLoopCheck"
