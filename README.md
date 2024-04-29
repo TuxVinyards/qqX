@@ -23,9 +23,10 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Fixes have been made for spidering of home pages and reporting of updates.
 
-- One or two 'no disk messages' from new quickemu code on new installs which a restart of qqX will clear. 
-
-- Stable but work in progress ...
+  Stable but work in progress.
+  
+  Known bug: One or two 'no disk messages' from new quickemu code on new distro installs.
+  Clears on qqX restart ...
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
