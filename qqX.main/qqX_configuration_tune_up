@@ -59,12 +59,25 @@ function_config_tune_up ()  {
 
   cp "$TuneUpTargetFile"  "$TuneUpOldFile"
 
+  # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
+  # default behaviour from quickget is to add "#!$(which quickemu) --vm"
+  # and from ver 1.8 on, builtins or custom will make a non standard mod 
+  # if bypassing the tune-up, unless tweaked here:
+
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$System_qqX_Path" )"
+  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
+
   TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
   TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
-
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
-  [[ $GeneralLoopCheck ]] && echo
+  if [[ ! $Conf_qqX_Pointer && ! $Conf_SysQE_Pointer ]]; then 
+    printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetFile" 
+    tail -n +2 "$TuneUpTmpCopy" >> "$TuneUpTargetFile" 
+    cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+  fi
+
+  [[ $GeneralLoopCheck ]] && echo && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer" && echo "Conf_SysQE_Pointer = $Conf_SysQE_Pointer"  && echo 
   dev_loop_check
 
   printColor "\n\n  CHECK ME: \n\n"
@@ -78,19 +91,7 @@ function_config_tune_up ()  {
     NewFileTuneUp_JustDone=1
   fi
 
-  # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
-
-  ConfLine="$(grep '#!' "$TuneUpTmpCopy" | grep quickemu )"
-  Conf_qqX_Pointer="$(grep '#!' "$TuneUpTmpCopy" | grep qqX | grep -v 'qqX.builtins')"
-
-  [[ $GeneralLoopCheck ]] && echo && echo "ConfLine = $ConfLine" && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer"
-
-  if [[ ! $ConfLine ]]; then 
-
-    # some kind of line is needed
-    printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
-
-  elif [[ ! $Conf_qqX_Pointer ]]; then
+  if [[ ! $Conf_qqX_Pointer ]]; then
 
     ConfEdit_Qstart=
     printColor "\n\n  The start line may be edited to point to qqX"  
