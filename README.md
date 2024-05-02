@@ -23,10 +23,11 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Fixes have been made for spidering of home pages and reporting of updates.
 
-  Stable but work in progress.
-  
-  Known bug: One or two 'no disk messages' from new quickemu code on new distro installs.
-  Clears on qqX restart ...
+### 1.8.04
+
+- The **new 2nd May Quickemu code** :partying_face:
+
+- Raft of Quickemu [fixes and updates](https://github.com/TuxVinyards/quickemu/tree/freebird-qqX-1.8.04) plus a couple of qqX fixes to go with
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
