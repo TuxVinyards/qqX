@@ -29,6 +29,10 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Raft of Quickemu [fixes and updates](https://github.com/TuxVinyards/quickemu/tree/freebird-qqX-1.8.04) plus a couple of qqX fixes to go with
 
+### 1.8.05
+
+- Fix SHA wget 302 error
+
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
