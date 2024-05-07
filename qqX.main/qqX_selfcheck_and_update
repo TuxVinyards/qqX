@@ -164,6 +164,7 @@ function download_new_release {
       AboutRelease="${AboutRelease//'## '/}"
       AboutRelease="${AboutRelease//'\n'/}"
       AboutRelease="${AboutRelease//'\r'/}"
+      AboutRelease="${AboutRelease//'}'/}"
 
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
 
@@ -190,7 +191,7 @@ function download_new_release {
       fi 
 
       printf "\n\n"
-      [[ $WebBrowser ]] && printColor "  [w] popup qqX web pages with browser" 
+      [[ $WebBrowser ]] && printf "  [w] popup qqX web pages with browser" 
       printf "   or [b] to go back \n\n"
       read -rp "  >  "  qqX_LatestTarBall_Folder
       printf "\n\n"
@@ -229,15 +230,15 @@ function download_new_release {
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         
-        wget "$qqX_Latest_Secure_TarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
-        wget "$qqX_Latest_Secure_TarSha" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"
+        eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"  "$qqX_Latest_Secure_TarBall"
+        eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"  "$qqX_Latest_Secure_TarSha"
         SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
 
         printColor "\n  SHA256 Check: %s "  "$SHA_Check"
 
         [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
       
-      else  wget "$qqX_LatestTarBall" -O "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"
+      else  eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" "$qqX_Latest_Secure_TarBall"
 
       fi
 
