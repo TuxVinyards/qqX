@@ -29,6 +29,8 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Raft of Quickemu [fixes and updates](https://github.com/TuxVinyards/quickemu/tree/freebird-qqX-1.8.04) plus a couple of qqX fixes to go with
 
+- A few issues are still present in the May 9th Quickemu release 4.9.4 but this version can be enabled via the general settings.
+
 ### 1.8.05
 
 - Fix SHA wget 302 error
