@@ -141,11 +141,13 @@ qqX will work happily alongside quickgui or any quickemu shortcuts. But these ar
 
 Start from scratch. Or safely test out the qqX difference on your existing quickgui VM's  
 
-- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
+- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu) .
   
-  You must be able to type `quickemu` at a command prompt and get the quickemu usage screen.
+  You should be able to type `quickemu` at a command prompt and get the quickemu usage screen but from version 1.8 this is not essential.
 
-- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
+  Manual installation of Quickemu to 'PATH' as in the case of some Host distros such as Fedora may now be omitted.
+
+- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may newer and may have the very latest tweaks and bug fixes too ...
 
   No other software, support structures or dependencies are needed.
 
@@ -153,7 +155,9 @@ See the installer [Wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ## FAQs and Help
 
-FAQ: [Wiki](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
+Lots available at the qqX wiki pages [here](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
+
+And the Quickemu general forum and chat is available at <https://discord.gg/sNmz3uw>
 
 ## Release notes
 
@@ -167,19 +171,19 @@ Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk 
 
 ![disk error alert crop](https://github.com/TuxVinyards/qqX/assets/3956806/7edf972c-3c18-4f33-8096-2c1cbc5ba4f5)
 
-Feedback, positive or constructive, at <https://discord.gg/sNmz3uw>
-
-## Development
-
-When making clones of the repo to your local machine, you can easily run any new version of qqX directly from the working folder.
-
-See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
+See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for more details
 
 ## Bash
 
-Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's
+Any confident Linux user should find it relatively easy to make simple edits.
 
-Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet. Any confident Linux user should find it relatively easy to make simple edits.
+Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
+
+Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet.
+
+## Development
+
+See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
 
 ## why 'X' ?
 
