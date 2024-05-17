@@ -101,7 +101,7 @@ function  load_mod_quickemu_boot {
   declare -f vm_boot  >  "/tmp/qmod-function-vm_boot-orig-temp"
 
   # shellcheck disable=SC2016
-  QE_args_DeclarePoint=$(grep -n -m 1 -e 'local args=()' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
+  QE_args_DeclarePoint=$(grep -n -m 1 -e 'args=()' "/tmp/qmod-function-vm_boot-orig-temp" | cut -d ':' -f 1)
   QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-orig-temp")
   QE_vm_bootCutOff=$((QE_vm_bootLength-QE_args_DeclarePoint+1))
   head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-orig-temp"  >  "/tmp/qmod-function-vm_boot-interim-temp"
