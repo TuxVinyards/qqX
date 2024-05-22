@@ -35,6 +35,16 @@ Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
 
 - Fix SHA wget 302 error
 
+### Dev
+
+- Try branch 'qe 4.9.5 - mac' for fixes to get quickemu system code running. Plus adds a new macos runtime to FreeBird.
+
+- FreeSpirit remains currently unchanged and as older FreeBird.  More later.
+
+- Current problems with Quickemu are with Spicy display failure and with Width and Height mouse interaction in SDL.
+
+- Plus work in progress still for MacOS and for Windows language support.
+
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
