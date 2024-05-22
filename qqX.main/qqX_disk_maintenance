@@ -555,7 +555,7 @@ function create_new_drives {
             #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
             #  sed -i only works in GNU sed  ... 
 
-            if [[ "$(sed --version | head -1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
+            if [[ "$(sed --version | head -n 1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
               # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
               

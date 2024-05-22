@@ -129,7 +129,7 @@ if [[ $1 == "XDG" ]]; then
       echo; echo " $2"; echo
       echo " qqX has been associated to open .conf (text) files via the file properties 'open-with' option."
       echo; echo; echo "<<" 
-      head -20 "$2"
+      head -n 20 "$2"
       echo ">>" ; echo
       FileLines="$(wc -l < "$2")"
       printf "\n This current file is plain text only. " 
