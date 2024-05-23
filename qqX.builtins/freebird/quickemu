@@ -532,10 +532,14 @@ function vm_boot() {
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2115516935
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2120274893
         # https://github.com/quickemu-project/quickemu/pull/1225#issuecomment-2117555805
+
+        # Skylake-Server-v3  added as dev option for testing 
+        # as is only officially supported Sonoma CPU and supports more cores: 8, 16, 32
  
         CPU_MODEL="Haswell-v2"
+        #CPU_MODEL="Skylake-Server-v3"
         CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+ssse3,vmware-cpuid-freq=on"
-        # A CPU with fma is required for Metal support
+        # A CPU with fma is required for Metal support (@flexiondotorg)
 
         case ${macos_release} in
             ventura|sonoma)
@@ -571,11 +575,19 @@ function vm_boot() {
                     rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
                     x2apic xgetbv1 xsave xsaveopt; do
                 if check_cpu_flag "$FLAG"; then
-                    QEMU_CPU_FLAG="${FLAG}"
-                    QEMU_CPU_FLAG="${QEMU_CPU_FLAG//_/-}"
+                    QEMU_CPU_FLAG="${FLAG//_/-}"
                     CPU+=",+${QEMU_CPU_FLAG}"
                 fi
         done
+
+        if [[ $CPU_MODEL == "Skylake-Server-v3" ]]; then
+            for FLAG in clwb adx ; do
+                    if ! check_cpu_flag "$FLAG"; then
+                        QEMU_CPU_FLAG="${FLAG//_/-}"
+                        CPU+=",-${QEMU_CPU_FLAG}"
+                    fi
+            done
+        fi
 
         OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
         # Disable S3 support in the VM to prevent macOS suspending during install
