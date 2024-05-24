@@ -538,8 +538,8 @@ function vm_boot() {
         # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
         # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
 
-        CPU_MODEL="Haswell-v2"
-        #CPU_MODEL="Skylake-Server-v3"
+        #CPU_MODEL="Haswell-v2"
+        CPU_MODEL="Skylake-Server-v3"
 
         # A CPU with fma is required for Mac Graphics 'Metal' support (@flexiondotorg)
 
@@ -547,17 +547,17 @@ function vm_boot() {
         # Use "sysctl -a | grep machdep.cpu" at terminal in MacOS to see flags
         # On initial tests, outperforms +ve method.
 
-        UseSubtractiveCPU=
+        UseSubtractiveCPU=1
 
         if [[ $UseSubtractiveCPU ]]; then
 
-            CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on"
+            CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off" 
 
             case ${macos_release} in
                 ventura|sonoma)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if ! check_cpu_flag sse4_2 && check_cpu_flag avx2; then 
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
+                    if ! check_cpu_flag sse4_2 || ! check_cpu_flag avx2; then 
+                        echo "ERROR! macOS ${macos_release} requires a CPU with both SSE 4.2 and AVX2 support."
                         echo "       Try macOS Monterey or Big Sur."
                         exit 1
                     fi ;;
@@ -575,10 +575,20 @@ function vm_boot() {
                     fi ;;
             esac
 
+            for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
+                        erms f16c fma fsgsbase fxsr invpcid invtsc lahf_lm lm \
+                        mca mce mmx movbe mpx msr mtrr nx pae pat pge pse popcnt pse36 \
+                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes bmi2 vpclmulqdq \
+                        x2apic xgetbv1 xsave xsaveopt; do
+                    if  ! check_cpu_flag "$FLAG"; then
+                        QEMU_CPU_FLAG="${FLAG//_/-}"
+                        CPU+=",${QEMU_CPU_FLAG}=off"
+                    fi
+            done
+
         else
 
             CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+ssse3,vmware-cpuid-freq=on"
-            # A CPU with fma is required for Metal support (@flexiondotorg)
 
             case ${macos_release} in
                 ventura|sonoma)
@@ -609,9 +619,9 @@ function vm_boot() {
             esac
 
             for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
-                        erms f16c fma fp87 fsgsbase fxsr invpcid invtsc lahf_lm lm \
-                        mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
-                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
+                        erms f16c fma fsgsbase fxsr invpcid invtsc lahf_lm lm \
+                        mca mce mmx movbe mpx msr mtrr nx pae pat pge pse popcnt pse36 \
+                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes bmi2 vpclmulqdq \
                         x2apic xgetbv1 xsave xsaveopt; do
                     if check_cpu_flag "$FLAG"; then
                         QEMU_CPU_FLAG="${FLAG//_/-}"
@@ -622,10 +632,10 @@ function vm_boot() {
         fi
 
         if [[ $CPU_MODEL == "Skylake-Server-v3" ]]; then
-            for FLAG in clwb adx smap pdpe1gb; do
+            for FLAG in clwb adx smap; do
                     if ! check_cpu_flag "$FLAG"; then
                         QEMU_CPU_FLAG="${FLAG//_/-}"
-                        CPU+=",-${QEMU_CPU_FLAG}"
+                        CPU+=",${QEMU_CPU_FLAG}=off"
                     fi
             done
         fi
