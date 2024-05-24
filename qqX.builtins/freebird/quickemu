@@ -536,6 +536,7 @@ function vm_boot() {
         # Skylake-Server-v3  added as dev option for testing 
         # as is only officially supported Sonoma CPU and *technically* supports up to 18 cores.
         # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
+        # Also retains IBRS spectre mitigation
         # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
 
         #CPU_MODEL="Haswell-v2"
@@ -546,8 +547,10 @@ function vm_boot() {
         # Dev Subtractive method: Set =1 or blank  Allow Qemu to add all, unless not present in host.
         # Use "sysctl -a | grep machdep.cpu" at terminal in MacOS to see flags
         # On initial tests, outperforms +ve method.
+         UseSubtractiveCPU=1
 
-        UseSubtractiveCPU=1
+        # Dev overwrite, for testing only
+         UseHostOverWrite=
 
         if [[ $UseSubtractiveCPU ]]; then
 
@@ -578,7 +581,7 @@ function vm_boot() {
             for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
                         erms f16c fma fsgsbase fxsr invpcid invtsc lahf_lm lm \
                         mca mce mmx movbe mpx msr mtrr nx pae pat pge pse popcnt pse36 \
-                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes bmi2 vpclmulqdq \
+                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vpclmulqdq \
                         x2apic xgetbv1 xsave xsaveopt; do
                     if  ! check_cpu_flag "$FLAG"; then
                         QEMU_CPU_FLAG="${FLAG//_/-}"
@@ -621,7 +624,7 @@ function vm_boot() {
             for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
                         erms f16c fma fsgsbase fxsr invpcid invtsc lahf_lm lm \
                         mca mce mmx movbe mpx msr mtrr nx pae pat pge pse popcnt pse36 \
-                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes bmi2 vpclmulqdq \
+                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vpclmulqdq \
                         x2apic xgetbv1 xsave xsaveopt; do
                     if check_cpu_flag "$FLAG"; then
                         QEMU_CPU_FLAG="${FLAG//_/-}"
@@ -639,6 +642,9 @@ function vm_boot() {
                     fi
             done
         fi
+
+        [[ $UseHostOverWrite ]] && CPU="-cpu host,kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off" 
+
 
         OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
         # Disable S3 support in the VM to prevent macOS suspending during install
