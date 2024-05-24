@@ -534,9 +534,9 @@ function vm_boot() {
         # https://github.com/quickemu-project/quickemu/pull/1225#issuecomment-2117555805
 
         # Skylake-Server-v3  added as dev option for testing 
-        # as is only officially supported Sonoma CPU and supports more cores: 16, 20 
+        # as is only officially supported Sonoma CPU and *technically* supports up to 18 cores.
         # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
-        # Edit .conf file to cpu_cores="16"  ie 8 core x 2 threads
+        # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
 
         CPU_MODEL="Haswell-v2"
         #CPU_MODEL="Skylake-Server-v3"
@@ -545,6 +545,7 @@ function vm_boot() {
 
         # Dev Subtractive method: Set =1 or blank  Allow Qemu to add all, unless not present in host.
         # Use "sysctl -a | grep machdep.cpu" at terminal in MacOS to see flags
+        # On initial tests, outperforms +ve method.
 
         UseSubtractiveCPU=
 
