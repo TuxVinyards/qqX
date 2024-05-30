@@ -129,16 +129,29 @@ EOV
   # then continue with the remainder
   tail -n +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
 
+  # From Quickemu 4.9.5 a PID test was introduced to wrap the run command but qqX has its own control for this, so not needed.
+  # shellcheck disable=SC2016
+  QE_495Test=$(grep -B2 -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
+  if grep -q 'VM_PID' <<< "$QE_495Test" ; then QE_495Test="true" ; else QE_495Test= ; fi
+
   # shellcheck disable=SC2016
   QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
   QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-interim-temp")
-  QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
+
+  if [[ $QE_495Test ]]; then
+    QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+2))
+  else
+    QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
+  fi
+
   head -n -"$QE_vm_bootCutOff" "/tmp/qmod-function-vm_boot-interim-temp" >  "/tmp/qmod-function-vm_boot-new-temp"
 
 
 ## ADD-IN extra code  ( place between the first EOF line & the brace that closes the tail trimmed boot function, just before the second EOF)
 
 # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     (@ 2024/04 use quote EOF, not escape)
+
+[[ $QE_495Test ]] && printf "\n\n %s \n\n"  "  if [[ $QEMU ]]; then  # 495 hack fix" >> "/tmp/qmod-function-vm_boot-new-temp"
 
 cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
@@ -188,10 +201,12 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     while [[ "${args[i]}" ]]; do
 
       # fixes for quickemu deprecated code, to be updated from time to time REVIEW 
+
       if [[ $FixArgs_hpet ]] && [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
+
       if [[ $FixArgs_smartcard ]] && [[ "${args[i]}" == *ccid* ]] && [[ $NoSmartcardSupport ]]; then 
 
-          args[i]=" " ;  args[i-1]=" " 
+        args[i]=" " ;  args[i-1]=" " 
           
       else
 
@@ -352,8 +367,15 @@ function load_quickemu_cases_and_actions {
   ##  Add in the standard actions ( also where quickemu sources in the .conf file )
 
   ((QE_EoCasePoint += (QE_StartCasePoint +2) ))
-  QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
-  ((QE_vm_bootPoint -= 2))
+
+  if [[ $QE_495Test ]]; then 
+    QE_vm_bootPoint=$(grep -n -m 1 'VM_PID' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
+    ((QE_vm_bootPoint -= 1))
+  else
+    QE_vm_bootPoint=$(grep -n -m 1 'vm_boot' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
+    ((QE_vm_bootPoint -= 2))
+  fi
+
   QE_EoLength=$(wc -l < "/tmp/qmod-endof-file-temp")
   QE_BootRemainder=$((QE_EoLength - QE_vm_bootPoint))
 

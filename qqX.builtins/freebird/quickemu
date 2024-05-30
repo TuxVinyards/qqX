@@ -542,7 +542,7 @@ function vm_boot() {
         #CPU_MODEL="Haswell-v2"
         CPU_MODEL="Skylake-Server-v3"
 
-        # A CPU with fma is required for Mac Graphics 'Metal' support (@flexiondotorg)
+        # A CPU with fma is required for Mac Graphics 'Metal' support (@flexiondotorg) # REVIEW add darwin test
 
         # Dev Subtractive method: Set =1 or blank  Allow Qemu to add all, unless not present in host.
         # Use "sysctl -a | grep machdep.cpu" at terminal in MacOS to see flags
@@ -554,7 +554,7 @@ function vm_boot() {
 
         if [[ $UseSubtractiveCPU ]]; then
 
-            CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off" 
+            CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off"
 
             case ${macos_release} in
                 ventura|sonoma)
@@ -578,10 +578,13 @@ function vm_boot() {
                     fi ;;
             esac
 
+            # rdtscp and invtsc, tsc, tsc_adjust, as neutral, neither on nor off
+            # ditto pcid for AMD and fp87 for Intel
+
             for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
-                        erms f16c fma fsgsbase fxsr invpcid invtsc lahf_lm lm \
+                        erms f16c fma fsgsbase fxsr invpcid lahf_lm lm \
                         mca mce mmx movbe mpx msr mtrr nx pae pat pge pse popcnt pse36 \
-                        rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vpclmulqdq \
+                        rdrand sep smep syscall vaes vpclmulqdq \
                         x2apic xgetbv1 xsave xsaveopt; do
                     if  ! check_cpu_flag "$FLAG"; then
                         QEMU_CPU_FLAG="${FLAG//_/-}"
@@ -634,12 +637,14 @@ function vm_boot() {
 
         fi
 
-        if [[ $CPU_MODEL == "Skylake-Server-v3" ]]; then
-            for FLAG in clwb adx smap; do
-                    if ! check_cpu_flag "$FLAG"; then
-                        QEMU_CPU_FLAG="${FLAG//_/-}"
-                        CPU+=",${QEMU_CPU_FLAG}=off"
-                    fi
+        # Not many host CPU's will have AVX 512
+
+        if [[ "$CPU_MODEL" == 'Skylake-Server'* ]]; then
+            for FLAG in clwb adx smap avx512f avx512dq avx512bw avx512cd avx512vl ; do
+                if ! check_cpu_flag "$FLAG"; then
+                    QEMU_CPU_FLAG="${FLAG//_/-}"
+                    CPU+=",${QEMU_CPU_FLAG}=off"
+                fi
             done
         fi
 
@@ -1697,7 +1702,7 @@ SOUND_CARD=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FB 4.9.3.04"
+readonly VERSION="FB 4.9.3.06"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
