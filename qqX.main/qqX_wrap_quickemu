@@ -395,6 +395,7 @@ load_quickemu_cases_and_actions
 function refresh_and_load_quickemu_sources {
 
   find_quickemu_source_functions_and_vars
+  refresh_and_load_quickemu_vars
   load_mod_quickemu_boot
   load_quickemu_cases_and_actions
   find_quick_version_numbers
