@@ -157,13 +157,19 @@ function_config_tune_up ()  {
  
   printf "\n\n  Normal guest setting should be around 2/3 to 3/4 of the host's."
   printf "\n\n  All available 'cores x threads' can be allocated, esp. if running the VM full screen"
-  printf "\n\n  Possibly, if using 'big LITTLE'  CPU's you *may* need to use a lower figure."   
-  printf "\n\n  Quickemu defaults to safe half, minimals. Be generous as less will actually be used."
-  printf "\n\n  And CPU virtualizing units will always protect the host ...."
+  printf "\n\n  These are VIRTUAL cores. So more than physically available may also be used too."
 
-  [[ $ThreadsSuggested ]] && printColor "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
+  printf "\n\n\n  Possibly, if using 'big LITTLE'  CPU's you *may* choose to use a lower figure."   
+  printf "\n\n  Quickemu defaults to half the physical count. But be generous as less will actually be used."
+  printf "\n\n  And the host CPU virtualizing units will always protect things ...."
 
-
+  if [[ $guest_os == "macos" ]]; then 
+    printColor "\n\n\n  MacOS:  Suggest cpu_cores=8 as detection algorithms seem happier with this, even if more are available. "
+    ThreadsSuggested=8
+    ThreadsSuggestLower=8
+  else
+    [[ $ThreadsSuggested ]] && printColor "\n\n  Suggested setting:  cpu_cores=\"%s\"  or  cpu_cores=\"%s\"" "$ThreadsSuggested"  "$ThreadsSuggestLower"
+  fi
   CoresSetNumber=
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
 
@@ -382,14 +388,14 @@ function_config_tune_up ()  {
 
       ConfLine="$(grep -s 'mouse=' "$TuneUpTmpCopy")"
       if [[ ! $ConfLine ]]; then 
-        printColor "\n\n  MacOS WARNING: A line mouse=\"virtio\" or similar is recommended,"
+        printColor "\n\n  MacOS Note: A line mouse=\"virtio\" or similar is recommended,"
         printColor "\n\n  especially with newer releases. Older ones may need =\"usb\" .... "
         printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
       fi
 
       ConfLine="$(grep -s 'keyboard=' "$TuneUpTmpCopy")"
       if [[ ! $ConfLine ]]; then 
-        printColor "\n\n  MacOS WARNING: A line keyboard=\"usb\" or similar is recommended,"
+        printColor "\n\n  MacOS Note: A line keyboard=\"usb\" or similar is recommended,"
         printColor "\n\n  some newer releases may need =\"virtio\" .... "
         printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
       fi

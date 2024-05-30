@@ -101,6 +101,7 @@ function quickemu {
     # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
+    [[ $guest_os == "macos" && ! $cpu_cores ]] && cpu_cores=8
 
     source "/tmp/qmod-actions-temp" 
 
