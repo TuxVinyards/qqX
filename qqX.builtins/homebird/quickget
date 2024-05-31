@@ -3391,7 +3391,7 @@ case "${1}" in
   '--version'|'-v')
     #WHERE=$(dirname "${BASH_SOURCE[0]}")
     #"${WHERE}/quickemu" --version
-    echo "FB 4.9.3.04"
+    echo "HB 4.9.3.04"
     exit 0
     ;;
   '--help'|'-h')
