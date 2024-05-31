@@ -84,7 +84,7 @@ function check_screen_percentage_and_output {
 
     if (( 24 < SDL_ScreenPercent && SDL_ScreenPercent < 100 )); then
 
-      if [[ $QE_495Test ]] && [[ $XDG_SESSION_TYPE == "x11" || $XDG_SESSION_TYPE == "wayland" ]]; then
+      if [[ $QE_495_Script ]] && [[ $XDG_SESSION_TYPE == "x11" || $XDG_SESSION_TYPE == "wayland" ]]; then
         Mon_xRes= 
         Mon_yRes= 
         Mon_xRes=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
@@ -93,12 +93,16 @@ function check_screen_percentage_and_output {
 
       if grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then   SDL_ScrnPcnt_Cmd=" --screenpct  $SDL_ScreenPercent"
 
-      elif [[ $QE_495Test ]] && [[ $Mon_xRes && $Mon_yRes ]]; then
+      elif [[ $QE_495_Script ]] && [[ $Mon_xRes && $Mon_yRes ]]; then
 
         xRes="$(bc <<< "scale=0; $Mon_xRes*$SDL_ScreenPercent/100")"
         yRes="$(bc <<< "scale=0; $Mon_yRes*$SDL_ScreenPercent/100")"
 
         [[ ! $xRes || ! $yRes ]] && xRes=1152 && yRes=648
+
+        #  TEMP  
+        
+        [[ $guest_os == "macos" ]]  &&  xRes=1920 && yRes=1080
 
         SDL_ScrnPcnt_Cmd=" --width $xRes --height $yRes"
 

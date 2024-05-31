@@ -86,7 +86,7 @@ vm_pid_kill_menu() {
     if [[ $KillPID_Menu == "k" ]]; then 
 
       printf "\n\n"
-      if [[ $( ps -p "$InstancePID" --no-headers ) ]]; then
+      if [[ $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then
         [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
         kill "$InstancePID" 2>/dev/null &
       fi
@@ -107,7 +107,7 @@ vm_pid_kill_menu() {
 
     else
 
-      if [[ ! $( ps -p "$InstancePID" --no-headers ) ]]; then 
+      if [[ ! $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then 
       
         tput cnorm 
         break 
@@ -115,7 +115,6 @@ vm_pid_kill_menu() {
       else
 
         #  Erase text and adjust cursor:   "\e[1A\r"  "\e[2K\r"  etc    See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-       
         printf "\r"
 
       fi
@@ -130,7 +129,7 @@ vm_pid_kill_menu() {
 
   P_Kill_WaitSecs="$P_Kill_WaitSecs_PreSet"
 
-  refresh_and_load_quickemu_vars
+  refresh_and_load_quickemu_sources
   refresh_conf_vars_and_values
 
 }	

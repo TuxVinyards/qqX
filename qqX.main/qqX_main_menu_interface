@@ -110,7 +110,7 @@ else
       printColor  "\n\n  [d]   start with SDL display"
       
       if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)" 
-      elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS)" 
+      elif [[ "$VM_InstanceName" =~ 'macos' ]] && [[ ! $QE_495_Script ]]; then  printColor " (size determined by MacOS with this QE version)" 
       elif [[ $SDL_ScrnPcnt_Cmd ]]; then printColor " (%s%%)    [df]  99%% "  "$SDL_ScreenPercent"; [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    
       elif [[ $SDL_ScrnPcnt_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScrnPcnt_Error"
       fi

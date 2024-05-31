@@ -29,6 +29,7 @@
 #   Technically, this script absorbs rather than wraps. 
 #   The original code remains basically as is but some calls get re-routed via new functions ....
 
+
 function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
@@ -40,6 +41,8 @@ function find_quickemu_source_functions_and_vars {
     printf "\n\n  Settings file: %s \n\n" "$qqX_SettingsFile"
     exit  hold
   fi
+
+  if grep -q 'configure_storage' "$QE_SourcePath" ; then QE_495_Script="true" ; else QE_495_Script= ; fi
 
   # Ignore first bits, bash check & locale preamble etc.  
   # QE starts into setting out the functions almost straight away.  
@@ -64,18 +67,21 @@ function find_quickemu_source_functions_and_vars {
   # with QEMU_IMG checker which has been replaced (at the start of qqX)
   # and the 3 strangely & unexplainedly read-only vars which need special treatment ...
 
+  # Quickemu 4.9.5 adds in a few lines after the readonly ....
+
   SpecialVarCheckArr=("LAUNCHER" "DISK_MIN_SIZE" "VERSION")
 
   # Separate the re-writeable vars  # NB not all vars are listed by the quickemu script ...  
   # Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
 
-  QE_rw_Vars_StartPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
- ((QE_rw_Vars_StartPoint -=2))
-  head -n "$QE_rw_Vars_StartPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
+  QE_rw_Vars_EndPoint=$(grep -n -m 1 -e 'readonly' "/tmp/qmod-qe-all-vars-temp" | cut -d ':' -f 1)
+ ((QE_rw_Vars_EndPoint -=2))
+  head -n "$QE_rw_Vars_EndPoint" "/tmp/qmod-qe-all-vars-temp"  > "/tmp/qmod-qe-rw-vars-temp"
 
 }
 
 find_quickemu_source_functions_and_vars
+
 
 function refresh_and_load_quickemu_vars {
 
@@ -86,6 +92,30 @@ function refresh_and_load_quickemu_vars {
     eval "$SpecialLine"
   done
 
+  if [[ $QE_495_Script ]]; then
+
+    ARCH_VM="x86_64"
+    ARCH_HOST=$(uname -m)
+    QEMU=$(command -v qemu-system-${ARCH_VM})
+    QEMU_IMG=$(command -v qemu-img)
+    if [ ! -x "${QEMU}" ] || [ ! -x "${QEMU_IMG}" ]; then
+        echo "ERROR! QEMU not found. Please make sure 'qemu-system-${ARCH_VM}' and 'qemu-img' are installed."
+        exit 1
+    fi
+
+    # Check for gnu tools on macOS
+    STAT="stat"
+    if command -v gstat &>/dev/null; then
+        STAT="gstat"
+    fi
+
+    OS_KERNEL=$(uname -s)
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
+        display="cocoa"
+    fi
+
+  fi
+
 }
 
 # Vars are now all r/w. Loads adjusted vars here. 
@@ -93,6 +123,7 @@ function refresh_and_load_quickemu_vars {
 # later gets moved to after a VM launch to avoid prior conflict with conf var overwrites
 
 refresh_and_load_quickemu_vars
+
 
 function  load_mod_quickemu_boot {
 
@@ -130,15 +161,12 @@ EOV
   tail -n +"$QE_args_DeclarePoint" "/tmp/qmod-function-vm_boot-orig-temp" >> "/tmp/qmod-function-vm_boot-interim-temp"
 
   # From Quickemu 4.9.5 a PID test was introduced to wrap the run command but qqX has its own control for this, so not needed.
-  # shellcheck disable=SC2016
-  QE_495Test=$(grep -B2 -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
-  if grep -q 'VM_PID' <<< "$QE_495Test" ; then QE_495Test="true" ; else QE_495Test= ; fi
 
   # shellcheck disable=SC2016
   QE_qemuCallPoint=$(grep -n -m 1 -e 'QEMU}" "${SHELL_ARGS' "/tmp/qmod-function-vm_boot-interim-temp" | cut -d ':' -f 1)
   QE_vm_bootLength=$(wc -l < "/tmp/qmod-function-vm_boot-interim-temp")
 
-  if [[ $QE_495Test ]]; then
+  if [[ $QE_495_Script ]]; then
     QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+2))
   else
     QE_vm_bootCutOff=$((QE_vm_bootLength-QE_qemuCallPoint+1))
@@ -151,7 +179,7 @@ EOV
 
 # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     (@ 2024/04 use quote EOF, not escape)
 
-[[ $QE_495Test ]] && printf "\n\n %s \n\n"  "  if [[ $QEMU ]]; then  # 495 hack fix" >> "/tmp/qmod-function-vm_boot-new-temp"
+[[ $QE_495_Script ]] && printf "\n\n %s \n\n"  "  if [[ $QEMU ]]; then  # 495 hack fix" >> "/tmp/qmod-function-vm_boot-new-temp"
 
 cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
@@ -368,7 +396,7 @@ function load_quickemu_cases_and_actions {
 
   ((QE_EoCasePoint += (QE_StartCasePoint +2) ))
 
-  if [[ $QE_495Test ]]; then 
+  if [[ $QE_495_Script ]]; then 
     QE_vm_bootPoint=$(grep -n -m 1 'VM_PID' "/tmp/qmod-endof-file-temp" | cut -d ':' -f 1)
     ((QE_vm_bootPoint -= 1))
   else

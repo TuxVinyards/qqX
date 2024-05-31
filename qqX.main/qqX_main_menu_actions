@@ -170,8 +170,8 @@ function  main_menu_actions {
 
     else
 
-      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
-      else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 99  $Extra_QE_Params" 
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
       fi
 
       [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
@@ -358,6 +358,7 @@ function  main_menu_actions {
 
     # refresh
     MainMenuChoice=
+    refresh_and_load_quickemu_sources
     refresh_conf_vars_and_values
 
   fi
