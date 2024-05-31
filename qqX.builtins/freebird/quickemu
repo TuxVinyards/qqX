@@ -858,7 +858,8 @@ function vm_boot() {
     elif [ "${guest_os}" == "macos" ]; then
         # qxl-vga supports seamless mouse and sane resolutions if only one scanout
         # is used. Which is whay '-vga none' is added to the QEMU command line.
-        DISPLAY_DEVICE="qxl-vga"
+        #DISPLAY_DEVICE="qxl-vga"
+        DISPLAY_DEVICE="VGA"
     elif [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         case ${OUTPUT} in
         # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues.
