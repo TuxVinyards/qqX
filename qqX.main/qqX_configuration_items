@@ -100,9 +100,10 @@ function check_screen_percentage_and_output {
 
         [[ ! $xRes || ! $yRes ]] && xRes=1152 && yRes=648
 
-        #  TEMP   # ? 1360 x 768  ? 1920 x 1080 (max ovmf)
-        
-        [[ $guest_os == "macos" ]]  &&  xRes=1280 && yRes=720
+        #  REVIEW  # ? 1360 x 768  ? 1920 x 1080 (max ovmf)  ? 1280 x 720  (max default qxl)
+        # Sonoma default is 2560 x 1440 low res. In other words 1280 x 720 at x2 Hi-DPI res.
+        # Mac seems to be able to use 1280 and then takes control of the outcome itself, once set up.
+        [[ $guest_os == "macos" ]]  &&   xRes=1280 && yRes=720
 
         SDL_ScrnPcnt_Cmd=" --width $xRes --height $yRes"
 
