@@ -330,6 +330,8 @@ VM_SelectorStyle="A"
 # to that used for FreeBird. This preset path will be auto-checked.
 
 # For 'Dev' give full path of your Quickemu source clone here. QE_SourceVersion may be set above or here as an overwrite.
+# QE_DevPath may be left set. This path will only be used if Version is set to 'Dev'
+
   #QE_SourceVersion="Dev"
   #QE_DevPath="~/Files/myClone"
 
@@ -342,16 +344,17 @@ VM_SelectorStyle="A"
 
 # System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
 
-# HomeBird   - A recent official quickemu release, which may have quickemu/quickget issues, and which may or  
-#              may not have been fixed in the current main, but known to be STABLE with qqX 
+# Echo       - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
 
-# FreeBird   - Either the full current official quickemu release, or a cherry-picked official main branch
-#              that is working towards a new release, if known to be qqX stable. Or a duplicate of HomeBird.
+# HomeBird   - A recent FreeBird release, known to be generally STABLE and known to work with qqX.
 
-# FreeSpirit - Either a cherry-picked pre-release current official main branch or the latest official release,
-#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
+# FreeBird   - Based on HomeBird or Current official code. May be release or pre-release but known to be both stable & qqX stable.
+#              Probably with a sprinkling of cherry-picked official improvements along with a few qqX additions and tweaks ... 
 
-# Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
+# FreeSpirit - An alternative A/B FreeBird variant, or as FreeBird but more spirited. Possibly based on official pre-release.
+#              May contain newer ideas and fixes if they are expected to be stable.
+
+# Custom/Dev - Your own customised or development version.  See the notes here, at the end of the settings file.
 
 # FreeBird is default.  Set blank for default.
 

@@ -3428,8 +3428,9 @@ case "${1}" in
         fi
         exit 0;;
     --version|-version)
-        WHERE=$(dirname "${BASH_SOURCE[0]}")
-        "${WHERE}/quickemu" --version
+        #WHERE=$(dirname "${BASH_SOURCE[0]}")
+        #"${WHERE}/quickemu" --version
+        echo "FB 4.9.5.01"
         exit 0;;
     --help|-help|--h|-h)
         help_message

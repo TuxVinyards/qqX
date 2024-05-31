@@ -418,7 +418,8 @@ function_quick_get_wrap ()  {
 
     done
 
-    QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
+    #QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
+    QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Releases:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
     # filter out display folding  REVIEW 
     QGW_Releases_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Releases_ListRaw")"
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
@@ -489,7 +490,8 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
+      #QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
+      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Languages:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
       # filter out display folding  REVIEW 
       QGW_WinLangs_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_WinLangs_ListRaw")"
       QGW_WinLangs_ListString="${QGW_WinLangs_ListRaw/'- Languages: '/}"
@@ -551,7 +553,8 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+      #QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
       # filter out display folding  REVIEW 
       QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
       QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"

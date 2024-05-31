@@ -172,6 +172,11 @@ function sort_qqX_builtin_settings () {
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"
+  elif [[ $QE_SourceVersion == "Echo" || $QE_SourceVersion == "echo" ]]; then
+    FreePath="$qqX_BuiltinsFolder/echo"
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"
   elif [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]]; then
     FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
     QE_SourcePath="$FreePath/quickemu"
