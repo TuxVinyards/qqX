@@ -533,8 +533,8 @@ function vm_boot() {
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2120274893
         # https://github.com/quickemu-project/quickemu/pull/1225#issuecomment-2117555805
 
-        # Skylake-Server-v3  added as dev option for testing 
-        # as is only officially supported Sonoma CPU and *technically* supports up to 18 cores.
+        # Skylake-Server-v3 should be default 
+        # as is only officially supported Sonoma CPU and *technically* supports up to 10x2 cores.
         # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
         # Also retains IBRS spectre mitigation
         # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
@@ -542,9 +542,9 @@ function vm_boot() {
         #CPU_MODEL="Haswell-v2"
         CPU_MODEL="Skylake-Server-v3"
 
-        # A CPU with fma is required for Mac Graphics 'Metal' support (@flexiondotorg) # REVIEW add darwin test
+        # A CPU with fma is required for Mac Graphics 'Metal' support (@flexiondotorg) # REVIEW add darwin hardware test ?
 
-        # Dev Subtractive method: Set =1 or blank  Allow Qemu to add all, unless not present in host.
+        # Default Use Subtractive method: Set =1 or blank  Allow Qemu to add all, unless not present in host.
         # Use "sysctl -a | grep machdep.cpu" at terminal in MacOS to see flags
         # On initial tests, outperforms +ve method.
          UseSubtractiveCPU=1
@@ -699,7 +699,8 @@ function vm_boot() {
         ;;
     windows|windows-server)
         if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-            CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+            #CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+            CPU="-cpu host,kvm=on,+hypervisor,l3-cache=on,migratable=no,hv_passthrough"
         else
             CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
         fi
