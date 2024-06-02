@@ -64,7 +64,7 @@ function_create_VM_folderList
 ExtraSetArgs="$ExtraArgs"
 
 #  Add default values, if none supplied
-[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="6"
+[[ ! $P_Kill_WaitSecs ]] && P_Kill_WaitSecs="4"
 P_Kill_WaitSecs_PreSet="$P_Kill_WaitSecs"
 
 # Set up any quickemu variables needed for .conf file analysis
@@ -216,12 +216,12 @@ function find_quick_version_numbers () {
   # See function 'refresh_and_load_quickemu_sources'
 
   # QuickEMU also uses an internal variable '$VERSION' but this only works after the correct script has been sourced.
-  QE_VerNumber="$(eval "$QE_SourcePath --version")"
+  QE_VerNumber="$("$QE_SourcePath" --version)"
 
   # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number. 
   # But the 'quickget' call goes to a qqX capture function of the same name, 
   # and allows re-routes to custom versions that may work differently. 
-  QG_VerNumber="$(eval "$QG_SourcePath --version")"
+  QG_VerNumber="$("$QG_SourcePath" --version)"
 
   # Release Quickemu 4.9.2 was still numbered 4.9.1  
   # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
@@ -261,6 +261,7 @@ fi
 
 QEMU="$(type -p "$QEMU_Default_SystemType")"
 QEMU_IMG="$(type -p qemu-img)"
+
 
 function qemu_version_check {
 

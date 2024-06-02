@@ -427,6 +427,7 @@ function refresh_and_load_quickemu_sources {
   load_mod_quickemu_boot
   load_quickemu_cases_and_actions
   find_quick_version_numbers
+  qemu_version_check
 
 }
 

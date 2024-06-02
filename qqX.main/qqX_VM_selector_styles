@@ -186,6 +186,8 @@ print_selector_array_C_style () {
   i=0
   VM_List_LineItemCount=1
   ListTitleFolder=
+  ListTitleFolderOld=
+  ListTitleFolderDisplay=
 
   if [[ $1 == "invert" ]]; then InvertStyleColors=1 ; else InvertStyleColors= ; fi
 
@@ -255,6 +257,8 @@ print_selector_array_E_style () {
   i=0
   VM_List_LineItemCount=1
   ListTitleFolder=
+  ListTitleFolderOld=
+  ListTitleFolderDisplay=
 
   vm_selector_init_common
 
