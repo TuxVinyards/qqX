@@ -313,7 +313,7 @@ function  main_menu_actions {
     IsoImg=
     NewFileTuneUp=
     NewFileTuneUp_JustDone=
-
+    cd "$Default_VM_Folder" || DefaultFolderError=1
     refresh_sources_and_load_VM_arrays
     return
 

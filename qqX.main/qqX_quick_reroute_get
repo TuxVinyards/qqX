@@ -33,7 +33,7 @@ function quickget {
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
   
-  eval command "$QG_SourcePath" " $*"
+  eval command '"$QG_SourcePath"' " $*"
   
 }
 
