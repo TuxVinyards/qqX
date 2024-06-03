@@ -1,37 +1,14 @@
 #!/usr/bin/env bash
+# SC2317: Command appears to be unreachable. Check usage (or ignore if invoked indirectly).
+#  - https://www.shellcheck.net/wiki/SC2317
+#  - Disable globally because many functions are called indirectly
+# shellcheck disable=SC2317
 export LC_ALL=C
-
-# Here the quick 'n dirty guide to adding a new OS to quickget
-#
-# 1. Update os_support() - add new OS, all lowercase
-# 2. Update os_info() - Fill all posible fields for new OS (leave empty if no login, but | must stay same)
-#    Here is whats should be there...
-#    <OS name>)     INFO="<OS nice name>|<OS based on>|<OS default login:pass if any>|<OS homepage>|<ABOUT>";;
-# 4. Create a releases_newos() generator (required) outputs the current supported release versions (from newest)
-# 5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
-# 6. Update make_vm_config() - add any *required* new OS tweaks
-# 7. Create a get_newos() function - that does something like this: (Look at other OS)
-#    For cutting first field with hash you can use function `cut_1` instead of `cut -d' ' -f1``
-#
-#function get_newos() {
-#    local EDITION="${1:-}"
-#    local HASH=""
-#    local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
-#    local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
-#
-#    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
-#    echo "${URL}/${ISO} ${HASH}"
-#}
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
-        kill "$(jobs -p)"
+        kill "$(jobs -p)" 2>/dev/null
     fi
-}
-
-# Get string before first whitespace (HASH)
-function cut_1() {
-    cut -d' ' -f1
 }
 
 function os_info() {
@@ -39,203 +16,192 @@ function os_info() {
     local INFO=""
     SIMPLE_NAME="${1}"
     case ${SIMPLE_NAME} in
-      #name)            INFO="PrettyName|BasedOf|Credentials|Homepage|Info";;
-      alma)             INFO="Alma Linux|Fedora,RedHat|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
-      alpine)           INFO="Alpine Linux|Independent|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
-      android)          INFO="Android x86|Independent|-|https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
-      antix)            INFO="Antix|Debian|-|https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
-      archcraft)        INFO="Archcraft|Arch|-|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
-      archlinux)        INFO="Arch Linux|Independent|-|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
-      arcolinux)        INFO="Arco Linux|Arch|-|https://arcolinux.com/|Is all about becoming an expert in linux.";;
-      artixlinux)       INFO="Artix Linux|Arch|-|https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
-      athenaos)         INFO="Athena OS|Arch|-|https://athenaos.org/|Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials.";;
-      batocera)         INFO="Batocera|Independent|-|https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
-      bazzite)          INFO="Bazzite|Fedora,SteamOS|-|https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like.";;
-      biglinux)         INFO="BigLinux|unknown|-|https://www.biglinux.com.br/|Is the right choice if you want to have an easy and enriching experience with Linux. It has been perfected over more than 19 years, following our motto: 'In search of the perfect system'.";;
-      blendos)          INFO="BlendOS|Arch|-|https://blendos.co/|A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
-      bodhi)            INFO="Bodhi|Debian,Ubuntu|-|https://www.bodhilinux.com/|Lightweight distribution featuring the fast & fully customizable Moksha Desktop.";;
-      bunsenlabs)       INFO="BunsenLabs|Debian|-|https://www.bunsenlabs.org/|Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.";;
-      cachyos)          INFO="CachyOS|Arch|-|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
-      centos-stream)    INFO="CentOS Stream|Fedora,RedHat|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
-      chimeralinux)     INFO="Chimera Linux|Independent|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
-      crunchbang++)     INFO="#!++|Debian|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
-      debian)           INFO="Debian|Independent|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
-      deepin)           INFO="Deepin|Debian|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
-      devuan)           INFO="Devuan|Debian|-|https://www.devuan.org/|Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.";;
-      dragonflybsd)     INFO="DragonFlyBSD|FreeBSD|-|https://www.dragonflybsd.org/|Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series.";;
-      easyos)           INFO="EasyOS|Independent|-|https://easyos.org/|Experimental distribution designed from scratch to support containers.";;
-      edubuntu)         INFO="Edubuntu|Ubuntu|-|https://www.edubuntu.org/|Stable, secure and privacy concious option for schools.";;
-      elementary)       INFO="elementary OS|Debian,Ubuntu|-|https://elementary.io/|Thoughtful, capable, and ethical replacement for Windows and macOS.";;
-      endeavouros)      INFO="EndeavourOS|Arch|-|https://endeavouros.com/|Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems.";;
-      endless)          INFO="Endless OS|Debian|-|https://www.endlessos.org/os|Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More.";;
-      fedora)           INFO="Fedora|Independent|-|https://www.fedoraproject.org/|Innovative platform for hardware, clouds, and containers, built with love by you.";;
-      freebsd)          INFO="FreeBSD|Independent|-|https://www.freebsd.org/|Operating system used to power modern servers, desktops, and embedded platforms.";;
-      freedos)          INFO="FreeDOS|Independent|-|https://freedos.org/|DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems.";;
-      garuda)           INFO="Garuda Linux|Arch|-|https://garudalinux.org/|Feature rich and easy to use Linux distribution.";;
-      gentoo)           INFO="Gentoo|Independent|-|https://www.gentoo.org/|Highly flexible, source-based Linux distribution.";;
-      ghostbsd)         INFO="GhostBSD|FreeBSD|-|https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System.";;
-      gnomeos)          INFO="GNOME OS|Independent|-|https://os.gnome.org/|Alpha nightly bleeding edge distro of GNOME";;
-      guix)             INFO="Guix|Independent|-|https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
-      haiku)            INFO="Haiku|Independent|-|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
-      holoiso)          INFO="SteamOS HoloISO|Arch,SteamOS|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
-      kali)             INFO="Kali|Debian|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
-      kdeneon)          INFO="KDE Neon|Debian,Ubuntu|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
-      kolibrios)        INFO="KolibriOS|Independent|-|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
-      kubuntu)          INFO="Kubuntu|Ubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
-      linuxlite)        INFO="Linux Lite|Debian,Ubuntu|-|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.";;
-      linuxmint)        INFO="Linux Mint|Debian,Ubuntu|-|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
-      lmde)             INFO="Linux Mint Debian Edition|Debian|-|https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
-      lubuntu)          INFO="Lubuntu|Ubuntu|-|https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
-      mageia)           INFO="Mageia|Independent|-|https://www.mageia.org/|Stable, secure operating system for desktop & server.";;
-      manjaro)          INFO="Manjaro|Arch|-|https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
-      mxlinux)          INFO="MX Linux|Debian,Antix|-|https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.";;
-      netboot)          INFO="netboot.xyz|iPXE|-|https://netboot.xyz/|Your favorite operating systems in one place.";;
-      netbsd)           INFO="NetBSD|Independent|-|https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
-      nitrux)           INFO="Nitrux|Debian|-|https://nxos.org/|Powered by Debian, KDE Plasma and Frameworks, and AppImages.";;
-      nixos)            INFO="NixOS|Independent|-|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
-      nwg-shell)        INFO="nwg-shell|Arch|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
-      macos)            INFO="macOS|proprietary|-|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
-      openbsd)          INFO="OpenBSD|Independent|-|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
-      openindiana)      INFO="OpenIndiana|Solaris,OpenSolaris|-|https://www.openindiana.org/|Community supported illumos-based operating system.";;
-      opensuse)         INFO="openSUSE|Independent|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
-      oraclelinux)      INFO="Oracle Linux|RedHat|-|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
-      parrotsec)        INFO="Parrot Security|Debian|parrot:parrot|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.";;
-      peppermint)       INFO="PeppermintOS|Debian,Devuan|-|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
-      popos)            INFO="Pop!_OS|Ubuntu|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
-      porteus)          INFO="Porteus|Slackware|-|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
-      primtux)          INFO="PrimTux|Ubuntu|-|https://primtux.fr/|A complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware.";;
-      pureos)           INFO="PureOS|Debian|-|https://www.pureos.net/|A fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation.";;
-      reactos)          INFO="ReactOS|Independent|-|https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
-      rebornos)         INFO="RebornOS|Arch|-|https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
-      rockylinux)       INFO="Rocky Linux|RedHat|-|https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
-      siduction)        INFO="Siduction|Debian|-|https://siduction.org/|Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.";;
-      slackware)        INFO="Slackware|Independent|-|http://www.slackware.com/|Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.";;
-      slax)             INFO="Slax|Debian Slackware|-|https://www.slax.org/|Compact, fast, and modern Linux operating system that combines sleek design with modular approach. With the ability to run directly from a USB flash drive without the need for installation, Slax is truly portable and fits easily in your pocket.";;
-      slint)            INFO="Slint|Slackware|-|https://slint.fr/|Slint is an easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.";;
-      slitaz)           INFO="SliTaz|Independent|-|https://www.slitaz.org/en/|Simple, fast and low resource Linux OS for servers & desktops.";;
-      solus)            INFO="Solus|Independent|-|https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
-      sparkylinux)      INFO="SparkyLinux|Debian|-|https://sparkylinux.org/|Fast, lightweight and fully customizable operating system which offers several versions for different use cases.";;
-      spirallinux)      INFO="SpiralLinux|Debian|-|https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
-      tails)            INFO="Tails|Debian|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
-      tinycore)         INFO="Tiny Core Linux|Independent|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
-      trisquel)         INFO="Trisquel|Debian,Ubuntu|-|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
-      truenas-core)     INFO="TrueNAS Core|FreeBSD|-|https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
-      truenas-scale)    INFO="TrueNAS Scale|Debian|-|https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
-      tuxedo-os)        INFO="Tuxedo OS|Ubuntu|-|https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
-      ubuntu)           INFO="Ubuntu|Debian|-|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
-      ubuntu-budgie)    INFO="Ubuntu Budgie|Ubuntu|-|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
-      ubuntucinnamon)   INFO="Ubuntu Cinnamon|Ubuntu|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
-      ubuntukylin)      INFO="Ubuntu Kylin|Ubuntu|-|https://ubuntukylin.com/|Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world.";;
-      ubuntu-mate)      INFO="Ubuntu MATE|Ubuntu|-|https://ubuntu-mate.org/|Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.";;
-      ubuntu-server)    INFO="Ubuntu Server|Ubuntu|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
-      ubuntustudio)     INFO="Ubuntu Studio|Ubuntu|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
-      ubuntu-unity)     INFO="Ubuntu Unity|Ubuntu|-|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
-      vanillaos)        INFO="Vanilla OS|Debian,Ubuntu|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
-      void)             INFO="Void Linux|Independent|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
-      vxlinux)          INFO="VX Linux|Void|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
-      whonix)           INFO="Whonix|Debian|-|https://www.whonix.org/|Superior Internet Privacy with Whonix™ As handy as an app - delivering maximum anonymity and security.";;
-      windows)          INFO="Windows|proprietary|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
-      windows-server)   INFO="Windows Server|proprietary|-|https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
-      xubuntu)          INFO="Xubuntu|Ubuntu|-|https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
-      zorin)            INFO="Zorin OS|Ubuntu|-|https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
+        #name)            INFO="PrettyName|Credentials|Homepage|Info";;
+        alma)             INFO="AlmaLinux|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
+        alpine)           INFO="Alpine Linux|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
+        android)          INFO="Android x86|-|https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
+        antix)            INFO="Antix|-|https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
+        archcraft)        INFO="Archcraft|-|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
+        archlinux)        INFO="Arch Linux|-|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
+        arcolinux)        INFO="Arco Linux|-|https://arcolinux.com/|Is all about becoming an expert in linux.";;
+        artixlinux)       INFO="Artix Linux|-|https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
+        athenaos)         INFO="Athena OS|-|https://athenaos.org/|Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials.";;
+        batocera)         INFO="Batocera|-|https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
+        bazzite)          INFO="Bazzite|-|https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like.";;
+        biglinux)         INFO="BigLinux|-|https://www.biglinux.com.br/|Is the right choice if you want to have an easy and enriching experience with Linux. It has been perfected over more than 19 years, following our motto: 'In search of the perfect system'.";;
+        blendos)          INFO="BlendOS|-|https://blendos.co/|A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
+        bodhi)            INFO="Bodhi|-|https://www.bodhilinux.com/|Lightweight distribution featuring the fast & fully customizable Moksha Desktop.";;
+        bunsenlabs)       INFO="BunsenLabs|-|https://www.bunsenlabs.org/|Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.";;
+        cachyos)          INFO="CachyOS|-|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
+        centos-stream)    INFO="CentOS Stream|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
+        chimeralinux)     INFO="Chimera Linux|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
+        crunchbang++)     INFO="Crunchbangplusplus|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
+        debian)           INFO="Debian|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
+        deepin)           INFO="Deepin|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
+        devuan)           INFO="Devuan|-|https://www.devuan.org/|Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.";;
+        dragonflybsd)     INFO="DragonFlyBSD|-|https://www.dragonflybsd.org/|Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series.";;
+        easyos)           INFO="EasyOS|-|https://easyos.org/|Experimental distribution designed from scratch to support containers.";;
+        edubuntu)         INFO="Edubuntu|-|https://www.edubuntu.org/|Stable, secure and privacy concious option for schools.";;
+        elementary)       INFO="elementary OS|-|https://elementary.io/|Thoughtful, capable, and ethical replacement for Windows and macOS.";;
+        endeavouros)      INFO="EndeavourOS|-|https://endeavouros.com/|Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems.";;
+        endless)          INFO="Endless OS|-|https://www.endlessos.org/os|Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More.";;
+        fedora)           INFO="Fedora|-|https://www.fedoraproject.org/|Innovative platform for hardware, clouds, and containers, built with love by you.";;
+        freebsd)          INFO="FreeBSD|-|https://www.freebsd.org/|Operating system used to power modern servers, desktops, and embedded platforms.";;
+        freedos)          INFO="FreeDOS|-|https://freedos.org/|DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems.";;
+        garuda)           INFO="Garuda Linux|-|https://garudalinux.org/|Feature rich and easy to use Linux distribution.";;
+        gentoo)           INFO="Gentoo|-|https://www.gentoo.org/|Highly flexible, source-based Linux distribution.";;
+        ghostbsd)         INFO="GhostBSD|-|https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System.";;
+        gnomeos)          INFO="GNOME OS|-|https://os.gnome.org/|Alpha nightly bleeding edge distro of GNOME";;
+        guix)             INFO="Guix|-|https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
+        haiku)            INFO="Haiku|-|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
+        holoiso)          INFO="HoloISO|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
+        kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
+        kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
+        kolibrios)        INFO="KolibriOS|-|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
+        kubuntu)          INFO="Kubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
+        linuxlite)        INFO="Linux Lite|-|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.";;
+        linuxmint)        INFO="Linux Mint|-|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
+        lmde)             INFO="Linux Mint Debian Edition|-|https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
+        lubuntu)          INFO="Lubuntu|-|https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
+        mageia)           INFO="Mageia|-|https://www.mageia.org/|Stable, secure operating system for desktop & server.";;
+        manjaro)          INFO="Manjaro|-|https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
+        mxlinux)          INFO="MX Linux|-|https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.";;
+        netboot)          INFO="netboot.xyz|-|https://netboot.xyz/|Your favorite operating systems in one place.";;
+        netbsd)           INFO="NetBSD|-|https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
+        nitrux)           INFO="Nitrux|-|https://nxos.org/|Powered by Debian, KDE Plasma and Frameworks, and AppImages.";;
+        nixos)            INFO="NixOS|-|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
+        nwg-shell)        INFO="nwg-shell|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
+        macos)            INFO="macOS|-|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
+        openbsd)          INFO="OpenBSD|-|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
+        openindiana)      INFO="OpenIndiana|-|https://www.openindiana.org/|Community supported illumos-based operating system.";;
+        opensuse)         INFO="openSUSE|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
+        oraclelinux)      INFO="Oracle Linux|-|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
+        parrotsec)        INFO="Parrot Security|parrot:parrot|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.";;
+        peppermint)       INFO="PeppermintOS|-|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
+        popos)            INFO="Pop!_OS|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
+        porteus)          INFO="Porteus|-|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
+        primtux)          INFO="PrimTux|-|https://primtux.fr/|A complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware.";;
+        pureos)           INFO="PureOS|-|https://www.pureos.net/|A fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation.";;
+        reactos)          INFO="ReactOS|-|https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
+        rebornos)         INFO="RebornOS|-|https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
+        rockylinux)       INFO="Rocky Linux|-|https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
+        siduction)        INFO="Siduction|-|https://siduction.org/|Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.";;
+        slackware)        INFO="Slackware|-|http://www.slackware.com/|Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.";;
+        slax)             INFO="Slax|-|https://www.slax.org/|Compact, fast, and modern Linux operating system that combines sleek design with modular approach. With the ability to run directly from a USB flash drive without the need for installation, Slax is truly portable and fits easily in your pocket.";;
+        slint)            INFO="Slint|-|https://slint.fr/|Slint is an easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.";;
+        slitaz)           INFO="SliTaz|-|https://www.slitaz.org/en/|Simple, fast and low resource Linux OS for servers & desktops.";;
+        solus)            INFO="Solus|-|https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
+        sparkylinux)      INFO="SparkyLinux|-|https://sparkylinux.org/|Fast, lightweight and fully customizable operating system which offers several versions for different use cases.";;
+        spirallinux)      INFO="SpiralLinux|-|https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
+        tails)            INFO="Tails|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
+        tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
+        trisquel)         INFO="Trisquel-|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
+        truenas-core)     INFO="TrueNAS Core|-|https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
+        truenas-scale)    INFO="TrueNAS Scale|-|https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
+        tuxedo-os)        INFO="Tuxedo OS|-|https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
+        ubuntu)           INFO="Ubuntu|-|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
+        ubuntu-budgie)    INFO="Ubuntu Budgie|-|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
+        ubuntucinnamon)   INFO="Ubuntu Cinnamon|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
+        ubuntukylin)      INFO="Ubuntu Kylin|-|https://ubuntukylin.com/|Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world.";;
+        ubuntu-mate)      INFO="Ubuntu MATE|-|https://ubuntu-mate.org/|Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.";;
+        ubuntu-server)    INFO="Ubuntu Server|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
+        ubuntustudio)     INFO="Ubuntu Studio|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
+        ubuntu-unity)     INFO="Ubuntu Unity|-|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
+        vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
+        void)             INFO="Void Linux|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
+        vxlinux)          INFO="VX Linux|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
+        windows)          INFO="Windows|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
+        windows-server)   INFO="Windows Server|-|https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
+        xubuntu)          INFO="Xubuntu|-|https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
+        zorin)            INFO="Zorin OS|-|https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
     esac
     echo "${INFO}"
 }
 
 function show_os_info() {
-     while getopts ":12345" opt; do
-        case $opt in
-          1|2|3|4|5) os_info "${2}" | cut -d'|' -f${opt};;
-          *) echo "Wrong choice!" && exit 1;;
-        esac
-    done
+    echo
+    echo -e "$(os_info "${1}" | cut -d'|' -f 1)"
+    echo -e " - Credentials:\t$(os_info "${1}" | cut -d'|' -f 2)"
+    echo -e " - Website:\t$(os_info "${1}" | cut -d'|' -f 3)"
+    echo -e " - Description:\t$(os_info "${1}" | cut -d'|' -f 4)"
 }
 
 function pretty_name() {
-    echo $(show_os_info -1 "${1}")
+    os_info "${1}" | cut -d'|' -f 1
 }
 
 # Just in case quickget want use it
-function os_homepage(){
-    echo $(show_os_info -4 "${1}")
+function os_homepage() {
+    os_info "${1}" | cut -d'|' -f 4
 }
 
 function error_specify_os() {
-    echo 'ERROR! You must specify an operating system.'
-    echo '- Supported Operating Systems:'
+    echo "ERROR! You must specify an operating system."
+    echo "- Supported Operating Systems:"
     os_support | fold -s -w "$(tput cols)"
     echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
 }
 
 function os_supported() {
-    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
-        error_not_supported_os
+    if [[ ! "$(os_support)" =~ ${OS} ]]; then
+        echo -e "ERROR! ${OS} is not a supported OS.\n"
+        os_support | fold -s -w "$(tput cols)"
+        exit 1
     fi
 }
 
 function error_specify_release() {
-    echo 'ERROR! You must specify a release.'
+    show_os_info "${OS}"
     case ${OS} in
-      *ubuntu-server*)
-        echo -n ' - Releases: '
-        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *ubuntu*)
-        echo -n ' - Releases: '
-        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *windows*)
-        echo -n ' - Releases: '
-        "releases_${OS}"
-        echo -n ' - Languages: '
-        "languages_${OS}" && echo "${LANGS[@]}"
-        ;;
-      *)
-        echo -n ' - Releases: '
-        "releases_${OS}" | fold -s -w "$(tput cols)"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-            echo -n ' - Editions: '
-            "editions_${OS}" | fold -s -w "$(tput cols)"
-        fi
-        ;;
+        *ubuntu-server*)
+            echo -en " - Releases:\t"
+            releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+            ;;
+        *ubuntu*)
+            echo -en " - Releases:\t"
+            releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+            ;;
+        *windows*)
+            echo -en " - Releases:\t"
+            "releases_${OS}"
+            echo -en " - Languages:\t"
+            "languages_${OS}"
+            echo "${I18NS[@]}"
+            ;;
+        *)
+            echo -en " - Releases:\t"
+            "releases_${OS}" | fold -s -w "$(tput cols)"
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                echo -en " - Editions:\t"
+                "editions_${OS}" | fold -s -w "$(tput cols)"
+            fi
+            ;;
     esac
+    echo -e "\nERROR! You must specify a release."
     exit 1
 }
 
 function error_specify_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
-}
-
-#TODO: Not yet used!
-function error_specify_path() {
-    echo 'ERROR! You must specify path.'
-    error_specify_os
-    exit 1
-}
-
-function error_not_supported_os() {
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support | fold -s -w "$(tput cols)"
+    show_os_info "${OS}"
+    echo -e " - Editions:\t$("editions_${OS}" | fold -s -w "$(tput cols)")"
+    echo -e "\nERROR! You must specify an edition."
     exit 1
 }
 
 function error_not_supported_release() {
-    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-        echo -n 'Supported releases: '
+    if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
+        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
+        echo -n ' - Supported releases: '
         "releases_${OS}"
         exit 1
     fi
 }
 
 function error_not_supported_edition() {
-    if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
+    if [[ ! "${EDITIONS[*]}" =~ ${EDITION} ]]; then
         echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
-        echo -n ' - Editions: '
+        echo -n ' - Supported editions: '
         for EDITION in "${EDITIONS[@]}"; do
             echo -n "${EDITION} "
         done
@@ -245,11 +211,18 @@ function error_not_supported_edition() {
 }
 
 function error_not_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
+    echo -e "ERROR! ${I18N} is not a supported $(pretty_name "${OS}") language\n"
     echo -n ' - Editions: '
-    for LANG in "${LANGS[@]}"; do
-        echo -n "${LANG} "
+    for I18N in "${I18NS[@]}"; do
+        echo -n "${I18N} "
     done
+    exit 1
+}
+
+function error_not_supported_argument() {
+    echo "ERROR! Not supported argument"
+    echo "To see all possible arguments, use:"
+    echo "   quickget -h  or  quickget --help"
     exit 1
 }
 
@@ -272,9 +245,9 @@ function validate_release() {
 
     DISPLAY_NAME="$(pretty_name "${OS}")"
     case ${OS} in
-      *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
-      *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
-      *) RELEASE_GENERATOR="${1}";;
+        *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
+        *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
+        *) RELEASE_GENERATOR="${1}";;
     esac
     RELEASES=$(${RELEASE_GENERATOR})
     error_not_supported_release
@@ -317,9 +290,9 @@ function csv_data() {
         DISPLAY_NAME="$(pretty_name "${OS}")"
 
         case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
+            *ubuntu-server*) FUNC="ubuntu-server";;
+            *ubuntu*) FUNC="ubuntu";;
+            *) FUNC="${OS}";;
         esac
 
         PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
@@ -343,8 +316,8 @@ function csv_data() {
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
-                for LANG in "${LANGS[@]}"; do
-                    echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
+                for I18N in "${I18NS[@]}"; do
+                    echo "${DISPLAY_NAME},${OS},${RELEASE},${I18N},${DOWNLOADER},${PNG},${SVG}"
                 done
             else
                 echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
@@ -355,20 +328,48 @@ function csv_data() {
 }
 
 function create_config() {
-    local OS="${1}"
-    local DESTINATION="${2}"
-    local USE
-
-    if [[ "${DESTINATION}" == "http://"* ]] || [[ "${DESTINATION}" == "https://"* ]]; then
-        web_get "${DESTINATION}" "${OS}"
-        echo "#TODO: create config!"
-    elif [[ "${DESTINATION}" == "/"* ]]; then
-        cp "${OS}" "${DESTINATION}"/
-        echo "#TODO: create config!"
-    else
-        echo "You forget write full path?" && exit 1
+    local VM_PATH="${1}"
+    local INPUT="${2}"
+    OS="custom"
+    if ! mkdir "${VM_PATH}" 2>/dev/null; then
+        echo "ERROR! Could not create directory: ${VM_PATH}. Please verify that it does not already exist"
+        exit 1
     fi
-    exit 0
+    if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
+        INPUT="$(web_redirect "${INPUT}")"
+        if [[ "${INPUT}" == *".iso" ]] || [[ "${INPUT}" == *".img" ]]; then
+            web_get "${INPUT}" "${VM_PATH}"
+            INPUT="${VM_PATH}/${INPUT##*/}"
+        else
+            echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+            exit 1
+        fi
+    fi
+    if [[ "${INPUT}" == *".iso" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        CUSTOM_IMAGE_TYPE="iso"
+    elif [[ "${INPUT}" == *".img" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        CUSTOM_IMAGE_TYPE="img"
+    elif [[ "${INPUT}" == *".qcow2" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}/disk.qcow2"
+        CUSTOM_IMAGE_TYPE="qcow2"
+    else
+        echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+        exit 1
+    fi
+    echo "Creating custom VM config for ${INPUT##*/}."
+    case "${INPUT,,}" in
+        *windows-server*) CUSTOM_OS="windows-server";;
+        *windows*) CUSTOM_OS="windows";;
+        *freebsd*) CUSTOM_OS="freebsd";;
+        *kolibrios*) CUSTOM_OS="kolibrios";;
+        *reactos*) CUSTOM_OS="reactos";;
+        *) CUSTOM_OS="linux";;
+    esac
+    echo "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS."
+    echo
+    make_vm_config "${INPUT}"
 }
 
 function list_supported() {
@@ -413,22 +414,22 @@ function test_all() {
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut_1 | head -1)
+                URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
-                    CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                    CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
                 fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
-            for LANG in "${LANGS[@]}"; do
+            for I18N in "${I18NS[@]}"; do
                 validate_release releases_"${OS}"
                 if [ "${OPERATION}" == "show" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" ""
+                    test_result "${OS}" "${RELEASE}" "${I18N}" ""
                 elif [ "${OPERATION}" == "test" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" "${URL}" "SKIP"
+                    test_result "${OS}" "${RELEASE}" "${I18N}" "${URL}" "SKIP"
                 fi
             done
         elif [[ "${OS}" == "macos" ]]; then
@@ -442,11 +443,11 @@ function test_all() {
             (get_ubuntu)
         else
             validate_release releases_"${OS}"
-            URL=$(get_"${OS}" | cut_1 | head -1)
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
-                CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
             fi
         fi
@@ -458,8 +459,8 @@ function os_support() {
     alpine \
     android \
     antix \
-    archlinux \
     archcraft \
+    archlinux \
     arcolinux \
     artixlinux \
     athenaos \
@@ -499,6 +500,8 @@ function os_support() {
     linuxlite \
     linuxmint \
     lmde \
+    lubuntu \
+    macos \
     mageia \
     manjaro \
     mxlinux \
@@ -507,14 +510,12 @@ function os_support() {
     nitrux \
     nixos \
     nwg-shell \
-    lubuntu \
-    macos \
     openbsd \
     openindiana \
     opensuse \
     oraclelinux \
-    peppermint \
     parrotsec \
+    peppermint \
     popos \
     porteus \
     primtux \
@@ -538,12 +539,12 @@ function os_support() {
     tuxedo-os \
     ubuntu \
     ubuntu-budgie \
-    ubuntucinnamon \
-    ubuntukylin \
     ubuntu-mate \
     ubuntu-server \
-    ubuntustudio \
     ubuntu-unity \
+    ubuntucinnamon \
+    ubuntukylin \
+    ubuntustudio \
     vanillaos \
     void \
     vxlinux \
@@ -563,7 +564,8 @@ function editions_alma() {
 
 function releases_alpine() {
     local REL=""
-    local RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    local RELS=""
+    RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
     for REL in ${RELS}; do
         if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
             echo -n "${REL} "
@@ -596,46 +598,58 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | sort -r | head -n 5)
+    #shellcheck disable=SC2046,SC2005
+    # breaking change in v24.05
+    # v24.05.1 is the first release with the new naming scheme and too complex to parse old and new so just show the new
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v24.0[5-9].[[:digit:]]{2}"  -e "v24.1[0-2].[[:digit:]]{2}" | sort -ru | head -n 5)
 }
 
 function editions_arcolinux() {
-    echo large small
+    echo net plasma pro
 }
 
 function releases_artixlinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -1)
 }
 
 function editions_artixlinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u)
 }
 
 function releases_athenaos() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/Athena-OS/athena/releases" | grep 'download_url' | grep rolling | cut -d'/' -f8 | sort -u)
 }
 
 function releases_batocera() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail +2 | head -n 5)
 }
 
 function releases_bazzite() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | head -n 5)
 }
 
 function releases_biglinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -1)
 }
 
 function editions_biglinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo "biglinux_$(releases_biglinux)_k[0-9]{2,3}.iso" | cut -d'_' -f3 | cut -d'.' -f1 | sort -Vru)
 }
 
 function releases_blendos() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.ico277.xyz/blendos/gnome/" | grep "\.iso" | cut -c81- | cut -d'"' -f2 | cut -d'-' -f2)
 }
 
 function editions_blendos() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.ico277.xyz/blendos/" | grep "\[DIR\]" | cut -c81-90 | cut -d'/' -f1 | grep -v testing | sort -u)
 }
 
@@ -656,10 +670,12 @@ function releases_cachyos() {
 }
 
 function editions_cachyos() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.cachyos.org/ISO/" | grep "title=" | grep -v testing | grep -v cli | cut -d'"' -f4 | cut -d '/' -f1 | sort)
 }
 
 function releases_centos-stream() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://linuxsoft.cern.ch/centos-stream/" | grep "\-stream" | cut -d'"' -f 6 | cut -d'-' -f 1)
 }
 
@@ -676,6 +692,7 @@ function editions_chimeralinux() {
 }
 
 function releases_crunchbang++() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
 }
 
@@ -684,6 +701,7 @@ function releases_debian() {
     local OLD=""
     NEW=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     OLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac | head -20)
+    #shellcheck disable=SC2086
     echo ${NEW} ${OLD}
 }
 
@@ -692,6 +710,7 @@ function editions_debian() {
 }
 
 function releases_deepin() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r)
 }
 
@@ -702,6 +721,7 @@ function releases_devuan() {
 function releases_dragonflybsd() {
     # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "http://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
 }
 
@@ -721,7 +741,8 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    local ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
+    local ENDEAVOUR_RELEASES=""
+    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
     echo "${ENDEAVOUR_RELEASES,,}"
 }
 
@@ -734,18 +755,21 @@ function editions_endless() {
 }
 
 function releases_fedora() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -r)
 }
 
 function editions_fedora() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(select(.arch=="x86_64" and .variant!="Labs" and .variant!="IoT" and .variant!="Container" and .variant!="Cloud" and .variant!="Everything"  and .subvariant!="Security" and .subvariant!="Server_KVM" and .subvariant!="SoaS")) | map(.subvariant) | unique | .[]')
 }
 
-function releases_freebsd(){
+function releases_freebsd() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/" |grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/' | sort -r)
 }
 
-function editions_freebsd(){
+function editions_freebsd() {
     echo disc1 dvd1
 }
 
@@ -770,6 +794,7 @@ function editions_gentoo() {
 }
 
 function releases_ghostbsd() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -3)
 }
 
@@ -778,6 +803,7 @@ function editions_ghostbsd() {
 }
 
 function releases_gnomeos() {
+    #shellcheck disable=SC2046,SC2005
     echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
 }
 
@@ -813,35 +839,35 @@ function releases_linuxlite() {
     echo 6.6 6.4 6.2 6.0
 }
 
-function releases_linuxmint(){
-    echo 21.2 21.1 21 20.3 20.2
+function releases_linuxmint() {
+    echo 21.3 21.2 21.1 21 20.3 20.2
 }
 
-function editions_linuxmint(){
+function editions_linuxmint() {
     echo cinnamon mate xfce
 }
 
-function editions_lmde(){
+function editions_lmde() {
     echo cinnamon
 }
 
-function releases_lmde(){
+function releases_lmde() {
     echo 6
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura sonoma
+    echo mojave catalina big-sur monterey ventura sonoma
 }
 
-function releases_mageia(){
+function releases_mageia() {
     echo 9 8
 }
 
-function editions_mageia(){
+function editions_mageia() {
     echo Plasma GNOME Xfce
 }
 
-function editions_manjaro(){
+function editions_manjaro() {
     echo full minimal
 }
 
@@ -849,11 +875,11 @@ function releases_manjaro() {
     echo xfce gnome plasma cinnamon i3 sway
 }
 
-function releases_mxlinux(){
+function releases_mxlinux() {
     echo 23.2
 }
 
-function editions_mxlinux(){
+function editions_mxlinux() {
     echo Xfce KDE Fluxbox
 }
 
@@ -863,6 +889,7 @@ function releases_netboot() {
 
 function releases_netbsd() {
     # V8 is EOL so filter it out
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr)
 }
 
@@ -870,31 +897,35 @@ function releases_nitrux() {
     echo latest
 }
 
-function releases_nixos(){
+function releases_nixos() {
     echo unstable 23.11 23.05 22.11 22.05 21.11 21.05
 }
 
-function editions_nixos(){
+function editions_nixos() {
     echo minimal plasma5 gnome
 }
 
 function releases_nwg-shell() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep 'url=' | grep '64.iso' | cut -d'/' -f12 | cut -d'-' -f3)
 }
 
-function releases_openbsd(){
+function releases_openbsd() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r)
 }
 
-function releases_openindiana(){
+function releases_openindiana() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5)
 }
 
-function editions_openindiana(){
+function editions_openindiana() {
     echo gui text minimal
 }
 
-function releases_opensuse(){
+function releases_opensuse() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
 }
 
@@ -959,6 +990,7 @@ function releases_rebornos() {
 }
 
 function releases_rockylinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | sort -ru)
 }
 
@@ -971,10 +1003,12 @@ function releases_siduction() {
 }
 
 function editions_siduction() {
-    echo kde lxqt nox xfce xorg
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/Standing_on_the_Shoulders_of_Giants/" | grep folder | cut -d'"' -f8 | tr -d '/' | sort -u)
 }
 
 function releases_slackware() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -5)
 }
 
@@ -988,26 +1022,32 @@ function editions_slax() {
 
 function releases_slint() {
     # 15.0.1 returns a 404 so is excluded
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://slackware.uk/slint/x86_64/" | grep "slint-" | cut -d'>' -f2 | cut -d'-' -f2 | tr -d "/\"" | grep -v "15.0.1" | sort -ru)
 }
 
 function releases_slitaz() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "http://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
 }
 
 function releases_solus() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'-' -f 2 | sort -ru)
 }
 
 function editions_solus() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'.' -f5 | cut -d'-' -f2- | sort -u)
 }
 
 function releases_sparkylinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru)
 }
 
 function editions_sparkylinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
 }
 
@@ -1040,7 +1080,7 @@ function editions_trisquel() {
 }
 
 function releases_truenas() {
-    if [[ $OS == truenas ]] ; then
+    if [[ ${OS} == truenas ]] ; then
         echo "ERROR! The supported TrueNAS OS values are truenas-core or truenas-scale"
         exit 1;
     fi
@@ -1059,34 +1099,43 @@ function releases_tuxedo-os() {
 }
 
 function releases_ubuntu() {
-    local VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
-    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
-    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    local VERSION_DATA=""
+    local SUPPORTED_VERSIONS=()
+    local EOL_VERSIONS=()
+    VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    # shellcheck disable=SC2207
+    SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
+    # shellcheck disable=SC2207
+    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<"${VERSION_DATA}" | sort))
     case "${OS}" in
         ubuntu)
-            echo ${SUPPORTED_VERSIONS[@]} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
             # after 16.04
-            echo ${SUPPORTED_VERSIONS[@]:1} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         ubuntu-budgie)
             # after 18.04
-            echo ${SUPPORTED_VERSIONS[@]:2} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         edubuntu|ubuntu-unity|ubuntucinnamon)
             # after 23.10
-            echo ${SUPPORTED_VERSIONS[@]:5} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
     esac
 }
 
 function releases_ubuntu-server() {
-    local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
-    echo ${ALL_VERSIONS[@]}
+    local ALL_VERSIONS=()
+    # shellcheck disable=SC2207
+    ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
+    echo daily-live "${ALL_VERSIONS[@]}"
 }
 
 function releases_vanillaos() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
 }
 
 function releases_void() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -3)
 }
 
@@ -1095,6 +1144,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | sort -u | cut -d'/' -f 3)
 }
 
@@ -1104,15 +1154,15 @@ function releases_windows() {
 
 function languages_windows() {
     if [ "${RELEASE}" == 8 ]; then
-        LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
+        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
         "Croatian" "Czech" "Danish" "Dutch" "English (United States)" "English International" "Estonian" "Finnish" "French" "German" "Greek" \
         "Hebrew" "Hungarian" "Italian" "Japanese" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" \
         "Slovak" "Slovenian" "Spanish" "Swedish" "Thai" "Turkish" "Ukrainian")
     elif [ "${RELEASE}" == "10-ltsc" ]; then
-        LANGS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
+        I18NS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
         "French" "German" "Italian" "Japanese" "Korean" "Portuguese (Brazil)" "Spanish")
     else
-        LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
         "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
         "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
         "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
@@ -1124,7 +1174,7 @@ function releases_windows-server() {
 }
 
 function languages_windows-server() {
-    LANGS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
+    I18NS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
 }
 
 function releases_zorin() {
@@ -1147,12 +1197,12 @@ function check_hash() {
     hash="${2}"
     # Guess the hash algorithm by the hash length
     case ${#hash} in
-      32) hash_algo=md5sum;;
-      40) hash_algo=sha1sum;;
-      64) hash_algo=sha256sum;;
-      128) hash_algo=sha512sum;;
-      *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
-        return;;
+        32) hash_algo=md5sum;;
+        40) hash_algo=sha1sum;;
+        64) hash_algo=sha256sum;;
+        128) hash_algo=sha512sum;;
+        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+            return;;
     esac
     echo -n "Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
@@ -1202,7 +1252,7 @@ function web_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
@@ -1215,34 +1265,23 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}
+        echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
         echo "- URL: ${URL}"
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         echo "ERROR! Failed to download ${URL} with curl."
-        echo "       Will try again with wget."
         rm -f "${DIR}/${FILE}"
-        if command -v wget2 &>/dev/null; then
-            if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-                echo "ERROR! Failed to download ${URL} with wget2."
-                echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
-                exit 1
-            fi
-        elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-            echo "ERROR! Failed to download ${URL} with wget."
-            echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
-            exit 1
-        fi
     fi
 }
 
 # checks if a URL needs to be redirected and returns the final URL
 function web_redirect() {
+    local REDIRECT_URL=""
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    local REDIRECT_URL=$(curl --silent --location --fail --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1267,16 +1306,18 @@ function web_check() {
 }
 
 function zsync_get() {
+    local CHECK=""
     local DIR="${2}"
     local FILE="${1##*/}"
     local OUT=""
     local URL="${1}"
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
-        echo "${URL}"
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        web_check "${URL}"
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
@@ -1289,7 +1330,7 @@ function zsync_get() {
             echo "ERROR! Unable to create directory ${DIR}"
             exit 1
         fi
-        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
+        echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION} from ${URL}"
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -1300,7 +1341,7 @@ function zsync_get() {
             rm "${DIR}/${OUT}.zs-old"
         fi
     else
-        echo "INFO: zsync not found, falling back to curl/wget"
+        echo "INFO: zsync not found, falling back to curl"
         if [ -n "${3}" ]; then
             web_get "${1}" "${2}" "${3}"
         else
@@ -1315,72 +1356,73 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
-    local SEC_BOOT=""
     if [ "${OPERATION}" == "download" ]; then
         exit 0
     fi
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-      batocera)
-        GUEST="batocera"
-        IMAGE_TYPE="img";;
-      dragonflybsd)
-        GUEST="dragonflybsd"
-        IMAGE_TYPE="iso";;
-      easyos)
-        GUEST="linux"
-        IMAGE_TYPE="img";;
-      freebsd|ghostbsd)
-        GUEST="freebsd"
-        IMAGE_TYPE="iso";;
-      haiku)
-        GUEST="haiku"
-        IMAGE_TYPE="iso";;
-      freedos)
-        GUEST="freedos"
-        IMAGE_TYPE="iso";;
-      kolibrios)
-        GUEST="kolibrios"
-        IMAGE_TYPE="iso";;
-      macos)
-        GUEST="macos"
-        IMAGE_TYPE="img";;
-      netbsd)
-        GUEST="netbsd"
-        IMAGE_TYPE="iso";;
-      openbsd)
-        GUEST="openbsd"
-        IMAGE_TYPE="iso";;
-      openindiana)
-        GUEST="solaris"
-        IMAGE_TYPE="iso";;
-      reactos)
-        GUEST="reactos"
-        IMAGE_TYPE="iso";;
-      truenas*)
-        GUEST="truenas"
-        IMAGE_TYPE="iso";;
-      ubuntu*)
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-        # If there is a point in the release, check if it is less than 16.04
-        if [[ "${RELEASE}" == "*.*" ]]; then
-            local SHORT_RELEASE=${RELEASE//./}
-            if [ "${SHORT_RELEASE}" -lt 1604 ]; then
-                GUEST="linux_old"
+        batocera)
+            GUEST="batocera"
+            IMAGE_TYPE="img";;
+        custom)
+            GUEST="${CUSTOM_OS}"
+            IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
+        dragonflybsd)
+            GUEST="dragonflybsd"
+            IMAGE_TYPE="iso";;
+        easyos)
+            GUEST="linux"
+            IMAGE_TYPE="img";;
+        freebsd|ghostbsd)
+            GUEST="freebsd"
+            IMAGE_TYPE="iso";;
+        haiku)
+            GUEST="haiku"
+            IMAGE_TYPE="iso";;
+        freedos)
+            GUEST="freedos"
+            IMAGE_TYPE="iso";;
+        kolibrios)
+            GUEST="kolibrios"
+            IMAGE_TYPE="iso";;
+        macos)
+            GUEST="macos"
+            IMAGE_TYPE="img";;
+        netbsd)
+            GUEST="netbsd"
+            IMAGE_TYPE="iso";;
+        openbsd)
+            GUEST="openbsd"
+            IMAGE_TYPE="iso";;
+        openindiana)
+            GUEST="solaris"
+            IMAGE_TYPE="iso";;
+        reactos)
+            GUEST="reactos"
+            IMAGE_TYPE="iso";;
+        truenas*)
+            GUEST="truenas"
+            IMAGE_TYPE="iso";;
+        ubuntu*)
+            GUEST="linux"
+            IMAGE_TYPE="iso"
+            # If there is a point in the release, check if it is less than 16.04
+            if [[ "${RELEASE}" != *"daily"* ]]; then
+                if [ "${RELEASE//./}" -lt 1604 ]; then
+                    GUEST="linux_old"
+                fi
             fi
-        fi
-        ;;
-      windows)
-        GUEST="windows"
-        IMAGE_TYPE="iso";;
-      windows-server)
-        GUEST="windows-server"
-        IMAGE_TYPE="iso";;
-      *)
-        GUEST="linux"
-        IMAGE_TYPE="iso";;
+            ;;
+        windows)
+            GUEST="windows"
+            IMAGE_TYPE="iso";;
+        windows-server)
+            GUEST="windows-server"
+            IMAGE_TYPE="iso";;
+        *)
+            GUEST="linux"
+            IMAGE_TYPE="iso";;
     esac
 
     CONF_FILE="${VM_PATH}.conf"
@@ -1393,7 +1435,7 @@ guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        echo "Setting ${CONF_FILE} executable"
+        echo " - Setting ${CONF_FILE} executable"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
@@ -1401,81 +1443,85 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
-            echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          openindiana)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          batocera)
-            echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
-          dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-          deepin)
-            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-            echo "ram=\"4G\"" >> "${CONF_FILE}"
-            ;;
-          freedos)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-            echo "ram=\"256M\"" >> "${CONF_FILE}"
-            ;;
-          kolibrios)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"2G\"" >> "${CONF_FILE}"
-            echo "ram=\"128M\"" >> "${CONF_FILE}"
-            ;;
-          slint)
-            echo "disk_size=\"50G\"" >> "${CONF_FILE}"
-            ;;
-          slitaz)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-            echo "ram=\"512M\"" >> "${CONF_FILE}"
-            ;;
-          truenas-scale|truenas-core)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            # the rest is non-functional
-            # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
-            # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
-            # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
-            ;;
-          ubuntu-server)
-            # 22.04+ fails on LVM build if disk size is < 10G
-            # 22.04.1 fails on auto-install if TPM is disabled
-            echo "disk_size=\"10G\"" >> "${CONF_FILE}"
-            echo "ram=\"4G\"" >> "${CONF_FILE}"
-            if [[ "${RELEASE}" == *"22.04"* ]]; then
-                echo "tpm=\"on\"" >> "${CONF_FILE}"
-            fi
-            ;;
-          vanillaos)
-            ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
-            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-            ;;
-          zorin)
-            case ${EDITION} in
-              education64|edulite64)
+            alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-            esac
-            ;;
-          reactos)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"12G\"" >> "${CONF_FILE}"
-            echo "ram=\"2048M\"" >> "${CONF_FILE}"
-            ;;
-          macos)
-            echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
-            # https://github.com/quickemu-project/quickemu/issues/438
-            if [ "${RELEASE}" == "monterey" ]; then
-                echo "cpu_cores=2" >> "${CONF_FILE}"
-            fi
-            ;;
+            openindiana)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+            batocera)
+                echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+            deepin)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+                echo "ram=\"4G\"" >> "${CONF_FILE}"
+                ;;
+            freedos)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+                echo "ram=\"256M\"" >> "${CONF_FILE}"
+                ;;
+            kolibrios)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+                echo "ram=\"128M\"" >> "${CONF_FILE}"
+                ;;
+            slint)
+                echo "disk_size=\"50G\"" >> "${CONF_FILE}"
+                ;;
+            slitaz)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+                echo "ram=\"512M\"" >> "${CONF_FILE}"
+                ;;
+            truenas-scale|truenas-core)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                # the rest is non-functional
+                # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+                # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+                # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+                ;;
+            ubuntu-server)
+                # 22.04+ fails on LVM build if disk size is < 10G
+                # 22.04.1 fails on auto-install if TPM is disabled
+                echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+                echo "ram=\"4G\"" >> "${CONF_FILE}"
+                if [[ "${RELEASE}" == *"22.04"* ]]; then
+                    echo "tpm=\"on\"" >> "${CONF_FILE}"
+                fi
+                ;;
+            vanillaos)
+                ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+                ;;
+            zorin)
+                case ${EDITION} in
+                    education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                esac;;
+            reactos)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"12G\"" >> "${CONF_FILE}"
+                echo "ram=\"2048M\"" >> "${CONF_FILE}"
+                ;;
+            macos)
+                echo "disk_size=\"128G\"" >> "${CONF_FILE}"
+                echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
+                # https://github.com/quickemu-project/quickemu/issues/438
+                if [ "${RELEASE}" == "monterey" ]; then
+                    echo "cpu_cores=2" >> "${CONF_FILE}"
+                fi
+                ;;
         esac
 
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
             # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
             echo "disk_size=\"32G\"" >> "${CONF_FILE}"
         fi
+
+        if [[ "${OS}" == "windows"* ]]; then
+            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+        fi
+
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" == 11 ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
@@ -1483,7 +1529,7 @@ EOF
         fi
     fi
     echo -e "\nTo start your $(pretty_name "${OS}") virtual machine run:"
-    if [ ${OS} == "slint" ]; then
+    if [ "${OS}" == "slint" ]; then
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
         echo "    quickemu --vm ${CONF_FILE}"
@@ -1553,7 +1599,7 @@ function get_antix() {
         full-*) ISO+="_x64-full.iso";;
         net-*)  ISO+="-net_x64-net.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut_1 | head -1)
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1575,9 +1621,11 @@ function get_archlinux() {
 
 function get_arcolinux() {
     local HASH=""
-    local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
-    local URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
-    HASH=$(web_pipe "${URL}/${ISO}.sha1" | cut_1)
+    local ISO=""
+    local URL=""
+    URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
+    ISO="arco${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1594,14 +1642,15 @@ function get_athenaos() {
     local HASH=""
     local URL="https://github.com/Athena-OS/athena/releases/download/${RELEASE}"
     local ISO="athena-rolling-x86_64.iso"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_batocera() {
     local HASH=""
+    local ISO=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
-    local ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
+    ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1634,10 +1683,10 @@ function get_bodhi() {
     local ISO=""
     local URL="https://sourceforge.net/projects/bodhilinux/files/${RELEASE}"
     case ${EDITION} in
-      standard) ISO="bodhi-${RELEASE}-64.iso";;
-      *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
+        standard) ISO="bodhi-${RELEASE}-64.iso";;
+        *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1645,53 +1694,60 @@ function get_bunsenlabs() {
     local HASH=""
     local ISO="boron-1-240123-amd64.hybrid.iso"
     local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut_1)
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_cachyos() {
+    local HASH=""
+    local REL=""
     local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    local REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
+    REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
     local ISO="cachyos-${EDITION}-linux-${REL}.iso"
-    local HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${REL}/${ISO} ${HASH}"
 }
 
 function get_centos-stream() {
+    local HASH=""
     local ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
     local URL="https://linuxsoft.cern.ch/centos-stream/${RELEASE}-stream/BaseOS/x86_64/iso"
-    local HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_chimeralinux() {
+    local DATE=""
+    local HASH=""
     local URL="https://repo.chimera-linux.org/live/${RELEASE}"
-    local DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
+    DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
     local ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
-    local HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_crunchbang++() {
     local HASH=""
-    local ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
     echo "${ISO} ${HASH}"
 }
 
 function get_debian() {
+    local DEBCURRENT=""
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid"
-    local DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
+    DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     case "${RELEASE}" in
-      "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+        "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
     esac
     if [ "${EDITION}" == "netinst" ]; then
         URL="${URL/-live/}"
         URL="${URL/hybrid/cd}"
         ISO="${ISO/-live/}"
     fi
-    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1 | head -1)
+    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1707,7 +1763,7 @@ function get_deepin() {
         REV="1010"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
-    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1717,12 +1773,12 @@ function get_devuan() {
     local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
     local VER=""
     case ${RELEASE} in
-      beowulf)  VER="3.1.1";;
-      chimaera) VER="4.0.3";;
-      daedalus) VER="5.0.0";;
+        beowulf)  VER="3.1.1";;
+        chimaera) VER="4.0.3";;
+        daedalus) VER="5.0.0";;
     esac
     ISO="devuan_${RELEASE}_${VER}_amd64_desktop-live.iso"
-    HASH=$(web_pipe "${URL}/SHASUMS.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1745,7 +1801,7 @@ function get_easyos() {
         5.7|5.6.7|5.6.6)               YEAR="2024";;
     esac
     URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
-    HASH=$(web_pipe "${URL}/md5.sum.txt" | cut_1)
+    HASH=$(web_pipe "${URL}/md5.sum.txt" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1761,12 +1817,14 @@ function get_elementary() {
 }
 
 function get_endeavouros() {
+    local ENDEAVOUR_RELEASES=""
     local HASH=""
+    local ISO=""
     local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Find EndeavourOS releases from mirror, pick one matching release
-    local ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
-    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
-    HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut_1)
+    ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
+    ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1801,6 +1859,7 @@ function get_fedora() {
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    #shellcheck disable=SC2086
     JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
@@ -1820,14 +1879,10 @@ function get_freedos() {
     local ISO=""
     local URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
     case ${RELEASE} in
-      1.2)
-        ISO="FD12CD.iso"
-        HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut_1)
-        ;;
-      1.3)
-        ISO="FD13-LiveCD.zip"
-        HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut_1)
-        ;;
+        1.2) ISO="FD12CD.iso"
+             HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
+        1.3) ISO="FD13-LiveCD.zip"
+             HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
     esac
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1837,7 +1892,7 @@ function get_garuda() {
     local ISO=""
     local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
     ISO=${EDITION}/latest.iso
-    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut_1)"
+    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1846,10 +1901,10 @@ function get_gentoo() {
     local ISO=""
     local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds"
     case ${EDITION} in
-        minimal) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep install | cut_1);;
-        livegui) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep livegui | cut_1);;
+        minimal) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1);;
+        livegui) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep livegui | cut -d' ' -f1);;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1897,7 +1952,8 @@ function get_haiku() {
 
 function get_holoiso() {
     local HASH=""
-    local URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
+    local URL=""
+    URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
     echo "${URL} ${HASH}"
 }
 
@@ -1906,7 +1962,7 @@ function get_kali() {
     local ISO=""
     local URL="https://cdimage.kali.org/${RELEASE}"
     ISO=$(web_pipe "${URL}/?C=M;O=D" | grep -o ">kali-linux-.*-installer-amd64.iso" | head -n 1 | cut -c 2-)
-    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1915,7 +1971,7 @@ function get_kdeneon() {
     local ISO=""
     local URL="https://files.kde.org/neon/images/${RELEASE}/current"
     ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
-    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut_1)
+    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1930,7 +1986,7 @@ function get_linuxlite() {
     local HASH=""
     local ISO="linux-lite-${RELEASE}-64bit.iso"
     local URL="https://sourceforge.net/projects/linux-lite/files/${RELEASE}"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1938,7 +1994,7 @@ function get_linuxmint() {
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
-    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1946,7 +2002,7 @@ function get_lmde() {
     local HASH=""
     local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
-    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1954,57 +2010,64 @@ function generate_id() {
     local macRecoveryID=""
     local TYPE="${1}"
     local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
-    for ((i=0; i<$TYPE; i++)); do
+    for ((i=0; i<TYPE; i++)); do
         macRecoveryID+="${valid_chars[$((RANDOM % 16))]}"
     done
     echo "${macRecoveryID}"
 }
 
 function get_macos() {
+    local appleSession=""
+    local info=""
+    local downloadLink=""
+    local downloadSession=""
+    local chunkListLink=""
+    local chunkListSession=""
     local BOARD_ID=""
     local CWD=""
+    local CHECK=""
     local CHUNKCHECK=""
     local MLB="00000000000000000"
     local OS_TYPE="default"
 
     case ${RELEASE} in
-      lion)           #10.7
-        BOARD_ID="Mac-2E6FAB96566FE58C"
-        MLB="00000000000F25Y00";;
-      mountainlion)   #10.8
-        BOARD_ID="Mac-7DF2A3B5E5D671ED"
-        MLB="00000000000F65100";;
-      mavericks)      #10.9
-        BOARD_ID="Mac-F60DEB81FF30ACF6"
-        MLB="00000000000FNN100";;
-      yosemite)       #10.10
-        BOARD_ID="Mac-E43C1C25D4880AD6"
-        MLB="00000000000GDVW00";;
-      elcapitan)      #10.11
-        BOARD_ID="Mac-FFE5EF870D7BA81A"
-        MLB="00000000000GQRX00";;
-      sierra)         #10.12
-        BOARD_ID="Mac-77F17D7DA9285301"
-        MLB="00000000000J0DX00";;
-      high-sierra)    #10.13
-        BOARD_ID="Mac-BE088AF8C5EB4FA2"
-        MLB="00000000000J80300";;
-      mojave)         #10.14
-        BOARD_ID="Mac-7BA5B2DFE22DDD8C"
-        MLB="00000000000KXPG00";;
-      catalina)       #10.15
-        BOARD_ID="Mac-00BE6ED71E35EB86";;
-      big-sur)        #11
-        BOARD_ID="Mac-42FD25EABCABB274";;
-      monterey)       #12
-        BOARD_ID="Mac-E43C1C25D4880AD6";;
-      ventura)        #13
-        BOARD_ID="Mac-BE088AF8C5EB4FA2";;
-      sonoma)
-        BOARD_ID="Mac-53FDB3D8DB8CA971";;
-      *) echo "ERROR! Unknown release: ${RELEASE}"
-        releases_macos
-        exit 1;;
+        lion|10.7)
+            BOARD_ID="Mac-2E6FAB96566FE58C"
+            MLB="00000000000F25Y00";;
+        mountainlion|10.8)
+            BOARD_ID="Mac-7DF2A3B5E5D671ED"
+            MLB="00000000000F65100";;
+        mavericks|10.9)
+            BOARD_ID="Mac-F60DEB81FF30ACF6"
+            MLB="00000000000FNN100";;
+        yosemite|10.10)
+            BOARD_ID="Mac-E43C1C25D4880AD6"
+            MLB="00000000000GDVW00";;
+        elcapitan|10.11)
+            BOARD_ID="Mac-FFE5EF870D7BA81A"
+            MLB="00000000000GQRX00";;
+        sierra|10.12)
+            BOARD_ID="Mac-77F17D7DA9285301"
+            MLB="00000000000J0DX00";;
+        high-sierra|10.13)
+            BOARD_ID="Mac-BE088AF8C5EB4FA2"
+            MLB="00000000000J80300";;
+        mojave|10.14)
+            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
+            MLB="00000000000KXPG00";;
+        catalina|10.15)
+            BOARD_ID="Mac-00BE6ED71E35EB86";;
+        big-sur|11)
+            BOARD_ID="Mac-42FD25EABCABB274";;
+        monterey|12)
+            BOARD_ID="Mac-E43C1C25D4880AD6";;
+        ventura|13)
+            BOARD_ID="Mac-BE088AF8C5EB4FA2";;
+        sonoma|14)
+            BOARD_ID="Mac-53FDB3D8DB8CA971";;
+        *) echo "ERROR! Unknown release: ${RELEASE}"
+           releases_macos
+           exit 1;;
     esac
 
     CWD="$(dirname "${0}")"
@@ -2014,76 +2077,68 @@ function get_macos() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
-    if [ -z "${CHUNKCHECK}" ]; then
-        read -p "ERROR! Can not find chunkcheck. Will not be able to verify image. Proceed anyway?" skipVerification
-        if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
-            exit 1
-        fi
-        echo 'Skipping verification' && skipVerification="true"
-    fi
-
-    OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
-    OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
-    OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
-
-    local appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
-    local info=$(curl -s -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
-    -d $'cid='$(generate_id 16)$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${OS_TYPE} \
-    http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
-    local downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
-    local downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
-    local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
-    local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
+    appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+    info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" \
+                           -b "session=\"${appleSession}\"" \
+                           -H "Content-Type: text/plain" \
+                           -d $'cid='"$(generate_id 16)"$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='"$(generate_id 64)"$'\nfg='"$(generate_id 64)"$'\nos='${OS_TYPE} \
+                           http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+    downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
+    downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
+    chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
+    chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
     if [ "${OPERATION}" == "show" ]; then
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
-        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+        echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+        echo " - URL: ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
     else
-        echo "Downloading macOS firmware"
-        web_get "${OpenCore_qcow2}" "${VM_PATH}"
-        web_get "${OVMF_CODE}" "${VM_PATH}"
-        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-            web_get "${OVMF_VARS}" "${VM_PATH}"
-        fi
-
         if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-            echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+            echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+            echo " - URL: ${downloadLink}"
             web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
             web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+            if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+                echo " - WARNING! Verification failed, continuing anyway"
+            else
+                echo " - Verification passed"
+            fi
+
+            if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+                echo " - Converting RecoveryImage.dmg"
+                ${QEMU_IMG} convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
+            fi
+            rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
+            echo " - RecoveryImage.img is ready."
+        fi
+        echo "Downloading OpenCore & UEFI firmware"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
+            web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
         fi
     fi
-
-    if [ "${skipVerification}" != "true" ]; then
-        if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
-            echo "Verification failed."
-        else
-            echo "Verified macOS ${RELEASE} image using chunklist."
-        fi
-    else
-        echo "Skipping verification of image."
-    fi
-
-    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
-        echo "Converting RecoveryImage..."
-        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
-    fi
-
-    rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
     make_vm_config RecoveryImage.img
 }
 
 function get_mageia() {
-    local ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
-    local HASH=$(web_pipe "${ISO}.sha512" | cut_1)
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
+    HASH=$(web_pipe "${ISO}.sha512" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
 }
 
@@ -2092,20 +2147,28 @@ function get_manjaro() {
     local ISO=""
     local MANIFEST=""
     local URL=""
-    local TYPE=""
-    case ${RELEASE} in
-      sway) MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)";;
-      gnome|xfce|plasma) TYPE="official";;
-      *) TYPE="community";;
+    local TYPE="official"
+    MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    case "${RELEASE}" in
+        sway)
+            MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)"
+            TYPE="sway"
+            ;;
+        cinnamon|i3) TYPE="community";;
     esac
-    [[ ${RELEASE} != "sway" ]] && MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
-    [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
-    if [[ ${RELEASE} != "sway" ]]; then
-        URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
+
+    if [ "${EDITION}" == "minimal" ] && [ "${TYPE}" != "sway" ]; then
+        EDITION=".minimal"
     else
-        URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
+        EDITION=""
     fi
-    HASH=$(web_pipe "${URL}.sha512" | cut_1)
+
+    if [ "${RELEASE}" == "sway" ]; then
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | .url')
+    else
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}.${RELEASE}${EDITION}".image)"
+    fi
+    HASH=$(web_pipe "${URL}.sha512" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
@@ -2114,11 +2177,11 @@ function get_mxlinux() {
     local ISO=""
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
     case ${EDITION} in
-      Xfce) ISO="MX-${RELEASE}_x64.iso";;
-      KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
-      Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
+        Xfce) ISO="MX-${RELEASE}_x64.iso";;
+        KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
+        Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2126,7 +2189,7 @@ function get_netboot() {
     local HASH=""
     local ISO="netboot.xyz.iso"
     local URL="https://boot.netboot.xyz/ipxe"
-    HASH=$(web_pipe "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2146,7 +2209,7 @@ function get_nitrux() {
     URLBASE="https://sourceforge.net/projects/nitruxos/files/Release"
     URL="${URLBASE}/ISO"
     ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -1 | cut -d']' -f1 | cut -d '/' -f4)
-    HASH=$(web_pipe "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2154,7 +2217,7 @@ function get_nixos() {
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2174,13 +2237,13 @@ function get_openbsd() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_openindiana(){
+function get_openindiana() {
     local HASH=""
     local ISO=""
     local URL=""
     URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
     ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2194,14 +2257,14 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
-    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
+    elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     else
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     fi
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | awk '{if(NR==4) print $0}' | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | awk '{if(NR==4) print $0}' | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2212,10 +2275,10 @@ function get_oraclelinux() {
     local VER_MIN=${RELEASE:2:1}
     local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64"
     case ${VER_MAJ} in
-      7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
-      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
+        7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+        *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
     esac
-    HASH=$(web_pipe "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2225,7 +2288,7 @@ function get_parrotsec() {
     local URL=""
     ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
     URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
-    HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep "${ISO}" | cut_1)"
+    HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep "${ISO}" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2234,20 +2297,20 @@ function get_peppermint() {
     local ISO=""
     local URL="https://sourceforge.net/projects/peppermintos/files/isos"
     case ${EDITION} in
-      devuan-xfce) ISO="PeppermintOS-devuan_64_xfce.iso"
-      URL="${URL}/XFCE"
-      ;;
-      debian-xfce) ISO="PeppermintOS-Debian-64.iso"
-      URL="${URL}/XFCE"
-      ;;
-      devuan-gnome) ISO="PeppermintOS-devuan_64_gfb.iso"
-      URL="${URL}/Gnome_FlashBack"
-      ;;
-      debian-gnome) ISO="PeppermintOS-Debian_64_gfb.iso"
-      URL="${URL}/Gnome_FlashBack"
-      ;;
+        devuan-xfce)
+            ISO="PeppermintOS-devuan_64_xfce.iso"
+            URL="${URL}/XFCE";;
+        debian-xfce)
+            ISO="PeppermintOS-Debian-64.iso"
+            URL="${URL}/XFCE";;
+        devuan-gnome)
+            ISO="PeppermintOS-devuan_64_gfb.iso"
+            URL="${URL}/Gnome_FlashBack";;
+        debian-gnome)
+            ISO="PeppermintOS-Debian_64_gfb.iso"
+            URL="${URL}/Gnome_FlashBack";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}-sha512.checksum" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}-sha512.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2267,7 +2330,7 @@ function get_porteus() {
     edition="${EDITION~~}"
     ISO="Porteus-${edition}-v${RELEASE}-x86_64.iso"
     URL="https://mirrors.dotsrc.org/porteus/x86_64/Porteus-v${RELEASE}"
-    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2277,7 +2340,7 @@ function get_primtux() {
     local ISO=""
     ISO="PrimTux${RELEASE}-amd64-${EDITION}.iso"
     URL="https://sourceforge.net/projects/primtux/files/Distribution"
-    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2301,13 +2364,16 @@ function get_pureos() {
 
 function get_reactos() {
     local HASH=""
-    local URL="https://sourceforge.net/projects/reactos/files/latest/download"
+    local URL=""
+    URL="$(web_redirect "https://sourceforge.net/projects/reactos/files/latest/download")"
     echo "${URL} ${HASH}"
 }
 
 function get_rebornos() {
-    local ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    local HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
     echo "${ISO} ${HASH}"
 }
 
@@ -2329,7 +2395,7 @@ function get_siduction() {
     local ISO=""
     local URL="https://mirrors.dotsrc.org/siduction/iso/Standing_on_the_Shoulders_of_Giants/${EDITION}"
     DATE=$(web_pipe "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
-    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
     ISO="siduction-2023.1.1-Standing_on_the_Shoulders_of_Giants-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2338,7 +2404,7 @@ function get_slackware() {
     local HASH=""
     local ISO="slackware64-${RELEASE}-install-dvd.iso"
     local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
-    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2347,14 +2413,12 @@ function get_slax() {
     local ISO=""
     local URL=""
     case ${EDITION} in
-      debian)
-        URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
-        ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
-        ;;
-      slackware)
-        URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x"
-        ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
-        ;;
+        debian)
+            URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
+            ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1);;
+        slackware)
+            URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x"
+            ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1);;
     esac
     HASH=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
     echo "${URL}/${ISO} ${HASH}"
@@ -2373,7 +2437,7 @@ function get_slitaz() {
     local HASH=""
     local ISO="slitaz-rolling-${RELEASE}"
     local URL="http://mirror.slitaz.org/iso/rolling"
-    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
     echo "${URL}/${ISO}.iso ${HASH}"
 }
 
@@ -2381,7 +2445,7 @@ function get_solus() {
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2391,11 +2455,11 @@ function get_sparkylinux() {
     local URL=""
     ISO="sparkylinux-${RELEASE}-x86_64-${EDITION}.iso"
     case ${EDITION} in
-      minimalcli) URL="https://sourceforge.net/projects/sparkylinux/files/cli";;
-      minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
-      *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
+        minimalcli) URL="https://sourceforge.net/projects/sparkylinux/files/cli";;
+        minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
+        *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut -d' ' -f1)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
@@ -2425,7 +2489,7 @@ function get_tinycore() {
         *Pure*) ARCH+="_64";;
     esac
     local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
-    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2434,21 +2498,22 @@ function get_trisquel() {
     local ISO=""
     local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
     case ${EDITION} in
-      mate) ISO="trisquel_${RELEASE}_amd64.iso";;
-      lxde) ISO="trisquel-mini_${RELEASE}_amd64.iso";;
-      kde) ISO="triskel_${RELEASE}_amd64.iso";;
-      sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
+        mate) ISO="trisquel_${RELEASE}_amd64.iso";;
+        lxde) ISO="trisquel-mini_${RELEASE}_amd64.iso";;
+        kde) ISO="triskel_${RELEASE}_amd64.iso";;
+        sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_truenas-scale() {
+    local HASH=""
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-scale/"
-    URL=$(web_pipe ${DLINFO} | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
-    HASH=$(web_pipe "${URL}.sha256" | cut_1)
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
@@ -2456,19 +2521,18 @@ function get_truenas-core() {
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-core/"
-    URL=$(web_pipe ${DLINFO} | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
-    HASH=$(web_pipe "${URL}".sha256 | cut_1)
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}".sha256 | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
 function get_tuxedo-os() {
+    local HASH=""
     local ISO=""
-    local URL=""
-    local Current=
-    Current="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
-    URL="https://os.tuxedocomputers.com/${Current}"
-    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${Current}.sha256" | cut -d ' ' -f 1)"
-    echo "${URL} ${HASH}"
+    local URL="https://os.tuxedocomputers.com"
+    ISO="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
+    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${ISO}.sha256" | cut -d ' ' -f 1)"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_ubuntu-server() {
@@ -2476,7 +2540,7 @@ function get_ubuntu-server() {
     local ISO=""
     local NAME="live-server"
     local URL=""
-    [[ $RELEASE = daily ]] && RELEASE=daily-live
+
     if [[ "${RELEASE}" == "daily"* ]]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
     else
@@ -2484,17 +2548,17 @@ function get_ubuntu-server() {
     fi
 
     case "${RELEASE}" in
-      14*|16*) NAME="server";;
+        14*|16*) NAME="server";;
     esac
 
     if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
     else
         DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
-        ISO=$(cut -d' ' -f3 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d' ' -f3 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
@@ -2511,7 +2575,7 @@ function get_ubuntu() {
     local HASH=""
     local URL=""
     local DATA=""
-    [[ $RELEASE = daily ]] && RELEASE=daily-live
+
     if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
         RELEASE="dvd"
@@ -2535,15 +2599,15 @@ function get_ubuntu() {
     fi
     if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
-        HASH=$(cut_1 <<<${DATA} | sed '1q;d')
+        ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
+        HASH=$(cut -d' ' -f1 <<<"${DATA}" | sed '1q;d')
     else
         DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
-    if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+    if [ -z "${ISO}" ] || [ -z "${HASH}" ]; then
+        echo "$(pretty_name "${OS}") ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -2560,9 +2624,12 @@ function get_ubuntu() {
 }
 
 function get_vanillaos() {
-    local ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
-    local HASH_URL=$(echo "${ISO}" | sed s'|\.iso|\.sha256\.txt|g')
-    local HASH=$(web_pipe "${HASH_URL}" | cut_1)
+    local HASH=""
+    local HASH_URL=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
+    HASH_URL="${ISO//.iso/.sha256.txt}"
+    HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
 }
 
@@ -2572,10 +2639,10 @@ function get_void() {
     local ISO=""
     local URL="https://repo-default.voidlinux.org/live"
     case ${EDITION} in
-      glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
-      musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
-      xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
-      xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+        glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
+        musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+        xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
     esac
     HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${RELEASE}/${ISO} ${HASH}"
@@ -2585,7 +2652,7 @@ function get_vxlinux() {
     local HASH=""
     local ISO="vx-${RELEASE}.iso"
     local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
-    HASH=$(web_pipe "${URL}/vx-${RELEASE}.md5" | cut_1)
+    HASH=$(web_pipe "${URL}/vx-${RELEASE}.md5" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2883,116 +2950,71 @@ function unattended_windows() {
 EOF
 }
 
-handle_curl_error() {
+function handle_curl_error() {
     local error_code="$1"
     local fatal_error_action=2
     case "$error_code" in
-      6)
-        echo "Failed to resolve Microsoft servers! Is there an Internet connection? Exiting..."
-        return "$fatal_error_action"
-        ;;
-      7)
-        echo "Failed to contact Microsoft servers! Is there an Internet connection or is the server down?"
-        ;;
-      8)
-        echo "Microsoft servers returned a malformed HTTP response!"
-        ;;
-      22)
-        echo "Microsoft servers returned a failing HTTP status code!"
-        ;;
-      23)
-        echo "Failed at writing Windows media to disk! Out of disk space or permission error? Exiting..."
-        return "$fatal_error_action"
-        ;;
-      26)
-        echo "Ran out of memory during download! Exiting..."
-        return "$fatal_error_action"
-        ;;
-      36)
-        echo "Failed to continue earlier download!"
-        ;;
-      63)
-        echo "Microsoft servers returned an unexpectedly large response!"
-        ;;
-        # POSIX defines exit statuses 1-125 as usable by us
-        # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
-        $((error_code <= 125)))
-        # Must be some other server or network error (possibly with this specific request/file)
-        # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and an HTTP(S) request, using only the curl features we're using, and a sane build
-        echo "Miscellaneous server or network error!"
-        ;;
-      126 | 127 )
-        echo "Curl command not found! Please install curl and try again. Exiting..."
-        return "$fatal_error_action"
-        ;;
-      # Exit statuses are undefined by POSIX beyond this point
-      *)
-        case "$(kill -l "$error_code")" in
-          # Signals defined to exist by POSIX:
-          # https://pubs.opengroup.org/onlinepubs/009695399/basedefs/signal.h.html
-          INT)
-            echo "Curl was interrupted!"
-            ;;
-          # There could be other signals but these are most common
-          SEGV | ABRT )
-            echo "Curl crashed! Failed exploitation attempt? Please report any core dumps to curl developers. Exiting..."
+        6)
+            echo "Failed to resolve Microsoft servers! Is there an Internet connection? Exiting..."
             return "$fatal_error_action"
             ;;
-          *)
-            echo "Curl terminated due to a fatal signal!"
+        7)
+            echo "Failed to contact Microsoft servers! Is there an Internet connection or is the server down?"
             ;;
-        esac
+        8)
+            echo "Microsoft servers returned a malformed HTTP response!"
+            ;;
+        22)
+            echo "Microsoft servers returned a failing HTTP status code!"
+            ;;
+        23)
+            echo "Failed at writing Windows media to disk! Out of disk space or permission error? Exiting..."
+            return "$fatal_error_action"
+            ;;
+        26)
+            echo "Ran out of memory during download! Exiting..."
+            return "$fatal_error_action"
+            ;;
+        36)
+            echo "Failed to continue earlier download!"
+            ;;
+        63)
+            echo "Microsoft servers returned an unexpectedly large response!"
+            ;;
+            # POSIX defines exit statuses 1-125 as usable by us
+            # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
+            $((error_code <= 125)))
+            # Must be some other server or network error (possibly with this specific request/file)
+            # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and an HTTP(S) request, using only the curl features we're using, and a sane build
+            echo "Miscellaneous server or network error!"
+            ;;
+        126 | 127 )
+            echo "Curl command not found! Please install curl and try again. Exiting..."
+            return "$fatal_error_action"
+            ;;
+        # Exit statuses are undefined by POSIX beyond this point
+        *)
+            case "$(kill -l "$error_code")" in
+            # Signals defined to exist by POSIX:
+            # https://pubs.opengroup.org/onlinepubs/009695399/basedefs/signal.h.html
+            INT)
+                echo "Curl was interrupted!"
+                ;;
+            # There could be other signals but these are most common
+            SEGV | ABRT )
+                echo "Curl crashed! Failed exploitation attempt? Please report any core dumps to curl developers. Exiting..."
+                return "$fatal_error_action"
+                ;;
+            *)
+                echo "Curl terminated due to a fatal signal!"
+                ;;
+            esac
     esac
     return 1
 }
 
-function curl_windows() {
-    local part_ext=".PART"
-    local vm_path="$1"
-    local out_file="$2"
-    local tls_version="$3"
-    local url="$4"
-
-    mkdir -p "${vm_path}"
-
-    real_file="${vm_path}/${out_file}"
-    part_file="${vm_path}/${out_file}${part_ext}"
-
-    # --location: Microsoft likes to change which endpoint these downloads are stored on but is usually kind enough to add redirects
-    # --fail: Return an error on server errors where the HTTP response code is 400 or greater
-    curl --progress-bar --location --output "${part_file}" --continue-at - --max-filesize 10G --fail --proto =https "--tlsv$tls_version" --http1.1 -- "$url" || {
-        error_code=$?
-        handle_curl_error "$error_code"
-        error_action=$?
-
-        # Clean up and make sure a future resume doesn't happen from a bad download resume file
-        if [ -f "${part_file}" ]; then
-            # If file is empty, bad HTTP code, or bad download resume file
-            if [ ! -s "${part_file}" ] || [ "$error_code" = 22 ] || [ "$error_code" = 36 ]; then
-                echo "- Deleting failed download..."
-                rm -f "${part_file}"
-            fi
-        fi
-
-        local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
-        case "$windows_version" in
-          8 | 10) url="${url}ISO";;
-        esac
-
-        echo
-        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
-        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
-        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
-        echo " - Continuing with the VM creation process..."
-
-        return "$error_action"
-    }
-
-    # Full downloaded succeeded
-    mv "${part_file}" "${real_file}"
-}
-
 function download_windows_server() {
+    local iso_download_page_html=""
     # Copyright (C) 2024 Elliot Killick <contact@elliotkillick.com>
     # This function is adapted from the Mido project:
     # https://github.com/ElliotKillick/Mido
@@ -3000,10 +3022,20 @@ function download_windows_server() {
     # Download enterprise evaluation Windows versions
     local windows_version="$1"
     local enterprise_type="$2"
+    local PRETTY_RELEASE=""
+
+    case "${RELEASE}" in
+        "10-ltsc") PRETTY_RELEASE="10 LTSC";;
+        "2012-r2") PRETTY_RELEASE="2012 R2";;
+        *) PRETTY_RELEASE="${RELEASE}";;
+    esac
+
+    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${I18N})"
 
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
-    local iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    echo " - Parsing download page: ${url}"
+    iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -3016,56 +3048,49 @@ function download_windows_server() {
 
     local CULTURE=""
     local COUNTRY=""
-    local PRETTY_RELEASE=""
-
-    case "$RELEASE" in
-      "10-ltsc") PRETTY_RELEASE="10 LTSC";;
-      "2012-r2") PRETTY_RELEASE="2012 R2";;
-      *) PRETTY_RELEASE="$RELEASE";;
+    case "${I18N}" in
+        "English (Great Britain)")
+            CULTURE="en-gb"
+            COUNTRY="GB";;
+        "Chinese (Simplified)")
+            CULTURE="zh-cn"
+            COUNTRY="CN";;
+        "Chinese (Traditional)")
+            CULTURE="zh-tw"
+            COUNTRY="TW";;
+        "French")
+            CULTURE="fr-fr"
+            COUNTRY="FR";;
+        "German")
+            CULTURE="de-de"
+            COUNTRY="DE";;
+        "Italian")
+            CULTURE="it-it"
+            COUNTRY="IT";;
+        "Japanese")
+            CULTURE="ja-jp"
+            COUNTRY="JP";;
+        "Korean")
+            CULTURE="ko-kr"
+            COUNTRY="KR";;
+        "Portuguese (Brazil)")
+            CULTURE="pt-br"
+            COUNTRY="BR";;
+        "Spanish")
+            CULTURE="es-es"
+            COUNTRY="ES";;
+        "Russian")
+            CULTURE="ru-ru"
+            COUNTRY="RU";;
+        *)
+            CULTURE="en-us"
+            COUNTRY="US";;
     esac
 
-    case "$LANG" in
-      "English (Great Britain)")
-        CULTURE="en-gb"
-        COUNTRY="GB";;
-      "Chinese (Simplified)")
-        CULTURE="zh-cn"
-        COUNTRY="CN";;
-      "Chinese (Traditional)")
-        CULTURE="zh-tw"
-        COUNTRY="TW";;
-      "French")
-        CULTURE="fr-fr"
-        COUNTRY="FR";;
-      "German")
-        CULTURE="de-de"
-        COUNTRY="DE";;
-      "Italian")
-        CULTURE="it-it"
-        COUNTRY="IT";;
-      "Japanese")
-        CULTURE="ja-jp"
-        COUNTRY="JP";;
-      "Korean")
-        CULTURE="ko-kr"
-        COUNTRY="KR";;
-      "Portuguese (Brazil)")
-        CULTURE="pt-br"
-        COUNTRY="BR";;
-      "Spanish")
-        CULTURE="es-es"
-        COUNTRY="ES";;
-      "Russian")
-        CULTURE="ru-ru"
-        COUNTRY="RU";;
-      *)
-        CULTURE="en-us"
-        COUNTRY="US";;
-    esac
-
-    iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=$CULTURE&country=$COUNTRY")" || {
+    echo " - Getting download link.."
+    iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=${CULTURE}&country=${COUNTRY}")" || {
         # This should only happen if there's been some change to the download endpoint web address
-        echo "- Windows server download page gave us no download link"
+        echo " - Windows server download page gave us no download link"
         return 1
     }
 
@@ -3092,21 +3117,25 @@ function download_windows_server() {
     # Limit untrusted size for input validation
     iso_download_link="$(echo "$iso_download_link" | head -c 1024)"
 
-    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${LANG}): $iso_download_link"
-
-    # Use highest TLS version for endpoints that support it
-    case "$iso_download_link" in
-        "https://download.microsoft.com"*) tls_version="1.2" ;;
-        *) tls_version="1.3" ;;
-    esac
+    echo " - URL: $iso_download_link"
 
     # Download ISO
     FILE_NAME="${iso_download_link##*/}"
-    curl_windows "${VM_PATH}" "${FILE_NAME}" "$tls_version" "$iso_download_link"
+    web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
     OS="windows-server"
 }
 
 function download_windows_workstation() {
+    local HASH=""
+    local session_id=""
+    local iso_download_page_html=""
+    local product_edition_id=""
+    local language_skuid_table_html=""
+    local sku_id=""
+    local iso_download_link_html=""
+    local iso_download_link=""
+
+    echo "Downloading Windows ${RELEASE} (${I18N})"
     # This function is adapted from the Mido project:
     # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
@@ -3116,28 +3145,30 @@ function download_windows_workstation() {
 
     local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
     case "$windows_version" in
-      8 | 10) url="${url}ISO";;
+        8 | 10) url="${url}ISO";;
     esac
 
     local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
-    # uuidgen: For MacOS (installed by default) and other systems (e.g. with no /proc) that don't have a kernel interface for generating random UUIDs
-    local session_id="$(cat /proc/sys/kernel/random/uuid 2> /dev/null || uuidgen --random)"
+    session_id="$(uuidgen)"
 
     # Get product edition ID for latest release of given Windows version
     # Product edition ID: This specifies both the Windows release (e.g. 22H2) and edition ("multi-edition" is default, either Home/Pro/Edu/etc., we select "Pro" in the answer files) in one number
     # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
-    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    echo " - Parsing download page: ${url}"
+    iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
 
+    echo -n " - Getting Product edition ID: "
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
-    local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
-    # echo " - Product edition ID: $product_edition_id"
+    product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
+    echo "$product_edition_id"
 
+    echo " - Permit Session ID: $session_id"
     # Permit Session ID
     # "org_id" is always the same value
     curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
@@ -3149,11 +3180,12 @@ function download_windows_workstation() {
     # Extract everything after the last slash
     local url_segment_parameter="${url##*/}"
 
+    echo -n " - Getting language SKU ID: "
     # Get language -> skuID association table
     # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
     # We must make this request so our next one will be allowed
     # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
-    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+    language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
         handle_curl_error $?
         return $?
     }
@@ -3162,13 +3194,14 @@ function download_windows_workstation() {
     language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
 
     # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
-    local sku_id="$(echo "$language_skuid_table_html" | grep "${LANG}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
-    # echo " - SKU ID: $sku_id"
+    sku_id="$(echo "$language_skuid_table_html" | grep "${I18N}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    echo "$sku_id"
 
+    echo " - Getting ISO download link..."
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
+    iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
 
     local failed=0
 
@@ -3179,22 +3212,22 @@ function download_windows_workstation() {
     fi
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
-        echo " - Microsoft blocked the automated download request based on your IP address."
+        echo " - WARNING! Microsoft blocked the automated download request based on your IP address."
         failed=1
     fi
 
     if [ ${failed} -eq 1 ]; then
-        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
-        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
-        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
-        echo " - Continuing with the VM creation process..."
+        echo "   Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
+        echo "   Save the downloaded ISO to: $(realpath "${VM_PATH}")"
+        echo "   Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
+        echo "   Continuing with the VM creation process..."
         return 1
     fi
 
     # Filter for 64-bit ISO download URL
     # sed: HTML decode "&" character
     # tr: Filter for only alphanumerics or punctuation
-    local iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]')"
+    iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]')"
 
     if ! [ "$iso_download_link" ]; then
         # This should only happen if there's been some change to the download endpoint web address
@@ -3202,25 +3235,16 @@ function download_windows_workstation() {
         return 1
     fi
 
-    echo "Downloading Windows ${RELEASE} (${LANG}): $iso_download_link"
+    echo " - URL: ${iso_download_link%%\?*}"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
-    curl_windows "${VM_PATH}" "${FILE_NAME}" "1.3" "$iso_download_link"
-    # Only Windows 11 hashes can be found directly from Microsoft's page.
-    if [ "${windows_version}" == 11 ]; then
-        local HASH_LANG="${LANG}"
-        if [ "${LANG}" == "English (United States)" ]; then
-            HASH_LANG="English"
-        fi
-        local HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$HASH_LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
-        check_hash "${VM_PATH}/${FILE_NAME}" "${HASH}"
-    fi
+    web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
 }
 
 function get_windows() {
     if [ "${RELEASE}" == "10-ltsc" ]; then
-        download_windows_workstation windows-10-enterprise ltsc
+        download_windows_server windows-10-enterprise ltsc
     elif [ "${OS}" == "windows-server" ]; then
         download_windows_server "windows-server-${RELEASE}"
     else
@@ -3236,15 +3260,15 @@ function get_windows() {
 
     rm -f "${VM_PATH}/unattended.iso"
     case ${RELEASE} in
-      10|11)
-        echo "Making unattended.iso"
-        mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-        web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-        web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-        web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-        unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-        mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
-        ;;
+        10|11)
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            echo "Making unattended.iso"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
     esac
 
     if [ -n "${FILE_NAME}" ]; then
@@ -3254,9 +3278,17 @@ function get_windows() {
     fi
 }
 
-function open_url() {
-    local URL="$1";
-    xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
+function open_homepage() {
+    local URL=""
+    local XDG_OPEN=""
+    if [ -z "$(os_info "${1}")" ]; then
+        error_specify_os
+    else
+        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        # shellcheck disable=SC2034
+        XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
+        exit 0
+    fi
 }
 
 function create_vm() {
@@ -3270,83 +3302,81 @@ function create_vm() {
     #echo "${HASH}"
     web_get "${URL}" "${VM_PATH}"
     if [ -n "${HASH}" ]; then
-      check_hash "${ISO}" "${HASH}"
+        check_hash "${ISO}" "${HASH}"
     fi
 
-    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
-        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso')
-    fi
-    #if [ ${OS} == "guix" ] && [[ $ISO =~ ".qcow2" ]]; then
-        #cp ${VM_PATH}/${ISO} ${VM_PATH}/disc.qcow2
-    #fi
-    if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
-        gzip -d "${VM_PATH}/${ISO}"
-        ISO="${ISO/.gz/}"
-    fi
-    #  Could be other OS iso files compressed with bzip2 or gzip
-    #  but for now we'll keep this to know cases
-    if [[ ${OS} == "dragonflybsd" ]] && [[ ${ISO} =~ ".bz2" ]]; then
-        bzip2 -d  "${VM_PATH}/${ISO}"
-        ISO="${ISO/.bz2/}"
-    fi
-
-    if [[ ${OS} == "easyos" ]] && [[ ${ISO} =~ ".img" ]]; then
-        qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
-        ISO="${ISO/.img/}"
-    fi
-
-    if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
-        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
-    fi
+    case "${OS}" in
+        batocera)
+            if [[ ${ISO} = *".gz"* ]]; then
+                gzip -d "${VM_PATH}/${ISO}"
+                ISO="${ISO/.gz/}"
+            fi;;
+        dragonflybsd)
+            #  Could be other OS iso files compressed with bzip2 or gzip
+            #  but for now we'll keep this to know cases
+            if [[ ${ISO} = *".bz2"* ]]; then
+                bzip2 -d  "${VM_PATH}/${ISO}"
+                ISO="${ISO/.bz2/}"
+            fi;;
+        easyos)
+            if [[ ${ISO} = *".img"* ]]; then
+                ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+                ISO="${ISO/.img/}"
+            fi;;
+        freedos)
+            if [[ ${ISO} = *".zip"* ]]; then
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                rm -f "${VM_PATH}/${ISO}"
+                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+            fi;;
+        reactos)
+            if [[ ${ISO} = *".zip"* ]]; then
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                rm -f "${VM_PATH}/${ISO}"
+                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+            fi;;
+    esac
     make_vm_config "${ISO}"
 }
 
 function help_message() {
     #shellcheck disable=SC2016
-    printf '                           _              _
-         __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
-        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
-       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_      MIT
-        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║   license
-           ║_║  version: %s ║___/ part of Quickemu project
---------------------------------------------------------------
-         > Quickly create and run optimised Linux, <
-       > Windows and macOS desktop virtual machines. <
-
+    printf '
+             _      _              _
+  __ _ _   _(_) ___| | ____ _  ___| |_
+ / _` | | | | |/ __| |/ / _` |/ _ \ __|
+| (_| | |_| | | (__|   < (_| |  __/ |_
+ \__, |\__,_|_|\___|_|\_\__, |\___|\__|
+    |_|                 |___/ v%s, using curl %s
+--------------------------------------------------------------------------------
  Project - https://github.com/quickemu-project/quickemu
  Discord - https://wimpysworld.io/discord
---------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-Basic Usage:
- quickget <os> <release> [edition]
- quickget ubuntu 22.04
+Usage:
+  quickget <os> <release> [edition]
+  quickget ubuntu 22.04
 
-Advanced Usage:
- quickget <arg> [path] <os> [re] [ed]
- quickget --download ubuntu 22.04
+Advanced usage:
+  quickget <arg> [path] <os> [release] [edition]
+  quickget --download ubuntu 22.04
 
 Arguments:
- -[12345]              <os>           : Show info* about OS
- --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
- --create-config (-cc) <os> [path/url]: Create default VM config for image
- --open-homepage  (-o) <os>           : Open homepage for the OS
- --version        (-v)                : Show version
- --help           (-h)                : Show this help message
--------------- For testing & development ---------------------
- --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
- --url-all       (-ua) <os>           : Show all download URLs for an OS
- --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
- --check-all     (-ca) <os>           : Check all downloads for an OS are available
- --list           (-l)                : List all supported systems in plain text
- --list-csv      (-lc)                : List all supported systems in csv format
- --list-json     (-lj)                : List all supported systems in json format
---------------------------------------------------------------
-   *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
-    Can be used in any combination like -13254 or -52
+  --download      <os> <release> [edition] : Download image; no VM configuration
+  --create-config <os> [path/url]          : Create VM config for a OS image
+  --open-homepage <os>                     : Open homepage for the OS
+  --show          [os]                     : Show OS information
+  --version                                : Show version
+  --help                                   : Show this help message
+-------------------------- For testing & development ---------------------------
+  --url           [os] [release] [edition] : Show image URL(s)
+  --check         [os] [release] [edition] : Check image URL(s)
+  --list                                   : List all supported systems
+  --list-csv                               : List everything in csv format
+  --list-json                              : List everything in json format
+--------------------------------------------------------------------------------
 
-supported Operating Systems:\n' "$(quickemu --version)"
+Supported Operating Systems:\n\n' "$(quickemu --version)" "${CURL_VERSION}"
     os_support | fold -s -w "$(tput cols)"
 }
 
@@ -3357,92 +3387,82 @@ if ((BASH_VERSINFO[0] < 4)); then
     exit 1
 fi
 
-LANGS=()
+I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
-if [ ! -e "${CURL}" ]; then
-    echo "ERROR! curl not found. Please make install curl"
+if [ ! -x "${CURL}" ]; then
+    echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
 
+QEMU_IMG=$(command -v qemu-img)
+if [ ! -x "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+    exit 1
+fi
+
+#TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
 case "${1}" in
-  -1*|-2*|-3*|-4*|-5*)
-    show_os_info "${1}" "${2}"
-    exit 0
-    ;;
-  '--download'|'-d')
-    OPERATION="download"
-    shift
-    ;;
-  '--create-config'|'-cc')
-    OPERATION="config"
-    shift
-    create_config "${@}"
-    ;;
-  '--open-homepage'|'-o')
-    if [ -z "$(os_info "${2}")" ]; then
-        error_specify_os
-    else
-        open_url "$(os_info "${2}" | cut -d'|' -f4)"
-        exit 0
-    fi
-    ;;
-  '--version'|'-v')
-    #WHERE=$(dirname "${BASH_SOURCE[0]}")
-    #"${WHERE}/quickemu" --version
-    echo "FS 4.9.3.04"
-    exit 0
-    ;;
-  '--help'|'-h')
-    help_message
-    exit 0
-    ;;
-  '--url'|'-u')
-    OPERATION="show"
-    shift
-    ;;
-  '--url-all'|'-ua')
-    OPERATION="show"
-    shift
-    # if no OS is specified, list all URLs for all supported OSes
-    if [ -z "${1}" ]; then
-        for OS in $(os_support); do
-            (test_all "${OS}")
-        done
-    else
-        test_all "${1}"
-    fi
-    exit 0
-    ;;
-  '--check'|'-c')
-    OPERATION="test"
-    shift
-    ;;
-  '--check-all'|'-ca')
-    OPERATION="test"
-    shift
-    # if no OS is specified, check all URLs for all supported OSes
-    if [ -z "${1}" ]; then
-        for OS in $(os_support); do
-            (test_all "${OS}")
-        done
-    else
-        test_all "${1}"
-    fi
-    exit 0
-    ;;
-    #TODO: Argument without dashes should be DEPRECATED!
-  '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
-    list_csv
-    ;;
-    #TODO: Argument without dashes should be DEPRECATED!
-  '--list-json'|'-lj'|'list_json')
-    list_json
-    ;;
-  '--list'|'-l')
-    list_supported
-    ;;
+    --download|-download)
+        OPERATION="download"
+        shift
+        ;;
+    --create-config|-create-config)
+        OPERATION="config"
+        shift
+        create_config "${@}"
+        ;;
+    --open-homepage|-open-homepage)
+        shift
+        open_homepage "${1}"
+        ;;
+    --show|-show)
+        shift
+        if [ -z "${1}" ]; then
+            for OS in $(os_support); do
+                show_os_info "${OS}"
+            done
+        else
+            show_os_info "${1}"
+        fi
+        exit 0;;
+    --version|-version)
+        #WHERE=$(dirname "${BASH_SOURCE[0]}")
+        #"${WHERE}/quickemu" --version
+        echo "FS 4.9.5.01"
+        exit 0;;
+    --help|-help|--h|-h)
+        help_message
+        exit 0;;
+    --url|-url)
+        OPERATION="show"
+        shift
+        if [ -z "${1}" ]; then
+            for OS in $(os_support); do
+                (test_all "${OS}")
+            done
+            exit 0
+        elif [ -z "${2}" ]; then
+            test_all "${1}"
+            exit 0
+        fi;;
+    --check|-check)
+        OPERATION="test"
+        shift
+        if [ -z "${1}" ]; then
+            for OS in $(os_support); do
+                (test_all "${OS}")
+            done
+            exit 0
+        elif [ -z "${2}" ]; then
+            test_all "${1}"
+            exit 0
+        fi;;
+    --list-csv|-list-csv|list|list_csv) list_csv;;
+    --list-json|-list-json|list_json) list_json;;
+    --list|-list) list_supported;;
+    -*) error_not_supported_argument;;
 esac
 
 if [ -n "${1}" ]; then
@@ -3459,7 +3479,8 @@ if [ -n "${2}" ]; then
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
-        EDITIONS=($(editions_${OS}))
+        EDITIONS=("$(editions_"${OS}")")
+        # Default to the first edition if none is specified.
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
@@ -3484,14 +3505,14 @@ if [ -n "${2}" ]; then
         validate_release releases_ubuntu
         get_ubuntu
     elif [[ "${OS}" == "windows"* ]]; then
-        LANG="English International"
+        I18N="English International"
         "languages_${OS}"
         if [ -n "${3}" ]; then
-            LANG="${3}"
-            if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
+            I18N="${3}"
+            if [[ ! "${I18NS[*]}" =~ ${I18N} ]]; then
                 error_not_supported_lang
             fi
-            VM_PATH="$(echo "${OS}-${RELEASE}-${LANG// /-}" | tr -d '()')"
+            VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
         fi
         validate_release "releases_${OS}"
         get_windows

@@ -53,7 +53,7 @@ VM_SelectorStyle="A"
 
 # VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="windows-insider.conf"
 
-# ADD here:
+# ADD here. Make sure to remove the '#' in order to activate the line.
 
 # VM_Array[0,0]="$Default_VM_Folder" ; VM_Array[0,1]=""
 
@@ -61,7 +61,8 @@ VM_SelectorStyle="A"
 
 # VM_Array[2,0]= ; VM_Array[2,1]=
 
-# MUST BE set as CONTIGIUOUS, non-sparse, no gaps, and
+# MUST BE set as CONTIGIUOUS, non-sparse 
+# ie. no numeric sequence gaps when counting the first number of each pair on each line in order...
 # COMMENT OUT with # any Non-Present VM entries 
 
 
@@ -108,13 +109,15 @@ VM_SelectorStyle="A"
 
 # System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
 
-# HomeBird   - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
+# Echo       - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
 
-# FreeBird   - The full current official quickemu release, if known to be both stable & qqX stable, or a duplicate of HomeBird.
-#              Or the full current release but with cherry-picked, officially merged but not yet released additions ... 
+# HomeBird   - A recent FreeBird release, known to be generally STABLE and known to work with qqX.
 
-# FreeSpirit - As FreeBird, as either a cherry-picked pre-release current official main branch or the latest official release,
-#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
+# FreeBird   - Based on HomeBird or Current official code. May be release or pre-release but known to be both stable & qqX stable.
+#              Probably with a sprinkling of cherry-picked official improvements along with a few qqX additions and tweaks ... 
+
+# FreeSpirit - An alternative A/B FreeBird variant, or as FreeBird but more spirited. Possibly based on official pre-release.
+#              May contain newer ideas and fixes if they are expected to be stable.
 
 # Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
 
@@ -195,7 +198,7 @@ VM_SelectorStyle="A"
 # Time adjuster for pkill display. Adds a delay to allow background processes time to output to screen.
 # Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
 # Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ... 
-  P_Kill_WaitSecs="6"
+  P_Kill_WaitSecs="4"
 
 
 ##  SHARED or SECOND DRIVES:  
@@ -328,6 +331,8 @@ VM_SelectorStyle="A"
 # to that used for FreeBird. This preset path will be auto-checked.
 
 # For 'Dev' give full path of your Quickemu source clone here. QE_SourceVersion may be set above or here as an overwrite.
+# QE_DevPath may be left set. This path will only be used if Version is set to 'Dev'
+
   #QE_SourceVersion="Dev"
   #QE_DevPath="~/Files/myClone"
 
@@ -340,16 +345,17 @@ VM_SelectorStyle="A"
 
 # System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
 
-# HomeBird   - A recent official quickemu release, which may have quickemu/quickget issues, and which may or  
-#              may not have been fixed in the current main, but known to be STABLE with qqX 
+# Echo       - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
 
-# FreeBird   - Either the full current official quickemu release, or a cherry-picked official main branch
-#              that is working towards a new release, if known to be qqX stable. Or a duplicate of HomeBird.
+# HomeBird   - A recent FreeBird release, known to be generally STABLE and known to work with qqX.
 
-# FreeSpirit - Either a cherry-picked pre-release current official main branch or the latest official release,
-#              or similar, but with un-official pre-merged quickemu community pull requests and fixes that are expected to be stable.
+# FreeBird   - Based on HomeBird or Current official code. May be release or pre-release but known to be both stable & qqX stable.
+#              Probably with a sprinkling of cherry-picked official improvements along with a few qqX additions and tweaks ... 
 
-# Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
+# FreeSpirit - An alternative A/B FreeBird variant, or as FreeBird but more spirited. Possibly based on official pre-release.
+#              May contain newer ideas and fixes if they are expected to be stable.
+
+# Custom/Dev - Your own customised or development version.  See the notes here, at the end of the settings file.
 
 # FreeBird is default.  Set blank for default.
 

@@ -3,18 +3,13 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-
 # 	Otherwise:  
-
 #   Licence  GPL3   https://www.gnu.org/licenses 
-
 ##  qqX - quickemu quickget X terminal project   
 
 ## ShellCheck global disables:
-
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
@@ -33,7 +28,7 @@ function quickget {
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
   
-  eval command "$QG_SourcePath" " $*"
+  eval command '"$QG_SourcePath"' " $*"
   
 }
 
@@ -279,15 +274,10 @@ function_quick_get_wrap ()  {
   while [[ ! $InternetUp ]]; do   
 
     if wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
-
     elif wget -q -T2 -t2 --spider cloudflare.com  2> /dev/null ; then InternetUp=1
-
     elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
-
     elif  ( ping -w 2  1.1.1.1 | grep -q ttl ) 2> /dev/null ; then InternetUp=1
-
     elif ( ping -w 2  8.8.8.8  | grep -q ttl ) 2> /dev/null ; then InternetUp=1  
-
     # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
     # No changes to '--spider' in wget2  https://gitlab.com/gnuwget/wget2/-/wikis/home
 
@@ -301,7 +291,6 @@ function_quick_get_wrap ()  {
       echo
 
       [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="b"  && break   
-
       [[ $Test_Internet == "i" ]] &&  break   
 
     fi
@@ -418,7 +407,8 @@ function_quick_get_wrap ()  {
 
     done
 
-    QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
+    #QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
+    QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Releases:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
     # filter out display folding  REVIEW 
     QGW_Releases_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Releases_ListRaw")"
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
@@ -489,7 +479,8 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
+      #QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
+      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Languages:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
       # filter out display folding  REVIEW 
       QGW_WinLangs_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_WinLangs_ListRaw")"
       QGW_WinLangs_ListString="${QGW_WinLangs_ListRaw/'- Languages: '/}"
@@ -551,7 +542,8 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+      #QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
+      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
       # filter out display folding  REVIEW 
       QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
       QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
@@ -952,35 +944,21 @@ function_quick_get_wrap ()  {
   if [[ ! $ZsyncDownload ]]; then
 
     # folder check
-
     if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
-
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
-
     elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
-
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}"
-
     elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}" ]]; then 
-
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}"
-
     fi
 
     #  file check  .conf 
-
     if [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then 
-
       New_VM_Conf_File="${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf"
-
     elif [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}.conf" ]]; then 
-
       New_VM_Conf_File="${QGW_OS_Arr_NameSelected}.conf"
-
     elif [[ -f "${QWG_Conf_Dir}/${New_VM_InstanceName}.conf" ]]; then 
-
       New_VM_Conf_File="${New_VM_InstanceName}.conf"
-
     fi
 
   fi
@@ -1048,6 +1026,9 @@ function_quick_get_wrap ()  {
       else  
         printf  "  Folder/file retained"
       fi
+
+      cd "$Default_VM_Folder" || DefaultFolderError=1
+      refresh_sources_and_load_VM_arrays
 
     fi
 

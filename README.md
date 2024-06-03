@@ -2,6 +2,10 @@
 
 ## " quickemu quickget X terminal project "
 
+@ 24 May  Dev branch adds new subtractive MacOS method. (WiP)
+
+See https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2129370687
+
 Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES
 
 - now adds a _handy distro rename function_ to help with upgrades

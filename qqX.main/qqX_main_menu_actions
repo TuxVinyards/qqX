@@ -3,18 +3,13 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-
 # 	Otherwise:  
-
 #   Licence  GPL3   https://www.gnu.org/licenses 
-
 ##  qqX - quickemu quickget X terminal project   
 
 ## ShellCheck global disables:
-
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
@@ -135,10 +130,7 @@ function  main_menu_actions {
 
     printf "\n\n"
 
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then  show_msg_pid_found
     else
       UseCustomBootArgs=1
       eval quickemu "-vm $VM_Conf_File --vm_boot" 
@@ -149,10 +141,7 @@ function  main_menu_actions {
 
     printf "\n\n"
 
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
     else
       eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
       vm_pid_kill_menu
@@ -162,18 +151,12 @@ function  main_menu_actions {
 
     printf "\n\n"
 
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
     else
 
-      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --screenpct 99  $Extra_QE_Params" 
-      else  eval quickemu "-vm $VM_Conf_File --vm_boot  $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
+      if [[ $MainMenuChoice == "df"  ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 99  $Extra_QE_Params" 
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScrnPcnt_Cmd $Extra_QE_Params" 
       fi
-
       [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
       vm_pid_kill_menu
 
@@ -183,27 +166,18 @@ function  main_menu_actions {
 
     printf "\n\n"
 
-    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then 
-
-      printColor "  ERROR:  QEMU appears to be running this machine elsewhere  (qemu.pid file found - delete if not needed)"
-      printf "\n\n [enter] to return \n\n"
-      read -rp "  >  "
-
-    else
+    if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
+   else
 
       if [[ $HeadlessCmd ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
-
       elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
-
       else  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
-
       fi
 
       #  headless only runs in Spice
       #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
 
       [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
-
       vm_pid_kill_menu
 
     fi
@@ -313,7 +287,7 @@ function  main_menu_actions {
     IsoImg=
     NewFileTuneUp=
     NewFileTuneUp_JustDone=
-
+    cd "$Default_VM_Folder" || DefaultFolderError=1
     refresh_sources_and_load_VM_arrays
     return
 
@@ -358,6 +332,7 @@ function  main_menu_actions {
 
     # refresh
     MainMenuChoice=
+    refresh_and_load_quickemu_sources
     refresh_conf_vars_and_values
 
   fi

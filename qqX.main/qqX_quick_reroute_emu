@@ -3,18 +3,13 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-
 # 	Otherwise:  
-
 #   Licence  GPL3   https://www.gnu.org/licenses 
-
 ##  qqX - quickemu quickget X terminal project   
 
 ## ShellCheck global disables:
-
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
@@ -74,6 +69,7 @@ function quickemu {
 
   done
 
+
   ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
 
   #  These bits are basically the remaining sections of the original quickemu code. 
@@ -101,6 +97,7 @@ function quickemu {
     # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
+    [[ $guest_os == "macos" && ! $cpu_cores ]] && cpu_cores=8
 
     source "/tmp/qmod-actions-temp" 
 

@@ -34,11 +34,7 @@ while true ; do
 		printColor "\n\n COPY the qqX script to usr/bin" 
 		printColor "\n\n COPY all qqX.main scripts to /usr/share/qqX \n"  
 	fi
-	
-	copy_files
 
-	if [[ $CopyFail ]]; then printColor " COPY ERROR .... " ; else printf " Copied @ %s" "$(date +%H.%M.%S)"  ; fi
-	
 	printf "\n\n Terminal may be kept open. Sudo will stay usable for a while ..."
 	printColor "\n\n COPY > [enter] for qqX scripts" ; printf "    [s] qqX SETTINGS update    [b] copy /qqX.builtins to /usr/share/qqX \n\n" 
 	read -rp " >  "  UpdSets
@@ -46,12 +42,13 @@ while true ; do
 	if [[ $UpdSets ]]; then 
 		[[ $UpdSets == "s" ]] && update_old_settings_file_with_new_options 
 		[[ $UpdSets == "b" ]] && copy_builtins 
-		((Counter+=1)) 
-		#printColor "  [enter] to continue \n\n " 
-		#read -t 5 -rp "  >  "
-		sleep 1
+		((Counter+=1))  # double depth, so add another count
+	else
+		copy_files
+		if [[ $CopyFail ]]; then printColor " COPY ERROR .... " ; else printf " Copied @ %s" "$(date +%H.%M.%S)"  ; fi
 	fi
 	
+	sleep 1
 	((Counter+=1)) ;  [[ $Counter -ge 4 ]] && Counter=0 ; UpdSets= ; CopyFail=
 		
 done
