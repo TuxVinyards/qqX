@@ -3,18 +3,14 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
 # 	Otherwise:  
-
 #   Licence  GPL3   https://www.gnu.org/licenses 
-
 ##  qqX - quickemu quickget X terminal project   
 
 ## ShellCheck global disables:
-
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
 
@@ -23,19 +19,25 @@
 #  shellcheck disable=SC2034
 #  shellcheck disable=SC2154 
 
+show_msg_pid_found() {
+      printColor "  WARNING:  QEMU may be running this machine elsewhere" 
+      printf "\n\n  A .pid file '%s.pid' has been found in the Distro Folder "  "$VM_InstanceName"
+      if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
+      else printf " \n\n  but no KVM activity has been detected. \n\n  This file can probably be deleted"
+      fi
+      printf "\n\n [enter] to return \n\n"
+      read -rp "  >  "
+}
+
 
 vm_pid_kill_menu() {
 
   tput civis
 
 	# WAIT for background load & QEMU messages to appear before showing menu (unless reloading)
-
 	if [[ $KillPID_Menu_Exited ]]; then  KillPID_Menu_Exited=
-
   elif [[ $BreakAtVerboseArgs ]]; then BreakAtVerboseArgs= ; return
-
   else  sleep 2 
-  
   fi
   
   # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
