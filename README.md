@@ -2,52 +2,13 @@
 
 ## " quickemu quickget X terminal project "
 
-@ 24 May  Dev branch adds new subtractive MacOS method. (WiP)
+### 1.8.07
 
-See https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2129370687
+Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code
 
-Release 1.7.03 builds on the earlier NEW INTERFACE FEATURES
+MacOS is now much faster and much improved too. Both in qqX and in with Quickemu.
 
-- now adds a _handy distro rename function_ to help with upgrades
-- makes detection improvements for the Gnome 45 text editor and adds a few minor tweaks
-
-Lots of details in the new [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages
-
-### 1.8.03  - Hot Fixes for the pending new quickemu release
-
-- Now features quickemu builtins to give much greater control.
-
-- Maintains quickemu 4.9.2 but gives you the [new Quickemu code,](https://github.com/TuxVinyards/qqX/wiki/FreeBird)  as of Apr 25, which people are starting to download and use.
-
-- Windows [generally works](https://github.com/quickemu-project/quickemu/issues/1113) for international English and MacOS Sonoma can now be downloaded, with a [bit of patience.](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help#macos-hangs-when-running-the-setup)
-
-- Quickemu's new CLI and API are now usable.
-
-- Testing for qqX has carried out so far on Fedora 40, Arch and different Ubuntu flavors.
-
-- Fixes have been made for spidering of home pages and reporting of updates.
-
-### 1.8.04
-
-- The **new 2nd May Quickemu code** :partying_face:
-
-- Raft of Quickemu [fixes and updates](https://github.com/TuxVinyards/quickemu/tree/freebird-qqX-1.8.04) plus a couple of qqX fixes to go with
-
-- A few issues are still present in the May 9th Quickemu release 4.9.4 but this version can be enabled via the general settings.
-
-### 1.8.05
-
-- Fix SHA wget 302 error
-
-### Dev
-
-- Try branch 'qe 4.9.5 - mac' for fixes to get quickemu system code running. Plus adds a new macos runtime to FreeBird.
-
-- FreeSpirit remains currently unchanged and as older FreeBird.  More later.
-
-- Current problems with Quickemu are with Spicy display failure and with Width and Height mouse interaction in SDL.
-
-- Plus work in progress still for MacOS and for Windows language support.
+Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
 ## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
 
@@ -123,9 +84,13 @@ Release 1.5.02 added alphabetical zooming into list sections for the Quick Get m
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-Release 1.7.01 now has a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
+Release 1.7.01 added a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
 
 ![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
+
+Whilst release 1.7.03 built on the earlier NEW INTERFACE FEATURES with
+
+- A _handy distro rename function_ to help with upgrades
 
 And 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
