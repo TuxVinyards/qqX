@@ -22,9 +22,9 @@ show_msg_pid_found() {
       printColor "  WARNING:  QEMU may be running this machine elsewhere" 
       printf "\n\n  A .pid file '%s.pid' has been found in the Distro Folder "  "$VM_InstanceName"
       if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
-      else printf " \n\n  but no KVM activity has been detected. \n\n  This file can probably be deleted"
+      else printf " \n\n  but as no KVM activity has been detected, this file can probably be deleted."
       fi
-      printf "\n\n [enter] to return \n\n"
+      printf "\n\n  [enter] to return and to open File Manager \n\n"
       read -rp "  >  "
 }
 
