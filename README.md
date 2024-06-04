@@ -146,11 +146,9 @@ All scripts have been carefully Shellcheck linted & have full error handling rou
 
 qqX always makes backups, as is _standard good practice_ with _any_ software.
 
-Release 1.1.05, added an extra layer of qemu-img disk health checks to the disk info function.
+See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins
 
-![disk error alert crop](https://github.com/TuxVinyards/qqX/assets/3956806/7edf972c-3c18-4f33-8096-2c1cbc5ba4f5)
-
-See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for more details
+See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
 ## Bash
 
@@ -160,7 +158,7 @@ Learning Bash, or improving your knowledge of it, is always time well spent. Bas
 
 Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet.
 
-## Development
+## Development and Roadmap
 
 See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
 
