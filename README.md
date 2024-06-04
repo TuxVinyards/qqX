@@ -6,7 +6,7 @@
 
 Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code
 
-MacOS is now much faster and much improved too. Both in qqX and in with Quickemu.
+[MacOS](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) is now much faster and much improved too. Both in qqX and in with Quickemu.
 
 Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
