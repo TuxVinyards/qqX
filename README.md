@@ -28,9 +28,7 @@ VirtualBox was good in its day .... developers are now moving to [QEMU](https://
 
 Unfortunately, Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-And even beneath Gnome Boxes' initially simple interface, for example, something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala
-
-Quickemu, on the other hand, is a simple and capable Bash script. Much easier for community contributions. Much easier to edit and easy to fix.
+Even those with initially simple interfaces, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala
 
 ## Why qqX?
 
@@ -154,7 +152,9 @@ Any confident Linux user should find it relatively easy to make simple edits.
 
 Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
 
-Use of a clear and well annotated qqX coding style means that even Bash novices should be able to find their feet.
+Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
+
+The qqX coding style is clear and well annotated. Even Bash novices should be able to find their feet.
 
 ## Development and Roadmap
 
