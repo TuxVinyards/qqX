@@ -76,13 +76,13 @@ Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://
 
 ![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
 
-Whilst release 1.7.03 built on the earlier NEW INTERFACE FEATURES with
+And 1.7.03 added
 
 - A _handy distro rename function_ to help with upgrades
 
-And 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
+Release 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
-Earlier releases have added:
+Whilst earlier releases have added:
 
 - Distro homepage browser and link checker
   
