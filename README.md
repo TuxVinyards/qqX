@@ -24,24 +24,23 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
 - It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
-VirtualBox was good in its day .... but developers are now moving to [QEMU](https://qemu.readthedocs.io)  
-
-Unfortunately, Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
+Quickemu is not like Qemu front-ends based on LibVirt, which can often be quite abstract and complex.
 
 Even those with initially simple interfaces, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
+VirtualBox was good in its day .... but developers are now moving to [QEMU](https://qemu.readthedocs.io)  
+
 ## Why qqX?
 
-qqX goes far beyond the restricted basic quickemu API
+qqX goes far beyond the quickemu API
 
 - A full menu system  offers lots more power and functions.
 
-- The easy installation needs no additional software or dependencies.
+- The easy [installation](https://github.com/TuxVinyards/qqX/wiki) needs no additional software or dependencies.
 
 - It has improved display modes, utilities, optimizers and tools.
 
-- qqX is fully compatible with the basic stop / go [quickgui](https://github.com/quickemu-project/quickgui)
-  
+- qqX is fully compatible with the basic stop / go of [quickgui](https://github.com/quickemu-project/quickgui)
 
 ## Not just a text interface
 
