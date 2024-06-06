@@ -20,31 +20,28 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
 ## Why quickemu?
 
-[Quickemu](https://github.com/quickemu-project/quickemu) is simply built and easy to use.
+[Quickemu](https://github.com/quickemu-project/quickemu) is a _simply built_ front end for Qemu / KVM
 
-It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
+- It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
 
-VirtualBox was good in its day .... developers are now moving to [QEMU](https://qemu.readthedocs.io)  
+VirtualBox was good in its day .... but developers are now moving to [QEMU](https://qemu.readthedocs.io)  
 
 Unfortunately, Qemu front-ends are often enterprise orientated and based on LibVirt, which can be quite abstract and complex.
 
-Even those with initially simple interfaces, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) unless you wish to become an expert in xml, gnome3 & vala
+Even those with initially simple interfaces, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
 ## Why qqX?
 
-qqX goes far beyond a front-end restricted to the basic quickemu API
+qqX goes far beyond the restricted basic quickemu API
 
-- A full menu system that improves on the traditional quickemu interfaces
+- A full menu system  offers lots more power and functions.
 
-- Lots of power and functions. Even more than quickemu.
+- The easy installation needs no additional software or dependencies.
 
-- An easy installation with no additional software or dependencies required.
+- It has improved display modes, utilities, optimizers and tools.
 
-Quickemu only works on the command line and quickgui is very basic.
-
-- qqX is fully compatible with [quickgui](https://github.com/quickemu-project/quickgui) if it is already installed on your system.
+- qqX is fully compatible with the basic stop / go [quickgui](https://github.com/quickemu-project/quickgui)
   
-Using qqX will power up existing VM's with improved display modes, utilities, optimizers and tools.
 
 ## Not just a text interface
 
