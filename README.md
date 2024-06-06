@@ -48,7 +48,7 @@ Quickemu only works on the command line and quickgui is very basic.
   
 Using qqX will power up existing VM's with improved display modes, utilities, optimizers and tools.
 
-### Not just a text interface
+## Not just a text interface
 
 Less can be more.
 
@@ -58,7 +58,7 @@ qqX uses the same well-known scripting language that is used by quickemu.
 
 And anything within quickemu can be easily taken, shaped and improved.
 
-### Install the latest ISO's at the click of a mouse
+### Install the latest and greatest, at the click of a mouse
 
 ![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
 
