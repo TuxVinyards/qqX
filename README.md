@@ -40,19 +40,17 @@ qqX goes far beyond the quickemu API
 
 - qqX is fully compatible with the basic stop / go of [quickgui](https://github.com/quickemu-project/quickgui)
 
-## Not just a text interface
+### Hybrid interface. Part text, part mouse
 
-Less can be more.
+_Less can be more_.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
-
-### Lots of mouse click functions too
 
 Easy _install the latest_ and greatest.
 
 ![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
 
-No need to wait for Quickget to add in the distros or releases that you want.
+_No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
 
