@@ -112,7 +112,7 @@ Start from scratch. Or safely test out the qqX difference on your existing quick
 
   Manual installation of Quickemu to 'PATH' as in the case of some Host distros such as Fedora may now be omitted.
 
-- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may newer and may have the very latest tweaks and bug fixes too ...
+- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
   No other software, support structures or dependencies are needed.
 
