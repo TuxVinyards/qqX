@@ -20,15 +20,13 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
 ## Why quickemu?
 
-[Quickemu](https://github.com/quickemu-project/quickemu) is a _simply built_ front end for Qemu / KVM
+[Quickemu](https://github.com/quickemu-project/quickemu) is a _simply built_ front end for Qemu / KVM  
 
-- It has an active community and is the only virtual machine manager that makes easy work of running Microsoft Windows.
+- It has an active community and is the only virtual machine manager that makes easy work of Mac and Windows.
 
-Quickemu is not like Qemu front-ends based on LibVirt, which can often be quite abstract and complex.
+Developers are now moving to [QEMU](https://qemu.readthedocs.io)
 
-Even those with initially simple interfaces, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
-
-VirtualBox was good in its day .... but developers are now moving to [QEMU](https://qemu.readthedocs.io)  
+- Quickemu is not like Qemu front-ends based on LibVirt, which can often be quite abstract and complex.
 
 ## Why qqX?
 
@@ -48,10 +46,6 @@ Less can be more.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-qqX uses the same well-known scripting language that is used by quickemu.
-
-And anything within quickemu can be easily taken, shaped and improved.
-
 ### Install the latest and greatest, at the click of a mouse
 
 ![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
@@ -64,9 +58,7 @@ There is no need to wait for official bug fixes to make their way through the sy
 
 Confident Linux users should quickly find themselves at home.
 
-### Work continues
-
-Release 1.1.01 improved the front end machine selector & makes clearer folder organisation:
+## Screenshots and features
 
 Release 1.1.03 improved the main menu & added a gtk display option, while 1.5.02 now has GL toggle:
 
@@ -142,15 +134,23 @@ See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on 
 
 See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
-## Bash
+## Why Bash?
 
 Any confident Linux user should find it relatively easy to make simple edits.
 
-Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
+Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. 
+
+There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
 
 Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
 
-The qqX coding style is clear and well annotated. Even Bash novices should be able to find their feet.
+qqX uses the same well-known scripting language that is used by quickemu. Anything can be easily taken, shaped and improved.
+
+The qqX coding style is clear and annotated sufficiently for newcomers to find their feet.
+
+VirtualBox was good in its day ...
+
+Whilst even with newer and initially simple LibVirt front-ends, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
 ## Development and Roadmap
 
