@@ -1,6 +1,6 @@
-# qqX  - quickemu quickget X terminal project 
+# qqX  - quickemu quickget X terminal project
 
-### 1.8.07
+## Latest release 1.8.07
 
 Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code
 
