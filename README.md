@@ -34,7 +34,7 @@ qqX goes far beyond the quickemu API
 
 - A full menu system  offers lots more power and functions.
 
-- The easy [installation](https://github.com/TuxVinyards/qqX/wiki) needs no additional software or dependencies.
+- The easy [installation](https://github.com/TuxVinyards/qqX#how-to-install) needs no additional software or dependencies.
 
 - It has improved display modes, utilities, optimizers and tools.
 
