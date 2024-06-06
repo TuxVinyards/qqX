@@ -138,21 +138,21 @@ See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a histo
 
 ## Why Bash?
 
+Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
+
 Any confident Linux user should find it relatively easy to make simple edits.
 
 Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little.
 
-There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
-
-Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
+### Keep it Simple and Straight forward
 
 qqX uses the same well-known scripting language that is used by quickemu. Anything can be easily taken, shaped and improved.
 
+There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
+
 The qqX coding style is clear and annotated sufficiently for newcomers to find their feet.
 
-VirtualBox was good in its day ...
-
-Whilst even with newer and initially simple LibVirt front-ends, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
+Even with newer and initially simple LibVirt front-ends, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
 ## Development and Roadmap
 
