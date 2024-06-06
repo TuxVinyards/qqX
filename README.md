@@ -46,13 +46,16 @@ Less can be more.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-### Install the latest and greatest, at the click of a mouse
+### Lots of mouse click functions too
+
+No need to wait for Quickget to add in the distros or releases that you want. Easy _install the latest_ and greatest.
 
 ![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
 
-No need to wait for Quickget to add in the distros or releases that you want.
 
-### Get the latest fixes too
+
+
+### Get the latest fixes
 
 There is no need to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
@@ -60,15 +63,15 @@ Confident Linux users should quickly find themselves at home.
 
 ## Screenshots and features
 
-Release 1.1.03 improved the main menu & added a gtk display option, while 1.5.02 now has GL toggle:
+Release 1.1.03 improved the _main menu_ & added a gtk display option, while 1.5.02 now has GL toggle:
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
-Release 1.5.02 added alphabetical zooming into list sections for the Quick Get multi distro menu:
+Release 1.5.02 added _alphabetical zooming_ into list sections for the Quick Get multi distro menu:
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-Release 1.7.01 added a choice of 5 menu styles and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
+Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
 
 ![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
 
@@ -138,7 +141,7 @@ See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a histo
 
 Any confident Linux user should find it relatively easy to make simple edits.
 
-Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little. 
+Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little.
 
 There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
 
