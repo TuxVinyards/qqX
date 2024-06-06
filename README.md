@@ -1,6 +1,4 @@
-# qqX
-
-## " quickemu quickget X terminal project "
+# qqX  - quickemu quickget X terminal project 
 
 ### 1.8.07
 
@@ -10,7 +8,7 @@ Adds new built-ins and consolidates the raft of tweaks and adjustments to handle
 
 Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki) pages ...
 
-## Quickemu Virtual Machine Manager - A Safe and Powerful TUI
+## A Safe and Powerful  Virtual Machine Manager
 
 - Full process & version controlled wrapping of both Quickemu & Quickget
 
