@@ -50,9 +50,13 @@ Less can be more.
 
 Easy _install the latest_ and greatest.
 
-![right-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/23dd984c-8119-4d8a-b486-c26ac7bf21bb)
+![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
 
 No need to wait for Quickget to add in the distros or releases that you want.
+
+![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
+
+Start specific VM's straight from the folder
 
 ### Get the latest fixes
 
