@@ -263,6 +263,8 @@ if [[ ! $LinuxType ]] || [[ "$LinuxType" != *Linux ]] && [[ $LinuxMachine != "x8
 
 fi
 
+if [[ -d "/mnt/c/Windows" ]]; then WSL_Install=1 ; else WSL_Install= ; fi
+
 
 # INITIAL MENU:
 
@@ -475,7 +477,7 @@ if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
 
 fi
 
-if [[ ! $SkipMkLauncher ]]; then
+if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
 
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
   [[ ! $UserTerm ]] && source "$(pwd)/qqX.system/qqX_termfind"
@@ -563,7 +565,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   ## RUN .desktop CREATOR  
 
-  if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] || [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
+  if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] || [[ "$XDG_RUNTIME_DIR" == *wslg* ]] ; then
 
     printColor "\n\n  XDG desktop not fully set up or not found." 
     UserLand_Name="$(users)"
