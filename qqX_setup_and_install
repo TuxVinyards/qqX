@@ -563,9 +563,9 @@ if [[ ! $SkipMkLauncher ]]; then
 
   ## RUN .desktop CREATOR  
 
-  if [[ ! $XDG_SESSION_DESKTOP ]] && [[ ! $XDG_CURRENT_DESKTOP ]] && [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
+  if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] || [[ "$XDG_RUNTIME_DIR" != *wslg* ]] ; then
 
-    printColor "\n\n  XDG desktop not found." 
+    printColor "\n\n  XDG desktop not fully set up or not found." 
     UserLand_Name="$(users)"
     No_XDG=1
 
@@ -575,7 +575,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
-  if [[ ! $(type -p update-desktop-database) ]] && [[ ! $No_XDG ]] ; then
+  if [[ ! $(type -p update-desktop-database) ]] || [[ ! $No_XDG ]] ; then
 
       printColor "\n\n  Incomplete XDG desktop installation. \n\n  Check your distro repository for ""'""desktop-file-utils""'"" "
       printColor "\n\n  or see https://www.freedesktop.org/software/desktop-file-utils/releases/ \n\n"
@@ -583,7 +583,7 @@ if [[ ! $SkipMkLauncher ]]; then
       [[ $Missing_XDG_Utils == "q" ]] && sleep 0.6 && exit
   fi
 
-  if [[ ! -d  "$HOME/.local/share/applications" ]] && [[ ! $No_XDG ]]; then
+  if [[ ! -d  "$HOME/.local/share/applications" ]] || [[ ! $No_XDG ]]; then
     mkdir "$HOME/.local/share/applications"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
   fi
 
@@ -593,7 +593,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   if [[ $No_XDG ]]; then 
 
-    printColor "\n\n  An XDG desktop cannot be found.  Type 'qqX' at the command line for starting.\n\n"
+    printColor "\n\n  An XDG desktop cannot be found or cannot be set up.  Type 'qqX' at the command line for starting.\n\n"
     sleep 3 ; exit 1
 
   else

@@ -124,18 +124,18 @@ function find_file_manager_browser()  {
 # NB Also needs calling if re-loading the settings file  See refresh_sources_and_load_VM_arrays
 find_file_manager_browser
 
-
 # Set the original initial value of paths as found on start up. Check Once.
 OriginalPATH="$PATH"
 QE_SystemFilePath="$(type -p quickemu)"  
 QG_SystemFilePath="$(type -p quickget)"
-
 
 function sort_qqX_builtin_settings () {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
 
   export PATH="$OriginalPATH"
+  QE_SourcePath=
+  QG_SourcePath=
 
   if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
