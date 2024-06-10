@@ -635,7 +635,8 @@ if [[ ! $SkipMkLauncher ]]; then
 
       # needs quotes
 
-      if [[ $SelectedTerminalProfile ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      if [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      elif [[ $SelectedTerminalProfile ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       else  echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
       fi
 
