@@ -320,8 +320,8 @@ else
       [[ -d "/usr/share/qqX" ]] && sudo rm -r "/usr/share/qqX"  
       [[ -d "$HOME/.qqX" ]] && rm -r "$HOME/.qqX" 
 
-      rm "$HOME/.local/share/applications/qqX.desktop" ||  printColor "\n\n  qqX.desktop file not found \n\n"
-      update-desktop-database  ~/.local/share/applications  ||  printColor "\n\n  XDG desktop utils not available. Try reboot.\n\n"
+      [[ -e "$HOME/.local/share/applications/qqX.desktop"  ]] && rm "$HOME/.local/share/applications/qqX.desktop" 
+      [[ $(type -p update-desktop-database) ]] && update-desktop-database  ~/.local/share/applications  
 
       printColor "\n\n  Removal processing complete \n\n"
       read -rp "  [enter] to quit  >  "
