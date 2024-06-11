@@ -626,7 +626,11 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
      #  Remove any old launcher file & create a new one  
     [[ -f "$XDG_GUI_desktop_PathName" ]]  && sudo rm "$XDG_GUI_desktop_PathName"
     #   Plus remove any from pre qqX 1.9
-    [[ -f "$HOME/.local/share/applications/qqX.desktop" ]] && rm "$HOME/.local/share/applications/qqX.desktop"
+    if [[ -f "$HOME/.local/share/applications/qqX.desktop" ]]; then 
+      rm "$HOME/.local/share/applications/qqX.desktop"
+      update-desktop-database "$HOME/.local/share/applications"
+      printColor "\n\n  qqX desktop links have been moved, any pinned links may need re-pinning \n\n"
+    fi
 
     #  NoDisplay: means don't show in the main menu  (Use =false)
     #  Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
