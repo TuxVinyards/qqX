@@ -62,6 +62,7 @@
 # https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
 # shellcheck disable=SC1090
 # shellcheck disable=SC2317
+# shellcheck disable=SC2034
 
 if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
   echo; echo "  Sorry, you probably need Bash 5.0 or newer to run this script."; echo
