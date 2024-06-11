@@ -357,6 +357,8 @@ else
       printColor "\n\n  sudo cp \"./qqX.main/qqX_\"*  \"%s/qqX.main/\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo cp -r \"./qqX.builtins/\"*  \"%s/qqX.builtins/\" " "$qqX_Std_Share_Path" 
 
+      printf "\n\n  NOTE command line installation only. Use auto for desktop launchers and shortcuts"
+
       printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
       read -rp  "  >  "  SeparateSudo
       printf "\n"
@@ -567,7 +569,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
     printColor "\n\n  XDG desktop not fully set up or not found." 
     UserLand_Name="$(users)"
-    No_XDG=1
+    [[ ! $WSL_Install ]] && No_XDG=1
 
     if [[ "$(whoami)" == root ]]; then printf "\n\n  User-Interactive Scripts:  Root installation adds complications ... \n\n  Select a UserLand folder (%s) etc\n\n" "$UserLand_Name"
     else printf "\n\n  For menu links, only XDG desktop compliant OS's are supported. \n\n  Running from CLI may be possible.\n\n"
