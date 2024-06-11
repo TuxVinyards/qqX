@@ -159,14 +159,21 @@ qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"
 
 qqX_Std_Share_Path="/usr/share/qqX"   
 
+#  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+#  qqX 1.9 on, move .desktop "$HOME/.local/share/applications" to "/usr/share/applications"
+
+XDG_GUI_desktop_Folder="/usr/share/applications"
+XDG_GUI_desktop_Name="qqX.desktop" 
+XDG_GUI_desktop_PathName="$XDG_GUI_desktop_Folder/$XDG_GUI_desktop_Name"  
+
 
 function print_manual_uninstall_notes {
 
   cat << Notes
 
   Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME 
-  and any desktop items in (hidden) User folder:  $HOME/.local/share/applications  
-  followed by:  update-desktop-database  ~/.local/share/applications  
+  and any desktop items in folder:  $qqX_Std_Share_Path  
+  followed by: sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
 
   Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
   From qqX 1.6 onwards also remove  sudo rm -r /usr/share/qqX
@@ -290,7 +297,7 @@ else
   cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
 
   printColor "\n  [enter] to auto-install from this terminal"
-  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install   [enter] re-install/upgrade"
+  [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install scripts and settings  [enter] re-install/upgrade"
   printf "   [m] use manual installation"
   printf "   [q] to quit \n\n"
   read -rp "   >  "  InstallSelect
@@ -308,8 +315,8 @@ else
     qqX_RemovalTarget_X="$(type -p qqX)"
     qqX_Remove=
 
-    printColor "\n\n  [y] sudo auto removal of qqX scripts, plus of removal qqX folders & of settings" 
-    printf " \n\n  [enter] to quit \n\n"
+    printColor "\n\n  [y] sudo auto removal of qqX scripts and settings and builtins." 
+    printf " \n\n  All VM folders will be left as they are ... [enter] to quit \n\n"
     read -rp "  >  "  qqX_Remove
     printf "\n\n"
 
@@ -320,8 +327,8 @@ else
       [[ -d "/usr/share/qqX" ]] && sudo rm -r "/usr/share/qqX"  
       [[ -d "$HOME/.qqX" ]] && rm -r "$HOME/.qqX" 
 
-      [[ -e "$HOME/.local/share/applications/qqX.desktop"  ]] && rm "$HOME/.local/share/applications/qqX.desktop" 
-      [[ $(type -p update-desktop-database) ]] && update-desktop-database  ~/.local/share/applications  
+      [[ -e "$XDG_GUI_desktop_Folder/qqX.desktop"  ]] && sudo rm "$XDG_GUI_desktop_Folder/qqX.desktop" 
+      [[ $(type -p update-desktop-database) ]] && sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
 
       printColor "\n\n  Removal processing complete \n\n"
       read -rp "  [enter] to quit  >  "
@@ -452,18 +459,13 @@ fi
 
 ##  DESKTOP LAUNCHER
 
-#  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
-
-XDG_AppFolder="$HOME/.local/share/applications"
-XDG_GUI_ItemName="qqX.desktop" 
-XDG_GUI_ItemPathName="$XDG_AppFolder/$XDG_GUI_ItemName"  
 SkipMkLauncher=
 
-if [[ -e  "$XDG_GUI_ItemPathName" ]] ; then
+if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
 
   printColor "\n\n  A desktop launcher already exists >> " 
 
-  if grep -q -s 'x-cd-image' "$XDG_GUI_ItemPathName" ; then
+  if grep -q -s 'x-cd-image' "$XDG_GUI_desktop_PathName" ; then
     printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
   else
     printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
@@ -565,7 +567,7 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
 
   ## RUN .desktop CREATOR  
 
-  if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] || [[ "$XDG_RUNTIME_DIR" == *wslg* ]] ; then
+  if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] ; then
 
     printColor "\n\n  XDG desktop not fully set up or not found." 
     UserLand_Name="$(users)"
@@ -577,7 +579,7 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
 
   fi
 
-  if [[ ! $(type -p update-desktop-database) ]] || [[ ! $No_XDG ]] ; then
+  if [[ ! $(type -p update-desktop-database) ]] || [[ $No_XDG ]] ; then
 
       printColor "\n\n  Incomplete XDG desktop installation. \n\n  Check your distro repository for ""'""desktop-file-utils""'"" "
       printColor "\n\n  or see https://www.freedesktop.org/software/desktop-file-utils/releases/ \n\n"
@@ -585,11 +587,11 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
       [[ $Missing_XDG_Utils == "q" ]] && sleep 0.6 && exit
   fi
 
-  if [[ ! -d  "$HOME/.local/share/applications" ]] || [[ ! $No_XDG ]]; then
-    mkdir "$HOME/.local/share/applications"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
+  if [[ ! -d  "$XDG_GUI_desktop_Folder" ]] || [[ $No_XDG ]]; then
+    mkdir "$XDG_GUI_desktop_Folder"  ||  printColor "\n\n  ERROR  making basic XDG folders \n\n"
   fi
 
-  if [[ ! -d $XDG_AppFolder ]]; then
+  if [[ ! -d $XDG_GUI_desktop_Folder ]]; then
     printColor "\n\n  ERROR:  The default XDG user desktop folder cannot be created or found\n\n  See https://www.freedesktop.org/wiki/ \n\n"
   fi
 
@@ -621,13 +623,16 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
     # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774 
 
 
-    [[ -f "$XDG_GUI_ItemPathName" ]]  && rm "$XDG_GUI_ItemPathName"
+     #  Remove any old launcher file & create a new one  
+    [[ -f "$XDG_GUI_desktop_PathName" ]]  && sudo rm "$XDG_GUI_desktop_PathName"
+    #   Plus remove any from pre qqX 1.9
+    [[ -f "$HOME/.local/share/applications/qqX.desktop" ]] && rm "$HOME/.local/share/applications/qqX.desktop"
 
-    #  Remove any old launcher file & create a new one  
     #  NoDisplay: means don't show in the main menu  (Use =false)
     #  Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
 
-    {
+    make_desktop_content()  {
+
       echo "[Desktop Entry]"
       echo "Type=Application"
       echo "Terminal=false"
@@ -653,9 +658,11 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
       echo "#"
       echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
 
-    }  > "$XDG_GUI_ItemPathName"
+    }  
+    
+    make_desktop_content | sudo tee "$XDG_GUI_desktop_PathName"  1>/dev/null
 
-    chmod +x  "$XDG_GUI_ItemPathName"
+    sudo chmod +x  "$XDG_GUI_desktop_PathName"
 
     # Useful:  
     # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
@@ -664,7 +671,7 @@ if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
     # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
 
     # Important: 
-    update-desktop-database  "$HOME/.local/share/applications" 
+    sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
 
     # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
 
@@ -677,12 +684,12 @@ fi
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
 #  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
 
-# But must move to $HOME to pick up the new builtins
+# But must move to $HOME to pick up the new builtins   # REVIEW  qqX 1.9 moves .desktop location to /usr/share
 
- if cd "$HOME" ; then
-  GrepExecLine="$(grep -s Exec "$HOME/.local/share/applications/qqX.desktop")"
+# if cd "$HOME" ; then
+  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
   if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
-fi
+# fi
 
 End_Install=
 printColor  "\n\n  Install process finished:  "
