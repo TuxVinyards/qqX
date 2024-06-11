@@ -144,13 +144,8 @@ qqX_Version="$(./qqX --version 2>/dev/null)"
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
-
-if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"
-
-else qqX_Std_Bin_Dir="/bin" ; fi
-
+if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"; else qqX_Std_Bin_Dir="/bin" ; fi
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
-
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
 #  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
@@ -479,7 +474,7 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
 
 fi
 
-if [[ ! $SkipMkLauncher && ! $WSL_Install ]]; then
+if [[ ! $SkipMkLauncher ]]; then
 
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
   [[ ! $UserTerm ]] && source "$(pwd)/qqX.system/qqX_termfind"
