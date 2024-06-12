@@ -10,13 +10,9 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) 
 
 ## A Safe and Powerful  Virtual Machine Manager
 
-- Full process & version controlled wrapping of both Quickemu & Quickget
-
-- Desktop Integrated. Works safely alongside other existing GUI installations
+- Full desktop control of both Quickemu & Quickget
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
-
-- Text based interface for easy [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Why quickemu?
 
@@ -26,21 +22,23 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) 
 
 Developers are now moving to [QEMU](https://qemu.readthedocs.io)
 
-- Quickemu is not like Qemu front-ends based on LibVirt, which can often be quite abstract and complex.
+- Quickemu is easier and simpler than the front-ends based on LibVirt.
 
 ## Why qqX?
 
-qqX goes far beyond the quickemu API
+qqX goes beyond quickemu
 
 - A full menu system  offers lots more power and functions.
 
 - The easy [installation](#how-to-install) needs no additional software or dependencies.
 
-- It has improved display modes, utilities, optimizers and tools.
+- Multiple display modes, utilities, optimizers and tools.
 
-- qqX is fully compatible with the basic stop / go of [quickgui](https://github.com/quickemu-project/quickgui)
+- Works safely alongside other existing installations and fully compatible with the basic stop / go of [quickgui](https://github.com/quickemu-project/quickgui)
 
 ### Hybrid interface. Part text, part mouse
+
+- Easy text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 _Less can be more_.
 
