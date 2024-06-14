@@ -345,7 +345,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
       for Line in "${CustomBootArr[@]}"; do
 
-        if [[ $(tr -cd "[:graph:]" <<< "$Line") ]] && [[ "$Line" != *'#'* ]]; then QemuCustomBootCommand+="$Line " ; fi
+        if [[ $(tr -cd "[:print:]" <<< "$Line") ]] && [[ "$Line" != *'#'* ]]; then QemuCustomBootCommand+="$Line " ; fi
 
       done
 
