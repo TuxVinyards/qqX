@@ -439,12 +439,12 @@ else
     fi
 
 
-    if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]]; then
+    if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
     
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
       [[ ! $(type -p qqx) && ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
-      [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.96.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
+      [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
       printf "\n\n  [enter] to close & investigate \n\n"
       read -rp "  >  "
       exit 1
@@ -605,7 +605,7 @@ if [[ ! $SkipMkLauncher ]]; then
     #[Desktop Entry]
     #Type=Link
     #Name=qqX
-    #Icon=$HOME/.qqX/icons/qqX.std.logo.96.png     
+    #Icon=$HOME/.qqX/icons/qqX.std.logo.128.png     
     #URL=/usr/bin/qqX
 
     # https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup  # $HOME/.icons ?
@@ -649,7 +649,7 @@ if [[ ! $SkipMkLauncher ]]; then
       else  echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
       fi
 
-      echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.96.png"
+      echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
       echo "Categories=System;Emulator"
 
       # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
