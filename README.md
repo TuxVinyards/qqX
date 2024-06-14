@@ -18,7 +18,7 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) 
 
 [Quickemu](https://github.com/quickemu-project/quickemu) is a _simply built_ front end for Qemu / KVM  
 
-- It has an active community and is the only virtual machine manager that makes easy work of Mac and Windows.
+- Has an active community and makes easy work of installing Mac and Windows.
 
 Developers are now moving to [QEMU](https://qemu.readthedocs.io)
 
@@ -28,13 +28,13 @@ Developers are now moving to [QEMU](https://qemu.readthedocs.io)
 
 qqX goes beyond quickemu
 
-- A full menu system  offers lots more power and functions.
-
-- The easy [installation](#how-to-install) needs no additional software or dependencies.
+- A full menu system  offers lots more power and functions,
 
 - Multiple display modes, utilities, optimizers and tools.
 
-- Works safely alongside other existing installations and fully compatible with the basic stop / go of [quickgui](https://github.com/quickemu-project/quickgui)
+- The easy [installation](#how-to-install) needs no additional software or dependencies.
+
+- Works safely alongside other existing installations and fully compatible with the basic stop/go of [quickgui](https://github.com/quickemu-project/quickgui)
 
 ### Hybrid interface. Part text, part mouse
 
