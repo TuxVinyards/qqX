@@ -528,6 +528,12 @@ move_rename_Selected_VM () {
 
   if [[ $MoveFail ]]; then printColor "\n  Hmm. Something went wrong.  \n"  ; else printColor "\n  Success  '%s'\n"  "$(pwd)" ; fi
   list_current_folder_instance_names
+
+  ConfLine="$(grep -s 'macos_release=' "${Mv_NewName}.conf")"
+  if [[ $ConfLine ]]; then
+    printColor "\n\n  MAC OS .conf file may need manually editing: ' %s ' \n\n "  "$ConfLine"
+  fi
+
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
 
