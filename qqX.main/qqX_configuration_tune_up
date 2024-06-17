@@ -395,6 +395,14 @@ function_config_tune_up ()  {
         printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
       fi
 
+      ConfLine="$(grep -s 'MacScreenRes=' "$TuneUpTmpCopy")"
+      if [[ ! $ConfLine ]]; then 
+        printColor "\n\n  MacOS Note: A line MacScreenRes=\"2560x1440\" or similar may be used"
+        printColor "\n\n  or needed in order to control the screen size when using FreeSpirit "
+        printf "\n\n  Standard Stock sizes: 2560x1440  1920x1080  1280x720 to be added & optimised manually."
+        printf "\n\n  Requires scripts from June 17 2024 onwards. Default is 1280x720.\n"
+      fi
+
     fi
 
 
