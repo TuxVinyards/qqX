@@ -165,11 +165,23 @@ VM_SelectorStyle="A"
 
 ##  BOOT DEFAULTS:
 
-# SCREEN PERCENTAGE may be added here.  Use just the value, eg. ="68"   Suggested values from 50 to 70
+# SCREEN %PERCENTAGE may be added here or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenPercent' 
+# Use just the value, eg. ="68"   Suggested values from 50 to 70 as a percentage of the physical monitor
 # From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
   Default_SDL_ScreenPercent="60"
 
-# INDIVIDUAL SCREEN PERCENTAGE may also be placed in the .conf file with 'Custom_SDL_ScreenPercent' as ="xx"  
+# VM SCREEN SIZE may be added here. Standard values are suggested. Oddball sizes may cause unsharp display.
+# Or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenSize' 
+# From quickemu 4.9.5 onwards For Linux VM's, SDL only.  
+# qqX still allows percent as a value in later code. Size, if present, takes priority over percent.
+# Windows determines its own sizes, as does earlier code for Macs.
+# For later code MacOS should now use Size as per release in the conf files. See qqX wiki notes for Mac.
+# Set Linux sizes as ="XxY" Eg 2560x1440 2560x1080 1600x900 1920x1080 1920x720 etc
+  Default_SDL_ScreenSize=""
+
+# PHYSICAL MONITOR SIZE - quickemu 4.9.5 onwards
+# Set here, if 'xrandr' is not detecting size correctly  eg 3840x2160
+  PhysicalMonitor=
 
 # GL GRAPHICS by default are "on".  Individually, placing gl as = "off" in the .conf file will reverse this.
 # This state may be toggled from the main menu or set here to normally boot as "off"
