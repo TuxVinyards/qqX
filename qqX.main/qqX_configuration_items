@@ -96,6 +96,7 @@ function check_screen_percentage_and_output {
     fi
 
     [[ $Custom_SDL_ScreenSize ]] && SDL_ScreenSize="$Custom_SDL_ScreenSize"
+    [[ $MacScreenRes ]] && SDL_ScreenSize="$MacScreenRes"
     [[ $Default_SDL_ScreenSize ]] && [[ ! $SDL_ScreenSize ]] && SDL_ScreenSize="$Default_SDL_ScreenSize"
   fi
 
@@ -110,9 +111,9 @@ function check_screen_percentage_and_output {
       SDL_ScreenSize_Error="> display size error"
     fi
     SDL_ScreenSize_Cmd=" --width $xRes --height $yRes"
-    xRes99="$(bc <<< "scale=0; $Mon_xRes*95/100")"
-    yRes99="$(bc <<< "scale=0; $Mon_yRes*95/100")"
-    SDL_ScreenSize_Cmd95=" --width $xRes99 --height $yRes99"
+    xRes97="$(bc <<< "scale=0; $Mon_xRes*97/100")"
+    xRes97="$(bc <<< "scale=0; $Mon_yRes*97/100")"
+    SDL_ScreenSize_Cmd97=" --width $xRes97 --height $xRes97"
   fi
 
   if [[ $SDL_ScreenPercent ]]; then 
