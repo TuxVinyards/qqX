@@ -126,7 +126,9 @@ function_config_tune_up ()  {
     [[ $ConfEdit_DiskSize ]]  &&  ConfEdit_DiskSize="$(tr -cd "[:digit:]" <<< "$ConfEdit_DiskSize")"
     [[ $ConfEdit_DiskSize ]] && printf "disk_size=\"%sG\"\n"  "$ConfEdit_DiskSize"  >> "$TuneUpTargetDraft"
 
-  else  [[ $ConfLine ]] && printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" 
+  else  
+  
+    if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
 
   fi
 
@@ -159,7 +161,8 @@ function_config_tune_up ()  {
   printf "\n\n  And the host CPU virtualizing units will always protect things ...."
 
   if [[ $guest_os == "macos" ]]; then 
-    printColor "\n\n\n  MacOS:  Suggest cpu_cores=8 as detection algorithms seem happier with this, even if more are available. "
+    printColor "\n\n\n  MacOS: This should be cpu_cores=8 =16 or =32  Other values will not boot."
+    printf "\n\n  Where value based on the CPU threads available, eg 4 physical cores x 2 threads per core = 8"
     ThreadsSuggested=8
     ThreadsSuggestLower=8
   else
@@ -168,7 +171,7 @@ function_config_tune_up ()  {
   CoresSetNumber=
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
 
-  if [[ $ConfLine ]]; then 
+  if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then 
     printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
     CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
     [[ $CurrentCores != "$ThreadsSuggestLower"  ]] && printColor "   [c] to use current  "
@@ -268,7 +271,7 @@ function_config_tune_up ()  {
 
   ConfLine="$(grep -s 'ram=' "$TuneUpTmpCopy")"
 
-  if [[ $ConfLine ]]; then 
+  if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then 
   
     printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
     Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
@@ -322,7 +325,7 @@ function_config_tune_up ()  {
 
   ConfLine="$(grep -s 'guest_os=' "$TuneUpTmpCopy")"
 
-  if [[ ! $ConfLine ]]; then
+  if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then
 
     printColor "\n\n  WARNING  a line 'guest_os=\"xxx\"' should be present"
     printf "\n\n  This should be added manually, where  =\"linux\"  \"windows\"  or \"macos\" are valid options"
@@ -340,7 +343,7 @@ function_config_tune_up ()  {
       
       ConfLine="$(grep -s '# Secure Boot' "$TuneUpTmpCopy")"
 
-      if [[ ! $ConfLine ]]; then  printf "\n\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft" ; fi
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then  printf "\n\n# Secure Boot should normally be off & TPM should be on."   >> "$TuneUpTargetDraft" ; fi
 
       {   printf "\ntpm=\"on\"" 
 
@@ -352,13 +355,13 @@ function_config_tune_up ()  {
     elif [[ $guest_os == "macos" ]]; then 
 
       ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then  printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft" ; fi
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then  printf "macos_release=\"\"\n"  >> "$TuneUpTargetDraft" ; fi
 
       ConfLine="$(grep -s 'mouse=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then printf "mouse=\"virtio\"\n"  >> "$TuneUpTargetDraft" ; fi
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then printf "mouse=\"virtio\"\n"  >> "$TuneUpTargetDraft" ; fi
 
       ConfLine="$(grep -s 'keyboard=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then  printf "keyboard=\"usb\"\n"  >> "$TuneUpTargetDraft" ; fi
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then  printf "keyboard=\"usb\"\n"  >> "$TuneUpTargetDraft" ; fi
 
     fi
 
@@ -376,27 +379,27 @@ function_config_tune_up ()  {
     if [[ $guest_os == "macos" ]]; then 
 
       ConfLine="$(grep -s 'macos_release=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then 
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then 
         printColor "\n\n  MacOS WARNING: A line macos_release=\"catalina\" or similar should be present"
         printf "\n\n  This instructs Quickemu how to optimise & should be added manually.\n"
       fi
 
       ConfLine="$(grep -s 'mouse=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then 
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then 
         printColor "\n\n  MacOS Note: A line mouse=\"virtio\" or similar is recommended,"
         printColor "\n\n  especially with newer releases. Older ones may need =\"usb\" .... "
         printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
       fi
 
       ConfLine="$(grep -s 'keyboard=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then 
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then 
         printColor "\n\n  MacOS Note: A line keyboard=\"usb\" or similar is recommended,"
         printColor "\n\n  some newer releases may need =\"virtio\" .... "
         printf "\n\n  This has been added but will need to be tested & optimised manually.\n"
       fi
 
       ConfLine="$(grep -s 'MacScreenRes=' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]]; then 
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then 
         printColor "\n\n  MacOS Note: A line MacScreenRes=\"2560x1440\" or similar may be used"
         printColor "\n\n  or needed in order to control the screen size when using FreeSpirit "
         printf "\n\n  Standard Stock sizes: 2560x1440  1920x1080  1280x720 to be added & optimised manually."

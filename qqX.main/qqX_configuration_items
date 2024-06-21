@@ -508,7 +508,7 @@ function refresh_conf_vars_and_values {
 
           Line="$(cut -d'=' -f1 <<< "$Line")"
           Line="$Line""="
-          [[ "$Line" == '#'* ]] && Line="${Line/'#'/}"
+          [[ "$Line" == *'#'* ]] && Line="${Line/'#'/}"
 
         fi
         
