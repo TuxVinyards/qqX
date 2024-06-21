@@ -107,7 +107,7 @@ else
       if [[ "$VM_InstanceName" =~ 'windows' ]]; then  printColor " (sizes to Windows > display, useful for Windows updates)" 
       elif [[ "$VM_InstanceName" =~ 'macos' ]]; then  printColor " (size determined by MacOS with this QE version)" 
       elif [[ "$SDL_ScreenSize_Cmd" == *screenpct* ]]; then printColor " (%s%%)    [df]  99%% "  "$SDL_ScreenPercent"; [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    
-      elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  95%% "  "$SDL_ScreenSize"; [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    
+      elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  97%% "  "$SDL_ScreenSize"; [[ $qqX_GL_Mode == "off" ]] && printColor "  (scaleable)"    
       elif [[ $SDL_ScreenSize_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScreenSize_Error"
       fi
 
