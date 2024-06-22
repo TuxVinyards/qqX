@@ -36,6 +36,8 @@ Quickemu is a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs
 
 - Easy text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
+- Simple code customizing
+
 _Less can be more_.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
