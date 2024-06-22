@@ -16,25 +16,21 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) 
 
 ## Why quickemu?
 
-[Quickemu](https://github.com/quickemu-project/quickemu) is a _simply built_ front end for Qemu / KVM  
+Quickemu is a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
 
 - Has an active community and makes easy work of installing Mac and Windows.
 
-Developers are now moving to [QEMU](https://qemu.readthedocs.io)
+- [Quickemu](<https://github.com/quickemu-project/quickemu>) is easier and simpler than the front-ends based on LibVirt.
 
-- Quickemu is easier and simpler than the front-ends based on LibVirt.
+- More up-to-date than Gnome Boxes and easier to mod.
 
 ## Why qqX?
 
-qqX goes beyond quickemu
-
-- A full menu system  offers lots more power and functions,
+- A full menu system with lots more power and functions,
 
 - Multiple display modes, utilities, optimizers and tools.
 
-- The easy [installation](#how-to-install) needs no additional software or dependencies.
-
-- Works safely alongside other existing installations and fully compatible with the basic stop/go of [quickgui](https://github.com/quickemu-project/quickgui)
+- Easy [installation](#how-to-install) needs no additional software or dependencies.
 
 ### Hybrid interface. Part text, part mouse
 
