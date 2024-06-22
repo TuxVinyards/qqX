@@ -96,6 +96,10 @@ Whilst earlier releases have added:
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
+Release 1.8.05 fixes the wget 302 / SHA error that occured from github archive changes.
+
+- For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
+
 ## How to Install
 
 qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary.
