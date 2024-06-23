@@ -156,7 +156,7 @@ function  main_menu_actions {
 
       if [[ $MainMenuChoice == "df"  ]]; then  
         if [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScreenSize_Cmd97  $Extra_QE_Params"
-        else eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 99  $Extra_QE_Params" 
+        else eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 97  $Extra_QE_Params" 
         fi
       else  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScreenSize_Cmd $Extra_QE_Params" 
       fi
