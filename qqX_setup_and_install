@@ -208,13 +208,15 @@ Term_Width=145
 Term_Height=48
 Term_Taller=55
 
+# REVIEW qqX 1.9  changes desktop command slightly and 'desktop-file-validate' no says to remove the single quotes: --title='qqX'
+
 # MATE:
-MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title='qqX' "
-MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title='qqX' "
+MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
+MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
 
 # GNOME:
-GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title='qqX' "
-GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title='qqX' "
+GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
+GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
 
 # KONSOLE:
 KonsoleTitle="qqX"
@@ -422,25 +424,14 @@ else
 
     #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
-    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then 
-    
-      update_old_settings_file_with_new_options  
-
-      if [[ ! -e "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt" ]]; then  # added with version 1.7
-        cp "qqX.system/icons/qqX.ascii"* "$HOME/.qqX/icons"
-      fi
-
-    else
-
-      cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
-      cp -r "qqX.system/icons"  "$HOME/.qqX/icons" 
-      printColor "\n\n  Installing settings file and desktop icons \n\n"
-
+    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  
+    else cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
     fi
 
+    cp -r "qqX.system/icons"  "$HOME/.qqX" 
+    printColor "\n\n  Installing settings file and desktop icons \n\n"
 
     if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
-    
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
       [[ ! $(type -p qqx) && ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
@@ -448,7 +439,6 @@ else
       printf "\n\n  [enter] to close & investigate \n\n"
       read -rp "  >  "
       exit 1
-
     fi
 
   fi
@@ -642,7 +632,7 @@ if [[ ! $SkipMkLauncher ]]; then
       echo "NoDisplay=false"
       echo "Comment=qqX - quickemu quickget X terminal project"
 
-      # needs quotes
+      # needs quotes  - plus REVIEW  -e  deprecation in other terminals
 
       if [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       elif [[ $SelectedTerminalProfile ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
