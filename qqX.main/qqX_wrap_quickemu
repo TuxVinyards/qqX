@@ -329,33 +329,27 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     
     } >> "$QemuArgsFile"
 
-
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
     #   See  https://github.com/quickemu-project/quickemu/issues/572#issuecomment-1531348755
 
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
-
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
 
     if [[ $UseCustomBootArgs ]]; then
 
       QemuCustomBootCommand=""
-
       mapfile -t CustomBootArr < "$QemuArgsCustomFile"
-
       for Line in "${CustomBootArr[@]}"; do
 
         if [[ $(tr -cd "[:print:]" <<< "$Line") ]] && [[ "$Line" != *'#'* ]]; then QemuCustomBootCommand+="$Line " ; fi
 
       done
-
       eval "$QemuCustomBootCommand" 2> "$QemuErrorLog"  &
 
     else
             
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-  
       eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
 
     fi

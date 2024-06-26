@@ -149,7 +149,7 @@ show_qqX_title_bar() {
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
   printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
 
-  [[ $QE_SourcePath == "$QE_SystemFilePath" ]] && printf " 'System'"
+  [[ $QE_SystemFilePath ]] && [[ $QE_SourcePath == "$QE_SystemFilePath" ]] && printf " 'System'"
 
   QE_FilePath_Short=
   QG_FilePath_Short=

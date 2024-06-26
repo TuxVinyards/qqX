@@ -229,6 +229,7 @@ function download_new_release {
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         
         eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"  "$qqX_Latest_Secure_TarBall"
+        echo
         eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"  "$qqX_Latest_Secure_TarSha"
         SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
 

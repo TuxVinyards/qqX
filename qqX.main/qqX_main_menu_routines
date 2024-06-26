@@ -40,41 +40,27 @@ vm_pid_kill_menu() {
   fi
   
   # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
-
   # But from ver 1.6.02 there is a theoretical possibility of users customising out the call line: 
   # eg -pidfile ubuntu-22.04/ubuntu-22.04.pid etc being removed, so do belt & braces check for the PID  
-
   InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
-
-  [[ ! $InstancePID ]] && InstancePID="$(pgrep "$VM_InstanceName")"
+  [[ ! $InstancePID ]] && InstancePID="$(pgrep "${VM_InstanceName:0:15}")"
 
   SpicyPID="$(pgrep spicy)"
 
   if [[ ! $InstancePID ]]; then 
-
     # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
     [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
-
   else
-
     [[ $UseCustomBootArgs ]] && printColor "  STARTING CUSTOM BOOT SEQUENCE:  \n"
-
     sleep  "$P_Kill_WaitSecs"   
-
     printColor "\n  Quickemu instance %s on PID:  %s  %s"  "$VM_InstanceName"  "$InstancePID"  "$BootAlert"
-
     printColor  "\n\n  [k] force close the Quickemu instance   "
-    
     if [[ $SpicyPID ]]; then 
-
       SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
       printColor " [r] reload Spicy window (if closed)"
-
     fi
-
     printf "\n\n"
     tput cnorm
-
   fi
 
   # return to menu requires VM to be shutdown first
@@ -91,10 +77,8 @@ vm_pid_kill_menu() {
         [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
         kill "$InstancePID" 2>/dev/null &
       fi
-
       sleep 3
       printf "\n\n"
-
       tput cnorm
       break
 
@@ -109,15 +93,11 @@ vm_pid_kill_menu() {
     else
 
       if [[ ! $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then 
-      
         tput cnorm 
         break 
-
       else
-
         #  Erase text and adjust cursor:   "\e[1A\r"  "\e[2K\r"  etc    See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
         printf "\r"
-
       fi
 
     fi
