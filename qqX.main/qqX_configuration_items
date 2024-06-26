@@ -28,6 +28,7 @@ custom_conf_notes () {
     #!/usr/bin/qqX --vm                (for qqX direct start)
 
     Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
+    Custom_SDL_ScreenSize=\"WxH\"        (qe 4.95+ eg 2560x1440)
     HeadlessDisplay=\"true\"
 
     SecondDrive=\"My_Folder/My_VM/disk2.qcow2\"

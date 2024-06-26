@@ -127,8 +127,10 @@ function_config_tune_up ()  {
     [[ $ConfEdit_DiskSize ]] && printf "disk_size=\"%sG\"\n"  "$ConfEdit_DiskSize"  >> "$TuneUpTargetDraft"
 
   else  
-  
-    if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
+
+    printColor "\n\n  This line disk_size= may be removed if wished, or left as a reminder" 
+    printColor "\n\n  The disk has now been created. It now has no effect." 
+    if [[ $ConfLine ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
 
   fi
 
@@ -171,7 +173,7 @@ function_config_tune_up ()  {
   CoresSetNumber=
   ConfLine="$(grep -s 'cpu_cores' "$TuneUpTmpCopy")"
 
-  if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then 
+  if [[ $ConfLine ]]; then 
     printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
     CurrentCores="$(tr -cd "[:digit:]" <<< "$ConfLine")"
     [[ $CurrentCores != "$ThreadsSuggestLower"  ]] && printColor "   [c] to use current  "
@@ -271,7 +273,7 @@ function_config_tune_up ()  {
 
   ConfLine="$(grep -s 'ram=' "$TuneUpTmpCopy")"
 
-  if [[ $ConfLine ]] && [[ "$ConfLine" != *'#'* ]]; then 
+  if [[ $ConfLine ]]; then 
   
     printf "\n\n  CURRENT setting:  %s" "$ConfLine"    
     Current_RAM="$(tr -cd "[:digit:]" <<< "$ConfLine")"
