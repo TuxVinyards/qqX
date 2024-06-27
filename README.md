@@ -1,5 +1,15 @@
 # qqX  - quickemu quickget X terminal project
 
+![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
+
+- Makes easy work of installing Mac and Windows
+
+- Easier and simpler than the front-ends based on LibVirt.
+
+- More up-to-date than Gnome Boxes and easier to mod.
+
+- Currently based on Quickemu, a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
+
 ## Latest release 1.8.07
 
 Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code
@@ -8,33 +18,12 @@ Adds new built-ins and consolidates the raft of tweaks and adjustments to handle
 
 Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages ...
 
-## A Safe and Powerful  Virtual Machine Manager
+## Hybrid interface. Part text, part mouse
 
-- Full desktop control of both Quickemu & Quickget
-
-![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
-
-## Why quickemu?
-
-Quickemu is a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
-
-- Has an active community and makes easy work of installing Mac and Windows.
-
-- [Quickemu](<https://github.com/quickemu-project/quickemu>) is easier and simpler than the front-ends based on LibVirt.
-
-- More up-to-date than Gnome Boxes and easier to mod.
-
-## Why qqX?
-
-- A full menu system with lots more power and functions,
+- A full menu system with lots of power and functions,
 
 - Multiple display modes, utilities, optimizers and tools.
 
-- Easy [installation](#how-to-install) needs no additional software or dependencies.
-
-### Hybrid interface. Part text, part mouse
-
-- Easy text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 - Simple code customizing
 
@@ -54,9 +43,11 @@ Start specific VM's straight from the folder
 
 ### Get the latest fixes
 
-No need to wait for official bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
+No need to wait for Quickemu bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
 
-Confident Linux users should quickly find themselves at home.
+- Easy [installation](#how-to-install)
+
+- Easy text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Screenshots and features
 
@@ -124,7 +115,7 @@ See the installer [Wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 Lots available at the qqX wiki pages [here](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
 
-And the Quickemu general forum and chat is available at <https://discord.gg/sNmz3uw>
+For Quickemu problems, there is a general chat forum at <https://discord.gg/sNmz3uw>
 
 ## Release notes
 
