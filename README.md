@@ -132,7 +132,7 @@ See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a histo
 
 ### Known Issues
 
-Quickemu 4.9.5  can cause  Intel processors to run very MacOS very slowly. This has been fixed in FreeBird and FreeSpirit.
+Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. This has been fixed in FreeBird and FreeSpirit.
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
