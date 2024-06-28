@@ -24,7 +24,6 @@ Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) 
 
 - Multiple display modes, utilities, optimizers and tools.
 
-
 - Simple code customizing
 
 _Less can be more_.
@@ -128,6 +127,14 @@ qqX always makes backups, as is _standard good practice_ with _any_ software.
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins
 
 See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
+
+- Release [1.9.0.02](https://github.com/TuxVinyards/qqX/tree/1.9.0.02) is now available in early beta by switching branch. There are still some features to add but it appears to be stable.
+
+### Known Issues
+
+Quickemu 4.9.5  can cause  Intel processors to run very MacOS very slowly. This has been fixed in FreeBird and FreeSpirit.
+
+Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
 ## Why Bash?
 
