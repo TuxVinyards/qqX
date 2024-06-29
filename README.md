@@ -46,7 +46,7 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 - Easy [installation](#how-to-install)
 
-- Always up-todate text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
+- Always up-to-date text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Screenshots and features
 
@@ -94,11 +94,11 @@ qqX will work happily alongside quickgui or any quickemu shortcuts. But these ar
 
 Start from scratch. Or safely test out the qqX difference on your existing quickgui VM's  
 
-- If you don't already have a standard Quickemu setup, start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu) .
+- The easiest route, currently, if you don't already have a standard Quickemu setup, is to start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
   
-  You should be able to type `quickemu` at a command prompt and get the quickemu usage screen but from version 1.8 this is not essential.
+  Being able to type `quickemu` at a command prompt and get the quickemu usage screen is useful for test purposes but from version 1.8 this is not essential.
 
-  Manual installation of Quickemu to 'PATH' as in the case of some Host distros such as Fedora may now be omitted.
+  Manual installation of Quickemu to 'PATH' as in the case of some Host distros such as Fedora may now be omitted, if wished.
 
 - Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
@@ -116,12 +116,11 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ### Known Issues
 
-Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. This has been fixed in FreeBird and FreeSpirit.
+System release 4.9.5 can cause Intel processors to run MacOS very slowly but has been fixed in FreeBird and FreeSpirit.
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
-
 
 ### FAQs and Help
 
