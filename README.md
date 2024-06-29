@@ -12,17 +12,17 @@
 
 ## Latest release 1.8.07
 
-Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code
+Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code.
 
 [MacOS](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) is now much faster and much improved too. Both in qqX and in with Quickemu.
 
-Lots of details in the [Wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages ...
+More details in the [wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages and the [release notes](#release-notes)
 
 ## Hybrid interface. Part text, part mouse
 
-- A full menu system with lots of power and functions,
+- A full menu system with lots of power and functions
 
-- Multiple display modes, utilities, optimizers and tools.
+- Multiple display modes, utilities, optimizers and tools
 
 - Simple code customizing
 
@@ -42,11 +42,11 @@ Start specific VM's straight from the folder
 
 ### Get the latest fixes
 
-No need to wait for Quickemu bug fixes to make their way through the system either. Any new input from the quickemu community activity can be directly accessed and put to work.
+No need to wait for Quickemu bug fixes to make their way through the system either. Any new input from the quickemu community can be put to work.
 
 - Easy [installation](#how-to-install)
 
-- Easy text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
+- Always up-todate text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
 ## Screenshots and features
 
@@ -68,13 +68,13 @@ And 1.7.03 added
 
 Release 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
-Whilst earlier releases have added:
+Whilst earlier releases added:
 
 - Distro homepage browser and link checker
   
 - Configuration tune-up wizard
 
-- Screen percentage switching (default & individual)
+- Boot up Screen sizing (default & individual)
 
 - Multiple snapshot management, including of shared disks.
 
@@ -87,10 +87,6 @@ Whilst earlier releases have added:
 - Process logging and diagnostics
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
-
-Release 1.8.05 fixes the wget 302 / SHA error that occured from github archive changes.
-
-- For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
 
 ## How to Install
 
@@ -108,25 +104,13 @@ Start from scratch. Or safely test out the qqX difference on your existing quick
 
   No other software, support structures or dependencies are needed.
 
-See the installer [Wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
-
-## FAQs and Help
-
-Lots available at the qqX wiki pages [here](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
-
-For Quickemu problems, there is a general chat forum at <https://discord.gg/sNmz3uw>
+See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 ## Release notes
 
-Testing has been carried out on a variety of mainstream distros.
+- Release 1.8.05 fixes the wget 302 / SHA error that occured from github archive changes.
 
-All scripts have been carefully Shellcheck linted & have full error handling routines.
-
-qqX always makes backups, as is _standard good practice_ with _any_ software.
-
-See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins
-
-See [Change Log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
+- For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
 
 - Release [1.9.0.02](https://github.com/TuxVinyards/qqX/tree/1.9.0.02) is now available in early beta by switching branch. There are still some features to add but it appears to be stable.
 
@@ -136,23 +120,32 @@ Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. This has bee
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
+- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
+
+
+### FAQs and Help
+
+- Lots available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
+
+For Quickemu problems, there is a general chat forum at <https://discord.gg/sNmz3uw>
+
 ## Why Bash?
+
+Bash, or similar, is automatically there on the Linux command line. Most users already know or can understand at least a little of it.
+
+Improving your knowledge of Bash is always time well spent.
+
+### Keeping it Simple and Straight forward
 
 Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
 
-Any confident Linux user should find it relatively easy to make simple edits.
-
-Learning Bash, or improving your knowledge of it, is always time well spent. Bash is a flexible language of which all Linux users should know at least a little.
-
-### Keep it Simple and Straight forward
-
-qqX uses the same well-known scripting language that is used by quickemu. Anything can be easily taken, shaped and improved.
+qqX uses the same. Anything can be easily modded, shaped and improved.
 
 There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
 
 The qqX coding style is clear and annotated sufficiently for newcomers to find their feet.
 
-Even with newer and initially simple LibVirt front-ends, like Gnome Boxes for example, doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
+Compared to seemingly simple LibVirt front-ends, like Gnome Boxes for example, even doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
 ## Development and Roadmap
 
