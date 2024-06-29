@@ -151,6 +151,21 @@ Compared to seemingly simple LibVirt front-ends, like Gnome Boxes for example, e
 
 See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
 
+## Why the Vinyards?
+
+The Olde English spelling doesn't have with an 'e'.
+
+1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia
+...therefore they who are more religiously and holily instructed, neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation...
+
+The modern word isn't even pronounced with an 'e'
+
+Perhaps Martha and others decided at some point to spell things out fully as Vine Yards, only later for the phrase to become contracted.
+
+So, living in a castled village dating from the 1300's in a wine growing region of Italy, I tend to prefer the older spelling.
+
+And qqX is something to do when it's too hot or it's raining and I can't be outside.
+
 ## why 'X' ?
 
 More technically speaking qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X'
