@@ -122,6 +122,12 @@ Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly A
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
+Testing has been carried out on a variety of mainstream distros.
+
+All scripts have been carefully Shellcheck linted & have full error handling routines.
+
+qqX always makes backups, as is _standard good practice_ with _any_ software.
+
 ### FAQs and Help
 
 - Lots available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
