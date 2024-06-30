@@ -138,19 +138,27 @@ For Quickemu problems, there is a general chat forum at <https://discord.gg/sNmz
 
 Bash, or similar, is automatically there on the Linux command line. Most users already know or can understand at least a little of it.
 
-Improving your knowledge of Bash is always time well spent.
+- Improving your knowledge of Bash is always time well spent.
 
-### Keeping it Simple and Straight forward
+### Keeping it Simple
 
-Quickemu uses simple Bash scripts. Much easier for community contributions. Much easier to edit and easy to fix.
+- The qqX coding is clear and annotated sufficiently for newcomers to find their feet.
 
-qqX uses the same. Anything can be easily modded, shaped and improved.
+Quickemu currently uses simple Bash scripts. QEMU / KVM does all the heavy lifting.
 
-There are none of steep learning curves that are often involved with GUI's or compiled low level languages such as Rust or C.
+- Much easier for community contributions. Much easier to edit and easy to fix.
 
-The qqX coding style is clear and annotated sufficiently for newcomers to find their feet.
+qqX uses a more modern writing style but is much the the same.
 
-Compared to seemingly simple LibVirt front-ends, like Gnome Boxes for example, even doing something basic like moving the VM folder contains a whole learning curve. Forget anything much [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
+- Anything in quickemu can be easily modded, shaped and improved.
+
+### ... and Straight forward
+
+There are none of the complexities that LibVirt creates by using only machine readable configurations.
+
+And none of steep learning curves that come with languages such as Rust, C or Vala.
+
+- Even seemingly simple LibVirt front-ends like Gnome Boxes can contain whole learning curves for the most basic of things, like moving the default VM folder for example.  Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
 
 ## Development and Roadmap
 
@@ -158,24 +166,22 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 ## Why the Vinyards?
 
-The Olde English spelling doesn't have with an 'e'.
+I live in a wine growing region of Italy, in a castled village dating from the 1300's
+
+For me, qqX is something to do when it's too hot or it's raining and I can't be outside.
+
+The Olde English spelling of " Vine Yards " doesn't have with an 'e' whilst the modern word isn't even pronounced with one:
 
 1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia
 ...therefore they who are more religiously and holily instructed, neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation...
 
-The modern word isn't even pronounced with an 'e'
-
-Perhaps Martha and others decided at some point to spell things out fully as Vine Yards, only later for the phrase to become contracted.
-
-So, living in a castled village dating from the 1300's in a wine growing region of Italy, I tend to prefer the older spelling.
-
-And qqX is something to do when it's too hot or it's raining and I can't be outside.
+Perhaps [Martha](https://en.wikipedia.org/wiki/Martha%27s_Vineyard) and others decided at some point to spell things out fully as Vine Yards, only later for the phrase to become contracted?
 
 ## why 'X' ?
 
-More technically speaking qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X'
+Traditionally Linux has used the X window system from X.org, so 'X term' often gets used as shorthand for the terminal.
 
-But traditionally Linux uses the X window system from X.org, so 'X term' often gets used as shorthand ...
+More technically speaking qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X' ...
 
 <https://en.wikipedia.org/wiki/X_Window_System>
 
