@@ -60,8 +60,6 @@ Release 1.5.02 added _alphabetical zooming_ into list sections for the Quick Get
 
 Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
 
-![vm-small-d](https://github.com/TuxVinyards/qqX/assets/3956806/1a17b7d7-d6e3-471a-a934-e3530f6c9b17)
-
 And 1.7.03 added
 
 - A _handy distro rename function_ to help with upgrades
@@ -90,19 +88,17 @@ Whilst earlier releases added:
 
 ## How to Install
 
-qqX will work happily alongside quickgui or any quickemu shortcuts. But these are not necessary.
+Start from scratch. Or safely test out the qqX difference on your existing VM's.  
 
-Start from scratch. Or safely test out the qqX difference on your existing quickgui VM's  
+qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
 
-- The easiest route, currently, if you don't already have a standard Quickemu setup, is to start by installing that, complete with all its components and all its dependencies, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
-  
-  Being able to type `quickemu` at a command prompt and get the quickemu usage screen is useful for test purposes but from version 1.8 this is not essential.
+- From version 1.8 onwards, the installation of quickemu is not essential. However, the easiest route to installing all the necessary components and dependencies is to just follow the standard Quickemu setup, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
 
-  Manual installation of Quickemu to 'PATH' as in the case of some Host distros such as Fedora may now be omitted, if wished.
+  In the case of some host distros, such as Fedora, manual installation of quickemu to 'PATH' may now be omitted.
 
 - Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
-  No other software, support structures or dependencies are needed.
+  No further software, support structures or dependencies are needed.
 
 See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
@@ -116,7 +112,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ### Known Issues
 
-System release 4.9.5 can cause Intel processors to run MacOS very slowly but has been fixed in FreeBird and FreeSpirit.
+Test show that official Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
