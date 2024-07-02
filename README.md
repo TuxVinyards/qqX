@@ -88,7 +88,7 @@ Whilst earlier releases added:
 
 ## How to Install
 
-Start from scratch. Or safely test out the qqX difference on your existing VM's.  
+Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - From version 1.8 onwards, the installation of quickemu is not essential. However, the easiest route to installing all the necessary components and dependencies is to just follow the standard Quickemu setup, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
 
@@ -98,7 +98,9 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
-  No further software, support structures or dependencies are needed.
+  Normal [Filesystem_Hierarchy_Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) Linux is generally expected.
+
+  No further software, support structures or dependencies should be needed.
 
 See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
