@@ -90,11 +90,11 @@ Whilst earlier releases added:
 
 Start from scratch. Or safely test out the qqX difference on your existing VM's.  
 
-qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
-
-- From version 1.8 onwards, the installation of quickemu is not essential. However, the easiest route to installing all the necessary components and dependencies is to just follow the standard Quickemu setup, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu)
+- From version 1.8 onwards, the installation of quickemu is not essential. However, the easiest route to installing all the necessary components and dependencies is to just follow the standard Quickemu setup, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
 
   In the case of some host distros, such as Fedora, manual installation of quickemu to 'PATH' may now be omitted.
+
+  qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
 
 - Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
 
@@ -112,7 +112,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ### Known Issues
 
-Test show that official Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
+Tests show that official Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
 
