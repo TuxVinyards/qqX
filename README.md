@@ -10,7 +10,7 @@
 
 - Currently based on Quickemu, a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
 
-## Latest release 1.8.07
+## Latest release 1.9.01
 
 Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code.
 
@@ -106,17 +106,15 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ## Release notes
 
-- Release 1.8.05 fixes the wget 302 / SHA error that occured from github archive changes.
+- Release 1.8.05 should fix the wget 302 / SHA error that occured from github archive changes.
 
 - For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
-
-- Release [1.9.0.02](https://github.com/TuxVinyards/qqX/tree/1.9.0.02) is now available in early beta by switching branch. There are still some features to add but it appears to be stable.
 
 ### Known Issues
 
 Tests show that official Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
 
-Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). For telescoping use Freebird, not FreeSpirit. Fix to be released on the 1.9 branches before long.
+Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). Now fixed for FreeBird and FreeSpirit.
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
@@ -160,7 +158,7 @@ And none of steep learning curves that come with languages such as Rust, C or Va
 
 ## Development and Roadmap
 
-See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details
+See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details and for what's happening in future releases
 
 ## Why the Vinyards?
 
