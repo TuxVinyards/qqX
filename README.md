@@ -116,6 +116,8 @@ Tests show that official Quickemu 4.9.5 can cause Intel processors to run MacOS 
 
 Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). Now fixed for FreeBird and FreeSpirit.
 
+Changing from one code set to another may sometimes need a follow-up restart. Hopefully to be fixed in the next release.
+
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
 Testing has been carried out on a variety of mainstream distros.
