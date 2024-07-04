@@ -315,11 +315,11 @@ function_quick_get_wrap ()  {
 
     QGW_OS_ListRaw="$(quickget "qq-grep" | tail -n +3 )"
     # filter out display folding
-    QGW_OS_ListString="$(tr -cd "[:print:]" <<< "$QGW_OS_ListRaw")"
+    QGW_OS_ListString="$(tr '\n' ' ' <<< "$QGW_OS_ListRaw")"
+    QGW_OS_ListString="$(tr -cd "[:print:]" <<< "$QGW_OS_ListString")"
     read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
 
     print_quickget_and_folder_choices  "QGW_OS_Array"
-
 
     while true ; do
 
@@ -358,7 +358,8 @@ function_quick_get_wrap ()  {
           QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
           QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
 
-          printColor  "\n  Selected = %s  "  "$QGW_OS_Arr_NameSelected"
+          #printColor  "\n  Selected = %s  "  "$QGW_OS_Arr_NameSelected"
+          printColor  "\n  %s  "  "${QGW_OS_Arr_NameSelected^^}"
 
           # OS HOME PAGES  could be pulled in variable quality from the download URL
 
@@ -385,7 +386,7 @@ function_quick_get_wrap ()  {
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
               # first listing, some may have two
-              QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+              QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
               QGW_OS_Info="${QGW_OS_Info//';;'/}"
               QGW_OS_Info="${QGW_OS_Info//'"'/}"
 
@@ -401,7 +402,8 @@ function_quick_get_wrap ()  {
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
-            printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+            if [[ $QGW_OS_InfoText ]]; then printf "\n  " ; else printf "\n\n  " ; fi
+            printf "HomePage = %s"  "$QGW_OS_HomePage"
             if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 2 "$QGW_OS_HomePage" ; then  printf " (working)"
             else 
               [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
