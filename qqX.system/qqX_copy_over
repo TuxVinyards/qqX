@@ -21,7 +21,7 @@ function copy_files {
 function copy_builtins {
 	printf "\n"
 	sudo cp -r qqX.builtins/*   /usr/share/qqX/qqX.builtins/  || CopyFail=1
-	printf " Builtins Copied \n"
+	printf "\n Builtins Copied \n"
 }
 
 Counter=0
@@ -42,13 +42,14 @@ while true ; do
 	if [[ $UpdSets ]]; then 
 		[[ $UpdSets == "s" ]] && update_old_settings_file_with_new_options 
 		[[ $UpdSets == "b" ]] && copy_builtins 
-		((Counter+=1))  # double depth, so add another count
-	else
-		copy_files
-		if [[ $CopyFail ]]; then printColor " COPY ERROR .... " ; else printf " Copied @ %s" "$(date +%H.%M.%S)"  ; fi
+		((Counter+=1)) 
+	else	
+		copy_files	
+		if [[ $CopyFail ]]; then printColor " COPY ERROR .... \n" ; else printf " Copied @ %s \n" "$(date +%H.%M.%S)"  ; fi
 	fi
 	
 	sleep 1
+	
 	((Counter+=1)) ;  [[ $Counter -ge 4 ]] && Counter=0 ; UpdSets= ; CopyFail=
 		
 done
