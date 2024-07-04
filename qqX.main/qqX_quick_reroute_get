@@ -370,9 +370,10 @@ function_quick_get_wrap ()  {
           # Also add check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
           # 4.9.2 (still numbered 4.9.1) only has 'echo 38 39' for fedora releases ...
 
-          printColor "Checking ...."
+          printColor "INFO:"
 
           QGW_OS_HomePage=
+          QGW_OS_InfoText=
 
           if grep -q -s '4=Homepage' "$QG_SourcePath" ; then
 
@@ -384,16 +385,24 @@ function_quick_get_wrap ()  {
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
               # first listing, some may have two
-              QGW_OS_HomePage="$(grep "$QGW_OS_Arr_NameSelected" "$QG_SourcePath" | grep -m 1 'HOMEPAGE=' | cut -d '=' -f 2)"
-              QGW_OS_HomePage="${QGW_OS_HomePage//';;'/}"
-              QGW_OS_HomePage="${QGW_OS_HomePage//'"'/}"
+              QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+              QGW_OS_Info="${QGW_OS_Info//';;'/}"
+              QGW_OS_Info="${QGW_OS_Info//'"'/}"
 
+              QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+              mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+
+              QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
+              QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
+              [[ $QGW_OS_InfoText ]] && printf "\n\n"  && fmt -u -w 145 <<< "  $QGW_OS_InfoText"
+              
             fi
+
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
             printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-            if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage" ; then  printf " (working)"
+            if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 2 "$QGW_OS_HomePage" ; then  printf " (working)"
             else 
               [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
               printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
