@@ -343,30 +343,37 @@ function configure_cpu() {
         QEMU_ACCEL="kvm"
     fi
 
-    if [ "${ARCH_VM}" == "aarch64"  ]; then
-        # Support to run aarch64 VMs (best guess; untested)
-        # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
-        case ${ARCH_HOST} in
-            arm64|aarch64) CPU_MODEL="max"
-                           MACHINE_TYPE="virt,highmem=off";;
-        esac
-    elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
-        # If the architecture of the VM is different from the host, disable acceleration
-        CPU_MODEL="qemu64"
-        CPU_KVM_UNHALT=""
-        QEMU_ACCEL="tcg"
-    fi
+    function ignore_non_robust_for_now {
 
-    # TODO: More robust detection of running in a VM
-    # - macOS check for CPU flag: vmx
-    # - Linux AMD check for CPU flag: svm
-    # - Linux Intel check for CPU flag: vmx
-    case ${MANUFACTURER,,} in
-        qemu|virtualbox) CPU_MODEL="qemu64"
-                         QEMU_ACCEL="tcg"
-                         HYPERVISOR="${MANUFACTURER,,}";;
-        *) HYPERVISOR="";;
-    esac
+        # causes telescoped/nested VM's to fail ... 
+        # macos host not supported with qqX (yet)
+        # qqX uses different aarch methods
+
+        if [ "${ARCH_VM}" == "aarch64"  ]; then
+            # Support to run aarch64 VMs (best guess; untested)
+            # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
+            case ${ARCH_HOST} in
+                arm64|aarch64) CPU_MODEL="max"
+                            MACHINE_TYPE="virt,highmem=off";;
+            esac
+        elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
+            # If the architecture of the VM is different from the host, disable acceleration
+            CPU_MODEL="qemu64"
+            CPU_KVM_UNHALT=""
+            QEMU_ACCEL="tcg"
+        fi
+
+        # TODO: More robust detection of running in a VM
+        # - macOS check for CPU flag: vmx
+        # - Linux AMD check for CPU flag: svm
+        # - Linux Intel check for CPU flag: vmx
+        case ${MANUFACTURER,,} in
+            qemu|virtualbox) CPU_MODEL="qemu64"
+                            QEMU_ACCEL="tcg"
+                            HYPERVISOR="${MANUFACTURER,,}";;
+            *) HYPERVISOR="";;
+        esac
+    }
 
     if [ -z "${HYPERVISOR}" ]; then
         # A CPU with Intel VT-x / AMD SVM support is required
