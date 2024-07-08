@@ -267,13 +267,11 @@ else
     printf  "\n\n"
 
     if [[ $qqX_UpdaterPID ]]; then
-
       while true ; do
         if [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then   sleep 1
         else  source "$qqX_Upd_VarsTmpFile" ; qqX_UpdaterPID= ; break
         fi
       done
-
     fi
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"

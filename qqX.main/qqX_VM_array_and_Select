@@ -257,9 +257,14 @@ VM_loader_selector_and_menu () {
         VM_Array_NameZero="${VM_Array[0,1]}"
         VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
 
-        printColor "\n\n  [Enter]  "
+        if [[ -s "$qqX_Upd_VarsTmpFile" ]]; then source "$qqX_Upd_VarsTmpFile"; fi
+
+        if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
+
         printf "%s  "  "${VM_Array_NameZero^^}"
         printf "    [gt] quickget a new distro     [h] help   [f] refresh     [q] quit"
+
+        [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
         if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
         elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
@@ -307,6 +312,8 @@ VM_loader_selector_and_menu () {
         return
 
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
+
+      elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
 
       elif [[ $VM_Selection == "set" ]];then
 

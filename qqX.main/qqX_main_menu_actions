@@ -95,7 +95,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
-  elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release
+  elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
   elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
 
