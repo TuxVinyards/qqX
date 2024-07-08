@@ -46,11 +46,10 @@ else
 
       printf "   [del] delete selected VM   [mv] move or rename"
       printColor  "    [u]   hide utils & technical"
-      printf "\n"
-
-      printf "\n\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
+      printColor "\n\n  ---------------------------------------------------------------------------- \n"
+      printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
       printf "\n\n  [2c] create [2d] delete a second virtual hard-drive  [3] create shared drive "
-      printf "\n\n  [rtv] reset Tiano VMF boot Vars \n"
+      printf "\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit [FB] FreeBird [HB] [Ech] [Sys] [Cust] [Dev] \n"
 
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
       else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi
@@ -59,7 +58,7 @@ else
       printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
-      printf "\n"
+      printColor "\n\n  ---------------------------------------------------------------------------- "
 
     fi
 

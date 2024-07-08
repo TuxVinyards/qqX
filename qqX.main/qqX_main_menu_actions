@@ -64,15 +64,17 @@ function  main_menu_actions {
 
     if [[ ! $ShowUtilsMenu ]]; then ShowUtilsMenu=1 ; else ShowUtilsMenu= ; fi
 
-  elif [[ $MainMenuChoice == "set" ]] ; then
+  elif [[ $MainMenuChoice == "set" ]] ; then  qqX_edit_settings
 
-    qqX_edit_settings
+  elif [[ $MainMenuChoice == "rtv" ]] ; then RunRtvCheck=1 ; refresh_tiano_vars ; RunRtvCheck=
 
-  elif [[ $MainMenuChoice == "rtv" ]] ; then
-
-    RunRtvCheck=1
-    refresh_tiano_vars
-    RunRtvCheck=
+  elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
+  elif [[ $MainMenuChoice == "FB"   ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "HB"   ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Ech"  ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Sys"  ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Dev"  ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 

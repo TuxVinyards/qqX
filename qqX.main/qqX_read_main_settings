@@ -132,18 +132,21 @@ QG_SystemFilePath="$(type -p quickget)"
 function sort_qqX_builtin_settings () {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
+  # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
 
   export PATH="$OriginalPATH"
   QE_SourcePath=
   QG_SourcePath=
 
   if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
+    QE_SourceVersion="Custom"
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
   fi        
 
   if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "system" ]]; then 
-    if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then  
+    if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then 
+      QE_SourceVersion="System" 
       QE_SourcePath="$QE_SystemFilePath" 
       QG_SourcePath="$QG_SystemFilePath" 
     else  
@@ -153,32 +156,40 @@ function sort_qqX_builtin_settings () {
     fi
   fi
   if [[ ! $QE_SourceVersion ]] || [[ $QE_SourceVersion == "FreeBird" || $QE_SourceVersion == "Freebird" || $QE_SourceVersion == "freebird" ]]; then
+    QE_SourceVersion="FreeBird"
     FreePath="$qqX_BuiltinsFolder/freebird"
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"
   elif [[ $QE_SourceVersion == "FreeSpirit" || $QE_SourceVersion == "Freespirit" || $QE_SourceVersion == "freespirit" ]]; then
+    QE_SourceVersion="FreeSpirit"
     FreePath="$qqX_BuiltinsFolder/freespirit"
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"
   elif [[ $QE_SourceVersion == "HomeBird" || $QE_SourceVersion == "Homebird" || "$QE_SourceVersion" == *'homebird'* ]]; then
+    QE_SourceVersion="HomeBird"
     FreePath="$qqX_BuiltinsFolder/homebird"
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"
   elif [[ $QE_SourceVersion == "Echo" || $QE_SourceVersion == "echo" ]]; then
+    QE_SourceVersion="Echo"
     FreePath="$qqX_BuiltinsFolder/echo"
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"
   elif [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]]; then
+    QE_SourceVersion="Custom"
     FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
+    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"   
   elif [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]]; then
+    QE_SourceVersion="Dev"
     FreePath="$QE_DevPath"
+    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}"   
