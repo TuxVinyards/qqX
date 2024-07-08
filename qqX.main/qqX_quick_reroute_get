@@ -395,7 +395,7 @@ function_quick_get_wrap ()  {
 
               QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
               QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
-              [[ $QGW_OS_InfoText ]] && printf "\n\n"  && fmt -u -w 145 <<< "  $QGW_OS_InfoText"
+              [[ $QGW_OS_InfoText ]] && printf "\n\n"  && fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
               
             fi
 
