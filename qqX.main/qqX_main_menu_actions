@@ -107,7 +107,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" 
 
-  elif [[ $MainMenuChoice == "gt" ]] ; then function_quick_get_wrap
+  elif [[ $MainMenuChoice == "gt" ]] ; then  function_quick_get_wrap 
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 

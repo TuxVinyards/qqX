@@ -139,7 +139,6 @@ function sort_qqX_builtin_settings () {
   QG_SourcePath=
 
   if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
-    QE_SourceVersion="Custom"
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
   fi        

@@ -49,7 +49,7 @@ else
       printColor "\n\n  ---------------------------------------------------------------------------- \n"
       printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
       printf "\n\n  [2c] create [2d] delete a second virtual hard-drive  [3] create shared drive "
-      printf "\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit [FB] FreeBird [HB] [Ech] [Sys] [Cust] [Dev] \n"
+      printf "\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n"
 
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
       else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi

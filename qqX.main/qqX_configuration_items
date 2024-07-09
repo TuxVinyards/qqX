@@ -457,6 +457,7 @@ qqX_edit_settings() {
 
     else 
 
+      [[ $CodingHotSwap ]] && CodingHotSwap=
       (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
 
       if [[ $DefaultFolderError ]]; then 

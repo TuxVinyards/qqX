@@ -476,9 +476,8 @@ refresh_sources_and_load_VM_arrays() {
 
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
 
-  if [[ $CodingHotSwap ]]; then  QE_SourceVersion="$CodingHotSwap"
-  else  source "$qqX_SettingsFile" 
-  fi
+  source "$qqX_SettingsFile" 
+  if [[ $CodingHotSwap ]]; then  QE_SourceVersion="$CodingHotSwap" ; fi
 
   refresh_and_load_quickemu_sources
   find_file_manager_browser
