@@ -159,7 +159,7 @@ else
 
          if [[ "$VM_InstanceName" == *macos* ]]; then 
 
-          printf "\n\n  Tiano Core Updater .....  "
+          printf "\n\n  Tiano Core Security Updates .....  "
           refresh_tiano_vars &
           wait "$!" 
           RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log")"
