@@ -331,12 +331,14 @@ function_quick_get_wrap ()  {
 
     while true ; do
 
-      printColor "\n\n\n  Give [a-z] to zoom  or list [number] of OS name to select for download or to browse OS website  [B] to go back "
+      printColor "\n\n\n  Give [a-z] to zoom  or list [number] of OS name to select for download or to browse OS website   [H] help  [B] to go back "
       if [[ $CodingHotSwap ]]; then printf " (Hot-Swapped) \n\n" ; dev_loop_check ; else printf "\n\n" ; fi
 
       [[ ! $QGW_List_NumSelected ]] && read -rp "  >  "  QGW_List_NumSelected
 
-      if [[ $QGW_List_NumSelected == "B" ]]; then  QGW_List_NumSelected= ; GT_Exit=1 ; break 
+      if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
+
+      elif [[ $QGW_List_NumSelected == "B" ]]; then  QGW_List_NumSelected= ; GT_Exit=1 ; break 
 
       elif [[ $QGW_List_NumSelected == "FS"   ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
@@ -431,22 +433,20 @@ function_quick_get_wrap ()  {
 
       fi
 
-      if [[ $CodingHotSwap ]]; then
-        printf "\n\n  Using Quickget '%s' from selection:    [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n" "$CodingHotSwap"
+      if [[ $CodingHotSwap || $GT_Help ]]; then
+        printf "\n  Using Quickget '%s' from selection:    [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n" "$QE_SourceVersion"
         load_QGW_OS_Array 
         print_quickget_and_folder_choices  "QGW_OS_Array" 
+        GT_Help=
       fi
         
       QGW_List_NumSelected=
 
     done
 
-    #if [[ $GT_Exit ]]; then refresh_sources_and_load_VM_arrays ; VM_loader_selector_and_menu ; fi 
     if [[ $GT_Exit ]]; then QGW_List_NumSelected= ; GT_Exit= ; return ; fi
 
-    #QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Releases)"
     QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Releases:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-    # filter out display folding  REVIEW 
     QGW_Releases_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Releases_ListRaw")"
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"

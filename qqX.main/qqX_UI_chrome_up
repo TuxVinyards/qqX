@@ -169,13 +169,10 @@ show_qqX_title_bar() {
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
   
   PWD_Folder="$(pwd)"
-
   HideFolderTitleBar=
 
   for TF in "${Extra_VM_Folder[@]}"; do
-
     [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
-
   done
 
   if [[ ! $HideFolderTitleBar ]]; then  
@@ -188,29 +185,39 @@ show_qqX_title_bar() {
 
 function show_qqX_general_help {
 
-  HelpSelect=
+  while true; do 
 
-  printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
-  printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
-  printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
+    HelpSelect=
 
-  cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
+    printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
+    printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
+    printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
 
-  printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation "
-  printColor  "\n\n  [w] to OPEN qqX WIKI PAGES with browser    [c] qqX command line & mouse    [enter] to return"  
-  printf "\n\n"
-  read -rp "  >  "  HelpSelect
+    cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
-  if [[ $HelpSelect == "c" ]]; then   
-  
-    show_CLI_usage  
-    printf "\n  [enter] to return \n\n"
-    read -rp  "   >  " 
+    printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation "
+    printColor  "\n\n  [w] OPEN qqX WIKI PAGES  [c] command line & mouse notes   [f] FreeBird notes  [enter] to RETURN"  
+    printf "\n\n"
+    read -rp "  >  "  HelpSelect
 
-  elif [[ $HelpSelect == "w" ]]; then
-  
-     nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & 
+    if [[ $HelpSelect == "c" ]]; then   
+      show_CLI_usage  
+      printf "\n  [enter] to return \n\n"
+      read -rp  "   >  " 
 
-  fi
+    elif [[ $HelpSelect == "f" ]]; then   
+      echo; grep -m 1 -A 100  'System' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
+      printf "\n  [enter] to return \n\n"
+      read -rp  "   >  " 
+
+    elif [[ $HelpSelect == "w" ]]; then
+      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & 
+
+    else  
+      break
+    fi
+
+  done
+
 }
 

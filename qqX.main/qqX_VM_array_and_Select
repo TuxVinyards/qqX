@@ -243,7 +243,7 @@ VM_loader_selector_and_menu () {
       else
 
         printf "\n\n  [number] to select a VM"        
-        printf "   [set] to edit settings file"
+        printf "   [set] view or edit settings file"
         printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
 
         if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
