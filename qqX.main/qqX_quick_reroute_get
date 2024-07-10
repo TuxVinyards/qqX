@@ -382,7 +382,20 @@ function_quick_get_wrap ()  {
           QGW_OS_Arr_NumSelected=$((QGW_List_NumSelected-1))
           QGW_OS_Arr_NameSelected="${QGW_OS_Array[QGW_OS_Arr_NumSelected]}"
 
-          printColor  "\n  %s  "  "${QGW_OS_Arr_NameSelected^^}"
+          if [[ ${QGW_OS_Arr_NameSelected: -3} == "dos" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%???}"
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} dos"
+          elif [[ ${QGW_OS_Arr_NameSelected: -3} == "-os" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%???}"
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} os"
+          elif [[ ${QGW_OS_Arr_NameSelected: -2} == "os" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%??}"
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} os"
+          else 
+            QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
+          fi
+
+          printColor  "\n  %s  "  "${QGW_OS_Arr_NameDisplay^^}"
 
           # Quickemu OS HOME PAGE coding format keeps changing. Varied checks are needed, eg:
           # Check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
