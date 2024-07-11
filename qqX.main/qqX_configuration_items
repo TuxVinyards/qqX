@@ -425,11 +425,13 @@ qqX_edit_settings() {
 
       while true ; do
 
-        printColor "\n\n  [enter] to edit   [r] config reminder notes   [b] go back"
+        printColor "\n\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
 
-        if [[ $ConfEdit_Select == "r" ]] ; then    custom_conf_notes
+        if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
+
+        elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_File" ; break
 
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
 
