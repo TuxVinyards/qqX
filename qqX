@@ -103,7 +103,7 @@ function dev_loop_check {
     echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
-    echo "pwd: $(pwd)"
+    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script"
     sleep "$GeneralLoopCheck"
   fi
 }

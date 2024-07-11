@@ -84,7 +84,7 @@ function check_screen_percentage_and_output {
     if  grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then  
       SDL_ScreenSize_Cmd=" --screenpct  $SDL_ScreenPercent"
     else
-      if [[ ! $QE_495_Script ]]; then 
+      if [[ ! $QE_495_Script && ! $QE_496_Script ]]; then 
         printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
         SDL_ScreenSize_Error="> not possible with this qe-version"
       fi
