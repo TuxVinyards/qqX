@@ -128,8 +128,10 @@ function_config_tune_up ()  {
 
   else  
 
-    printColor "\n\n  This line disk_size= may be removed if wished, or left as a reminder" 
-    printColor "\n\n  The disk has now been created. It now has no effect." 
+    printColor "\n\n  The line "
+    printf "'disk_size=' "
+    printColor "may be removed if wished, at the end the tune-up, or left as a reminder" 
+    printColor "\n\n  The disk has now been created. This line now has no direct effect. \n" 
     if [[ $ConfLine ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
 
   fi
