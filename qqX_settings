@@ -240,8 +240,9 @@ VM_SelectorStyle="A"
 # Add here any 'errors' that changes in QEMU might throw up and that we want to generally ignore  eg. "warning" or "deprecated"
 # Add QemuError_VM_Filter=("warning" "deprecated") eg. to the .conf file for INDIVIDUALLY problematic distros.
 # @ 2023/12 Defaults:  # QemuErrorFilter=("gl_version" "signal 15 from pid")
+# 2024/07 add https://discussion.fedoraproject.org/t/selinux-alert-gst-plugin-scan-getattr-run-pcscd-pcscd-comm/79378  
 # Add any new values to the checking arrays as double quoted & space separated. Use the '+=' for further lines.
-  QemuErrorFilter=("gl_version" "signal 15 from pid")
+  QemuErrorFilter=("gl_version" "signal 15 from pid" "gst-plugin-scan")
 # QemuErrorFilter+=("") 
 
 
