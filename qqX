@@ -72,7 +72,7 @@ declare -ga QemuError_VM_Filter=()
 VM_ExecBoot=
 Extra_QE_Params=
 
-# Set .conf settings record from any previous session but not normally clear it until multi-instance issues have been approved
+# Set location of .conf log. May be present from any previous session but don't normally clear it until multi-instance issues have been approved
 ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 [[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
 
@@ -80,6 +80,10 @@ ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+# Don't load up code until checked for other instances, as the defaults could overwrite hot-swapped source files on the other instance
+multi_instance_checks
+
 source "$qqX_MainFolder/qqX_MSR_functions"
 source "$qqX_MainFolder/qqX_wrap_quickemu"
 source "$qqX_MainFolder/qqX_quick_reroute_emu"
@@ -139,7 +143,6 @@ tput civis
 printf "\033c"
 show_qqX_title_bar
 printf "\n  Running initial checks .... \n"
-multi_instance_checks
 
 # Once only, at the start.
 if [[ ! $Disable_qqX_upd_Checks ]]; then
