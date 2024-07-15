@@ -262,7 +262,7 @@ VM_loader_selector_and_menu () {
         if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
 
         printf "%s  "  "${VM_Array_NameZero^^}"
-        printf "    [gt] quickget a new distro     [h] help   [f] refresh     [q] quit"
+        printf "    [gt] quickget a new distro    [h] Help   [f] FreeBird   [r] refresh   [q] quit"
 
         [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
@@ -310,7 +310,7 @@ VM_loader_selector_and_menu () {
         VM_Selection=
         return
 
-      elif [[ $VM_Selection == "f" ]]; then  vm_menu_interface_refresh ; return
+      elif [[ $VM_Selection == "r" ]]; then  vm_menu_interface_refresh ; return
 
       elif [[ $VM_Selection == "FS"   ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
@@ -337,7 +337,7 @@ VM_loader_selector_and_menu () {
         qqX_edit_settings 
         return
 
-      elif [[ $VM_Selection == "h" ]];then
+      elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
 
         VM_Selection=
         show_qqX_general_help 

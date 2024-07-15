@@ -195,8 +195,8 @@ function show_qqX_general_help {
 
     cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
-    printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation "
-    printColor  "\n\n  [w] OPEN qqX WIKI PAGES  [c] command line & mouse notes   [f] FreeBird notes  [enter] to RETURN"  
+    printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation   Release Notes:  https://github.com/TuxVinyards/qqX#release-notes"
+    printColor  "\n\n  [w] Online: qqX WIKI PAGES    Offline: [f] FreeBird notes  [c] command line & mouse notes  [enter] to RETURN"  
     printf "\n\n"
     read -rp "  >  "  HelpSelect
 
@@ -206,7 +206,8 @@ function show_qqX_general_help {
       read -rp  "   >  " 
 
     elif [[ $HelpSelect == "f" ]]; then   
-      echo; grep -m 1 -A 100  'System' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
+      printf "\n  Selectable for Hot-Swap from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
+      grep -m 1 -A 100  'System' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
       printf "\n  [enter] to return \n\n"
       read -rp  "   >  " 
 
