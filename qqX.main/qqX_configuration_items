@@ -100,7 +100,7 @@ function check_screen_percentage_and_output {
   MacScreenRes=
   SDL_ScreenSize_Cmd97=
 
-  if [[ $QE_495_Script ]] && [[ $XDG_SESSION_TYPE == "x11" || $XDG_SESSION_TYPE == "wayland" ]]; then
+  if [[ $QE_495_Script || $QE_496_Script ]] && [[ $XDG_SESSION_TYPE == "x11" || $XDG_SESSION_TYPE == "wayland" ]]; then
 
     if [[ $PhysicalMonitor ]]; then
       Mon_xRes="$(cut -d 'x' -f 1 <<< "$PhysicalMonitor")" 
