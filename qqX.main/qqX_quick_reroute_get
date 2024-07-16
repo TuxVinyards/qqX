@@ -395,6 +395,21 @@ function_quick_get_wrap ()  {
           elif [[ ${QGW_OS_Arr_NameSelected: -2} == "os" ]]; then
             QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%??}"
             QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} os"
+          elif [[ ${QGW_OS_Arr_NameSelected:0:4} == "open" ]]; then
+            # all openxxx, at 07/2024, don't have any spaces
+            QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
+          elif [[ ${QGW_OS_Arr_NameSelected: -3} == "bsd" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%???}"
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} bsd"
+          elif [[ ${QGW_OS_Arr_NameSelected: -5} == "linux" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected%?????}"
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay} linux"
+          elif [[ ${QGW_OS_Arr_NameSelected:0:5} == "linux" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected#?????}"
+            QGW_OS_Arr_NameDisplay="linux ${QGW_OS_Arr_NameDisplay}"
+          elif [[ ${QGW_OS_Arr_NameSelected:0:3} == "kde" ]]; then
+            QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected#???}"
+            QGW_OS_Arr_NameDisplay="kde ${QGW_OS_Arr_NameDisplay}"
           else 
             QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
           fi
