@@ -1250,8 +1250,8 @@ function web_get() {
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-        echo "ERROR! Failed to download ${URL} with curl."
-        rm -f "${DIR}/${FILE}"
+        echo 
+        exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
     fi
 }
 

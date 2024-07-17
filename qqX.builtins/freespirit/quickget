@@ -1201,13 +1201,15 @@ function web_get() {
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
-        echo "- URL: ${URL}"
+        echo; echo "- URL: ${URL}"
+        echo
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-        echo "ERROR! Failed to download ${URL} with curl."
-        rm -f "${DIR}/${FILE}"
+        echo 
+        exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
     fi
+
 }
 
 # checks if a URL needs to be redirected and returns the final URL
