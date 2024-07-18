@@ -129,7 +129,8 @@ OriginalPATH="$PATH"
 QE_SystemFilePath="$(type -p quickemu)"  
 QG_SystemFilePath="$(type -p quickget)"
 
-function sort_qqX_builtin_settings () {
+
+function sort_qqX_builtin_settings {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
   # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
@@ -191,7 +192,20 @@ function sort_qqX_builtin_settings () {
     if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"   
+    export PATH="${FreePath}:${PATH}" 
+  elif [[ $QE_SourceVersion && $QE_SourceVersion != "System" ]]; then
+    printf "\n\n  Source Setting  '%s'  Not Recognised   >>  Using FreeBird \n\n"  "$QE_SourceVersion"
+    sleep 2
+    # clear any pressing of the enter key occuring during error message pause
+    read -r -t 0.1  
+    read -r -t 0.1  
+    read -r -t 0.1  
+    read -r -t 0.1	
+    QE_SourceVersion="FreeBird"
+    FreePath="$qqX_BuiltinsFolder/freebird"
+    QE_SourcePath="$FreePath/quickemu"
+    QG_SourcePath="$FreePath/quickget"
+    export PATH="${FreePath}:${PATH}"
   fi
 
   QE_VerNumber=
@@ -210,8 +224,8 @@ function sort_qqX_builtin_settings () {
 
 sort_qqX_builtin_settings
 
- 
-function find_quick_version_numbers () {
+
+function find_quick_version_numbers {
 
   # To be run only after rerouting functions for quickemu & quickget are in place & code has been sourced.
   # But place early as emu and get may load initially out of sequence ...

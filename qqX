@@ -81,6 +81,8 @@ source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
+[[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s  QG_SourcePath = %s "  "$QE_SourcePath" "$QG_SourcePath \n"
+
 # Don't load up code until checked for other instances, as the defaults could overwrite hot-swapped source files on the other instance
 multi_instance_checks
 

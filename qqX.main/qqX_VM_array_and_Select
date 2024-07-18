@@ -360,8 +360,6 @@ VM_loader_selector_and_menu () {
           read -r -t 0.1  
           read -r -t 0.1  
           read -r -t 0.1	
-          read -r -t 0.1  
-          read -r -t 0.1 
           VM_Conf_Dir=
           VM_Conf_File=
           VM_Selection=
@@ -381,8 +379,6 @@ VM_loader_selector_and_menu () {
         read -r -t 0.1  
         read -r -t 0.1  
         read -r -t 0.1	
-        read -r -t 0.1  
-        read -r -t 0.1 
         VM_Conf_Dir=
         VM_Conf_File=
         VM_Selection=
@@ -516,6 +512,7 @@ refresh_sources_and_load_VM_arrays() {
   if [[ $CodingHotSwap ]]; then  QE_SourceVersion="$CodingHotSwap" ; fi
 
   refresh_and_load_quickemu_sources
+
   find_file_manager_browser
 
   [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 

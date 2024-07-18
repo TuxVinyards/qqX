@@ -25,6 +25,19 @@
 #   The original code remains basically as is but some calls get re-routed via new functions ....
 
 
+function system_code_check_and_warn {
+
+  if [[ ! $WarnedOnQE ]] && [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
+    printColor "\n\n  CAUTION Source Version '%s' : not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
+    printf "\n\n  The qqX builtins contain certain tweaks to enable process controls but in some places there are not only"
+    printf "\n\n  improvements, there are also fixes where qqX testing has revealed upstream errors yet to be sorted."
+    printf "\n\n\n  I understand the risks ...  [enter] to continue or to change version\n\n"
+    read -rp "  >  "
+    WarnedOnQE=1
+  fi
+}
+
+
 function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
@@ -357,6 +370,7 @@ load_quickemu_cases_and_actions
 
 function refresh_and_load_quickemu_sources {
 
+  system_code_check_and_warn
   find_quickemu_source_functions_and_vars
   load_quickemu_special_vars
   load_mod_quickemu_boot
