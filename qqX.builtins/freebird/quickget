@@ -308,51 +308,6 @@ function csv_data() {
     wait
 }
 
-function create_config() {
-    local VM_PATH="${1}"
-    local INPUT="${2}"
-    OS="custom"
-    if ! mkdir "${VM_PATH}" 2>/dev/null; then
-        echo "ERROR! Could not create directory: ${VM_PATH}. Please verify that it does not already exist"
-        exit 1
-    fi
-    if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
-        INPUT="$(web_redirect "${INPUT}")"
-        if [[ "${INPUT}" == *".iso" ]] || [[ "${INPUT}" == *".img" ]]; then
-            web_get "${INPUT}" "${VM_PATH}"
-            INPUT="${VM_PATH}/${INPUT##*/}"
-        else
-            echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
-            exit 1
-        fi
-    fi
-    if [[ "${INPUT}" == *".iso" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
-        CUSTOM_IMAGE_TYPE="iso"
-    elif [[ "${INPUT}" == *".img" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
-        CUSTOM_IMAGE_TYPE="img"
-    elif [[ "${INPUT}" == *".qcow2" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}/disk.qcow2"
-        CUSTOM_IMAGE_TYPE="qcow2"
-    else
-        echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
-        exit 1
-    fi
-    echo "Creating custom VM config for ${INPUT##*/}."
-    case "${INPUT,,}" in
-        *windows-server*) CUSTOM_OS="windows-server";;
-        *windows*) CUSTOM_OS="windows";;
-        *freebsd*) CUSTOM_OS="freebsd";;
-        *kolibrios*) CUSTOM_OS="kolibrios";;
-        *reactos*) CUSTOM_OS="reactos";;
-        *) CUSTOM_OS="linux";;
-    esac
-    echo "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS."
-    echo
-    make_vm_config "${INPUT}"
-}
-
 function list_supported() {
     list_csv | cut -d ',' -f2,3,4 | tr ',' ' '
     exit 0
@@ -1246,13 +1201,15 @@ function web_get() {
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
-        echo "- URL: ${URL}"
+        echo; echo "- URL: ${URL}"
+        echo
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         echo 
         exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
     fi
+
 }
 
 # checks if a URL needs to be redirected and returns the final URL
@@ -2657,7 +2614,9 @@ function get_zorin() {
 }
 
 function unattended_windows() {
-    cat << 'EOF' > "${1}"
+    mkdir -p "${1}/unattended" 2>/dev/null
+
+    cat << 'EOF' > "${1}/unattended/autounattend.xml"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend"
   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
@@ -2939,6 +2898,15 @@ function unattended_windows() {
   </settings>
 </unattend>
 EOF
+
+
+echo "Downloading Spice drivers..."
+web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+
+echo "Making unattended.iso"
+mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
 }
 
 function handle_curl_error() {
@@ -3248,13 +3216,7 @@ function get_windows() {
     rm -f "${VM_PATH}/unattended.iso"
     case ${RELEASE} in
         10|11)
-            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-            echo "Making unattended.iso"
-            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            unattended_windows "${VM_PATH}"
             ;;
     esac
 
@@ -3326,6 +3288,71 @@ function create_vm() {
     make_vm_config "${ISO}"
 }
 
+function create_config() {
+    local VM_PATH="${1}"
+    local INPUT="${2}"
+    local FIXED_ISO=""
+
+    OS="custom"
+    if ! mkdir "${VM_PATH}" 2>/dev/null; then
+        echo "ERROR! Could not create directory: ${VM_PATH}. Please verify that it does not already exist"
+        exit 1
+    fi
+    if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
+        INPUT="$(web_redirect "${INPUT}")"
+        if [[ "${INPUT}" == *".iso" ]] || [[ "${INPUT}" == *".img" ]]; then
+            web_get "${INPUT}" "${VM_PATH}"
+            INPUT="${INPUT##*/}"
+        else
+            echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+            exit 1
+        fi
+    fi
+
+    if [ ! -f "${INPUT}" ]; then
+        echo "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
+        exit 1
+    elif [[ "${INPUT}" == *".iso" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        CUSTOM_IMAGE_TYPE="iso"
+    elif [[ "${INPUT}" == *".img" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        CUSTOM_IMAGE_TYPE="img"
+    elif [[ "${INPUT}" == *".qcow2" ]]; then
+        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}/disk.qcow2"
+        CUSTOM_IMAGE_TYPE="qcow2"
+    else
+        echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+        exit 1
+    fi
+    INPUT="$(basename "${INPUT}")"
+
+    echo "Creating custom VM config for ${INPUT##*/}."
+    case "${INPUT,,}" in
+        *freebsd*) CUSTOM_OS="freebsd";;
+        *kolibrios*) CUSTOM_OS="kolibrios";;
+        *reactos*) CUSTOM_OS="reactos";;
+        *windows-server*|*eval_oemret_x*|*eval_x*) CUSTOM_OS="windows-server";;
+        *windows*|win*)
+            CUSTOM_OS="windows"
+            # Older windows 10 ISOs use the year followed by the month rather than the year & half). Match any text for language.
+            if [ "${3}" != "--disable-unattended" ] && ( [ "${3}" == "--unattended" ] || grep -E -q 'Win(10|11)_([0-9]{2}H(1|2)|[0-9]{4})_[^.]*?(x64|x32)(v[0-9])?.iso' <<< "${INPUT}" ); then
+                echo "Creating unattended Windows installation files. To disable, pass --disable-unattended"
+                echo
+                echo "Downloading VirtIO drivers..."
+                web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+                FIXED_ISO="virtio-win.iso"
+                rm -f "${VM_PATH}/unattended.iso"
+                unattended_windows "${VM_PATH}"
+            fi
+            ;;
+
+        *) CUSTOM_OS="linux";;
+    esac
+    echo -e "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\n"
+    make_vm_config "${INPUT}" "${FIXED_ISO}"
+}
+
 # Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
 function resolve_quickemu() {
@@ -3363,11 +3390,14 @@ Advanced usage:
 
 Arguments:
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url]          : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
   --help                                   : Show this help message
+------------------------------------ Flags -------------------------------------
+--create-config:
+  --disable-unattended                     : Force quickget not to set up an unattended installation
 -------------------------- For testing & development ---------------------------
   --url           [os] [release] [edition] : Show image URL(s)
   --check         [os] [release] [edition] : Check image URL(s)
@@ -3431,7 +3461,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FB 4.9.6.01"
+        echo "FB 4.9.6.02"
         exit 0;;
     --help|-help|--h|-h)
         help_message

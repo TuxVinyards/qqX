@@ -138,7 +138,7 @@ function os_homepage() {
 function error_specify_os() {
     echo "ERROR! You must specify an operating system."
     echo "- Supported Operating Systems:"
-    os_support | fold -s -w "$(tput cols)"
+    os_support | fmt -w 80
     echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
 }
@@ -146,7 +146,7 @@ function error_specify_os() {
 function os_supported() {
     if [[ ! "$(os_support)" =~ ${OS} ]]; then
         echo -e "ERROR! ${OS} is not a supported OS.\n"
-        os_support | fold -s -w "$(tput cols)"
+        os_support | fmt -w 80
         exit 1
     fi
 }
@@ -156,11 +156,11 @@ function error_specify_release() {
     case ${OS} in
         *ubuntu-server*)
             echo -en " - Releases:\t"
-            releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+            releases_ubuntu-server
             ;;
         *ubuntu*)
             echo -en " - Releases:\t"
-            releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+            releases_ubuntu
             ;;
         *windows*)
             echo -en " - Releases:\t"
@@ -171,21 +171,14 @@ function error_specify_release() {
             ;;
         *)
             echo -en " - Releases:\t"
-            "releases_${OS}" | fold -s -w "$(tput cols)"
+            "releases_${OS}" | fmt -w 80
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 echo -en " - Editions:\t"
-                "editions_${OS}" | fold -s -w "$(tput cols)"
+                "editions_${OS}" | fmt -w 80
             fi
             ;;
     esac
     echo -e "\nERROR! You must specify a release."
-    exit 1
-}
-
-function error_specify_edition() {
-    show_os_info "${OS}"
-    echo -e " - Editions:\t$("editions_${OS}" | fold -s -w "$(tput cols)")"
-    echo -e "\nERROR! You must specify an edition."
     exit 1
 }
 
@@ -194,18 +187,6 @@ function error_not_supported_release() {
         echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
         echo -n ' - Supported releases: '
         "releases_${OS}"
-        exit 1
-    fi
-}
-
-function error_not_supported_edition() {
-    if [[ ! "${EDITIONS[*]}" =~ ${EDITION} ]]; then
-        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
-        echo -n ' - Supported editions: '
-        for EDITION in "${EDITIONS[@]}"; do
-            echo -n "${EDITION} "
-        done
-        echo ""
         exit 1
     fi
 }
@@ -302,7 +283,7 @@ function csv_data() {
             EDITIONS=$(editions_"${OS}")
         fi
 
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+        for RELEASE in $("releases_${FUNC}"); do
             if [[ "${OS}" == *"ubuntu"* ]] && [[ ${RELEASE} == *"daily"*  ]] && [ ${HAS_ZSYNC} -eq 1 ]; then
                 DOWNLOADER="zsync"
             else
@@ -410,11 +391,11 @@ function test_all() {
     fi
     local URL=""
 
-    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+    for RELEASE in $("releases_${FUNC}"); do
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
+                URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
@@ -443,7 +424,7 @@ function test_all() {
             (get_ubuntu)
         else
             validate_release releases_"${OS}"
-            URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
@@ -610,7 +591,7 @@ function editions_arcolinux() {
 
 function releases_artixlinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -1)
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n 1)
 }
 
 function editions_artixlinux() {
@@ -625,17 +606,20 @@ function releases_athenaos() {
 
 function releases_batocera() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail +2 | head -n 5)
+    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail -n +2 | head -n 5)
 }
 
 function releases_bazzite() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | head -n 5)
+    echo latest
+}
+
+function editions_bazzite() {
+    echo gnome kde
 }
 
 function releases_biglinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -1)
+    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -n 1)
 }
 
 function editions_biglinux() {
@@ -697,12 +681,20 @@ function releases_crunchbang++() {
 }
 
 function releases_debian() {
+    local ARCHIVE=""
+    local MAJ=""
     local NEW=""
     local OLD=""
     NEW=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
-    OLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac | head -20)
-    #shellcheck disable=SC2086
-    echo ${NEW} ${OLD}
+    echo -n "${NEW}"
+    MAJ=$(echo "${NEW}" | cut -d'.' -f 1)
+    ARCHIVE="$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep folder | grep -v NEVER | cut -d'"' -f 6)"
+    for i in {1..2}; do
+        CUR=$((MAJ - i))
+        OLD=$(grep ^"${CUR}"  <<< "${ARCHIVE}" | tail -n 1 | tr -d '/')
+        echo -n " ${OLD}"
+    done
+    echo
 }
 
 function editions_debian() {
@@ -711,7 +703,7 @@ function editions_debian() {
 
 function releases_deepin() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r)
+    echo $(web_pipe "https://mirrors.kernel.org/deepin-cd/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | tail -n 10 | sort -r)
 }
 
 function releases_devuan() {
@@ -728,8 +720,8 @@ function releases_dragonflybsd() {
 function releases_easyos() {
     #local Y2023=""
     #local Y2024=""
-    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
-    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
     #echo -n ${2024}
     #echo ${Y2023}
     # Not dynamic for now
@@ -742,7 +734,7 @@ function releases_elementary() {
 
 function releases_endeavouros() {
     local ENDEAVOUR_RELEASES=""
-    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
+    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | grep -o '<a href="[^"]*.iso">' | sed 's/^<a href="//;s/.iso">.*//' | grep -v 'x86_64' | LC_ALL="en_US.UTF-8" sort -Mr | cut -c 13- | head -n 5 | tr '\n' ' ')"
     echo "${ENDEAVOUR_RELEASES,,}"
 }
 
@@ -766,7 +758,7 @@ function editions_fedora() {
 
 function releases_freebsd() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/" |grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/' | sort -r)
+    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r)
 }
 
 function editions_freebsd() {
@@ -795,7 +787,7 @@ function editions_gentoo() {
 
 function releases_ghostbsd() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -3)
+    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail -n +3 | head -n 3)
 }
 
 function editions_ghostbsd() {
@@ -804,7 +796,7 @@ function editions_ghostbsd() {
 
 function releases_gnomeos() {
     #shellcheck disable=SC2046,SC2005
-    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
+    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep "title=" | awk -F'"' '{print $4}' | tr -d '/' | sort -nr)
 }
 
 function releases_guix() {
@@ -820,7 +812,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    web_pipe "https://github.com/HoloISO/releases/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -n 1 | cut -d'/' -f 3
+    echo "latest"
 }
 
 function releases_kali() {
@@ -876,7 +868,7 @@ function releases_manjaro() {
 }
 
 function releases_mxlinux() {
-    echo 23.2
+    echo 23.3
 }
 
 function editions_mxlinux() {
@@ -890,7 +882,7 @@ function releases_netboot() {
 function releases_netbsd() {
     # V8 is EOL so filter it out
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr)
+    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
 }
 
 function releases_nitrux() {
@@ -898,11 +890,13 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    echo unstable 23.11 23.05 22.11 22.05 21.11 21.05
+    # Lists unstable plus the two most recent releases
+    #shellcheck disable=SC2046
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -P '(?<=<Key>nixos-)[0-9]+.[0-9]+(?=</Key>)' | sort -nr | head -n +2)
 }
 
 function editions_nixos() {
-    echo minimal plasma5 gnome
+    echo minimal plasma gnome
 }
 
 function releases_nwg-shell() {
@@ -917,7 +911,7 @@ function releases_openbsd() {
 
 function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5)
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
 }
 
 function editions_openindiana() {
@@ -934,7 +928,8 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-    echo 6.0 5.3
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n 1)
 }
 
 function editions_parrotsec() {
@@ -1009,7 +1004,7 @@ function editions_siduction() {
 
 function releases_slackware() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -5)
+    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -n 5)
 }
 
 function releases_slax() {
@@ -1021,9 +1016,7 @@ function editions_slax() {
 }
 
 function releases_slint() {
-    # 15.0.1 returns a 404 so is excluded
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://slackware.uk/slint/x86_64/" | grep "slint-" | cut -d'>' -f2 | cut -d'-' -f2 | tr -d "/\"" | grep -v "15.0.1" | sort -ru)
+    echo "15.0-5"
 }
 
 function releases_slitaz() {
@@ -1101,24 +1094,21 @@ function releases_tuxedo-os() {
 function releases_ubuntu() {
     local VERSION_DATA=""
     local SUPPORTED_VERSIONS=()
-    local EOL_VERSIONS=()
     VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
     # shellcheck disable=SC2207
     SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
-    # shellcheck disable=SC2207
-    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<"${VERSION_DATA}" | sort))
     case "${OS}" in
         ubuntu)
-            echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]}" daily-live;;
         kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
             # after 16.04
-            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live;;
         ubuntu-budgie)
             # after 18.04
-            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live;;
         edubuntu|ubuntu-unity|ubuntucinnamon)
             # after 23.10
-            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live;;
     esac
 }
 
@@ -1136,7 +1126,7 @@ function releases_vanillaos() {
 
 function releases_void() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -3)
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
 }
 
 function editions_void() {
@@ -1149,28 +1139,18 @@ function releases_vxlinux() {
 }
 
 function releases_windows() {
-    echo 11 10-ltsc 10 8
+    echo 11 10
 }
 
 function languages_windows() {
-    if [ "${RELEASE}" == 8 ]; then
-        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
-        "Croatian" "Czech" "Danish" "Dutch" "English (United States)" "English International" "Estonian" "Finnish" "French" "German" "Greek" \
-        "Hebrew" "Hungarian" "Italian" "Japanese" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" \
-        "Slovak" "Slovenian" "Spanish" "Swedish" "Thai" "Turkish" "Ukrainian")
-    elif [ "${RELEASE}" == "10-ltsc" ]; then
-        I18NS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
-        "French" "German" "Italian" "Japanese" "Korean" "Portuguese (Brazil)" "Spanish")
-    else
-        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
-        "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
-        "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
-        "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
-    fi
+    I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+    "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
+    "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
+    "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
 }
 
 function releases_windows-server() {
-    echo 2022 2019 2016 2012-r2
+    echo 2022 2019 2016
 }
 
 function languages_windows-server() {
@@ -1270,8 +1250,8 @@ function web_get() {
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-        echo "ERROR! Failed to download ${URL} with curl."
-        rm -f "${DIR}/${FILE}"
+        echo 
+        exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
     fi
 }
 
@@ -1302,7 +1282,7 @@ function web_check() {
             shift
         fi
     done
-    curl --silent --location --head --output /dev/null --fail "${HEADERS[@]}" "${URL}"
+    curl --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
 }
 
 function zsync_get() {
@@ -1430,7 +1410,7 @@ function make_vm_config() {
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
         cat << EOF > "${CONF_FILE}"
-#!$(which quickemu) --vm
+#!${QUICKEMU} --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
@@ -1523,7 +1503,7 @@ EOF
         fi
 
         # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == 11 ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == "11" ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
@@ -1599,7 +1579,7 @@ function get_antix() {
         full-*) ISO+="_x64-full.iso";;
         net-*)  ISO+="-net_x64-net.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1657,9 +1637,12 @@ function get_batocera() {
 function get_bazzite() {
     local HASH=""
     local ISO=""
-    local URL="https://github.com/ublue-os/bazzite/releases/download/v${RELEASE}"
-    ISO=$(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '"' -f4 | cut -d'.' -f1-5 | grep "${RELEASE}" | cut -d'/' -f9)
-    HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | grep 'SHA256' | cut -d' ' -f4)
+    local URL="https://download.bazzite.gg"
+    case ${EDITION} in
+        gnome) ISO="bazzite-gnome-stable.iso";;
+        kde)  ISO="bazzite-stable.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1694,7 +1677,7 @@ function get_bunsenlabs() {
     local HASH=""
     local ISO="boron-1-240123-amd64.hybrid.iso"
     local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -n 1 | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1702,7 +1685,7 @@ function get_cachyos() {
     local HASH=""
     local REL=""
     local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
+    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n 1)
     local ISO="cachyos-${EDITION}-linux-${REL}.iso"
     HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${REL}/${ISO} ${HASH}"
@@ -1747,7 +1730,7 @@ function get_debian() {
         URL="${URL/hybrid/cd}"
         ISO="${ISO/-live/}"
     fi
-    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1756,11 +1739,9 @@ function get_deepin() {
     local REV=${RELEASE}
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
-    # fix iso name
-    if [[ "${RELEASE}" == *"20" ]] ; then
-        REV="1003"
-    elif [[ "${RELEASE}" == *"20.1" ]]; then
-        REV="1010"
+    # Correct URL for 23-RC onwards which has architecture directories
+    if [[ "${RELEASE}" == *"23-RC"* ]] ; then
+        URL+="/amd64"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
     HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
@@ -1822,7 +1803,7 @@ function get_endeavouros() {
     local ISO=""
     local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Find EndeavourOS releases from mirror, pick one matching release
-    ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
+    ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o '<a href="[^"]*.iso">' | sed 's/^<a href="//;s/.iso">.*//' | grep -v 'x86_64')"
     ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1860,7 +1841,7 @@ function get_fedora() {
         *) VARIANT="Spins";;
     esac
     #shellcheck disable=SC2086
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and .sha256 != null)')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -1953,7 +1934,8 @@ function get_haiku() {
 function get_holoiso() {
     local HASH=""
     local URL=""
-    URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
+    RELEASE="$(web_pipe "https://github.com/HoloISO/releases/releases" | grep -o -e 'releases/tag/[[:digit:]]\+\(\.[[:digit:]]\+\)*' | head -n 1 | cut -d'/' -f 3)"
+    URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq -r ".[] | select(.tag_name==\"${RELEASE}\") | .body" | sed -n 's/.*\(https:\/\/[^ ]*holoiso\.ru\.eu\.org\/[^ ]*\.iso\).*/\1/p' | head -n 1)
     echo "${URL} ${HASH}"
 }
 
@@ -2208,13 +2190,23 @@ function get_nitrux() {
     local ISO=""
     URLBASE="https://sourceforge.net/projects/nitruxos/files/Release"
     URL="${URLBASE}/ISO"
-    ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -1 | cut -d']' -f1 | cut -d '/' -f4)
+    ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -n 1 | cut -d']' -f1 | cut -d '/' -f4)
     HASH=$(web_pipe "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_nixos() {
     local HASH=""
+    # Adapt the plasma edition according to the NixOS release
+    case "${EDITION}" in
+        plasma)
+            if [ "${RELEASE}" == "23.11" ]; then
+                EDITION+="5"
+            else
+                EDITION+="6"
+            fi
+            ;;
+    esac
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
@@ -2225,7 +2217,7 @@ function get_nwg-shell() {
     local HASH=""
     local ISO="nwg-live-${RELEASE}-x86_64.iso"
     local URL="https://sourceforge.net/projects/nwg-iso/files"
-    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -1)"
+    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n 1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2426,9 +2418,10 @@ function get_slax() {
 
 function get_slint() {
     local HASH=""
-    local ISO=""
-    local URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
-    ISO=$(web_pipe "${URL}" | grep "slint64-" | cut -d'>' -f2 | cut -d'"' -f2 | head -n1)
+    local MAJ_VER=""
+    local ISO="slint64-${RELEASE}.iso"
+    MAJ_VER="$(echo "${RELEASE}" | cut -d'-' -f 1)"
+    local URL="https://slackware.uk/slint/x86_64/slint-${MAJ_VER}/iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f4)
     echo "${URL}/${ISO}" "${HASH}"
 }
@@ -2459,7 +2452,7 @@ function get_sparkylinux() {
         minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
         *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -n 2 | grep 'iso' | cut -d' ' -f1)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
@@ -2580,9 +2573,7 @@ function get_ubuntu() {
         # Ubuntu Studio daily-live images are in the dvd directory
         RELEASE="dvd"
     fi
-    if [[ "${RELEASE}" == "eol-"* ]]; then
-        URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
-    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+    if [[ "${RELEASE}" == "jammy-daily" ]]; then
         if [[ "${OS}" == "ubuntustudio" ]]; then
             URL="https://cdimage.ubuntu.com/${OS}/jammy/dvd/current"
         else
@@ -2627,7 +2618,7 @@ function get_vanillaos() {
     local HASH=""
     local HASH_URL=""
     local ISO=""
-    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n 1 | cut -d'"' -f4)
     HASH_URL="${ISO//.iso/.sha256.txt}"
     HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
@@ -3025,8 +3016,6 @@ function download_windows_server() {
     local PRETTY_RELEASE=""
 
     case "${RELEASE}" in
-        "10-ltsc") PRETTY_RELEASE="10 LTSC";;
-        "2012-r2") PRETTY_RELEASE="2012 R2";;
         *) PRETTY_RELEASE="${RELEASE}";;
     esac
 
@@ -3140,12 +3129,12 @@ function download_windows_workstation() {
     # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
 
-    # Either 8, 10, or 11
+    # Either 10, or 11
     local windows_version="$1"
 
     local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
     case "$windows_version" in
-        8 | 10) url="${url}ISO";;
+        10) url="${url}ISO";;
     esac
 
     local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
@@ -3243,9 +3232,7 @@ function download_windows_workstation() {
 }
 
 function get_windows() {
-    if [ "${RELEASE}" == "10-ltsc" ]; then
-        download_windows_server windows-10-enterprise ltsc
-    elif [ "${OS}" == "windows-server" ]; then
+    if [ "${OS}" == "windows-server" ]; then
         download_windows_server "windows-server-${RELEASE}"
     else
         download_windows_workstation "${RELEASE}"
@@ -3339,6 +3326,19 @@ function create_vm() {
     make_vm_config "${ISO}"
 }
 
+# Use command -v command to check if quickemu is in the system's PATH and
+# fallback to checking if quickemu is in the current directory.
+function resolve_quickemu() {
+    if command -v quickemu >/dev/null 2>&1; then
+        command -v quickemu
+    elif [ -f "./quickemu" ]; then
+        echo "$(pwd)/quickemu"
+    else
+        echo "quickemu not found" >&2
+        exit 1
+    fi
+}
+
 function help_message() {
     #shellcheck disable=SC2016
     printf '
@@ -3376,8 +3376,8 @@ Arguments:
   --list-json                              : List everything in json format
 --------------------------------------------------------------------------------
 
-Supported Operating Systems:\n\n' "$(quickemu --version)" "${CURL_VERSION}"
-    os_support | fold -s -w "$(tput cols)"
+Supported Operating Systems:\n\n' "$(${QUICKEMU} --version)" "${CURL_VERSION}"
+    os_support | fmt -w 80
 }
 
 trap cleanup EXIT
@@ -3387,6 +3387,7 @@ if ((BASH_VERSINFO[0] < 4)); then
     exit 1
 fi
 
+QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
@@ -3394,7 +3395,7 @@ if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
-CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
+CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
 QEMU_IMG=$(command -v qemu-img)
 if [ ! -x "${QEMU_IMG}" ]; then
@@ -3430,7 +3431,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "HB 4.9.5.01"
+        echo "HB 4.9.6.01"
         exit 0;;
     --help|-help|--h|-h)
         help_message
@@ -3480,13 +3481,22 @@ if [ -n "${2}" ]; then
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
         EDITIONS=("$(editions_"${OS}")")
-        # Default to the first edition if none is specified.
-        EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            error_not_supported_edition
+            if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
+                echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
+                echo -n ' - Supported editions: '
+                for EDITION in "${EDITIONS[@]}"; do
+                    echo -n "${EDITION} "
+                done
+                echo ""
+                exit 1
+            fi
         else
-            error_specify_edition
+            show_os_info "${OS}"
+            echo -e " - Editions:\t$("editions_${OS} | fmt -w 80")"
+            echo -e "\nERROR! You must specify an edition."
+            exit 1
         fi
         handle_missing
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
@@ -3509,7 +3519,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! "${I18NS[*]}" =~ ${I18N} ]]; then
+            if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
