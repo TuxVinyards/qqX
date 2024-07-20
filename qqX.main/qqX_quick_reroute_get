@@ -45,10 +45,12 @@ load_QGW_OS_Array () {
 print_quickget_and_folder_choices () {
 
   # listing function, originally for use inside 'function_quick_get_wrap'  
-  # adapted with $2 EITHER as number per line OR for alpha filter
+  # adapted with $2 EITHER as number per line OR for alpha zooming filter
   # and for use for listing target folder selections for installing or moving VM's
 
   declare -n  QGW_List_ArrName="$1"
+
+  #printf "\n * %s" "${QGW_List_ArrName[@]}" 
 
   QGW_List_Arr_ItemLength=15
 
@@ -59,19 +61,20 @@ print_quickget_and_folder_choices () {
     QGW_List_NewLinePoint="$Force_GetList_NewLinePoint"
   fi
 
-  if [[ $2 == "UbuntuOthers" ]]; then QGW_List_UbuntuOthers=1; else QGW_List_UbuntuOthers=; fi
+  # set flags and transfer arrays
+  QGW_TxArr=()
+  if [[ $2 == "UbuntuOthers" ]]; then QGW_List_UbuntuOthers=1;  else QGW_List_UbuntuOthers=; fi
+  if [[ "$2" == [a-z] ]]; then QGW_List_AlphaFilter="$2";  else QGW_List_AlphaFilter=; fi
 
-  if [[ "$2" == [a-z] ]]; then QGW_List_AlphaFilter="$2"; else QGW_List_AlphaFilter=; fi
-
+  # set vars:
   QGW_List_ArrNum=0
   QGW_List_ArrNum_Last="${#QGW_List_ArrName[@]}"
   QGW_List_DisplayNum=1
   QGW_List_NewLineCounter=1
 
-  # adjust things if needed
-
+  # adjust display spacing, if needed
   i=0
-  while [[ $i -le "$QGW_List_ArrNum_Last" ]]  ; do
+  while [[ $i -le "$QGW_List_ArrNum_Last" ]] ; do
     for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do    
       if [[ "${#QGW_List_Arr_Item}" -gt "$QGW_List_Arr_ItemLength" ]]; then 
         ((QGW_List_NewLinePoint-=1)); ((QGW_List_Arr_ItemLength+=5)) ; break
@@ -80,21 +83,43 @@ print_quickget_and_folder_choices () {
     done
   done
 
-  #printf "\n * %s" "${QGW_List_ArrName[@]}" 
-
   for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
 
+    local TxVar=
     if [[ $QGW_List_UbuntuOthers ]] && [[ ${QGW_List_Arr_Item:2} ==  *'buntu' ]]; then
-      printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"; ((QGW_List_NewLineCounter+=1))
+      printf -v TxVar "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
+      QGW_TxArr+=("$TxVar")
+
+    elif [[ ${QGW_List_Arr_Item:0:1} == "$QGW_List_AlphaFilter" ]] ; then
+      printf -v TxVar "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
+      QGW_TxArr+=("$TxVar")
+
     elif [[ ! $QGW_List_UbuntuOthers ]] && [[ ! $QGW_List_AlphaFilter || ${QGW_List_Arr_Item:0:1} == "$QGW_List_AlphaFilter" ]] ; then
       printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"; ((QGW_List_NewLineCounter+=1))
     fi
 
     ((QGW_List_ArrNum+=1));  ((QGW_List_DisplayNum+=1))
 
-    if [[ $QGW_List_NewLineCounter -ge "$QGW_List_NewLinePoint" ]];  then
+    if [[ ! $QGW_List_UbuntuOthers && ! $QGW_List_AlphaFilter ]] && [[ $QGW_List_NewLineCounter -ge "$QGW_List_NewLinePoint" ]];  then
       QGW_List_NewLineCounter=1   # reset counter
       [[ $QGW_List_ArrNum -lt "$QGW_List_ArrNum_Last" ]] &&  printf "\n\n"
+    fi
+
+  done
+
+  QGW_Tx_ArrNum=0
+  QGW_Tx_ArrNum_Last="${#QGW_TxArr[@]}"
+  QGW_List_NewLineCounter=1
+
+  for QGW_List_Arr_Item in "${QGW_TxArr[@]}"; do
+
+    [[ $QGW_Tx_ArrNum == "0" ]] && printf "\n"
+    printf "%s" "$QGW_List_Arr_Item"
+    ((QGW_Tx_ArrNum+=1));  ((QGW_List_NewLineCounter+=1))
+
+    if [[ $QGW_List_NewLineCounter -ge "$QGW_List_NewLinePoint" ]];  then
+      QGW_List_NewLineCounter=1   # reset counter
+      [[ $QGW_Tx_ArrNum -lt "$QGW_Tx_ArrNum_Last" ]] &&  printf "\n\n"
     fi
 
   done
