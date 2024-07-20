@@ -10,13 +10,11 @@
 
 - Currently based on Quickemu, a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
 
-## Latest release 1.9.01
+## Latest release 1.9.02
 
 Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code.
 
-[MacOS](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) is now much faster and much improved too. Both in qqX and in with Quickemu.
-
-More details in the [wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages and the [release notes](#release-notes)
+[MacOS](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) is now much faster and much improved. More details in the [wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages and the [release notes](#release-notes)
 
 ## Hybrid interface. Part text, part mouse
 
@@ -112,13 +110,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ### Known Issues
 
-Tests show that official Quickemu 4.9.5 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
-
-Recently noticed: is a problem with telescoping VM's on Intel Hosts. (Possibly AMD too?). Now fixed for FreeBird and FreeSpirit.
-
-The removal of 'cow' from [all](https://github.com/quickemu-project/quickemu/pull/1228) qcow2 disks, for the benefit of btrfs, in the newly released 4.9.6 is a cause for concern ...
-
-Changing from one code set to another may _sometimes_ need a follow-up qqX restart. Hopefully to be fixed in the next release.
+Tests show that official Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
