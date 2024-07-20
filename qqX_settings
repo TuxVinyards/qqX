@@ -105,19 +105,21 @@ VM_SelectorStyle="A"
 # The idea is to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes, 
 # and to have the possibilty, if needed or wished, of allowing in selected pre-release community contributions.
 
-# Named versions are as follows: 
+# Branches    - Source code and diff comparisons are at  https://github.com/TuxVinyards/quickemu/branches
 
-# System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
+# Named versions are generally as follows: 
 
-# Echo       - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
+# FreeSpirit - As FreeBird, or as FreeBird but more spirited, with newer ideas and fixes if they are EXPECTED TO BE STABLE.
+#              Probably includes some official pre-release, or qqX and Community pre-release, or both.
 
-# HomeBird   - A recent FreeBird release, known to be generally STABLE and known to work with qqX.
+# FreeBird   - Based on time tested FreeSpirit or on official code. Generally tested as STABLE.
+#              Contains the usual qqX additions and tweaks. May contain a few official pre-release improvements.
 
-# FreeBird   - Based on HomeBird or Current official code. May be release or pre-release but known to be both stable & qqX stable.
-#              Probably with a sprinkling of cherry-picked official improvements along with a few qqX additions and tweaks ... 
+# HomeBird   - An older FreeBird release.  Just in case of the unforeseen ....
 
-# FreeSpirit - An alternative A/B FreeBird variant, or as FreeBird but more spirited. Possibly based on official pre-release.
-#              May contain newer ideas and fixes if they are expected to be stable.
+# Echo       - An older official quickemu release. Should generally work with qqX.  May be useful?
+
+# System     - The latest official quickemu release, as it is on the system. Use with caution. New releases can often have problems.
 
 # Custom/Dev - Your own customised or development version.  See the notes towards the end of the settings file.
 
@@ -354,19 +356,21 @@ VM_SelectorStyle="A"
 
 # NB no spaces in path, as quoted paths can only be added to the end of $PATH and we need the source path as first.
 
-# Different names are as follows: 
+# Branches    - Source code and diff comparisons are at  https://github.com/TuxVinyards/quickemu/branches
 
-# System     - The latest official quickemu release, as it is on the system. Use with caution, new releases may have problems.
+# Named versions are generally as follows: 
 
-# Echo       - A recent official quickemu release, known to be generally STABLE and known to work with qqX.
+# FreeSpirit - As FreeBird, or as FreeBird but more spirited, with newer ideas and fixes if they are EXPECTED TO BE STABLE.
+#              Probably includes some official pre-release, or qqX and Community pre-release, or both.
 
-# HomeBird   - A recent FreeBird release, known to be generally STABLE and known to work with qqX.
+# FreeBird   - Based on time tested FreeSpirit or on official code. Generally tested as STABLE.
+#              Contains the usual qqX additions and tweaks. May contain a few official pre-release improvements.
 
-# FreeBird   - Based on HomeBird or Current official code. May be release or pre-release but known to be both stable & qqX stable.
-#              Probably with a sprinkling of cherry-picked official improvements along with a few qqX additions and tweaks ... 
+# HomeBird   - An older FreeBird release.  Just in case of the unforeseen ....
 
-# FreeSpirit - An alternative A/B FreeBird variant, or as FreeBird but more spirited. Possibly based on official pre-release.
-#              May contain newer ideas and fixes if they are expected to be stable.
+# Echo       - An older official quickemu release. Should generally work with qqX.  May be useful?
+
+# System     - The latest official quickemu release, as it is on the system. Use with caution. New releases can often have problems.
 
 # Custom/Dev - Your own customised or development version.  See the notes here, at the end of the settings file.
 

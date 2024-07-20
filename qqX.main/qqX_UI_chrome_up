@@ -147,9 +147,9 @@ function exit {
 show_qqX_title_bar() {
 
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
-  printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s" "$QEMU_VER_LONG"  "$QE_VerNumber"  "$QG_VerNumber"
+  printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s  '%s'" "$QEMU_VER_LONG" "$QE_VerNumber" "$QG_VerNumber" "$QE_SourceVersion"
 
-  [[ $QE_SystemFilePath ]] && [[ $QE_SourcePath == "$QE_SystemFilePath" ]] && printf " 'System'"
+  #[[ $QE_SystemFilePath ]] && [[ $QE_SourcePath == "$QE_SystemFilePath" ]] && printf " 'System'"
 
   QE_FilePath_Short=
   QG_FilePath_Short=
@@ -185,9 +185,11 @@ show_qqX_title_bar() {
 
 function show_qqX_general_help {
 
+  HelpSelect=
+
   while true; do 
 
-    HelpSelect=
+    if [[ $1 ]]; then  HelpSelect="$1" ; shift ; fi
 
     printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
     printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
@@ -198,23 +200,25 @@ function show_qqX_general_help {
     printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation   Release Notes:  https://github.com/TuxVinyards/qqX#release-notes"
     printColor  "\n\n  [w] Online: qqX WIKI PAGES    Offline: [f] FreeBird notes  [c] command line & mouse notes  [enter] to RETURN"  
     printf "\n\n"
-    read -rp "  >  "  HelpSelect
+    [[ ! $HelpSelect ]] && read -rp "  >  "  HelpSelect
 
     if [[ $HelpSelect == "c" ]]; then   
       show_CLI_usage  
-      printf "\n  [enter] to return \n\n"
-      read -rp  "   >  " 
+      printf "\n"
+      read -rp  "   >  " HelpSelect
 
     elif [[ $HelpSelect == "f" ]]; then   
       printf "\n  Selectable for Hot-Swap from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
-      grep -m 1 -A 100  'System' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
-      printf "\n  [enter] to return \n\n"
-      read -rp  "   >  " 
+      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
+      printf "\n"
+      read -rp  "   >  " HelpSelect
 
     elif [[ $HelpSelect == "w" ]]; then
+      HelpSelect=
       nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & 
 
     else  
+      HelpSelect=
       break
     fi
 

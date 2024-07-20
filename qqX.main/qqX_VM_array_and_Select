@@ -339,8 +339,8 @@ VM_loader_selector_and_menu () {
 
       elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
 
+        if [[ $VM_Selection == "f"  ]]; then  show_qqX_general_help "f" ; else show_qqX_general_help ; fi
         VM_Selection=
-        show_qqX_general_help 
         return
 
       elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
