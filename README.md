@@ -60,7 +60,7 @@ Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://
 
 And 1.7.03 added
 
-- A _handy distro rename function_ to help with upgrades
+- A _handy distro rename function_ which helps with upgrades and will update all the .conf internals in one click.
 
 Release 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
@@ -106,25 +106,29 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - Release 1.8.05 should fix the wget 302 / SHA error that occured from github archive changes.
 
-- For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
+  For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
+
+### Reliability
+
+- Testing has always been carried out on a variety of mainstream distros.
+
+- All scripts have been carefully Shellcheck linted & have full error handling routines.
+
+- qqX always makes backups, as is _standard good practice_ with _any_ software.
 
 ### Known Issues
 
-Tests show that official Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. Doesn't affect FreeBird or FreeSpirit.
+- Tests show that _official_ Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. This doesn't affect FreeBird or FreeSpirit.
 
-- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
+- Also the Quickemu problem, where telescoped/nested VM grind to a halt, doesn't happen when using the qqX builtins either.
 
-Testing has been carried out on a variety of mainstream distros.
-
-All scripts have been carefully Shellcheck linted & have full error handling routines.
-
-qqX always makes backups, as is _standard good practice_ with _any_ software.
+See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
 ### FAQs and Help
 
 - Lots available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
 
-For Quickemu problems, there is a general chat forum at <https://discord.gg/sNmz3uw>
+For general Quickemu problems, there is a chat forum at <https://discord.gg/sNmz3uw>
 
 ## Why Bash?
 
@@ -150,7 +154,7 @@ There are none of the complexities that LibVirt creates by using only machine re
 
 And none of steep learning curves that come with languages such as Rust, C or Vala.
 
-- Even seemingly simple LibVirt front-ends like Gnome Boxes can contain whole learning curves for the most basic of things, like moving the default VM folder for example.  Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads).
+- Even seemingly simple LibVirt front-ends like Gnome Boxes can contain whole learning curves for the most basic of things, like moving the default VM folder for example.  Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads)
 
 ## Development and Roadmap
 
@@ -160,14 +164,10 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 I live in a wine growing region of Italy, in a castled village dating from the 1300's
 
-For me, qqX is something to do when it's too hot or it's raining and I can't be outside.
-
-The Olde English spelling of " Vine Yards " doesn't have with an 'e' whilst the modern word isn't even pronounced with one:
+For me, qqX is something to do when it's too hot or it's raining and I can't be outside. So, Linux development amongst the Vinyards, with the Olde English spelling of " Vine Yards " which doesn't have with an 'e' to match the context.
 
 1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia
 ...therefore they who are more religiously and holily instructed, neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation...
-
-Perhaps [Martha](https://en.wikipedia.org/wiki/Martha%27s_Vineyard) and others decided at some point to spell things out fully as Vine Yards, only later for the phrase to become contracted?
 
 ## why 'X' ?
 
