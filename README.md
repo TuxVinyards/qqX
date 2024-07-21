@@ -116,7 +116,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - qqX always makes backups, as is _standard good practice_ with _any_ software.
 
-### Known Issues
+### Improvements
 
 - Tests show that _official_ Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. This doesn't affect FreeBird or FreeSpirit.
 
