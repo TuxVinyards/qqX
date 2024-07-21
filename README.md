@@ -158,13 +158,13 @@ And none of steep learning curves that come with languages such as Rust, C or Va
 
 ## Development and Roadmap
 
-See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for more details and for what's happening in future releases
+See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for _more details_ and for _what's happening_ in future releases
 
 ## Why the Vinyards?
 
 I live in a wine growing region of Italy, in a castled village dating from the 1300's
 
-For me, qqX is something to do when it's too hot or it's raining and I can't be outside. So, Linux development amongst the Vinyards, with the Olde English spelling of " Vine Yards " which doesn't have with an 'e' to match the context.
+For me, qqX is something to do when it's too hot or it's raining and I can't be outside. So, Linux development amongst the Vinyards, with the Olde English spelling of " Vine Yards " which doesn't have with an 'e', to match the context.
 
 1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia
 ...therefore they who are more religiously and holily instructed, neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation...
