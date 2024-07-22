@@ -110,9 +110,9 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ### Reliability
 
-- Testing has always been carried out on a variety of mainstream distros.
+- Testing is always carried out on a variety of mainstream distros before release.
 
-- All scripts have been carefully Shellcheck linted & have full error handling routines.
+- All scripts are carefully Shellcheck linted & have full error handling routines.
 
 - qqX always makes backups, as is _standard good practice_ with _any_ software.
 
@@ -121,6 +121,8 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 - Tests show that _official_ Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. This doesn't affect FreeBird or FreeSpirit.
 
 - Also the Quickemu problem, where telescoped/nested VM grind to a halt, doesn't happen when using the qqX builtins either.
+
+- As qqX will offer a config autotune atfer download, Quickemu issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top) with Windows will not be present.
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
