@@ -102,9 +102,9 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ## Release notes
 
-- Release 1.8.05 should fix the wget 302 / SHA error that occured from github archive changes.
+- The github changes behind the wget 302 / SHA error now has a fix in place.
 
-  For updates from 1.8.04 and previous, please download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly
+  Users wanting to update version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly.
 
 ### Reliability
 
