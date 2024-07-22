@@ -2,29 +2,27 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Makes easy work of installing Mac and Windows
+- Improves on the popular Quickemu's very basic front-ends for [Qemu / KVM](https://qemu.readthedocs.io)
 
-- Easier and simpler than the front-ends based on LibVirt.
+- Much simpler than the Qemu front-ends based on LibVirt.
 
-- More up-to-date than Gnome Boxes and easier to mod.
-
-- Currently based on Quickemu, a _simply built_ front end for [Qemu / KVM](https://qemu.readthedocs.io)
+- More up-to-date and easier to mod than Gnome Boxes.
 
 ## Latest release 1.9.02
 
-Adds new built-ins and consolidates the raft of tweaks and adjustments to handle all the new Quickemu code.
+Further updates and consolidates the raft of tweaks and adjustments to the new Quickemu code.
 
-[MacOS](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) is now much faster and much improved. More details in the [wiki](https://github.com/TuxVinyards/qqX/wiki/FreeBird) pages and the [release notes](#release-notes)
+MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and the qqX built-ins can now be hot-swapped. More details in the  [release notes](#release-notes)
 
-## Hybrid interface. Part text, part mouse
+### Simple and Straightforward
 
-- A full menu system with lots of power and functions
+- A complete menu system within a unique hybrid interface.
 
-- Multiple display modes, utilities, optimizers and tools
+- Browse, download, install and organise countless distros
 
-- Simple code customizing
+- Run integrated and Windows and MacOS set ups
 
-_Less can be more_.
+- Explore multiple display modes, utilities, optimizers and tools
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
