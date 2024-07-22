@@ -8,11 +8,11 @@
 
 - More up-to-date and easier to mod than Gnome Boxes.
 
-## Latest release 1.9.02
+## [Latest release 1.9.02](#release-notes)
 
 Further updates and consolidates the raft of tweaks and adjustments to the new Quickemu code.
 
-MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and the qqX built-ins can now be hot-swapped. More details in the  [release notes](#release-notes)
+MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and the qqX built-ins can now be hot-swapped.
 
 ### Simple and Straightforward
 
@@ -104,7 +104,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - Release 1.8.05 should fix the wget 302 / SHA error that occured from github archive changes.
 
-  For updates from 1.8.04 and previous, please download the latest release [directly](<https://github.com/TuxVinyards/qqX/releases/latest>)
+  For updates from 1.8.04 and previous, please download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly
 
 ### Reliability
 
