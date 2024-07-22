@@ -120,7 +120,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - Also the Quickemu problem, where telescoped/nested VM grind to a halt, doesn't happen when using the qqX builtins either.
 
-- As qqX will offer a config autotune atfer download, Quickemu issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top) with Windows will not be present.
+- As qqX will offer a config autotune after a download, the Quickemu issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top) with Windows will not be present.
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
