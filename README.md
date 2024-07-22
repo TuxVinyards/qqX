@@ -46,7 +46,7 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ## Screenshots and features
 
-Release 1.1.03 improved the _main menu_ & added a gtk display option, while 1.5.02 now has GL toggle:
+Release 1.1.03 improved the _main menu_ & added a gtk display option, whilst 1.5.02 added GL toggle:
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
@@ -54,9 +54,7 @@ Release 1.5.02 added _alphabetical zooming_ into list sections for the Quick Get
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) :rocket:
-
-And 1.7.03 added
+Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) and 1.7.03 added:
 
 - A _handy distro rename function_ which helps with upgrades and will update all the .conf internals in one click.
 
@@ -72,13 +70,11 @@ Whilst earlier releases added:
 
 - Multiple snapshot management, including of shared disks.
 
-- qcow2 repair & resize
+- A days count on 'daily-live' ISO's
+
+- Qcow2 repair, resize and diagnostics
 
 - Secondary storage creation
-
-- Progress reporting on distro downloads & zsync iso's.  
-
-- Process logging and diagnostics
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
@@ -148,7 +144,7 @@ qqX uses a more modern writing style but is much the the same.
 
 - Anything in quickemu can be easily modded, shaped and improved.
 
-### ... and Straight forward
+### ... and Straightforward
 
 There are none of the complexities that LibVirt creates by using only machine readable configurations.
 
