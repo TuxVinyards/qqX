@@ -2,11 +2,11 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Improves on the popular Quickemu's very basic front-ends for [Qemu / KVM](https://qemu.readthedocs.io)
-
-- Much simpler than the Qemu front-ends based on LibVirt.
+- Improves on Quickemu's very basic front-ends for [Qemu / KVM](https://qemu.readthedocs.io)
 
 - More up-to-date and easier to mod than Gnome Boxes.
+
+- Much easier than the complex Qemu front-ends based on LibVirt.
 
 ## [Latest release 1.9.02](#release-notes)
 
