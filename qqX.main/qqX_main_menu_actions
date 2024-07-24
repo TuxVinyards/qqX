@@ -151,7 +151,7 @@ function  main_menu_actions {
         
   elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
 
-    printf "\n\n"
+    printf "\n\n" 
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
     else

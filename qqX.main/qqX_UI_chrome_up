@@ -131,12 +131,15 @@ function exit {
 
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
     printf "\n\n"
-    printColor "  ERROR : [Enter] to quit  or [h] to hold terminal open \n\n"
-    read -rp  "  >  "  -t 30  ExitTrap
-    [[ $ExitTrap == "h" ]] &&  printf "\n\n  Holding terminal open  [Enter] to quit  \n\n"  && read -rp "  >  "
-    tput cnorm
-    command exit "$@"
-
+    printColor "  ERROR :  [i] ignore & continue  [q] quit  \n\n"
+    read -rp  "  >  "  
+    ExitTrap=
+    printf "\n\n  Confirm:  [Enter] to quit  [r] to return and retry something else \n\n"  
+    read -rp "  >  "  ExitTrap
+    if [[ ! $ExitTrap ]]; then 
+      tput cnorm
+      command exit "$@"
+    fi
   fi
 
   # zero the optional 'exit 1' bypass flag (if it has been set)
