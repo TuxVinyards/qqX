@@ -101,7 +101,11 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
 
-  elif [[ $MainMenuChoice == "cd" ]] ; then qqX_edit_settings  custom
+  elif [[ $MainMenuChoice == "ce" ]] ; then qqX_edit_settings  custom
+
+  elif [[ $MainMenuChoice == "cc" ]] ; then custom_boot_file create
+
+  elif [[ $MainMenuChoice == "cd" ]] ; then custom_boot_file delete
 
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
@@ -335,10 +339,13 @@ function  main_menu_actions {
 
     # refresh
     MainMenuChoice=
+    ShowUtilsMenu=
     refresh_and_load_quickemu_sources
     refresh_conf_vars_and_values
 
   fi
+
+  [[ $MainMenuChoice != "u" ]] && ShowUtilsMenu=
 
 }
 

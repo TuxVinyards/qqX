@@ -52,9 +52,14 @@ else
       printf "\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n"
 
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
-      else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi
-
+      else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	
+      fi
       printf  "   [xa]  view or edit extra qemu args  "
+
+      if [[ -e "$QemuArgsCustomFile" ]]; then printf "\n\n  [cd]  delete the custom boot file "
+      else printf "\n\n  [cc]  create a custom boot file "
+      fi
+
       printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
@@ -74,14 +79,21 @@ else
       MenuCustomSystemBaseName="$(tr -cd '[:graph:]' <<<"$MenuCustomSystemBaseName")"
 
       if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
+     
       if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootMenu= ; else ShowCustomBootMenu=1 ; fi
 
       [[ $ForceCustomBootMenu == "hide" ]] && ShowCustomBootMenu=  && ShowDefault_Hybrid=1
       [[ $ForceCustomBootMenu == "show" ]] && ShowCustomBootMenu=1 && ShowDefault_Hybrid=
 
+      [[ $PreferHybridCustomMenus && ! $ForceCustomBootMenu ]] && ShowDefault_Hybrid=1 && ShowCustomBootMenu=
+
     else
 
-      [[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
+      #[[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
+      if [[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]]; then   
+        SettingsFileAdjusted=1
+        refresh_sources_and_load_VM_arrays 
+      fi
 
     fi
 
@@ -92,13 +104,13 @@ else
       # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
       printf "\n\n  [C]  toggle normal/custom menu  or  use normal:  [d] or [df] > sdl   [s] or [sf] > spice   [g] std gtk "
-      printf "\n\n  [cd] edit custom args file    [qd] open Qemu docs in browser"
+      printf "\n\n  [ce] edit custom args file    [qd] open Qemu docs in browser"
 
     else
 
       if [[ $ShowDefault_Hybrid ]]; then 
         printColor "\n\n  [c]   start VM using custom args" 
-        printf "      [cd] edit custom args file    [qd] open Qemu docs in browser"
+        printf "      [ce] edit custom args file    [qd] open Qemu docs in browser"
       fi
 
       printColor  "\n\n  [d]   start with SDL display"
