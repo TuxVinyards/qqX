@@ -54,7 +54,7 @@ else
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
       else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	; fi
 
-      printf  "   [xa]  edit extra qemu args  "
+      printf  "   [xa]  view or edit extra qemu args  "
       printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"

@@ -301,35 +301,33 @@ function  main_menu_actions {
     MenuXA=
     MenuXA_Correct=
 
-    printColor "\n\n  Give extra qemu arguments to use or [enter] for none "
     printf     "\n\n  Format = grouped & with space separated elements "
     printf     "\n\n  eg.  -device  tpm-tis,tpmdev=tpm0 "
 
-    [[ $ExtraSetArgs ]] && printf  "\n\n  Extra Set Args:  %s"  "$ExtraSetArgs"
+    [[ $ExtraSetArgs ]] && printf  "\n\n  Settings file Extra Args:  %s"  "$ExtraSetArgs"
+    [[ ! $ExtraArgs ]] && printf  "\n\n  No Extra Args are present"
+
+    printColor "\n\n  Give extra QEMU arguments to add or to add further, or [enter] to continue as is"
 
     if [[ $ExtraArgs ]] && [[ "$ExtraArgs" != "$ExtraSetArgs" ]]; then
-    
-      printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
+      printf  "\n\n  Menu Added Extra Args:  %s"  "$ExtraArgs"
       if [[ $ExtraSetArgs ]]; then printf "\n\n  [r] reset back to Set Args only " ; else printf "\n\n  [r] remove the Extra Args " ; fi
-
     fi
 
     printf "\n\n"
     read -rp "  > "  MenuXA
 
-    if [[ $MenuXA != "r" ]]; then
-
+    if [[ $MenuXA && $MenuXA != "r" ]]; then
       printf "\n\n  %s %s"  "$ExtraArgs" " $MenuXA"
       printf "\n\n  Is this correct y/n ? \n\n"
       read -rp "  >  "  MenuXA_Correct
-
     fi
     
-    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 1.5 
-
-    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1 
-    
-    else  ExtraArgs="$ExtraArgs $MenuXA" ; fi
+    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 2 
+    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1.5 
+    elif [[ $MenuXA ]]; then  ExtraArgs="$ExtraArgs $MenuXA" ; printColor "\n\n  Added \n\n" ; sleep 1.5
+    else  printColor "\n\n  NOT changed \n\n" ; sleep 1.5
+    fi
 
     printf "\033c\n\n"
 

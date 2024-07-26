@@ -246,20 +246,16 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     printf "\n\n\n" >> "$QemuArgsShortFile"
 
     [[ $NoSmartcardSupport ]] && printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: \n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" >> "$QemuArgsFile"
-
     printf "\n\n\n"  >> "$QemuArgsFile"
 
     if [[ $VerboseArgs ]]; then 
-
       # hold the launch till we have checked the config 
       BreakAtVerboseArgs=
       if [[ $UseCustomBootArgs ]]; then cat "$QemuArgsCustomFile" ; else cat "$QemuArgsFile" ; fi
       printColor "  [enter] to continue  [b] to go back \n\n"
       read -rp " >  " BreakAtVerboseArgs
       printf "\n\n"
-
       [[ $BreakAtVerboseArgs == "b" ]]  && return
-
     fi
 
 
@@ -268,25 +264,17 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     { printf "\nQUICKEMU SCREEN OUTPUT & other ...  \n"
 
       for Line in "${QE_echo_Arr[@]}"; do
-
         if [[ "$Line" == *'-name'* ]]; then
-        
           printf "\n\n\n%s" "$Line"
           printf "\n\n\nNote, the .sh file is NOT used by quickemu to run the VM but it will run it if the script is placed"
           printf "\n\nin the calling folder, where the .conf file is located, and if it is given execute permission ..."
-
         elif [[ "$Line" == *'/usr/bin/env bas'* ]]; then true
-
         elif [[ ! "$(tr -cd '[:print:]' <<< "$Line")" ]]; then true
-
         else  printf "\n\n%s" "$Line"
-
         fi
-
       done
 
       [[ $UseCustomBootArgs ]] && printf "\n\n\nHOWEVER ignoring the above standard boot & using the following CUSTOM BOOT sequence instead: \n\n"  && cat "$QemuArgsCustomFile"
-      
       printf "\n\n\n\n"
     
     } >> "$QemuArgsFile"
@@ -302,9 +290,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
       QemuCustomBootCommand=""
       mapfile -t CustomBootArr < "$QemuArgsCustomFile"
       for Line in "${CustomBootArr[@]}"; do
-
         if [[ $(tr -cd "[:print:]" <<< "$Line") ]] && [[ "$Line" != *'#'* ]]; then QemuCustomBootCommand+="$Line " ; fi
-
       done
       eval "$QemuCustomBootCommand" 2> "$QemuErrorLog"  &
 
@@ -312,7 +298,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
             
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-      eval "$QEMU"  "${args[*]}"  "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      eval "$QEMU"  "${args[*]}" -boot menu=on "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
 
     fi
 
