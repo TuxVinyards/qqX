@@ -237,6 +237,8 @@ function_config_tune_up ()  {
       if [[ $(bc <<< "$Shared_RAM_Allocated < 500") == 1 ]]; then Shared_RAM_Allocated= ; else Shared_RAM_Allocated="1" ; fi
     fi
 
+    [[ "$Shared_RAM_Allocated" == *G* ]] && Shared_RAM_Allocated="${Shared_RAM_Allocated/G/}"
+
   fi
 
   [[ ! $Shared_RAM_Allocated ]] && SharedRAM_NotFound=1
