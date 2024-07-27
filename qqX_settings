@@ -7,9 +7,9 @@
 
 ## Settings file for qqX - quickemu quickget X terminal project 
 
-# qqX installer will create a hidden folder at $HOME to also contain the desktop icons & will place the settings here.
-# Usually ctrl-h to unhide/hide in the files in the file manager
-# Settings may be opened (hidden or not) and edited from within the scripts via a menu selector.
+# qqX installer will create a hidden folder at $HOME & will place the settings there.
+# Settings may normally opened and edited via the qqX menu interface.
+# Alternatively, may be edited via the file manager, usually ctrl-h to unhide/hide files.
 
 # shellcheck disable=SC2034,SC2154   
 
@@ -29,11 +29,23 @@ Extra_VM_Folder+=("")
 
 
 ##  GENERAL COLOR & THEMING  
-
-X_Shade="3" 
-
 #  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1   
 #  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+X_Shade="3" 
+
+
+## Other SETTINGS SECTIONS AVAILABLE:
+
+  #  'QUICKEMU' & 'QUICKGET'  SOURCE
+  #   qqX UPDATES
+  #   EDITOR & BROWSER PROGRAMS
+  #   BOOT DEFAULTS, MSR, LOCALE, SCREENS and SIZES
+  #   SHARED or SECOND DRIVES
+  #   ERROR HANDLING
+  #   QEMU VERSIONING
+  #   qqX CUSTOM BOOTING & EXTRA ARGS
+  #   TIANO BIOS
+  #   CUSTOM SETTINGS & DEVELOPMENT
 
 
 ## VM SELECTOR: 
@@ -185,6 +197,8 @@ VM_SelectorStyle="A"
 # Set here, if 'xrandr' is not detecting size correctly  eg 3840x2160
   PhysicalMonitor=
 
+# PHYSICAL MONITOR  - SELECTION   See Extra Args section
+
 # GL GRAPHICS by default are "on".  Individually, placing gl as = "off" in the .conf file will reverse this.
 # This state may be toggled from the main menu or set here to normally boot as "off"
 
@@ -308,7 +322,7 @@ VM_SelectorStyle="A"
   VerboseArgs= 
 
 
-## TIANO Boot updates
+## TIANO BIOS
 
 # The Tiano boot system that is used by quickemu will require updating if there are feature or security changes made to the code.
 # (03/2024) Quickemu, currently places edk.fd vars into the VM folder. And there they remain.
@@ -329,6 +343,11 @@ VM_SelectorStyle="A"
 # Standard Arm AAVMF source folder = "/usr/share/AAVMF"  >>  Variations may be placed here.  
 # Defaults to auto-update, as below.
   RtvArmFolder=
+
+# Default is to have the 2 or 3 second option (via esc key) to access the BIOS. 
+# This is needed to select boot from ISO & is useful for Windows updates. 
+# Set = 1 if you wish to slightly speed up the boot sequence.
+  HideBootMenu=
 
 
 # CUSTOM SETTINGS FILE
