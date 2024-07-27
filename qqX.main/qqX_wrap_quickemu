@@ -285,6 +285,8 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
 
+    if [[ $HideBootMenu ]]; then BootMenuCmd= ; else BootMenuCmd=" -boot menu=on " ; fi
+
     if [[ $UseCustomBootArgs ]]; then
 
       QemuCustomBootCommand=""
@@ -298,7 +300,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
             
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-      eval "$QEMU"  "${args[*]}" -boot menu=on "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      eval "$QEMU"  "${args[*]}" "$BootMenuCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
 
     fi
 
