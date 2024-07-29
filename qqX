@@ -43,7 +43,7 @@ export "LC_COLLATE=C"
 
 # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
 # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-qqX_Version="1.9.02"
+qqX_Version="1.9.03"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
