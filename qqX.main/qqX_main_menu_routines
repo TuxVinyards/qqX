@@ -133,8 +133,8 @@ show_main_menu_header () {
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
-  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Bootable Main Drive yet to be created)" 
-  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(ISO/IMG Boot: Distro Non-installed)" 
+  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" 
+  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)" 
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
   fi
@@ -776,6 +776,9 @@ iso_select_mount_and_boot () {
     printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
     printf "\n"
 
+    if [[ "$BootAlert" == *'New:'* || "$BootAlert" == *'Live:'*  ]]; then
+      printf "\n\n  CAUTION: You are already standard booting from ISO. A fixed drive doesn't yet exist"
+    fi
 
     if [[ ! ${IsoList[*]} ]]; then 
       printColor "\n\n  NONE FOUND:  An ISO formated disk image should be copied into the individual VM folder"
