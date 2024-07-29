@@ -8,11 +8,13 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.9.02](#release-notes)
+## [Latest release 1.9.03](#release-notes)
 
 Further updates and consolidates the raft of tweaks and adjustments to the new Quickemu code.
 
 MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and the qqX built-ins can now be hot-swapped.
+
+Adds option to boot from ISO for disk management and makes custom boot files easier.
 
 ### Simple and Straightforward
 
