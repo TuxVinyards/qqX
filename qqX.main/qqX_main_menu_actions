@@ -107,6 +107,8 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "cd" ]] ; then custom_boot_file delete
 
+  elif [[ $MainMenuChoice == "iso" ]] ; then iso_select_mount_and_boot
+
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" 
@@ -201,7 +203,8 @@ function  main_menu_actions {
 
     drives_and_snapshots  info
 
-    printf "\n\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+    printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+    printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
       printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
     else printColor "\n\n  [enter] to return to menu \n\n" ; fi
@@ -293,6 +296,7 @@ function  main_menu_actions {
     VM_Conf_File=
     VM_InstanceName=
     MainDrive=
+    Mounted_ISO=
     IsoImg=
     NewFileTuneUp=
     NewFileTuneUp_JustDone=

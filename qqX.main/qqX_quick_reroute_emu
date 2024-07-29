@@ -97,6 +97,7 @@ function quickemu {
     # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
+    fixed_iso="$Mounted_ISO"
     [[ $guest_os == "macos" && ! $cpu_cores ]] && cpu_cores=8
 
     source "/tmp/qmod-actions-temp" 
@@ -113,13 +114,29 @@ function quickemu {
       printf "" > "/tmp/qqX_echo_output.log"
       printf "" > "$QemuErrorLog"
 
-      source "/tmp/qmod-boot-temp" 
+      Mounted_ISO_Return=
 
-      VM_ExecBoot=
+      if [[ $Mounted_ISO ]]; then
+        printColor "\n\n  Mounted ISO:  To BOOT from ISO Press 'esc' when 'Start boot Option' appears" 
+        printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. "
+        printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
+        printColor "\n\n  [enter] to continue  [b] to go back \n\n"
+        read -rp "  >  "  Mounted_ISO_Return
+      fi
 
-      if [[ $BreakAtVerboseArgs ]]; then
-        SpicyPID="$(pgrep spicy)"
-        [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
+      if [[ $Mounted_ISO_Return ]]; then  return
+
+      else
+      
+        source "/tmp/qmod-boot-temp" 
+
+        VM_ExecBoot=
+
+        if [[ $BreakAtVerboseArgs ]]; then
+          SpicyPID="$(pgrep spicy)"
+          [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
+        fi
+
       fi
 
     fi

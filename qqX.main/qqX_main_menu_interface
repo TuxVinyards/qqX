@@ -59,6 +59,7 @@ else
       if [[ -e "$QemuArgsCustomFile" ]]; then printf "\n\n  [cd]  delete the custom boot file "
       else printf "\n\n  [cc]  create a custom boot file "
       fi
+      printf "  [iso] mount iso / boot from iso"
 
       printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
 
