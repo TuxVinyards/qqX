@@ -22,24 +22,15 @@
 function quickemu {      
 
   # Any calls to quickemu become re-routed to this function instead.
-
-  ## Do a first check for amy qwrap internal commands   REVIEW 
+  # Do a first check for amy qwrap internal commands   REVIEW 
 
   local FirstParamCount=0
-
   IFS=' '  read -ra FirstParamsArray <<< "$*"
-
-  # declare -p FirstParamsArray
-  # read
-
   # https://unix.stackexchange.com/questions/50654/function-caller-positional-parameters?rq=1
 
   while [[ "${FirstParamsArray[$FirstParamCount]}" ]]; do
-
     for FirstParam in "${FirstParamsArray[@]}"; do
-
       case "$FirstParam" in
-      
         --vm_boot)  
             VM_ExecBoot=1 
             unset "FirstParamsArray[$FirstParamCount]"
@@ -62,74 +53,72 @@ function quickemu {
             msrs_conflict_check_resolver 
             exit directly ;; 
       esac
-
       ((FirstParamCount+=1))
-
     done
-
   done
 
-
   ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
-
   #  These bits are basically the remaining sections of the original quickemu code. 
   #  The earlier original code sections are all functions that have now been loaded, as is, or modified
 
   if [[ ! -e "/tmp/qmod-case-temp" ]] || [[ ! -e "/tmp/qmod-actions-temp" ]] || [[ ! -e "/tmp/qmod-boot-temp" ]]; then
 
-    printColor "\n\n ERROR qqX restart needed \n\n"  
-    sleep 5
+    printColor "\n\n ERROR qqX restart needed \n\n"  ; sleep 5
 
   else
 
     # keep running quickemu 'case' checks for matches:
     while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done  
+    shift  $#
 
     # if no more matches, remove any leftover params not cleared due to trapped exit re-route 
     # & if not yet given, decide on action   
     #  https://unix.stackexchange.com/questions/18981/how-to-unset-the-positional-parameters
 
-    shift  $#
-
     # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp" 
-    # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
-
-    # Some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
+    # BUT from qqX ver. 1.5 this happens at the end of qqX function 'VM_loader_selector_and_menu'
+    # So, some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
 
     gl="$qqX_GL_Mode"  
     fixed_iso="$Mounted_ISO"
     [[ $guest_os == "macos" && ! $cpu_cores ]] && cpu_cores=8
-
     source "/tmp/qmod-actions-temp" 
-
 
     if [[ $VM_ExecBoot ]]; then
 
-      # make sure quickemu doesn't run the vm boot sequence after running an 'action' unless flagged to do so
+      # Make sure quickemu doesn't run the vm boot sequence after running an 'action' unless flagged to do so
       # load extracted standard quickemu code that gives the okay to run main function 'vm_boot' (in this case, the modded one)
-
-      # REVIEW  these logs only get cleared just before running, so stay until a boot sequence is run, irrespective of
-      #         whether the run is made as [v] verbose & terminated
-
-      printf "" > "/tmp/qqX_echo_output.log"
-      printf "" > "$QemuErrorLog"
 
       Mounted_ISO_Return=
 
-      if [[ $Mounted_ISO ]]; then
-        printColor "\n\n  Mounted ISO:  To BOOT from ISO Press 'esc' when 'Start boot Option' appears" 
+      if [[ $HideBootMenu ]]; then
+        printColor " 'HideBootMenu' may be session disabled in utils, to access BIOS Boot Manager ..."
+        printf "\n\n  Use [iso] utility to select and mount a bootable image file \n\n"
+
+      elif [[ $Mounted_ISO && ! $HideMountedMsg ]]; then
+        printColor "  Mounted ISO:  To BOOT from ISO Press 'esc' when 'Start boot Option' appears" 
         printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. "
         printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
+        printf "\n\n  Use [iso] utility to select and mount a bootable image file \n\n"
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
         read -rp "  >  "  Mounted_ISO_Return
+
+      else
+        printColor "  Press 'esc' to access BIOS Boot Manager, when 'Start boot Option' appears"
+        printf "\n\n  Use [iso] utility to select and mount a bootable image file \n\n"
+
       fi
 
       if [[ $Mounted_ISO_Return ]]; then  return
 
       else
-      
-        source "/tmp/qmod-boot-temp" 
 
+        # These logs only get cleared just before running, so stay until a boot sequence is run, irrespective of
+        # whether the run is made as [v] verbose & terminated
+        printf "" > "/tmp/qqX_echo_output.log"
+        printf "" > "$QemuErrorLog"
+
+        source "/tmp/qmod-boot-temp" 
         VM_ExecBoot=
 
         if [[ $BreakAtVerboseArgs ]]; then

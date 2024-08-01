@@ -346,8 +346,11 @@ VM_SelectorStyle="A"
 
 # Default is to have the 2 or 3 second option (via esc key) to access the BIOS. 
 # This is needed to select boot from ISO & is useful for Windows updates. 
-# Set = 1 if you wish to slightly speed up the boot sequence.
+# Set =1 if you wish to slightly speed up the boot sequence.
   HideBootMenu=
+
+# Set =1  to hide the Mounted ISO boot message
+  HideMountedMsg=
 
 
 # CUSTOM SETTINGS FILE
