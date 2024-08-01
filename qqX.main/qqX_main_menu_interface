@@ -60,6 +60,7 @@ else
       else printf "\n\n  [cc]  create a custom boot file "
       fi
       printf "  [iso] mount iso / boot from iso"
+      [[ $HideBootMenu ]] && printf "   [bm] un-hide bios bootmenu "
 
       printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
 

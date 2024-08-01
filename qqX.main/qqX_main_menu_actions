@@ -109,6 +109,8 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "iso" ]] ; then iso_select_mount_and_boot
 
+  elif [[ $MainMenuChoice == "bm" ]] ; then HideBootMenu= ; HideMountedMsg=
+
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" 

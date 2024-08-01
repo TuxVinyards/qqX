@@ -99,7 +99,7 @@ function quickemu {
         printColor "  Mounted ISO:  To BOOT from ISO Press 'esc' when 'Start boot Option' appears" 
         printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. "
         printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
-        printf "\n\n  Use [iso] utility to select and mount a bootable image file \n\n"
+        printf "\n\n  Use [iso] utility to select and mount a bootable image file"
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
         read -rp "  >  "  Mounted_ISO_Return
 
