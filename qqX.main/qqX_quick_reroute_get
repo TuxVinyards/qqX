@@ -289,7 +289,7 @@ function_quick_get_wrap ()  {
     if [[ $InternetUp ]]; then
       printf "\e[2A" ; printf "\eK"
       printf "               Connection Looks GOOD       \n\n" 
-      sleep 1
+      sleep 0.7
     else 
       printColor "\n\n  INTERNET CONNECTION NOT FOUND. Check settings and equipment "
       printf "\n\n  [enter] to re-test,  [i] ignore, continue anyway  [b] back to main menu \n\n"
