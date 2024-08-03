@@ -141,7 +141,7 @@ function_test_iso_url () {
     fi
     DL_Url="$(awk '/https/{print $2 $3}' < "/tmp/qmod-dl-url")"
     if [[ $DL_Url ]]; then
-      printColor "\n\n  Checking link ... "
+      printColor "\n\n  Checking link ... \n\n"
       sleep 1
       curl --silent --location --head --output "/tmp/qmod-dl-size" --fail --connect-timeout 5 --max-time 5 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ -s "/tmp/qmod-dl-size" ]]; then 
@@ -1064,6 +1064,19 @@ function_quick_get_wrap ()  {
         printf "  None found"
       fi
 
+      # clear any accidental double pressing of the enter key if instance was slow to close
+      read -r -t 0.2  
+      read -r -t 0.2  
+      read -r -t 0.2  
+      read -r -t 0.2  
+      read -r -t 0.2  
+      read -r -t 0.1	
+      read -r -t 0.1	
+      read -r -t 0.1	
+      read -r -t 0.1	
+      read -r -t 0.1	
+      read -r -t 0.1	
+
       printColor "\n\n  [d] delete the folder" 
       [[ $New_VM_Conf_File ]] && printColor " and .conf" 
 
@@ -1072,14 +1085,14 @@ function_quick_get_wrap ()  {
       read -rp "  >  "    QGW_FolderDelete
 
       if [[ $QGW_FolderDelete == "d" ]]; then
-        printf "\n  Folder/file being deleted ... \n\n"
+        printf "\n\n  Folder/file being deleted ... \n\n"
         [[ -d "$New_VM_InstanceName" ]] && rm -f -r "$New_VM_InstanceName"
         [[ -e "$New_VM_Conf_File" ]] && rm -f "$New_VM_Conf_File"
       else  
-        printf  "\n  Folder/file retained \n\n"
+        printf  "\n\n Folder/file retained \n\n"
       fi
 
-      sleep 1.5
+      sleep 2
 
       cd "$Default_VM_Folder" || DefaultFolderError=1
       VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
