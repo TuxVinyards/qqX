@@ -515,16 +515,18 @@ function_quick_get_wrap ()  {
 
       QGW_List_NumSelected_Next="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Next+=1 ))
 
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed page with web browser" 
+      printf "\n\n  [s] scroll to next listing"  
+
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
       else  printf "\n\n" ; fi
 
-      printf "   [n] scroll to next listing  [b] to go back \n\n"   
+      printf "   [b] to go back \n\n"   
       read -rp "  >  "  QGW_List_NumSelected  
 
 
-      [[ $QGW_List_NumSelected != "n" ]] && QGW_List_NumSelected_Next=
+      [[ $QGW_List_NumSelected != "s" ]] && QGW_List_NumSelected_Next=
       
-      if [[ $QGW_List_NumSelected == "b" || $QGW_List_NumSelected == "n" ]]; then 
+      if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "b" ]]; then 
         
         QGW_List_NumSelected= 
         QGW_OS_Arr_NameSelected=
