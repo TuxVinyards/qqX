@@ -327,6 +327,8 @@ function_quick_get_wrap ()  {
       printColor "\n\n\n  Give [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] refresh  [B] to go back "
       printf "\n\n" 
 
+      [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
+
       [[ ! $QGW_List_NumSelected ]] && read -rp "  >  "  QGW_List_NumSelected
 
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
@@ -511,15 +513,19 @@ function_quick_get_wrap ()  {
 
       fi  
 
+      QGW_List_NumSelected_Next="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Next+=1 ))
+
       if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "\n\n  [w] to open listed page with web browser" 
       else  printf "\n\n" ; fi
 
-      printf "  [b] to go back \n\n"   
+      printf "   [n] scroll to next listing  [b] to go back \n\n"   
       read -rp "  >  "  QGW_List_NumSelected  
 
 
-      if [[ $QGW_List_NumSelected == "b" ]]; then 
-
+      [[ $QGW_List_NumSelected != "n" ]] && QGW_List_NumSelected_Next=
+      
+      if [[ $QGW_List_NumSelected == "b" || $QGW_List_NumSelected == "n" ]]; then 
+        
         QGW_List_NumSelected= 
         QGW_OS_Arr_NameSelected=
         function_quick_get_wrap
