@@ -360,6 +360,15 @@ function_quick_get_wrap ()  {
           print_quickget_and_folder_choices  "QGW_OS_Array" "UbuntuOthers"
         fi
 
+        if [[ $QGW_List_NumSelected == "m" ]]; then
+          printf "\n\n  and ...%-${QGW_List_Arr_ItemLength}s" " "
+          i=1
+          for M in "${QGW_OS_Array[@]}" ; do
+            if [[ "$M" == *"linuxmint"* ]]; then printf "  %s)  %s" "$i" "$M" ; fi
+            ((i++))
+          done
+        fi
+
         QGW_List_NumSelected=
 
       else
