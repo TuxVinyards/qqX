@@ -129,59 +129,12 @@ print_quickget_and_folder_choices () {
 
 function_test_iso_url () {
 
-  if grep -q -s -e '--test-iso-url' "$QG_SourcePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath"; then
-
-    if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else [[ ! $Zsync_Updatable_ISO ]] && printf "\n\n" ; fi
-
-    printf "  Checking download sources ... \n\n"
-
-    [[ $QGW_OS_Arr_NameSelected == "windows" ]] &&  printf "  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
-
-    iso_get_message
-
-    QGW_OS_HomePage="$(quickget --os-info "$QGW_OS_Arr_NameSelected" | grep Homepage | cut -d ':' -f 2,3)"
-
-    if [[ $QGW_OS_HomePage ]]; then 
-      printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-      if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage"; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
-    else
-      printf "\n\n  HomePage not found. However, downloads still might work ... ??\n\n"  
-    fi
-
-  elif grep -q -s -e '--test-iso-url' "$QG_SourcePath" && ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath"; then
-
-    if [[ $QGW_BadLink_ReTest ]]; then QGW_BadLink_ReTest= ;  else [[ ! $Zsync_Updatable_ISO ]] && printf "\n\n" ; fi
-
-    printf "  Checking download sources ... \n\n"
-
-    if [[ $QGW_OS_Arr_NameSelected == "windows" ]]; then 
-      # don't check, it's just another repeat call 
-      printf "  Microsoft servers may not report accurately, may block repeat attempts or may need manual download."
-      printf "\n\n  Make sure that you have a stable internet connection.  "
-    else
-      quickget -t "$QGW_DownloadSelection" &> "/tmp/qqX_get.test.iso.url.log"
-      cat "/tmp/qqX_get.test.iso.url.log"
-    fi
-
-    if grep -q -s "broken" "/tmp/qqX_get.test.iso.url.log"; then  
-      printColor "  ERROR  Bad link or server down ... " ; QGW_Download_BadLink=1
-      iso_get_message
-      if [[ $QGW_OS_HomePage ]]; then 
-        printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-        if curl --location --silent --head --output /dev/null --retry 1 --connect-timeout 1 "$QGW_OS_HomePage"; then  printf " (working)\n\n" ; else printf " (down)\n\n" ; fi
-      else
-        printf "\n\n  HomePage not found either ...  Re-test the link or Open browser for a search ??"  
-      fi
-
-    else 
-      printColor "  Link looks good ... \n\n"; QGW_Download_BadLink=
-    fi
-
-  elif grep -q -e '--url' "$QG_SourcePath"  || grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
+  if grep -q -e '--url' "$QG_SourcePath"  || grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
 
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
+    # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
     if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     else echo > "/tmp/qmod-dl-url"
@@ -320,7 +273,6 @@ function_quick_get_wrap ()  {
     Test_Internet=
     tput sc
     printf  "               Checking connections ... \n\n" 
-    sleep 0.5
 
     if   curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "1.1.1.1"  2> /dev/null ; then InternetUp=1
     elif curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "cloudflare.com"  2> /dev/null ; then InternetUp=1
@@ -335,25 +287,16 @@ function_quick_get_wrap ()  {
     fi
 
     if [[ $InternetUp ]]; then
-       
       printf "\e[2A" ; printf "\eK"
       printf "               Connection Looks GOOD       \n\n" 
-      sleep 1.5
-      #tput rc; tput ed  
-      #printf "\e[2A\r"
-    
+      sleep 1
     else 
-
       printColor "\n\n  INTERNET CONNECTION NOT FOUND. Check settings and equipment "
       printf "\n\n  [enter] to re-test,  [i] ignore, continue anyway  [b] back to main menu \n\n"
       read -rp "   >  "   Test_Internet
       echo
       [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="B"  && break   
       [[ $Test_Internet == "i" ]] && break   
-
-      #tput rc; tput ed  
-      #printf "\e[1A\r"
-
     fi
 
     show_QWG_header
@@ -475,11 +418,13 @@ function_quick_get_wrap ()  {
           QGW_OS_InfoText=
 
           if grep -q -s '4=Homepage' "$QG_SourcePath" ; then
-
+            # @ 08/2024 this one is now deprecated, can't seem to be found ??
             QGW_OS_HomePage="$("$QG_SourcePath" -4 "$QGW_OS_Arr_NameSelected")"
             QGW_OS_HomePage="$(tr -cd "[:print:]" <<< "$QGW_OS_HomePage")"
 
           elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
+
+              # 4.9.2 onwards seems to be okay  REVIEW  
 
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
@@ -593,67 +538,46 @@ function_quick_get_wrap ()  {
 
     # EDITIONS
 
-    if [[ "$QGW_OS_Arr_NameSelected"  == "xxxwindows" ]]; then
+    if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      #QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Languages:)"
-      QGW_WinLangs_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Languages:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-      # filter out display folding  REVIEW 
-      QGW_WinLangs_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_WinLangs_ListRaw")"
-      QGW_WinLangs_ListString="${QGW_WinLangs_ListRaw/'- Languages: '/}"
-      QGW_WinLangs_ListTest="$(tr -d '[:space:]' <<< "$QGW_WinLangs_ListString" )"
-
-      echo "Langs list test $QGW_WinLangs_ListTest"
-      echo "Langs list string $QGW_WinLangs_ListString"
-
-
-      if [[ $QGW_WinLangs_ListTest ]]; then   
-      
-        #  TODO   See https://github.com/quickemu-project/quickemu/issues/1113
-
-        read -ra QGW_WinLangs_Array <<< "$QGW_WinLangs_ListString"
-
-        declare -p QGW_WinLangs_Array
-
-
-        if [[ ${#QGW_WinLangs_Array[@]} -eq 1 ]] ; then
-
-          printf "\n\n  Only one current language found: "
-          QGW_Edition_Arr_NumSelected="${QGW_WinLangs_Array[0]}"
-
-        else
-
-          printf "\n\n"
-          print_quickget_and_folder_choices  "QGW_WinLangs_Array"
-          printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
-          read -rp "  >  "  QGW_List_NumSelected   
-
-          if [[ $QGW_List_NumSelected == "b" ]]; then  
-
-            QGW_List_NumSelected=
-            QGW_OS_Arr_NameSelected=
-            QGW_Release_Arr_NameSelected=
-            QGW_Edition_Arr_NameSelected=
-            function_quick_get_wrap
-            return
-
-          else
-
-            [[ $QGW_List_NumSelected -gt "${#QGW_WinLangs_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_WinLangs_Array[@]}"
-            # Uses Lang as edition
-            QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
-            QGW_Edition_Arr_NumSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
-
-          fi
-
-        fi
-
+      if [[ $QGW_OS_Arr_NameSelected  == "windows" ]]; then
+        QGW_WinLangs_Array=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+        "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
+        "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
+        "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
       else
+        # windows-server
+        QGW_WinLangs_Array=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
+      fi
 
-        QGW_Edition_Arr_NumSelected=
-        printf "\n\n  Further language selection not available"
+      #  See https://github.com/quickemu-project/quickemu/issues/1113
 
+      printf "\n\n"
+      if [[ $QGW_Release_Arr_NameSelected == "8"  ||  $QGW_Release_Arr_NameSelected == "10-ltsc" ]]; then
+        printf "\n\n  WARNING:  Outdated code. This release can no longer be downloaded"
+        printColor "\n\n  [b] to go back \n\n"  
+      else
+        print_quickget_and_folder_choices  "QGW_WinLangs_Array"
+        printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
+      fi
+      read -rp "  >  "  QGW_List_NumSelected   
+
+      if [[ $QGW_List_NumSelected == "b" ]]; then  
+        QGW_List_NumSelected=
+        QGW_OS_Arr_NameSelected=
+        QGW_Release_Arr_NameSelected=
+        QGW_Edition_Arr_NameSelected=
+        function_quick_get_wrap
+        return
+      else
+        [[ $QGW_List_NumSelected -gt "${#QGW_WinLangs_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_WinLangs_Array[@]}"
+        # Uses Lang as edition
+        QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
+        QGW_Edition_Arr_NameSelected="${QGW_WinLangs_Array[QGW_Edition_Arr_NumSelected]}"
+
+        echo "$QGW_Edition_Arr_NameSelected"
       fi
 
     else
@@ -712,9 +636,14 @@ function_quick_get_wrap ()  {
     QWG_NewVM_Name="${QGW_OS_Arr_NameSelected}"
   fi 
 
-  # TEST DOWNLOAD URL is correct and is good to go
+  # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
-  function_test_iso_url
+  if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
+    printf "  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
+    printf "\n\n  Make sure that you have a stable internet connection.  "
+  else
+    function_test_iso_url
+  fi
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
 
