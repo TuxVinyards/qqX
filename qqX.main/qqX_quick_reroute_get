@@ -562,7 +562,9 @@ function_quick_get_wrap ()  {
         print_quickget_and_folder_choices  "QGW_WinLangs_Array"
         printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
       fi
-      read -rp "  >  "  QGW_List_NumSelected   
+      read -rp "  >  "  QGW_List_NumSelected 
+
+      printf "\n"  
 
       if [[ $QGW_List_NumSelected == "b" ]]; then  
         QGW_List_NumSelected=
@@ -576,8 +578,6 @@ function_quick_get_wrap ()  {
         # Uses Lang as edition
         QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
         QGW_Edition_Arr_NameSelected="${QGW_WinLangs_Array[QGW_Edition_Arr_NumSelected]}"
-
-        echo "$QGW_Edition_Arr_NameSelected"
       fi
 
     else
@@ -626,7 +626,7 @@ function_quick_get_wrap ()  {
 
   fi
 
-  QGW_DownloadSelection="$QGW_OS_Arr_NameSelected  $QGW_Release_Arr_NameSelected  $QGW_Edition_Arr_NameSelected"
+  QGW_DownloadSelection="$QGW_OS_Arr_NameSelected  $QGW_Release_Arr_NameSelected  ""'""$QGW_Edition_Arr_NameSelected""'"
 
   if [[ $QGW_Edition_Arr_NameSelected ]]; then
     QWG_NewVM_Name="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
