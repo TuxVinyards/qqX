@@ -291,7 +291,25 @@ else
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
-    printf  "  [enter] refresh    [q] quit \n\n"
+    if  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
+        # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
+      if [[ $VM_InstanceName == "ubuntu-"[0-9]* ]]; then  DistroHomePage="https://ubuntu.com/"
+      else
+        # first listing, some may have two
+        QGW_OS_Info="$(grep "${VM_InstanceName%%-*})" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+        QGW_OS_Info="${QGW_OS_Info//';;'/}"
+        QGW_OS_Info="${QGW_OS_Info//'"'/}"
+
+        QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+        mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+        DistroHomePage="${QGW_OS_Info_ARR[2]}"
+      fi
+    else DistroHomePage=
+    fi
+
+    printf  "  [enter] refresh   "
+    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
+    printf " [q] quit \n\n"
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }
