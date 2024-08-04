@@ -881,6 +881,7 @@ function_quick_get_wrap ()  {
     printColor   "\n  Press [enter] at quickget finish,  at  \"start your .. virtual machine ... etc\" "
     printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
     printf     "\n\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
+    [[ "$QGW_DownloadSelection" == *'windows'* ]] && printf "\n\n  Microsoft downloads may sometimes hang when finished but he terminal may be safely closed, if this happens."
 
     printf   "\n\n\n  Quickemu & downloader output: "
 
