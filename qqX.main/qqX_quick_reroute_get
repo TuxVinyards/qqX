@@ -219,17 +219,15 @@ function check_new_vm_folder_name {
     # first chars in new name match to somewhere in something existing
     SimilarVM_ShorterCheck="${QGW_OS_Arr_NameSelected:0:5}"
     SimilarVMs+=" $(ls "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
-
     if [[ $SimilarVMs ]]; then
       SimilarVMs="$(tr ' ' '\n' <<< "$SimilarVMs" )"
       SimilarVMs="$(sort -u <<< "$SimilarVMs" | uniq )"
       mapfile -t  SimilarVM_Arr  <<< "$SimilarVMs"
       for Item in "${SimilarVM_Arr[@]}" ; do  
         TrimmedItem="$(basename "$Item" .conf)"
-        SimilarVM_Arr_Display+=("$TrimmedItem")
+        [[ $TrimmedItem ]] && SimilarVM_Arr_Display+=("$TrimmedItem")
       done
     fi
-
     if [[ ${SimilarVM_Arr[*]} ]]; then  
       for DailyCheckVM in "${SimilarVM_Arr[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
       [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
