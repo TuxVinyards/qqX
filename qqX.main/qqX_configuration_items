@@ -438,7 +438,9 @@ qqX_edit_settings() {
         else
 
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
-          (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File") || texteditor_not_found_message
+          (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File" & ) || texteditor_not_found_message
+          printf "\n  [enter] to refresh, if editing has been completed \n\n"
+          read -rp "  >  "
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
           break
@@ -503,10 +505,11 @@ function refresh_conf_vars_and_values {
     SharedDriveArgs=
     MacLegacyDrive=
     QemuError_VM_Filter=()
+    Custom_SDL_ScreenSize=
+    Custom_SDL_ScreenPercent=
+    ACCESS=
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
-
-    source "$VM_Conf_File"
 
     # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
@@ -528,9 +531,12 @@ function refresh_conf_vars_and_values {
 
     done
 
-    # check any menu values that are based on the file .conf 
+    source "$ConfClearanceLog"
+    source "$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
+
+    # check any menu values that are based on the file .conf 
 
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars

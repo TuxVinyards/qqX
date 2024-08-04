@@ -110,7 +110,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
-  elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
+  elif [[ $MainMenuChoice == "conf" ]] ; then  qqX_edit_settings  conf 
 
   elif [[ $MainMenuChoice == "ce" ]] ; then qqX_edit_settings  custom
 

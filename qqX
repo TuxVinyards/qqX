@@ -81,7 +81,7 @@ source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
-[[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s  QG_SourcePath = %s "  "$QE_SourcePath" "$QG_SourcePath \n"
+[[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s \n\n QG_SourcePath = %s \n"  "$QE_SourcePath" "$QG_SourcePath"
 
 # Don't load up code until checked for other instances, as the defaults could overwrite hot-swapped source files on the other instance
 multi_instance_checks
@@ -106,6 +106,7 @@ function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
     echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+    echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
