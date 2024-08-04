@@ -546,7 +546,7 @@ function editions_arcolinux() {
 
 function releases_artixlinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n +1)
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n 1)
 }
 
 function editions_artixlinux() {
@@ -646,7 +646,7 @@ function releases_debian() {
     ARCHIVE="$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep folder | grep -v NEVER | cut -d'"' -f 6)"
     for i in {1..2}; do
         CUR=$((MAJ - i))
-        OLD=$(grep ^"${CUR}"  <<< "${ARCHIVE}" | tail -n +1 | tr -d '/')
+        OLD=$(grep ^"${CUR}"  <<< "${ARCHIVE}" | tail -n 1 | tr -d '/')
         echo -n " ${OLD}"
     done
     echo
@@ -991,12 +991,17 @@ function editions_solus() {
 
 function releases_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru)
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" |  grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f2 | sort -ru)
 }
 
 function editions_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
+    if [ -z "${RELEASE}" ]; then
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    else
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    fi
+    
 }
 
 function releases_spirallinux() {
@@ -1641,7 +1646,7 @@ function get_cachyos() {
     local HASH=""
     local REL=""
     local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n +1)
+    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n 1)
     local ISO="cachyos-${EDITION}-linux-${REL}.iso"
     HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${REL}/${ISO} ${HASH}"
@@ -2173,7 +2178,7 @@ function get_nwg-shell() {
     local HASH=""
     local ISO="nwg-live-${RELEASE}-x86_64.iso"
     local URL="https://sourceforge.net/projects/nwg-iso/files"
-    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n +1)"
+    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n 1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2574,7 +2579,7 @@ function get_vanillaos() {
     local HASH=""
     local HASH_URL=""
     local ISO=""
-    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n +1 | cut -d'"' -f4)
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n 1 | cut -d'"' -f4)
     HASH_URL="${ISO//.iso/.sha256.txt}"
     HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
@@ -3055,9 +3060,9 @@ function download_windows_server() {
 
     case "$enterprise_type" in
         # Select x64 download link
-        "enterprise") iso_download_link=$(echo "$iso_download_links" | head -n +2 | tail -n +1) ;;
+        "enterprise") iso_download_link=$(echo "$iso_download_links" | head -n 2 | tail -n 1) ;;
         # Select x64 LTSC download link
-        "ltsc") iso_download_link=$(echo "$iso_download_links" | head -n +4 | tail -n +1) ;;
+        "ltsc") iso_download_link=$(echo "$iso_download_links" | head -n 4 | tail -n 1) ;;
         *) iso_download_link="$iso_download_links" ;;
     esac
 
@@ -3144,7 +3149,7 @@ function download_windows_workstation() {
     echo -n " - Getting Product edition ID: "
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
-    product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n +1 | tr -cd '0-9' | head -c 16)"
+    product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
     echo "$product_edition_id"
 
     { echo "product_edition_id"; echo; echo "$product_edition_id"; echo 
@@ -3425,10 +3430,9 @@ function create_config() {
 
 # Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
-function resolve_quickemu() {
-    if command -v quickemu >/dev/null 2>&1; then
-        command -v quickemu
-    elif [ -f "./quickemu" ]; then
+function resolve_quickemu() {   
+    command -v quickemu || \
+    if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
         echo "quickemu not found" >&2
@@ -3531,7 +3535,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.6.03"
+        echo "FS 4.9.6.04"
         exit 0;;
     --help|-help|--h|-h)
         help_message
@@ -3594,7 +3598,7 @@ if [ -n "${2}" ]; then
             fi
         else
             show_os_info "${OS}"
-            echo -e " - Editions:\t$("editions_${OS} | fmt -w 80")"
+            echo -e " - Editions:\t$("editions_${OS}" | fmt -w 80)"
             echo -e "\nERROR! You must specify an edition."
             exit 1
         fi
