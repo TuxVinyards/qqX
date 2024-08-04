@@ -150,10 +150,12 @@ function_test_iso_url () {
         printf "  not working "; QGW_Download_BadLink=1
       fi
       DL_FileName="${DL_Url##*/}"
-      DL_PotentialSize="$(awk '/content-length/{print $2}' < "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
+      DL_PotentialSize="$(grep -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
+      else
+        printf "  but reported size not available"
       fi
     fi
 
