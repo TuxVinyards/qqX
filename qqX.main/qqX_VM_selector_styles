@@ -44,7 +44,7 @@ function_vm_folder_item_text () {
 
   [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
 
-  [[ ${#ArrayConf_Item_Listing} -gt "24" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:24}"
+  [[ ${#ArrayConf_Item_Listing} -gt "22" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:22}"
 
   ## Decide on item text to print
 
