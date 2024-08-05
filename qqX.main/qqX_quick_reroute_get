@@ -502,7 +502,9 @@ function_quick_get_wrap ()  {
       elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
 
         iso_get_message
-        printColor "\n\n\n  [enter] to continue, only one current release found "
+        printf "\n\n\n  One Release only:  %s " "${QGW_Releases_Array[0]}"
+        printf "\n\n  Editions choice may be be possible." 
+        printColor "\n\n  [enter] to continue"
 
       else
 
@@ -601,44 +603,51 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      #QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | tail -n +2 | grep Editions)"
-      QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-      # filter out display folding  REVIEW 
-      QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
-      QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
-      QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
+      QGW_Editions_ListTest=
+      QGW_List_NumSelected=
+      QGW_Edition_Arr_NumSelected=
+      QGW_Edition_Arr_NameSelected=
+
+      if grep -q -s "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
+        # quickget will auto-start if editions function not present
+        QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
+        QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
+        QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
+        QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
+      fi
 
       if [[ $QGW_Editions_ListTest ]]; then
+          read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
+      fi
 
-        read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
+      if [[ ! ${QGW_Editions_Array[*]} ]]; then
+        printf "\n\n  Further editions selection not available:"
 
-        if [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
-          printf "\n\n  Only one current edition found: "
-          QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-        else
-          printf "\n\n"
-          print_quickget_and_folder_choices  "QGW_Editions_Array"
-          printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n"  
-          read -rp "  >  "  QGW_List_NumSelected   
-
-          if [[ $QGW_List_NumSelected == "b" ]]; then  
-            QGW_List_NumSelected=
-            QGW_OS_Arr_NameSelected=
-            QGW_Release_Arr_NameSelected=
-            QGW_Edition_Arr_NameSelected=
-            function_quick_get_wrap
-            return
-          else
-            [[ $QGW_List_NumSelected -gt "${#QGW_Editions_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Editions_Array[@]}"
-            QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
-            QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
-          fi
-        fi
+      elif [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
+        printf "\n\n  One edition found: %s" "${QGW_Editions_Array[0]}"
+        QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
 
       else
+        printf "\n\n"
+        print_quickget_and_folder_choices  "QGW_Editions_Array"
+        printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n" 
+        read -rp "  >  "  QGW_List_NumSelected   
+
+      fi 
+
+      if [[ $QGW_List_NumSelected == "b" ]]; then  
+        QGW_List_NumSelected=
+        QGW_OS_Arr_NameSelected=
+        QGW_Release_Arr_NameSelected=
         QGW_Edition_Arr_NameSelected=
-        printf "\n\n  Further editions selection not available"
+        function_quick_get_wrap
+        return
+      elif [[ "$QGW_List_NumSelected" == [0-9] || "$QGW_List_NumSelected" == [0-9][0-9] ]]; then
+        [[ $QGW_List_NumSelected -gt "${#QGW_Editions_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Editions_Array[@]}"
+        QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
+        QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
       fi
+
     fi
 
   fi
@@ -698,7 +707,16 @@ function_quick_get_wrap ()  {
 
   # READY TO START DOWNLOAD 
 
-    QGW_OverWriteAllow=
+  # clear any accidental double pressing of the enter key to avoid any auto-starts
+
+  read -r -t 0.2	
+  read -r -t 0.1	
+  read -r -t 0.1	
+  read -r -t 0.1	
+  read -r -t 0.1
+
+  QGW_OverWriteAllow=
+  QGW_DownloadStart=
   
   while true ; do
 
