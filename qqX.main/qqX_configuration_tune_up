@@ -59,7 +59,7 @@ function_config_tune_up ()  {
   # and from ver 1.8 on, builtins or custom will make a non standard mod 
   # if bypassing the tune-up, unless tweaked here:
 
-  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$System_qqX_Path" )"
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "qq" )"
   Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
 
   TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
@@ -89,9 +89,9 @@ function_config_tune_up ()  {
   if [[ ! $Conf_qqX_Pointer ]]; then
 
     ConfEdit_Qstart=
-    printColor "\n\n  The start line may be edited to point to qqX"  
+    printColor "\n\n  The start line may be edited to point to qqX  (leave as System, if unsure)"  
     printf "\n\n  Change the start line to point to qqX ?"  
-    printf "\n\n  [enter] yes, go for it    [no] use System %s  [q] quit tune-up \n\n"  "$QE_SystemFilePath"
+    printf "\n\n  [enter] yes, go for it    [no] use System %s   [q] quit tune-up \n\n"  "$QE_SystemFilePath"
     read -rp "  >  "  ConfEdit_Qstart
 
     [[ $ConfEdit_Qstart == "q" ]] && return
@@ -106,11 +106,16 @@ function_config_tune_up ()  {
 
   dev_loop_check
 
+  # qcow disk
+  ConfLine="$(grep -s 'disk_img' "$TuneUpTmpCopy")"
+  TuneUpDisk="$(cut -d '=' -f 2 <<< "$ConfLine")"
+  TuneUpDisk="${TuneUpDisk//'"'/}"
+
   # disk size  (for existing installs use the 'disk' util)
-
   ConfLine="$(grep -s 'disk_size' "$TuneUpTmpCopy")"
+  TuneUpDiskSizeLine="$(tr -cd '[:digit:]' <<< "$ConfLine")"
 
-  if [[ $NewFileTuneUp ]]; then
+  if [[ $NewFileTuneUp ]] || [[ ! -e "$TuneUpDisk" ]]; then
 
     ConfEdit_DiskSize=
     printColor "\n\n  Suggest adding disk_size=\"64G\" or higher if expecting to create snapshots: " 
@@ -126,12 +131,36 @@ function_config_tune_up ()  {
     [[ $ConfEdit_DiskSize ]]  &&  ConfEdit_DiskSize="$(tr -cd "[:digit:]" <<< "$ConfEdit_DiskSize")"
     [[ $ConfEdit_DiskSize ]] && printf "disk_size=\"%sG\"\n"  "$ConfEdit_DiskSize"  >> "$TuneUpTargetDraft"
 
-  else  
-
+  elif [[ -e "$TuneUpDisk" ]]; then
+  
+    printColor "\n  ---------------------------------------------------------------------------- "
     printColor "\n\n  The line "
     printf "'disk_size=' "
-    printColor "may be removed if wished, at the end the tune-up, or left as a reminder" 
-    printColor "\n\n  The disk has now been created. This line now has no direct effect. \n" 
+    if [[ $TuneUpDiskSizeLine ]]; then
+      printColor "may be removed if wished, at the end the tune-up, or left as a reminder" 
+    else
+      printColor "is not present. One should have been made before first booting ..." 
+    fi
+    printColor "\n\n  This disk has now been created and this line now has no direct effect. " 
+    if [[ ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
+      printf "\n\n  However, at this stage, it appears that the distro has not been installed,"
+      printf "\n\n  so quitting the tune up wizard, deleting the qcow disk via the file manager,"
+      printf "\n\n  and re-starting as 'new' could also be possible."
+      if [[ $TuneUpDiskSizeLine -le 64 ]]; then 
+        printf "\n\n  Using disk_size=\"64G\" or higher is recommended as qcow2 disks auto-compress " 
+        printf "\n\n  & will normally occupy much less space."
+      fi
+      if [[ $TuneUpDiskSizeLine ]]; then 
+        printf "  Current max disk size is set as %sG" "$TuneUpDiskSizeLine"
+      else
+        printf "  More details via the 'disk' option from the utilities menu." 
+      fi
+      printf "\n\n  It is easier make them larger now than to resize later ... " 
+    else
+      printf "\n\n  Resizing, at this stage may be effected using the qqX 'disk' utilities."
+    fi
+    printColor "\n\n  ---------------------------------------------------------------------------- "
+
     if [[ $ConfLine ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
 
   fi
