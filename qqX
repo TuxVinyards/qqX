@@ -156,7 +156,7 @@ fi
 #  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
-if [[ $1 ]]; then source "$qqX_MainFolder/qqX_api_and_mouse_tidyup" ; fi
+source "$qqX_MainFolder/qqX_api_and_mouse_tidyup"
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1

@@ -23,10 +23,9 @@
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
 
-if [[ $XDG_MimeType_is_QCOW ]]; then  
+if [[ $XDG_MimeType_is_QCOW ]]; then 
 
   # should haved changed to the right directory at this point
-
   if grep -q -s "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
 
     VM_Conf_Dir="$(pwd)"
@@ -331,9 +330,11 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
 
 fi
 
-if [[ -f "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
 
-  source "$VM_Conf_Dir/$VM_Conf_File"
+if [[ -e "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
+
+  cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
+  source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
 
 else

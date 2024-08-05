@@ -145,7 +145,7 @@ show_main_menu_header () {
   # Note .conf won't exist at first load, at VM selector menu
 
   if [[ ! $NewFileTuneUp && ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] ; then 
-    printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
+    printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
   fi
 
 }
