@@ -89,6 +89,8 @@ show_CLI_usage () {
 
 # echo "$@"  ; echo  ; read
 
+if [[ $1 ]]; then RunMouseApiTidy=1 ; else RunMouseApiTidy= ; fi
+
 if [[ $1 == "XDG" ]]; then 
 
   if [[ -e "$2" ]]; then
