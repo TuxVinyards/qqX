@@ -543,6 +543,9 @@ function refresh_conf_vars_and_values {
     set_drive_paths
     check_disk_is_okay
 
+    # ShowBootMenu reads once on load from each .conf 
+    [[ $ShowBootMenu ]] && HideBootMenu= && ShowBootMenu=
+
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
 
 

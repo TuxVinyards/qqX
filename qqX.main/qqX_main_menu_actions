@@ -120,7 +120,11 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "iso" ]] ; then iso_select_mount_and_boot
 
-  elif [[ $MainMenuChoice == "bm" ]] ; then HideBootMenu= ; HideMountedMsg=
+  elif [[ $MainMenuChoice == "bm" ]] ; then 
+  
+    if [[ ! $HideBootMenu ]]; then  HideBootMenu=1 ; HideMountedMsg= 
+    else  HideBootMenu= ; HideMountedMsg= 
+    fi
 
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
@@ -360,6 +364,7 @@ function  main_menu_actions {
     VM_ExecBoot=
     refresh_and_load_quickemu_sources
     refresh_conf_vars_and_values
+    ConfSettingsAdjusted=1
 
   fi
 

@@ -344,12 +344,16 @@ VM_SelectorStyle="A"
 # Defaults to auto-update, as below.
   RtvArmFolder=
 
-# Default is to have the 2 or 3 second option (via esc key) to access the BIOS. 
-# This is needed to select boot from ISO & is useful for Windows updates. 
-# Set =1 if you wish to slightly speed up the boot sequence.
+# The Tiano core provides a 3 second window to access the BIOS via the escape key.
+# This allows you to select a boot from ISO option and can also be useful for Windows updates. 
+# Instance Session overides can be toggled from the Utilities menu or individually by placing 
+# either HideBootMenu or ShowBootMenu values in the .conf file
+
+# Setting =1 will slightly speed up the default boot sequence:
   HideBootMenu=
 
-# Set =1  to hide the Mounted ISO boot message
+# Set =1  to hide the Mounted ISO boot message. 
+# Use HideMountedMsg or ShowMountedMsg settings in the .conf if wished.
   HideMountedMsg=
 
 
