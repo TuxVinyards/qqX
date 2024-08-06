@@ -496,6 +496,7 @@ refresh_sources_and_load_VM_arrays() {
   Extra_VM_Folder=()
   VM_Array=()   
   QemuErrorFilter=()
+  clear_bootmenu_vars
 
   # clear possible flags
   VM_SettingsError=
@@ -507,18 +508,15 @@ refresh_sources_and_load_VM_arrays() {
   ForceCustomBootMenu=
 
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
-
   source "$qqX_SettingsFile" 
-  if [[ $CodingHotSwap ]]; then  QE_SourceVersion="$CodingHotSwap" ; fi
 
+  [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap" 
   refresh_and_load_quickemu_sources
-
+  store_bootmenu_defaults
   find_file_manager_browser
-
   [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 
-
   function_create_VM_folderList  
-  scan_folders_list_and_add_VMs  
+  scan_folders_list_and_add_VMs 
   refresh_conf_vars_and_values
 
 }

@@ -494,6 +494,7 @@ function refresh_conf_vars_and_values {
   # A blank clearance will have been created at first session start.  
 
   source "$ConfClearanceLog"
+  reload_bootmenu_defaults
 
   if [[ -e $VM_Conf_File ]]; then
 
@@ -542,9 +543,6 @@ function refresh_conf_vars_and_values {
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
-
-    # ShowBootMenu reads once on load from each .conf 
-    [[ $ShowBootMenu ]] && HideBootMenu= && ShowBootMenu=
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
 

@@ -41,8 +41,11 @@ else
     if [[ ! $ShowUtilsMenu ]]; then
 
       printf  "  [u]  show utils & technical"
-      if [[ $HideBootMenu ]]; then printf "   (fastboot)"
-      else printf "   (bootmenu options active)"
+
+      if [[ ! $LiveBoot ]]; then
+        if [[ $BootMenu == "fast" ]]; then printf "   (fastboot)"
+        else  printf "   (bootmenu options active)"
+        fi
       fi
 
     else
@@ -66,11 +69,11 @@ else
       else printf "\n\n  [cc]  create a custom boot file "
       fi
       printf "  [iso] mount iso / boot from iso"
-
-      if [[ $HideBootMenu ]]; then printf "   [bm] show bios bootmenu "
-      else printf "   [bm] hide bios bootmenu "
+      if [[ ! $LiveBoot ]]; then
+        if [[ $BootMenu == "fast" ]]; then printf "   [bm] show bios bootmenu "
+        else printf "   [fb] hide bios bootmenu "
+        fi
       fi
-
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
       printColor "\n\n  ---------------------------------------------------------------------------- "

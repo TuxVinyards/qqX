@@ -285,7 +285,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
 
-    if [[ $HideBootMenu ]]; then BootMenuCmd= ; else BootMenuCmd=" -boot menu=on " ; fi
+    if [[ $BootMenu == "slow" ]]; then BootMenuCmd= ; else BootMenuCmd=" -boot menu=on " ; fi
 
     if [[ $UseCustomBootArgs ]]; then
 
@@ -366,7 +366,7 @@ function refresh_and_load_quickemu_sources {
   find_quick_version_numbers
   qemu_version_check
   clear_custom_boot_vars
-
+  
 }
 
 

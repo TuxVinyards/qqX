@@ -179,6 +179,8 @@ VM_SelectorStyle="A"
 
 ##  BOOT DEFAULTS:
 
+# For BIOS settings, see TIANO BIOS further down.
+
 # SCREEN %PERCENTAGE may be added here or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenPercent' 
 # Use just the value, eg. ="68"   Suggested values from 50 to 70 as a percentage of the physical monitor
 # From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
@@ -346,15 +348,15 @@ VM_SelectorStyle="A"
 
 # The Tiano core provides a 3 second window to access the BIOS via the escape key.
 # This allows you to select a boot from ISO option and can also be useful for Windows updates. 
-# Instance Session overides can be toggled from the Utilities menu or individually by placing 
-# either HideBootMenu or ShowBootMenu values in the .conf file
+# Instance Session overides can be toggled from the Utilities menu, or individually by placing 
+# 'BootMenu' either as ="fast" or ="slow" in the .conf file
+# Default ="fast" as this will slightly speed up the normal boot sequence:
+  BootMenu="fast"
 
-# Setting =1 will slightly speed up the default boot sequence:
-  HideBootMenu=
-
-# Set =1  to hide the Mounted ISO boot message. 
-# Use HideMountedMsg or ShowMountedMsg settings in the .conf if wished.
-  HideMountedMsg=
+# Set ="fast"  to skip the ISO boot checks and instructions.
+# Default ="slow" as this only shows if BootMenu has been specifically set to slow
+# Also use 'BootMenuMsg' for individual overides in the .conf if wished.
+  BootMenuMsg="slow"
 
 
 # CUSTOM SETTINGS FILE

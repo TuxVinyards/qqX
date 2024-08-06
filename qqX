@@ -106,6 +106,7 @@ function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
     echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+    echo "BootMenu = $BootMenu   BootMenuMsg = $BootMenuMsg    BootMenu_Default = $BootMenu_Default   BootMenuMsg_Default = $BootMenuMsg_Default"
     echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"

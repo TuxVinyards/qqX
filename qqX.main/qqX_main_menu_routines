@@ -129,9 +129,10 @@ show_main_menu_header () {
   if [[ $fixed_iso ]]; then Mounted_ISO="$fixed_iso" ; fixed_iso= ; fi
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
+  LiveBoot=
   if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
-  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" 
-  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)" 
+  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
+  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
   fi
@@ -764,17 +765,18 @@ iso_select_mount_and_boot () {
     IsoList=()
     mapfile -t IsoList <<< "$(ls "$VM_InstanceName"/*.iso 2>/dev/null)"
 
-    printColor "\n\n  ISO formated disk images should be copied into the individual VM folder"
+    printColor "\n\n  ISO formated disk images may be copied into the individual VM folder"
     printf "\n\n  One or more may be added.  If more than one, an ISO should be selected from the list."
     printf "\n\n  Current Quickemu code is retricted to one only to be present as mounted at a time."
 
     printf "\n\n\n  To boot from a selected ISO, press the 'esc' key when the start up screen appears."
     printf "\n\n  To auto-mount an ISO when the VM is selected, set 'fixed_iso=\"VM_InstanceName/name.iso\"' in the .conf file"
-    printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
+    printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for partition management."
     printf "\n"
 
-    if [[ "$BootAlert" == *'New:'* || "$BootAlert" == *'Live:'*  ]]; then
-      printf "\n\n  CAUTION: You are already standard booting from ISO. A fixed drive doesn't yet exist"
+    if [[ $LiveBoot ]]; then
+      printf "\n\n  CAUTION: You are already standard booting from an ISO. "
+      printf "\n\n  The distro has not yet been installed to the disk."
     fi
 
     if [[ ! ${IsoList[*]} ]]; then 
@@ -790,10 +792,14 @@ iso_select_mount_and_boot () {
 
     IsoSelect=
     printf "\n\n" 
-    if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
-    elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount " 
+    if [[ $LiveBoot ]]; then
+      printColor "  [b] to go back"
+    else
+      if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
+      elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount " 
+      fi
+      printf "  [b] to go back"
     fi
-    printf "  [b] to go back"
 
     printf "\n\n"
     read -rp "  >  "  IsoSelect

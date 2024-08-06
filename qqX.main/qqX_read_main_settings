@@ -311,4 +311,22 @@ function qemu_version_check {
 
 qemu_version_check
 
+function store_bootmenu_defaults {
+  [[ ! $BootMenu ]] && BootMenu="fast"
+  [[ ! $BootMenuMsg ]] && BootMenuMsg="slow"
+  BootMenu_Default="$BootMenu"   
+  BootMenuMsg_Default="$BootMenuMsg"  
+}
+
+function reload_bootmenu_defaults {
+  BootMenu="$BootMenu_Default"   
+  BootMenuMsg="$BootMenuMsg_Default"  
+}
+
+function clear_bootmenu_vars {
+  BootMenu= ; BootMenu_Default=  
+  BootMenuMsg= ; BootMenuMsg_Default= 
+}
+
+store_bootmenu_defaults
 
