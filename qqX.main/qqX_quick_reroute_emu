@@ -112,7 +112,7 @@ function quickemu {
         read -rp "  >  "  Mounted_ISO_Return
 
       elif [[ $BootMenu == "fast" ]]; then
-        printColor " BIOS Boot Manager may be session enabled in utils ..."
+        printColor "  BIOS Boot Manager may be session enabled in utils ..."
         printf "\n\n  Use the qqX [iso] utility to select a specific bootable image file \n\n"
 
       elif [[ $BootMenu == "slow" ]]; then

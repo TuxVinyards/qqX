@@ -142,17 +142,19 @@ function_test_iso_url () {
     fi
     DL_Url="$(awk '/https/{print $2 $3}' < "/tmp/qmod-dl-url")"
     if [[ $DL_Url ]]; then
-      curl --silent --location --head --output "/tmp/qmod-dl-size" --fail --connect-timeout 5 --max-time 5 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 20 --max-time 60 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ $(cat "/tmp/qmod-dl-size") ]]; then 
+        DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
+      fi
+      if [[ $DL_PotentialOkay ]]; then
         printColor "  Looks good "; QGW_Download_BadLink=
       else
-        printf "  NOT WORKING "; QGW_Download_BadLink=1
+        printf "  NOT WORKING CORRECTLY"; QGW_Download_BadLink=1
         printf "\n"
         iso_get_message
-
       fi
       DL_FileName="${DL_Url##*/}"
-      DL_PotentialSize="$(grep -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
+      DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
