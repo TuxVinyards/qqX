@@ -135,6 +135,7 @@ function_test_iso_url () {
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
+    DL_PotentialOkay=
     # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
     if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
