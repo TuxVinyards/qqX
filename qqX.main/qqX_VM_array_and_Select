@@ -257,7 +257,7 @@ VM_loader_selector_and_menu () {
         VM_Array_NameZero="${VM_Array[0,1]}"
         VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
 
-        if [[ -s "$qqX_Upd_VarsTmpFile" ]]; then source "$qqX_Upd_VarsTmpFile"; fi
+        if [[ $(cat "$qqX_Upd_VarsTmpFile") ]]; then source "$qqX_Upd_VarsTmpFile"; fi
 
         if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
 
@@ -460,7 +460,7 @@ VM_loader_selector_and_menu () {
 
     # Qemu_IMG log > eg. for disk repair functions 
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
-    if [[ -s "$Qemu_IMG_ErrorLog" ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+    if [[ $(cat "$Qemu_IMG_ErrorLog") ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
 
     # Qemu SYSTEM log  # keep log, only clear if booting up afresh (in menu actions)
     if [[ -d  "$VM_Conf_Dir/$VM_InstanceName" ]]; then

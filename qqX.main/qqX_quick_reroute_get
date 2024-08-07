@@ -143,24 +143,27 @@ function_test_iso_url () {
     DL_Url="$(awk '/https/{print $2 $3}' < "/tmp/qmod-dl-url")"
     if [[ $DL_Url ]]; then
       curl --silent --location --head --output "/tmp/qmod-dl-size" --fail --connect-timeout 5 --max-time 5 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
-      if [[ -s "/tmp/qmod-dl-size" ]]; then 
+      if [[ $(cat "/tmp/qmod-dl-size") ]]; then 
         printColor "  Looks good "; QGW_Download_BadLink=
       else
-        printf "  not working "; QGW_Download_BadLink=1
+        printf "  NOT WORKING "; QGW_Download_BadLink=1
+        printf "\n"
+        iso_get_message
+
       fi
       DL_FileName="${DL_Url##*/}"
       DL_PotentialSize="$(grep -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
-      else
+      elif [[ ! $QGW_Download_BadLink ]]; then
         printf "  but reported size not available"
       fi
+    else
+      printf "  NOT WORKING \n"; QGW_Download_BadLink=1
     fi
 
-  else 
-  
-    printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
+  else  printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
 
   fi
 
@@ -415,6 +418,15 @@ function_quick_get_wrap ()  {
             QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
           fi
 
+          iso_get_message () {
+            if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
+              printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
+              printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
+            fi
+          }
+
+          iso_get_message ; printf "\n\n"
+
           printColor  "\n  %s  "  "${QGW_OS_Arr_NameDisplay^^}"
 
           # Quickemu OS HOME PAGE coding format keeps changing. Varied checks are needed, eg:
@@ -487,12 +499,6 @@ function_quick_get_wrap ()  {
     QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
     read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
 
-    iso_get_message () {
-      if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
-        printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
-        printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
-      fi
-    }
 
     function choose_QGW_release {
 
@@ -502,16 +508,14 @@ function_quick_get_wrap ()  {
       
         elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
 
-          iso_get_message
           printf "\n\n\n  One Release only:  %s " "${QGW_Releases_Array[0]}"
           printf "\n\n  Editions choice may be be possible." 
           printColor "\n\n  [enter] to continue"
 
         else
 
-          printf "\n\n"
+          printf "\n\n\n"
           print_quickget_and_folder_choices  "QGW_Releases_Array"
-          iso_get_message
           printColor "\n\n\n  Give LIST number of Release"   
 
         fi  
@@ -609,6 +613,7 @@ function_quick_get_wrap ()  {
       while true; do 
 
         printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
+        printf "\n\n  Checking editions .... \n"
 
         QGW_Editions_ListTest=
         QGW_List_NumSelected=
@@ -622,7 +627,7 @@ function_quick_get_wrap ()  {
 
         if grep -q -s "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
           # quickget will auto-start if editions function not present
-
+          QGW_EditionsFunction=1
           # Release specific list
           QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
           QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
@@ -636,6 +641,8 @@ function_quick_get_wrap ()  {
           QGW_Editions_FullListString="${QGW_Editions_FullListRaw/'- Editions: '/}"
           QGW_Editions_FullListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_FullListString" )"
 
+        else QGW_EditionsFunction=
+
         fi
 
         if [[ $QGW_Editions_ListTest ]]; then
@@ -643,23 +650,39 @@ function_quick_get_wrap ()  {
         fi
 
         if [[ ! ${QGW_Editions_Array[*]} ]]; then
-          printf "\n\n  Editions selection not available"
-          [[ $QGW_Editions_FullListTest ]] && printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-          printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+          if [[ $QGW_EditionsFunction && $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "\n\n  Further selection not available in this release"
+            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+          elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "\n\n  Further selection not available in any of the releases"
+            printColor "\n\n  [enter] to continue   [b] to go back \n\n" 
+          elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
+            printf "\n\n  This distro is single release option only .... "
+            printColor "\n\n  [enter] to continue   [b] to go back \n\n" 
+          fi
           read -rp "  >  "  QGW_List_NumSelected 
 
         elif [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
           printf "\n\n  One edition found: %s" "${QGW_Editions_Array[0]}"
           QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-          [[ $QGW_Editions_FullListTest ]] && printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-          printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+          if [[ $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+          else
+            printColor "\n\n  [enter] to continue   [b] to go back \n\n" 
+          fi
           read -rp "  >  "  QGW_List_NumSelected   
 
         else
           printf "\n\n"
           print_quickget_and_folder_choices  "QGW_Editions_Array"
-          printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-          printColor "\n\n  Give LIST number of Edition   [r] choose a different release   [b] to go back \n\n" 
+          if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printColor "\n\n  Give LIST number of Edition   [r] choose a different release   [b] to go back \n\n" 
+          else  
+            printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n" 
+          fi
           read -rp "  >  "  QGW_List_NumSelected   
 
         fi 
@@ -705,7 +728,6 @@ function_quick_get_wrap ()  {
   fi 
 
   printColor "\n\n  Selected:  %s "  "$QWG_NewVM_Name"
-
 
   # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
@@ -766,12 +788,14 @@ function_quick_get_wrap ()  {
   while true ; do
 
     dev_loop_check
-    show_current_group_folder_list
-    printf "\n\n\n"
-    printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
+
+    if [[ ! $QGW_Download_BadLink ]]; then
+      show_current_group_folder_list
+      printf "\n\n\n"
+      printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
+    fi
 
     # If not sync updating, list other copies of similar VM's in the target folder
-
     if [[ ! $ZsyncDownload ]]; then
       SimilarVMs=
       SimilarVM_ShorterCheck=
@@ -1024,7 +1048,7 @@ function_quick_get_wrap ()  {
       for P3_PID in "${P3_Arr[@]}" ; do
         P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2> /dev/null)" 
       
-        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* ]]; then 
+        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
           kill "$P3_PID" 2> /dev/null
           printColor "\n\nStopped \n\n" 
           QGW_DownloadStopped=1
@@ -1032,8 +1056,8 @@ function_quick_get_wrap ()  {
         fi
       done   
       
-      #  REVIEW  '/usr/bin/macrecovery'  replaced  # See https://github.com/quickemu-project/quickemu/pull/886
-      #  Chunkcheck is 'C' ...??
+      #  REVIEW  '/usr/bin/macrecovery'  # See https://github.com/quickemu-project/quickemu/pull/886
+      #  replaced with chunkcheck Also Python ....
 
       if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
         while true; do 
@@ -1205,7 +1229,8 @@ function_quick_get_wrap ()  {
   
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
     printColor "\n\n  [enter] to return or continue \n\n" ; read -rp "  > "
-
+    return
+    
   fi
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget Working Directory NOT FOUND ," ; fi
