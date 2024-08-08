@@ -166,7 +166,7 @@ else
     if [[ -f "$VM_InstanceName/rtv.date.txt" ]]; then
 
       SyncDateNow="$(date +%s)"
-      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt")"
+      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt" 2>/dev/null)"
       LastRtvUpd="$((SyncDateNow - SyncDateOld))"
 
       if [[ $RtvManualOnly ]]; then 
@@ -187,7 +187,7 @@ else
           printf "\n\n  Tiano Core Security Updates .....  "
           refresh_tiano_vars &
           wait "$!" 
-          RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log")"
+          RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log" 2>/dev/null)"
           [[ $RtvMacGet == "Okay" ]] && printf "All Good"
           [[ $RtvMacGet == "Fail" ]] && printColor "\n\n  Failed to update. See rtv logs in the VM folder ...."
 
@@ -232,7 +232,7 @@ else
         if [[ -f "$VM_InstanceName/zsync.date.txt" ]]; then
 
           SyncDateNow="$(date +%s)"
-          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt")"
+          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt" 2>/dev/null)"
           LastZsync="$((SyncDateNow - SyncDateOld))"
 
           printf "\n\n"

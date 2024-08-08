@@ -126,50 +126,70 @@ print_quickget_and_folder_choices () {
 
 }
 
+function show_distro_homepage_check_results {
+  # runs during start of function_quick_get_wrap and gets included at end of 'function_test_iso_url' too
+  if [[ $(cat "/tmp/qmod-dl-homepage-report.txt" 2>/dev/null) ]]; then
+    cat "/tmp/qmod-dl-homepage-report.txt"
+  fi
+}
 
 function_test_iso_url () {
 
-  if grep -q -e '--url' "$QG_SourcePath"  || grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
+  if ! grep -q -e '--url' "$QG_SourcePath"  && ! grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
+
+    printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
+
+  else
 
     printColor "\n\n  Checking link ... \n\n"
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
     DL_PotentialOkay=
+    DL_PotentialHtml=
+
     # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
     if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     else echo > "/tmp/qmod-dl-url"
     fi
     DL_Url="$(awk '/https/{print $2 $3}' < "/tmp/qmod-dl-url")"
-    if [[ $DL_Url ]]; then
+
+    if [[ ! $DL_Url ]]; then  
+      printColor "\n\n  Quickget cannot provide a link ?? "; QGW_Download_BadLink=
+      printf "\n\n"
+      iso_get_message
+    else  
+      DL_FileName="${DL_Url##*/}"
       curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 20 --max-time 60 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
-      if [[ $(cat "/tmp/qmod-dl-size") ]]; then 
+      if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
+        DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
+        DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       fi
       if [[ $DL_PotentialOkay ]]; then
-        printColor "  Looks good "; QGW_Download_BadLink=
+        printColor "  Appears to be Okay "; QGW_Download_BadLink=
       else
-        printf "  NOT WORKING CORRECTLY"; QGW_Download_BadLink=1
-        printf "\n"
-        iso_get_message
+        printf "  MAY NOT BE WORKING CORRECTLY"; QGW_Download_BadLink=1
       fi
-      DL_FileName="${DL_Url##*/}"
-      DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
-      elif [[ ! $QGW_Download_BadLink ]]; then
-        printf "  but reported size not available"
+      elif [[ $QGW_Download_BadLink ]]; then
+        printf "  and reported size not available either ...."
+        [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
+        printf "\n\n"
+        iso_get_message ; show_distro_homepage_check_results
+      else
+        printf "  but reported size not available ?? "
+        [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
+        printf "\n\n"
+        iso_get_message ; show_distro_homepage_check_results
       fi
-    else
-      printf "  NOT WORKING \n"; QGW_Download_BadLink=1
+
     fi
 
-  else  printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
-
   fi
-
 }
 
 
@@ -469,14 +489,18 @@ function_quick_get_wrap ()  {
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
-            if [[ $QGW_OS_InfoText ]]; then printf "\n  " ; else printf "\n\n  " ; fi
-            printf "HomePage = %s"  "$QGW_OS_HomePage"
-            if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 2 "$QGW_OS_HomePage" ; then  printf " (working)"
-            else 
-              [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printColor "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
-              printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
-            fi
+            printf "\n  Checking Distro Home Page ... "
+            printf "" > "/tmp/qmod-dl-homepage-report.txt"
+            {
+              printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+              if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 2 "$QGW_OS_HomePage" ; then  printf " (working)"
+              else 
+                [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
+                printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
+              fi
+            } >> "/tmp/qmod-dl-homepage-report.txt"
           fi
+          show_distro_homepage_check_results
           break
       
         fi
@@ -735,8 +759,8 @@ function_quick_get_wrap ()  {
   # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
   if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
-    printf "  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
-    printf "\n\n  Make sure that you have a stable internet connection.  "
+    printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
+    show_distro_homepage_check_results
   else
     function_test_iso_url
   fi

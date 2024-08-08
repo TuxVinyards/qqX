@@ -136,7 +136,7 @@ while [[ ! $UserTerm_Found ]]; do
       if [[ $TermFind_ReRun ]]; then
         echo "  UserTerm is $UserTerm" ; echo
         echo "  Parent PID is $PPID" ; echo
-        echo "  Process Command is $(cat "/proc/$PPID/comm")"; echo
+        echo "  Process Command is $(cat "/proc/$PPID/comm" 2>/dev/null)"; echo
         echo
       fi
 
@@ -155,7 +155,7 @@ while [[ ! $UserTerm_Found ]]; do
             head "/proc/$GrandParentPID/status"
             echo
             echo "  GrandParentPID is $GrandParentPID"; echo
-            echo "  Process Command is $(cat "/proc/$GrandParentPID/comm")"; echo
+            echo "  Process Command is $(cat "/proc/$GrandParentPID/comm" 2>/dev/null)"; echo
           fi
 
           GrandParent_Name="$(realpath /proc/"$GrandParentPID"/exe)"

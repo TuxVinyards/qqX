@@ -28,11 +28,11 @@ find_kvm_msr_default_and_status () {
   KVM_MSR_Error=
   KVM_MSR_Warn=
 
-  KVM_MSR_status="$(cat /sys/module/kvm/parameters/ignore_msrs)"
+  KVM_MSR_status="$(cat /sys/module/kvm/parameters/ignore_msrs 2>/dev/null)"
 
   [[ ! $KVM_MSR_ModProbeFile ]] && KVM_MSR_ModProbeFile="/etc/modprobe.d/kvm-quickemu.conf"
 
-  KVM_MSR_DefaultConf="$(cat "$KVM_MSR_ModProbeFile" 2> /dev/null)"
+  KVM_MSR_DefaultConf="$(cat "$KVM_MSR_ModProbeFile" 2>/dev/null)"
 
   [[ "$KVM_MSR_DefaultConf" == *'=Y' ]] &&  KVM_MSR_default="Y"
 
