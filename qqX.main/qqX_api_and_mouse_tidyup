@@ -337,7 +337,7 @@ fi
 if [[ -e "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
 
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
-  source "$VM_Conf_File"
+  [[ $VM_Conf_File ]] && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
 
 else

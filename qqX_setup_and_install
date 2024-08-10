@@ -145,7 +145,7 @@ qqX_Version="$(./qqX --version 2>/dev/null)"
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
-if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"; else qqX_Std_Bin_Dir="/bin" ; fi
+if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"; else qqX_Std_Bin_Dir="/usr/bin" ; fi
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
@@ -386,7 +386,7 @@ else
     
       printColor "\n  ...... All good " 
 
-    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Quit and retry  " "$qqX_Version" ; sleep 2000  
+    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
     fi
 
     Default_VM_Folder=
