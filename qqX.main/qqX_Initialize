@@ -104,7 +104,7 @@ if [[ $1 == "XDG" ]]; then
    
     if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_is_QCOW=1
 
-    elif [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'xxapplication/vnd.efi.iso' ]] && [[ "$2" == *'.iso' ]]; then 
+    elif [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'application/vnd.efi.iso' ]] && [[ "$2" == *'.iso' ]]; then 
 
       XDG_MimeType_is_ISO=1
       XDG_ISO_Name="$2"
