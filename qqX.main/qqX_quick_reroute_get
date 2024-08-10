@@ -1304,7 +1304,7 @@ function_quick_get_wrap ()  {
     VM_Conf_Dir="$QWG_Conf_Dir"
     VM_Conf_File="$(basename "$New_VM_Conf_File")"
 
-    if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget Working Directory NOT FOUND ," ; fi
+    if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "New Working Directory NOT FOUND ," ; fi
 
     # add at least basic values here, in case the tune up util gets skipped
     refresh_conf_vars_and_values
@@ -1324,7 +1324,7 @@ function_quick_get_wrap ()  {
     
   fi
 
-  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Quickget Working Directory NOT FOUND ," ; fi
+  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "New Working Directory NOT FOUND ," ; fi
 
   SettingsFileAdjusted=1
   ByPass_VM_Array_Selector=1

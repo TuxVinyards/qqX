@@ -514,9 +514,15 @@ refresh_sources_and_load_VM_arrays() {
   refresh_and_load_quickemu_sources
   store_bootmenu_defaults
   find_file_manager_browser
-  [[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder 
+
+  cd "$Default_VM_Folder" || printf "\n\n  ERROR changing to Default_VM_Folder to rebase the refresh"
+  CurrentFolder="$Default_VM_Folder"
   function_create_VM_folderList  
   scan_folders_list_and_add_VMs 
+
+  if [[ $XDG_GeneralDesktopStart ]]; then  find_xdg_start_folder 
+  elif [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir" || printf "\n\n  ERROR changing to selected VM directory"
+  fi
   refresh_conf_vars_and_values
 
 }
