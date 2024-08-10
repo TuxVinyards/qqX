@@ -60,7 +60,7 @@ right_click_re_route () {
   fi
 }
 
-if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]]; then
+if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised && ! $XDG_FileType_Recognised ]]; then
 
   if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1 "  "$XDG_MimeType"
   else  show_CLI_usage 
@@ -147,7 +147,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
 fi  
 
-if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
+if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised || $XDG_FileType_Recognised ]]; then
 
   while true; do
 
@@ -161,6 +161,9 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
     printColor "\n\n  Set up this ISO as a qqX/quickemu VM? "
     printf "\n\n  %s\n" "$XDG_ISO_Name"
     printf "\n\n  Standard LINUX ISO's only."
+    if [[ $XDG_FileType_Recognised && ! $XDG_MimeType_Recognised ]]; then
+      printf "\n\n  This ISO is a non-recognised mimetype so may not be bootable or valid. Try anyway?"
+    fi
     printColor "\n\n  [enter] yes   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
     read -rp "  >  "  Cancel_ISO
 
@@ -201,7 +204,7 @@ if [[ $XDG_MimeType_is_ISO && $XDG_MimeType_Recognised ]]; then
       QGW_OverWriteAlert=
 
       printColor "\n  New VM Name =  %s" "$ISO_NewVM_Name"
-      printf "\n\n  Preset Group Folders:"
+      printf "\n\n  Preset Group Folders: \n"
       show_current_group_folder_list
       printf "\n\n"
 
