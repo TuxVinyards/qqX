@@ -141,7 +141,7 @@ function_test_iso_url () {
 
   else
 
-    printColor "\n\n  Checking link .... \n\n"
+    printColor "\n\n  Checking download link .... \n\n"
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
@@ -162,10 +162,10 @@ function_test_iso_url () {
       iso_get_message
     else  
       DL_FileName="${DL_Url##*/}"
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --fail --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
-        printColor "  more extensively ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15 --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        printColor "  twice ........ \n\n"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15  --fail --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -500,7 +500,8 @@ function_quick_get_wrap ()  {
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 2 "$QGW_OS_HomePage" ; then  printf " (working)"
+              if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 4 --max-time 10 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 8 --max-time 20 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
                 printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
@@ -847,6 +848,12 @@ function_quick_get_wrap ()  {
         check_new_vm_folder_name
       fi
 
+      if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then  
+        printf "\n\n"
+        [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] && printf "  [r] reselect release "
+        [[ "${#QGW_Editions_Array[@]}" -gt 1 ]] && printf "  [e] reselect edition "
+      fi
+
       if [[ $QGW_Download_BadLink ]]; then
 
         printColor "\n\n  [enter]  re-test the download link "
@@ -882,12 +889,6 @@ function_quick_get_wrap ()  {
 
           if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
             printColor "\n\n  WARNING Source Version '%s' :  Stopping and Restarting of partly completed downloads requires the Freebird/FreeSpirit builtins." "$QE_SourceVersion"
-          fi
-
-          if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then  
-            printf "\n\n"
-            [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] && printf "  [r] reselect release "
-            [[ "${#QGW_Editions_Array[@]}" -gt 1 ]] && printf "  [e] reselect edition "
           fi
 
           if [[ "${#VM_Folder_List[*]}" -gt 1 ]]; then  printf  "\n\n  [enter] Start the download  "
