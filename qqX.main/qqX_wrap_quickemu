@@ -233,20 +233,25 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     if [[ $SecondDriveArgs ]]; then 
       printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
-      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile"
+      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile" 
     fi
+
+    if [[ $NoSmartcardSupport ]]; then  { 
+      printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: "
+      printf "\n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" 
+      } | tee -a "$QemuArgsFile" &> /dev/null
+    fi
+
+    if [[ $BootMenu == "slow" ]]; then BootMenuCmd=" -boot menu=on " ; else BootMenuCmd=" -boot menu=off " ; fi
+    printf "\n\n %s " "$BootMenuCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
 
     if [[ $tpm == "on" ]]; then 
-      printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  %s \n\n  %s \n\n\n" "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
       printf "\n\n  %s  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
     else    
-      printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  Not Set \n\n\n" >> "$QemuArgsFile"
     fi
 
-    printf "\n\n\n" >> "$QemuArgsShortFile"
-
-    [[ $NoSmartcardSupport ]] && printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: \n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" >> "$QemuArgsFile"
-    printf "\n\n\n"  >> "$QemuArgsFile"
 
     if [[ $VerboseArgs ]]; then 
       # hold the launch till we have checked the config 
@@ -284,8 +289,6 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
-
-    if [[ $BootMenu == "slow" ]]; then BootMenuCmd= ; else BootMenuCmd=" -boot menu=on " ; fi
 
     if [[ $UseCustomBootArgs ]]; then
 

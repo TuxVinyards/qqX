@@ -788,7 +788,9 @@ iso_select_mount_and_boot () {
       print_quickget_and_folder_choices  IsoList
     fi
 
-    [[ $Mounted_ISO ]] && printColor "\n\n  %s  is currently mounted" "$Mounted_ISO"
+    if [[ $Mounted_ISO ]]; then printColor "\n\n  %s  is currently mounted" "$Mounted_ISO"
+    else printColor "\n\n  No ISO is currently mounted"
+    fi
 
     IsoSelect=
     printf "\n\n" 
