@@ -16,6 +16,8 @@ MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in q
 
 Adds option to boot from ISO for disk management and makes custom boot files easier.
 
+- 1.9.04 is now pre-release downloadable
+
 ### Simple and Straightforward
 
 - A complete menu system within a unique hybrid interface.
@@ -100,8 +102,16 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ## Release notes
 
-- The github changes behind the wget 302 / SHA error now has a fix in place.
+- @ Aug 12: the next release should be finalized before long. This adds Windows languages and improved distro editions selection.
+  Other features also include being able scroll through the distro info pages, and from any given start point. And finally some control over boot management and being able to select whether we boot from the virtual hard drive or from the ISO. Very useful for partition management and disk maintenance.
 
+- Next release, [1.9.04](https://github.com/TuxVinyards/qqX/commits/1.9.04/)  is currently usable but there are one or two i's to dot and t's to cross and few little fixes needed for XFCE that showed up.  Testing was also carried out on Solus following a Discord [request](https://discord.com/channels/712850672223125565/739446818252783647/1271221009478975488) for help ...  , qqX will install but despite trying several ideas Solus refuses to run Quickemu in anything but legacy mode, so no Windows VM's, only Linux. See [Solus](https://github.com/getsolus/packages/issues/3487) GitHub.
+
+- Given that 1.9.04 also contains a few bug fixes, not just new features, it will probably be numbered as 1.9.05 or 1.10.01 when released so that anyone wanting to upgrade now doesn't miss out on the update messages.  Also 1.9.03 can be installed as a downgrade if needed ...
+
+- 1.9.04 is currently downloadable [here](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.9.04.zip)
+
+- The github changes behind the wget 302 / SHA error now has a fix in place.
   Users wanting to update version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly.
 
 ### Reliability
