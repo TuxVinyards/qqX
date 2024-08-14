@@ -359,6 +359,7 @@ function_quick_get_wrap ()  {
       printf "\n\n" 
 
       [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
+      QGW_VerifiedList_NumSelected=
 
       [[ ! $QGW_List_NumSelected ]] && read -rp "  >  "  QGW_List_NumSelected
 
@@ -576,6 +577,8 @@ function_quick_get_wrap ()  {
           printColor "\n\n\n  Give LIST number of Release"   
 
         fi  
+
+        [[ $QGW_VerifiedList_NumSelected ]] && QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
 
         if [[ $QGW_List_NumSelected -lt "${#QGW_OS_Array[@]}" ]]; then
           QGW_List_NumSelected_Next="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Next+=1 ))
