@@ -137,6 +137,7 @@ function  main_menu_actions {
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then MainMenuZsync=1 ; function_quick_get_wrap
     else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
     fi
+    refresh_conf_vars_and_values
 
   elif [[ $MainMenuChoice == "m" ]] ; then KVM_MSR_selector_LoadHelp=1 ; select_msr_config
 

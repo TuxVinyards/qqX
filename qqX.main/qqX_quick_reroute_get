@@ -831,8 +831,10 @@ function_quick_get_wrap ()  {
 
         printf "\n\n  Updating the live boot development iso with any changes"
         printColor "\n\n  May take a while to compare & synchronize"
-        [[ $LastZsync -gt 200000 ]] && printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
-        printf "\n\n"
+        if [[ $LastZsync -gt 200000 ]]; then 
+          printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
+          printf "\n\n  Deletion and re-download can sometimes be quicker ...."
+        fi
         ZsyncDownload=1
 
       fi
@@ -873,7 +875,9 @@ function_quick_get_wrap ()  {
 
       dev_loop_check
 
-      if [[ ! $QGW_Download_BadLink ]]; then
+      if [[ $MainMenuZsync ]]; then  
+        QGW_OverWriteAlert=1
+      elif [[ ! $QGW_Download_BadLink ]]; then
         show_current_group_folder_list
         printf "\n\n\n"
         printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
@@ -1360,7 +1364,8 @@ function_quick_get_wrap ()  {
   else  
   
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-    printColor "\n\n  [enter] to return or continue \n\n" ; read -rp "  > "
+    printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > "
+    printf "\n\n"
     return
     
   fi
