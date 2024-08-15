@@ -184,12 +184,10 @@ function print_terminal_notes {
 
   cat << Notes
  
-  Add 'UserTerm' located near the script start to manually specify the terminal name
+  Add 'UserTerm' located near the script start TO MANUALLY SPECIFY the terminal name
 
   Edit the script's custom profile if actual 'Xterm' itself is to be used,
   eg  xterm -geometry 150x50 -fa truetype -fs 12
-
-  XFCE users may like to install mate-terminal > Some XFCE distros default to this.
 
   Remember also that column width units are based on the size of your terminal font.
 
