@@ -595,7 +595,7 @@ function_quick_get_wrap ()  {
         if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
         else  printf "\n\n" ; fi
 
-        printf "   [b] to go back \n\n"   
+        printf "    [b] back to main menu \n\n"   
         read -rp "  >  "  QGW_List_NumSelected  
         printf "\n\n"
        
@@ -726,13 +726,13 @@ function_quick_get_wrap ()  {
             if [[ $QGW_EditionsFunction && $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
               printf "  Further selection not available in this release"
               printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-              printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+              printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
               printf "  NONE of the releases have editions to select"
-              printColor "\n\n  [enter] to continue   [r] choose a different release anyway ...  [b] to go back \n\n" 
+              printColor "\n\n  [enter] to continue   [r] choose a different release anyway ...  [b] back to main menu \n\n" 
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
               printf "  This distro is single release option only .... "
-              printColor "\n\n  [enter] to continue   [r] return to view web page   [b] to go back \n\n" 
+              printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
             fi
             read -rp "  >  "  QGW_List_NumSelected 
 
@@ -741,7 +741,7 @@ function_quick_get_wrap ()  {
             QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
             if [[ $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
               printf "  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-              printColor "\n\n  [enter] to continue   [r] choose a different release   [b] to go back \n\n" 
+              printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
             else
               printColor "  [enter] to continue   [b] to go back \n\n" 
             fi
@@ -751,9 +751,9 @@ function_quick_get_wrap ()  {
             print_quickget_and_folder_choices  "QGW_Editions_Array"
             if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
               printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
-              printColor "\n\n  Give LIST number of Edition   [r] choose a different release   [b] to go back \n\n" 
+              printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
             else  
-              printColor "\n\n  Give LIST number of Edition   [b] to go back \n\n" 
+              printColor "\n\n  Give LIST number of Edition   [b] back to main menu \n\n" 
             fi
             read -rp "  >  "  QGW_List_NumSelected   
 
@@ -770,6 +770,7 @@ function_quick_get_wrap ()  {
 
           elif [[ $QGW_List_NumSelected == "b" ]]; then  
             QGW_List_NumSelected=
+            QGW_List_NumSelected_Next=
             QGW_OS_Arr_NameSelected=
             QGW_Release_Arr_NumSelected=
             QGW_Release_Arr_NameSelected=
@@ -951,7 +952,7 @@ function_quick_get_wrap ()  {
 
       fi
       
-      printf " [h] help  [b] go back \n\n\n"
+      printf " [h] help  [b] back to main menu \n\n\n"
       read -rp "  >  " QGW_DownloadStart
       printf "\n\n"
 
