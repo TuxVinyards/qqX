@@ -218,6 +218,10 @@ MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-me
 GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
 GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
 
+# XFCE4:
+XfceTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
+XfceTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
+
 # KONSOLE:
 KonsoleTitle="qqX"
 KonsoleTerminalProfile_Taller=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Taller} "
@@ -515,6 +519,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
     MateTerminalProfile="$MateTerminalProfile_Taller"
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
+    XfceTerminalProfile="$XfceTerminalProfile_Taller"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
 
   else
@@ -523,15 +528,19 @@ if [[ ! $SkipMkLauncher ]]; then
 
     MateTerminalProfile="$MateTerminalProfile_Standard"
     GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
+    XfceTerminalProfile="$XfceTerminalProfile_Standard"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
 
   fi
+
+  # REVIEW  tidy the growing repetitiveness at some point ... ??
 
   SelectedTerminalProfile=
 
   if [[ $CustomTerminalProfile ]]; then  SelectedTerminalProfile="$CustomTerminalProfile"
   elif [[ $UserTerm == "mate-terminal" ]]; then SelectedTerminalProfile="$MateTerminalProfile"
   elif [[ $UserTerm == "gnome-terminal" ]]; then SelectedTerminalProfile="$GnomeTerminalProfile"
+  elif [[ $UserTerm == "xfce4-terminal" ]]; then SelectedTerminalProfile="$XfceTerminalProfile"
   elif [[ $UserTerm == "konsole" ]]; then SelectedTerminalProfile="$KonsoleTerminalProfile"
   fi
 
