@@ -149,6 +149,8 @@ fi
 
 if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised || $XDG_FileType_Recognised ]]; then
 
+  refresh_sources_and_load_VM_arrays
+
   while true; do
 
     New_ISO_Start=
@@ -164,7 +166,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
     if [[ $XDG_FileType_Recognised && ! $XDG_MimeType_Recognised ]]; then
       printf "\n\n  This ISO is a non-recognised mimetype so may not be bootable or valid. Try anyway?"
     fi
-    printColor "\n\n  [enter] yes   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
+    printColor "\n\n  [enter] choose name and folder  "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
     read -rp "  >  "  Cancel_ISO
 
     if [[ $Cancel_ISO == "c" ]]; then exit directly
@@ -175,18 +177,20 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
       VM_Conf_Dir=
       VM_Conf_File=
       XDG_MimeType_is_QCOW=
-      refresh_sources_and_load_VM_arrays
       break
 
     else  
 
       printColor "\n\n  Please give a short VM name for the folder."
-      printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"
+      printColor "\n\n  eg. tux-33-alpha  emu-44-mate  (usually recommended)"
+      printf "\n\n  [enter] to use ISO name: %s" "$(basename "$XDG_ISO_Name" .iso)"
+      printf "\n\n  [vm] switch to qqX VM selector menu   [c] cancel & close \n\n"
       read -rp "  >  "  ISO_NewVM_Name
 
       [[ ! $ISO_NewVM_Name ]] && ISO_NewVM_Name="$(basename "$XDG_ISO_Name" .iso)"
 
-      [[ $ISO_NewVM_Name == "b" ]] && break
+      [[ $ISO_NewVM_Name == "vm" ]] && break
+      [[ $ISO_NewVM_Name == "c" ]] && exit directly
 
     fi
 
@@ -198,12 +202,11 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 
     elif [[ $ISO_NewVM_Name ]]; then
 
-      CurrentFolder="$(dirname "$XDG_ISO_Name")"
       QWG_Conf_Dir="$CurrentFolder"
       QGW_OverWriteAllow=
       QGW_OverWriteAlert=
 
-      printColor "\n  New VM Name =  %s" "$ISO_NewVM_Name"
+      printColor "\n\n  New VM Name =  %s" "$ISO_NewVM_Name"
       printf "\n\n  Preset Group Folders: \n"
       show_current_group_folder_list
       printf "\n\n"
@@ -306,7 +309,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
         fi
         
         {
-          printf "#!/usr/bin/qqX --vm"
+          printf '#!' ; printf "/usr/bin/qqX --vm"
           printf "\n\nguest_os=\"linux\""
           printf "\ndisk_img=\"%s/disk.qcow2\"" "$QWG_NewVM_Name"
           printf "\ndisk_size=\"64G\""

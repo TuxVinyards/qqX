@@ -209,9 +209,9 @@ function configure_usb() {
 
 # get the number of processing units
 function get_nproc() {
-    if command -v nproc &>/dev/null; then
+    if type -p nproc &>/dev/null; then
         nproc
-    elif command -v sysctl &>/dev/null; then
+    elif type -p sysctl &>/dev/null; then
         sysctl -n hw.ncpu
     else
         echo "ERROR! Unable to determine the number of processing units."
@@ -724,7 +724,7 @@ function configure_bios() {
         local SHARE_PATH="/usr/share"
         if [ "${OS_KERNEL}" == "Darwin" ]; then
             # Do not assume brew; quickemu could have been installed via Nix
-            if command -v brew &>/dev/null; then
+            if type -p brew &>/dev/null; then
                 SHARE_PATH="$(brew --prefix qemu)/share"
             fi
         fi
@@ -1154,7 +1154,7 @@ function configure_file_sharing() {
         fi
 
         # SMB
-        if [ -x "$(command -v smbd)" ]; then
+        if [ -x "$(type -p smbd)" ]; then
             NET+=",smb=${PUBLIC}"
             echo " - smbd:     On guest: smb://10.0.2.4/qemu"
         fi
@@ -1218,7 +1218,7 @@ function vm_boot() {
 
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         # Get macOS product name and version using swvers
-        if [ -x "$(command -v sw_vers)" ]; then
+        if [ -x "$(type -p sw_vers)" ]; then
             OS_RELEASE="$(sw_vers -productName) $(sw_vers -productVersion)"
         fi
     elif [ -e /etc/os-release ]; then
@@ -1723,7 +1723,7 @@ function display_param_check() {
 
     # Set the default 3D acceleration.
     if [ -z "${gl}" ]; then
-        if command -v glxinfo &>/dev/null; then
+        if type -p glxinfo &>/dev/null; then
             GLSL_VER=$(glxinfo | grep "OpenGL ES GLSL" | awk '{print $NF}')
             case ${GLSL_VER} in
                 1*|2*) gl="off";;
@@ -1786,7 +1786,7 @@ function sound_card_param_check() {
 
 function tpm_param_check() {
     if [ "${tpm}" == "on" ]; then
-        SWTPM=$(command -v swtpm)
+        SWTPM=$(type -p swtpm)
         if [ ! -e "${SWTPM}" ]; then
             echo "ERROR! TPM is enabled, but swtpm was not found."
             exit 1
@@ -1803,10 +1803,10 @@ function viewer_param_check() {
         echo "ERROR! Requested viewer '${viewer}' is not recognised."
         exit 1
     fi
-    if [ "${viewer}" == "spicy" ] && ! command -v spicy &>/dev/null; then
+    if [ "${viewer}" == "spicy" ] && ! type -p spicy &>/dev/null; then
         echo "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
         exit 1
-    elif [ "${viewer}" == "remote-viewer" ] && ! command -v remote-viewer &>/dev/null; then
+    elif [ "${viewer}" == "remote-viewer" ] && ! type -p remote-viewer &>/dev/null; then
         echo "ERROR! Requested 'remote-viewer' as viewer, but 'remote-viewer' is not installed."
         exit 1
     fi
@@ -1819,7 +1819,7 @@ function fileshare_param_check() {
         # PUBLICSHARE is the only directory exposed to guest VMs for file
         # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
         if [ -z "${PUBLIC}" ]; then
-            if command -v xdg-user-dir &>/dev/null; then
+            if type -p xdg-user-dir &>/dev/null; then
                 PUBLIC=$(xdg-user-dir PUBLICSHARE)
             elif [ -d "${HOME}/Public" ]; then
                 PUBLIC="${HOME}/Public"
@@ -1959,8 +1959,8 @@ readonly VERSION="HB 4.9.5.01"
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
 ARCH_HOST=$(uname -m)
-QEMU=$(command -v qemu-system-${ARCH_VM})
-QEMU_IMG=$(command -v qemu-img)
+QEMU=$(type -p qemu-system-${ARCH_VM})
+QEMU_IMG=$(type -p qemu-img)
 if [ ! -x "${QEMU}" ] || [ ! -x "${QEMU_IMG}" ]; then
     echo "ERROR! QEMU not found. Please make sure 'qemu-system-${ARCH_VM}' and 'qemu-img' are installed."
     exit 1
@@ -1968,7 +1968,7 @@ fi
 
 # Check for gnu tools on macOS
 STAT="stat"
-if command -v gstat &>/dev/null; then
+if type -p gstat &>/dev/null; then
     STAT="gstat"
 fi
 

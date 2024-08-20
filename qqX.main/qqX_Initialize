@@ -101,6 +101,7 @@ if [[ $1 == "XDG" ]]; then
     XDG_MimeType_is_QCOW=
     XDG_ISO_Name=
     XDG_MimeType="$(mimetype "$2" 2>/dev/null)"
+    CurrentFolder="$(dirname "$2")"
    
     if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_is_QCOW=1
 
@@ -222,30 +223,6 @@ else
 fi
 
 if [[ $AllowMoreLocale ]]; then export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; else  export "LC_ALL=C" ; fi
-
-
-# Determine possible XDG folders 
-
-find_xdg_start_folder () {
-
-  #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
-
-  if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
-
-    cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found " 
-    CurrentFolder="$Default_VM_Folder"
-
-  else
-
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
-    CurrentFolder="$HOME"
-
-  fi
-
-}
-
-
-[[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder
 
 
 if [[ $XDG_MimeType_is_QCOW ]]; then

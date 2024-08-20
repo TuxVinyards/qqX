@@ -56,6 +56,9 @@ GeneralLoopCheck=
 
 System_qqX_Path="$(type -p qqX)"
 
+# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'  
+# Using caps (type -P) will show aliases and qqX re-routes
+
 # Respect standard FHS locations but allow local overide for qqX dev work. NB no spaces in qqX dev path, see notes at end of settings file.
 if [[ -d "./qqX.main" ]]; then qqX_MainFolder="$(realpath "./qqX.main")" ; else qqX_MainFolder="/usr/share/qqX/qqX.main"; fi
 if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi

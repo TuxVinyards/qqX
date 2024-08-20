@@ -79,7 +79,6 @@ else
       printColor "\n\n  ---------------------------------------------------------------------------- "
 
     fi
-
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
     printf "\n"
 

@@ -332,7 +332,7 @@ list_current_folder_instance_names () {
   mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
   for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
 
-  printf "\n  Folders:   "
+  printf "\n  Containing:   "
   if [[ ! ${CurrentFolderNames[*]} ]]; then printColor " NONE FOUND \n\n" 
   else 
     printf "\n\n" 
@@ -371,11 +371,11 @@ move_rename_Selected_VM () {
 
     printf "\n  Folder '%s' & .conf file to be MOVED and edited"  "$1"
     printf "\n\n  For new preset group folders, edit the main settings" 
-    printColor "\n\n  Current Folder: '%s'" "$(pwd)"
+    printf "\n\n  Current Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
 
     while true; do
-
+      
       printColor "\n\n  [number] select a different group folder "
       printf " [b] to go back\n\n"
       read -rp  "  >  "  Move_FolderOption
@@ -390,7 +390,8 @@ move_rename_Selected_VM () {
         [0-9]|[0-9][0-9]) 
           Mv_NewConf_Dir="${VM_Folder_List[Move_FolderOption]}" 
           if [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then  Move_FolderOption= 
-          else printf "\n  Selected: '%s'"  "$Mv_NewConf_Dir"  
+          else 
+            printf "\n\n  Selected: '%s' "  "$Mv_NewConf_Dir"  
           fi
           printColor "\n\n  [enter] to confirm " ; printf " [r] re-select \n\n"
           [[ $Move_FolderOption ]] && read -rp "  >  " Move_FolderOption
@@ -408,7 +409,7 @@ move_rename_Selected_VM () {
     Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
 
     Move_VM_Option="r"
-    if cd "$Mv_NewConf_Dir"; then printf "\n  Changing to folder '%s'\n"  "$Mv_NewConf_Dir"
+    if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
 
@@ -422,7 +423,7 @@ move_rename_Selected_VM () {
 
       Mv_NewName=
       CurrentFolderNameError=
-      printf "\n\n  Folder '%s' & .conf file to be RE-NAMED and edited"  "$1"
+      printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited"  "$1"
       printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 

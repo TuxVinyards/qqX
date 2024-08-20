@@ -25,8 +25,8 @@ function_config_tune_up ()  {
   
   TuneUpTargetFile="$1" 
 
-  if [[ ! -e $TuneUpTargetFile ]]; then 
-    printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
+  if [[ "$(dirname "$TuneUpTargetFile")" == '.' ]]; then 
+    printColor "\n\n  Internal ERROR  tune up .conf file not found or missing path \n\n  %s \n\n"
     sleep 100
   fi
 
@@ -50,33 +50,52 @@ function_config_tune_up ()  {
     sleep 100
   fi
 
-  TuneUpOldFile="$TuneUp_InstanceName/OldConfig.$TuneUpDate.conf"
-
-  cp "$TuneUpTargetFile"  "$TuneUpOldFile"
-
-  # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
-  # default behaviour from quickget is to add "#!$(which quickemu) --vm"
-  # and from ver 1.8 on, builtins or custom will make a non standard mod 
-  # if bypassing the tune-up, unless tweaked here:
-
-  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "qq" )"
-  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
-
-  TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
+  TuneUpTmpCopy="/tmp/TuneUpTargetCopy.tmp"
+  TuneUpTmpOriginal="/tmp/TuneUpTargetOriginal.tmp"
   TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
-  cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+  cp  "$TuneUpTargetFile"  "$TuneUpTmpOriginal"
+
+  # Possibly twice, but check paths as this script might be running for the first time on a brand new installation
+  Installed_qqX_Path="$(type -p qqX)"
+  QE_SystemFilePath="$(type -p quickemu)"
+
+  # Check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
+  # BUT as default behaviour from quickget is to add "#!$(which quickemu) --vm"
+  # this means that from ver 1.8 on, the builtins or custom will get added instead.
+  # Unless a few fixes get added here:
+
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep qq)"
+  [[ "$Conf_qqX_Pointer" == *'builtins'* ]] && Conf_qqX_Pointer=
+  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
+  [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
   if [[ ! $Conf_qqX_Pointer && ! $Conf_SysQE_Pointer ]]; then 
-    printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetFile" 
-    tail -n +2 "$TuneUpTmpCopy" >> "$TuneUpTargetFile" 
-    cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+    if [[ $Installed_qqX_Path ]]; then {
+      printf '#!' ; printf "%s --vm \n\n" "$Installed_qqX_Path" 
+      } > "$TuneUpTargetFile" 
+    elif [[ -e "/usr/bin/qqX" ]]; then  {
+      printf "#!/usr/bin/qqX --vm \n\n" 
+      } > "$TuneUpTargetFile" 
+    else {
+      printf "#!/usr/bin/qqX --vm \n\n# the qqX path should be checked ..." 
+      } > "$TuneUpTargetFile" 
+    fi
+    tail -n +2 "$TuneUpTmpOriginal" >> "$TuneUpTargetFile" 
   fi
+
+  if ! grep -q -s 'disk_size=' "$TuneUpTargetFile" ; then
+    printf "\ndisk_size=\"64G\"" >> "$TuneUpTargetFile" 
+  fi
+
+  TuneUpOldFile="$TuneUp_InstanceName/OldConfig.$TuneUpDate.conf"
+  cp "$TuneUpTargetFile"  "$TuneUpOldFile"
+  cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
   [[ $GeneralLoopCheck ]] && echo && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer" && echo "Conf_SysQE_Pointer = $Conf_SysQE_Pointer"  && echo 
   dev_loop_check
 
   printColor "\n\n  CHECK ME: \n\n"
-  cat "$TuneUpTmpCopy"
+  cat "$TuneUpTargetFile"
   printColor "\n\n  All changes made here, may be reversed:"
   printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
   
@@ -86,23 +105,38 @@ function_config_tune_up ()  {
     NewFileTuneUp_JustDone=1
   fi
 
-  if [[ ! $Conf_qqX_Pointer ]]; then
+  # Re-scan, even though from qqX 1.9.04 this pointer should now have been created, if a new install, 
+  # a pointer to 'quickemu' could exist on an older config.
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep qq)"
+  [[ "$Conf_qqX_Pointer" == *'builtins'* ]] && Conf_qqX_Pointer=
+  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
+  [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
-    ConfEdit_Qstart=
-    printColor "\n\n  The start line may be edited to point to qqX  (leave as System, if unsure)"  
-    printf "\n\n  Change the start line to point to qqX ?"  
-    printf "\n\n  [enter] yes, go for it    [no] use System %s   [q] quit tune-up \n\n"  "$QE_SystemFilePath"
-    read -rp "  >  "  ConfEdit_Qstart
+  ConfEdit_Qstart=
 
-    [[ $ConfEdit_Qstart == "q" ]] && return
-
-    if [[ $ConfEdit_Qstart == "no" ]]; then printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetDraft"  
-    else printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
-    fi
-
-  else  printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
-
+  if [[ "$Conf_qqX_Pointer" != *"$Installed_qqX_Path"* ]]; then
+    printColor "\n\n  Change the start line to point to qqX ?   "
+  elif [[ $QE_SystemFilePath ]]; then
+    printColor "\n\n  Stay with the start line pointing to qqX ?   "
   fi
+  if [[ "$Conf_SysQE_Pointer" == *"$QE_SystemFilePath"* && -e "$QE_SystemFilePath" ]]; then
+    printColor "(leave as System, if unsure)"  
+  fi
+  printf "\n\n  [enter] yes, continue with 'qqX'   " 
+  [[ $QE_SystemFilePath ]] && printf "[no] use System %s   " "$QE_SystemFilePath"
+  printf "[q] quit tune-up \n\n"
+  read -rp "  >  "  ConfEdit_Qstart
+
+  [[ $ConfEdit_Qstart == "q" ]] && return
+
+  if [[ $ConfEdit_Qstart == "no" ]]; then {
+    printf '#!' ; printf "%s --vm \n\n" "$QE_SystemFilePath"
+    } > "$TuneUpTargetDraft"  
+  else {
+    printf '#!' ; printf "%s --vm \n\n"  "$(type -p qqX)"
+    } > "$TuneUpTargetDraft" 
+  fi
+
 
   dev_loop_check
 
@@ -483,24 +517,17 @@ function_config_tune_up ()  {
     fi
 
   done
-
-  # usage case options are complex, so generally do a refresh all and return to vm selector menu ...  REVIEW 
   
   if [[ $NewFileTuneUp ]]; then 
 
-    SettingsFileAdjusted=1
+    ConfSettingsAdjusted=1
     SelectArrayError=
     IgnoreSecondCheckNew=1
 
     # set here, before refresh
     VM_Conf_Dir="$TuneUp_Conf_Dir"
-    VM_Conf_File="$TuneUpTargetFile"
+    VM_Conf_File="$(basename "$TuneUpTargetFile")"
     VM_InstanceName="$TuneUp_InstanceName"
-
-    # ByPass_VM_Array_Loader=1
-    # ByPass_VM_Array_Selector=1
-
-    refresh_sources_and_load_VM_arrays
 
   else
 

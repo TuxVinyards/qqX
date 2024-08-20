@@ -95,6 +95,9 @@ fi
 # Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem 
 # will need more adjustments than just this, so flag up for them to read the notes & probably other:
 
+# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'  
+# Using caps (type -P) will show aliases and qqX re-routes
+
 OS_BashLocation="$(type -p bash)"
 
 if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then 
@@ -109,11 +112,11 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
 
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
   read -rp  "  >  "   FHS_Alert
-
   [[ $FHS_Alert ]] &&  exit 
-
 fi
 
+# Set this session to bash. Attempt to make things work better if subsitute shell has been used eg. fishshell
+export SHELL="$OS_BashLocation"
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
@@ -122,30 +125,53 @@ if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   [[ $FHS_Alert ]] &&  exit 
 fi
 
+if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
+  printf "\n\n  Check for your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
+  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  read -rp  "  >  "   FHS_Alert
+  [[ $FHS_Alert ]] &&  exit 
+fi
 
-##  Check for 'curl' etc  as is may be omitted from quickemu install recipes
-#   & where $1 test is true if command line is being used 
-
+##  Check for 'curl' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p curl) ]]; then
-  echo
-  echo "  'Curl' is now a listed dependency of Quickget and will be used instead of 'wget' when installed ..."
-  echo
+  printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+##  Check for 'jq' as not in all distros (where $1 test is true if command line is being used) 
+if [[ ! $(type -p jq) ]]; then
+  printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+##  Check for 'bc' as not in all distros (where $1 test is true if command line is being used) 
+if [[ ! $(type -p bc) ]]; then
+  printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+##  Check for 'wget' as not in all distros (where $1 test is true if command line is being used) 
+if [[ ! $(type -p wget) ]]; then
+  printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
 
 qqX_Version="$(./qqX --version 2>/dev/null)"
 
-# Default location is next to quickemu in "/usr/bin" but where qqX_Std_Bin_Dir is set to "/bin" to improve portabilty.
-# @2023 there is normally a symlink for "/bin" so this will actually install to "/usr/bin" 
-
-# In the same way that the bash shebang itself starts at "/bin" 
-# the use of "/bin" allows for other systems that have not adopted or allowed for the newer standard method.
+# Default location is next to quickemu in "/usr/bin" This may frequently be set just to "/bin"
+# as this is often just a symlink and qqX will actually install to "/usr/bin". 
+# However, this doesn't always follow. Although the bash shebang itself starts at "/bin" 
+# some systems have not adopted or allowed for the newer standard method and will only route 
+# items on an individual basis.
 
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
-if [[ $Current_qqX_Location ]]; then  qqX_Std_Bin_Dir="${Current_qqX_Location/'/qqX'/}"; else qqX_Std_Bin_Dir="/usr/bin" ; fi
+if [[ ! $Current_qqX_Location ]]; then 
+  # new install
+  qqX_Std_Bin_Dir="/usr/bin"
+else 
+  # updating existing install
+  qqX_Std_Bin_Dir="$(dirname "$Current_qqX_Location")"
+fi
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
@@ -187,7 +213,7 @@ function print_terminal_notes {
   Add 'UserTerm' located near the script start TO MANUALLY SPECIFY the terminal name
 
   Edit the script's custom profile if actual 'Xterm' itself is to be used,
-  eg  xterm -geometry 150x50 -fa truetype -fs 12
+  eg  xterm -geometry 145x50 -fa truetype -fs 12
 
   Remember also that column width units are based on the size of your terminal font.
 
@@ -203,7 +229,7 @@ CustomTerminalProfile=
 ## SET TERMINAL SIZES
 
 Term_Width=145
-Term_Height=48
+Term_Height=50
 Term_Taller=55
 
 # REVIEW qqX 1.9  changes desktop command slightly and 'desktop-file-validate' no says to remove the single quotes: --title='qqX'
@@ -416,11 +442,11 @@ else
       printColor "\n\n\n  A default VM directory is required >> "  
       printf "\n\n  %s\n\n  This location can be easily moved and/or renamed later," "$HOME/VMQs"
       printf "\n\n  simply by using the file manager and by editing the qqX settings."
-      printf "\n\n  [enter] skip (if already set-up) " 
-      printColor "  [m] make folder '%s'\n\n" "$HOME/VMQs"
+      printColor "\n\n  [enter] make folder '%s'" "$HOME/VMQs"
+      printColor "  [n] not yet >> edit the settings file later ... \n\n" 
       read -rp "  >  "  MkDefDir
 
-      if [[ $MkDefDir ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+      if [[ ! $MkDefDir && ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
 
     fi
 
@@ -539,7 +565,10 @@ if [[ ! $SkipMkLauncher ]]; then
   elif [[ $UserTerm == "mate-terminal" ]]; then SelectedTerminalProfile="$MateTerminalProfile"
   elif [[ $UserTerm == "gnome-terminal" ]]; then SelectedTerminalProfile="$GnomeTerminalProfile"
   elif [[ $UserTerm == "xfce4-terminal" ]]; then SelectedTerminalProfile="$XfceTerminalProfile"
-  elif [[ $UserTerm == "konsole" ]]; then SelectedTerminalProfile="$KonsoleTerminalProfile"
+  elif [[ $UserTerm == "konsole" ]]; then 
+    SelectedTerminalProfile="$KonsoleTerminalProfile"
+    # make session allow terminal to close, when started as a terminal from inside a dolphin window
+    export DOLPHIN_TERM_ACTIVE=1
   fi
 
   printf "\n"
@@ -684,29 +713,38 @@ fi
 
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
 #  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
-
-# But must move to $HOME to pick up the new builtins   # REVIEW  qqX 1.9 moves .desktop location to /usr/share
-
-# if cd "$HOME" ; then
-  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
-  if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
-# fi
+Start_qqX=
+GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
+if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
 
 End_Install=
 printColor  "\n\n  Install process finished:  "
 
-printf "\n\n\n  qqX may be started from the main system menu,"
-printf   "\n  by mouse clicks on files, or straight from the terminal."
-printf "\n\n  The settings file may be edited both via the internal qqX menu"
-printf   "\n  or before starting at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
+printf "\n\n\n  Start qqX straight from the system's MAIN MENU,"
+printf   "\n  by typing 'qqX' the terminal, or by mouse clicks on VM or ISO files ..."
+printf "\n\n  Start qqX to edit the settings file, or before starting"
+printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
-[[ $GrepExecLine ]] && printColor "  [enter] to close current window and start"
+[[ $Start_qqX ]] && printColor "  [enter] to close current window and start"
 printf "   [q] to quit  \n\n "
 read -rp "  > "  End_Install
 
-if [[ $End_Install == "q" ]]; then exit; fi
+if [[ $End_Install == "q" ]]; then exit ; fi
 
-if [[ $GrepExecLine ]]; then exec bash -c "$Start_qqX" ; else  exit ;  fi
+if [[ $Start_qqX ]]; then 
+  if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
+    printColor "\n\n  Keep this window open until qqX is no longer running." 
+    printf "\n\n  Auto-closure of the calling script is not permitted in some desktop environments.\n\n"
+    sleep 3
+    eval "$Start_qqX" 
+    read -rp "  >  "
+    exit
+  else 
+    exec bash -c "$Start_qqX" 
+  fi
+else  
+  exit 
+fi
 
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject

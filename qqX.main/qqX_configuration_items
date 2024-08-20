@@ -344,7 +344,7 @@ function_conf_error () {
 
   if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit 
 
-  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_File" 
+  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
 
   elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
   
@@ -359,6 +359,8 @@ function_conf_error () {
     elif [[ $ErrorMenuSelect == "gt" ]]; then 
 
       VM_Selection=
+      VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      cd "$Default_VM_Folder" || DefaultFolderError=1
       function_quick_get_wrap 
       return
 
@@ -431,7 +433,7 @@ qqX_edit_settings() {
 
         if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
 
-        elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_File" ; break
+        elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
 
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
 
@@ -493,11 +495,17 @@ function refresh_conf_vars_and_values {
 
   # A blank clearance will have been created at first session start.  
 
-  source "$ConfClearanceLog"
-  reload_bootmenu_defaults
-
   if [[ -e $VM_Conf_File ]]; then
 
+    # this code only runs if a conf file has been specified, otherwise does nothing ...
+    # but make sure that the calling code has put us in the right place, if a conf file is there
+    if [[ "$(pwd)" != "$VM_Conf_Dir" ]]; then function_conf_error  "Conf Refresh:  WRONG FOLDER ," ; fi
+
+    # And make sure that $VM_Conf_File has not somehow inherited the whole path
+    VM_Conf_File="$(basename "$VM_Conf_File")"
+    if [[ ! -e "$VM_Conf_Dir/$VM_Conf_File" ]]; then function_conf_error  "Conf Refresh:  WRONG FOLDER/FILE ," ; fi
+
+    source "$ConfClearanceLog"
     SecondDrive=
     SharedDrive=
     DriveLocationError=
@@ -509,13 +517,16 @@ function refresh_conf_vars_and_values {
     Custom_SDL_ScreenSize=
     Custom_SDL_ScreenPercent=
     ACCESS=
+    QemuArgsCustomFile=
+    QemuErrorLog=
+    reload_bootmenu_defaults
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
 
     # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
     printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
-    mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+    mapfile -t ConfClearance_Arr < "$VM_Conf_Dir/$VM_Conf_File"
 
     for Line in "${ConfClearance_Arr[@]}"; do
       if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
@@ -533,7 +544,7 @@ function refresh_conf_vars_and_values {
     done
 
     source "$ConfClearanceLog"
-    source "$VM_Conf_File"
+    source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
 
@@ -543,6 +554,8 @@ function refresh_conf_vars_and_values {
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
 

@@ -262,7 +262,7 @@ function csv_data() {
     local HAS_ZSYNC=0
 
     # Check if zsync is available
-    if command -v zsync &>/dev/null; then
+    if type -p zsync &>/dev/null; then
         HAS_ZSYNC=1
     fi
 
@@ -1299,7 +1299,7 @@ function zsync_get() {
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
-    elif command -v zsync &>/dev/null; then
+    elif type -p zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
         else
@@ -2055,8 +2055,8 @@ function get_macos() {
     CWD="$(dirname "${0}")"
     if [ -x "${CWD}/chunkcheck" ]; then
         CHUNKCHECK="${CWD}/chunkcheck"
-    elif [ -x "$(command -v chunkcheck)" ]; then
-        CHUNKCHECK="$(command -v chunkcheck)"
+    elif [ -x "$(type -p chunkcheck)" ]; then
+        CHUNKCHECK="$(type -p chunkcheck)"
     fi
 
     appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
@@ -3326,11 +3326,11 @@ function create_vm() {
     make_vm_config "${ISO}"
 }
 
-# Use command -v command to check if quickemu is in the system's PATH and
+# Use type -p command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
 function resolve_quickemu() {
-    if command -v quickemu >/dev/null 2>&1; then
-        command -v quickemu
+    if type -p quickemu >/dev/null 2>&1; then
+        type -p quickemu
     elif [ -f "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
@@ -3390,14 +3390,14 @@ fi
 QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
-CURL=$(command -v curl)
+CURL=$(type -p curl)
 if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
-QEMU_IMG=$(command -v qemu-img)
+QEMU_IMG=$(type -p qemu-img)
 if [ ! -x "${QEMU_IMG}" ]; then
     echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
     exit 1

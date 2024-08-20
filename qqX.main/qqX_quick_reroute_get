@@ -202,7 +202,7 @@ function show_current_group_folder_list {
 
   i=0
   CurrentFolder_Recognised=
-  CurrentFolder="$(pwd)"
+  [[ ! $CurrentFolder ]] && CurrentFolder="$(pwd)"
 
   while [[ ${VM_Folder_List[i]} ]]; do
 
@@ -263,7 +263,7 @@ function check_new_vm_folder_name {
     if [[ ${SimilarVM_Arr[*]} ]]; then  
       for DailyCheckVM in "${SimilarVM_Arr[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
       [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
-      printColor "\n\n   %s  >>  similar name match(es) found: \n\n"  "$QWG_NewVM_Name"
+      printColor "\n\n  %s  >>  similar name match(es) found: \n\n"  "$QWG_NewVM_Name"
       print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
       printf "\n"
     fi
@@ -293,11 +293,29 @@ function refresh_QWG_selector {
 
 InternetUp=
 
+function clear_main_gt_start_vars {
+
+  # Main vars, other clearances will need less, 
+  # Zsync needs special treatment, as does QGW_List_NumSelected_Next
+  QGW_List_NumSelected=
+  QGW_OS_Arr_NumSelected=
+  QGW_OS_Arr_NameSelected=
+  QGW_Release_Arr_NumSelected=
+  QGW_Release_Arr_NameSelected=
+  QGW_Edition_Arr_NumSelected=
+  QGW_Edition_Arr_NameSelected=
+  QGW_DownloadStart=
+  QGW_DownloadSelection=
+  QGW_Download_BadLink=
+}
+
 function_quick_get_wrap ()  {
 
   show_QWG_header
   QGW_List_NumSelected= 
   dev_loop_check ; [[ $GeneralLoopCheck ]] && echo
+
+  clear_main_gt_start_vars
 
   while [[ ! $InternetUp ]]; do  
 
@@ -728,8 +746,9 @@ function_quick_get_wrap ()  {
               printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
               printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-              printf "  NONE of the releases have editions to select"
-              printColor "\n\n  [enter] to continue   [r] choose a different release anyway ...  [b] back to main menu \n\n" 
+              printf "  No editions to select in any of the releases ..."
+              printColor "\n\n  [enter] to continue   "
+              printf "[r] choose a different release anyway ...  [b] back to main menu \n\n" 
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
               printf "  This distro is single release option only .... "
               printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
@@ -837,6 +856,8 @@ function_quick_get_wrap ()  {
           printf "\n\n  Deletion and re-download can sometimes be quicker ...."
         fi
         ZsyncDownload=1
+
+        # REVIEW Deletion and re-download may be the way to go.  Zsync has a lot of code to keep maintained ...
 
       fi
 
@@ -959,20 +980,14 @@ function_quick_get_wrap ()  {
       case "$QGW_DownloadStart" in
 
         b)
-          QGW_List_NumSelected=
-          QGW_OS_Arr_NumSelected=
-          QGW_OS_Arr_NameSelected=
-          QGW_Release_Arr_NumSelected=
-          QGW_Release_Arr_NameSelected=
-          QGW_Edition_Arr_NumSelected=
-          QGW_Edition_Arr_NameSelected=
-          Zsync_OS_Name=
-          Zsync_Release_Name=
-          QGW_DownloadStart=
-          QGW_DownloadSelection=
-          QGW_Download_BadLink=
-
-          if [[ $MainMenuZsync ]]; then MainMenuZsync= ; else function_quick_get_wrap ; fi
+          clear_main_gt_start_vars
+          if [[ $MainMenuZsync ]]; then 
+            MainMenuZsync= 
+          else 
+            Zsync_OS_Name=
+            Zsync_Release_Name=
+            function_quick_get_wrap
+          fi
           return
         ;;
 
@@ -1044,7 +1059,7 @@ function_quick_get_wrap ()  {
               printf "\n\n"
               if [[ $ISO_OvWr ]]; then QGW_OverWriteAllow=1 ; QGW_DownloadStart="start" ; break ; fi  
             else 
-              printf "\n\n"
+              #printf "\n\n"
               QGW_DownloadStart="start" ; break
             fi
           fi
@@ -1073,6 +1088,8 @@ function_quick_get_wrap ()  {
 
     QGW_DownloadStart=
     QGW_DownloadStopped=
+    QGW_List_NumSelected_Next=
+    QGW_List_NumSelected_Previous=
    
     if [[ $ZsyncDownload ]]; then
       printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
@@ -1271,7 +1288,8 @@ function_quick_get_wrap ()  {
     fi
         
     # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-    # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
+    # but Zsync can now give these files root protection so this removal may not work ...   
+    # REVIEW Deletion and re-download may be the simpler way to go.  Zsync has a lot of code to keep maintained ...
       ZsyncDownload=
 
   elif [[ -d "$New_VM_InstanceName" ]]; then
@@ -1321,14 +1339,14 @@ function_quick_get_wrap ()  {
         printf "\n\n  Folder/file being deleted ... \n\n"
         [[ -d "$New_VM_InstanceName" ]] && rm -f -r "$New_VM_InstanceName"
         [[ -e "$New_VM_Conf_File" ]] && rm -f "$New_VM_Conf_File"
+
       else  
         printf  "\n\n Folder/file retained \n\n"
       fi
 
       sleep 2
-
       cd "$Default_VM_Folder" || DefaultFolderError=1
-      VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
       return
 
@@ -1350,13 +1368,13 @@ function_quick_get_wrap ()  {
     VM_Conf_Dir="$QWG_Conf_Dir"
     VM_Conf_File="$(basename "$New_VM_Conf_File")"
 
-    if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "New Working Directory NOT FOUND ," ; fi
-
-    # add at least basic values here, in case the tune up util gets skipped
-    refresh_conf_vars_and_values
+    refresh_sources_and_load_VM_arrays
 
     NewFileTuneUp=1
-    function_config_tune_up  "$New_VM_Conf_File"  
+    function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"  
+
+    # make sure values have been read, and at the least basic in case the tune up utility gets skipped
+    refresh_conf_vars_and_values
     NewFileTuneUp=
     NewFileTuneUp_JustDone=1
 
@@ -1371,7 +1389,7 @@ function_quick_get_wrap ()  {
     
   fi
 
-  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "New Working Directory NOT FOUND ," ; fi
+  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ," ; fi
 
   SettingsFileAdjusted=1
   ByPass_VM_Array_Selector=1
