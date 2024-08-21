@@ -40,14 +40,11 @@ add_unlisted_vm_to_vm_array () {
     
       New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
       local i=0
-
       while [[ ${VM_Array[$i,0]} ]]; do
-
         ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
         if [[ $ArrFolderFile == "$TestFolderFile" ]]; then return  # already exists, stop searching, quit function:
         else  ((i+=1))  # carry on interating the array
         fi
-        
       done
 
     fi
@@ -310,7 +307,7 @@ VM_loader_selector_and_menu () {
         VM_Selection=
         return
 
-      elif [[ $VM_Selection == "r" ]]; then  vm_menu_interface_refresh ; return
+      elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
 
       elif [[ $VM_Selection == "FS"   ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return

@@ -44,10 +44,10 @@ function_vm_folder_item_text () {
 
   [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
 
+  # item max display length
   [[ ${#ArrayConf_Item_Listing} -gt "22" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:22}"
 
-  ## Decide on item text to print
-
+  ## Decide on suffix (if needed)
   QcowTarget=
   QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
   QcowTarget="${QcowTarget/'disk_img='/}"  
