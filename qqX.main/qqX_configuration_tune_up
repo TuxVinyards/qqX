@@ -57,7 +57,10 @@ function_config_tune_up ()  {
 
   # Possibly twice, but check paths as this script might be running for the first time on a brand new installation
   Installed_qqX_Path="$(type -p qqX)"
-  QE_SystemFilePath="$(type -p quickemu)"
+
+  # We should be using 'QE_SystemFilePath' declared at the start of qqX, and before any builtins or re-routes happen,
+  # otherwise finding the filepath gets a bit complex so attempt to use the standard or warn ...
+  [[ ! $QE_SystemFilePath ]] && [[ -e "/usr/bin/quickemu" ]] && QE_SystemFilePath="/usr/bin/quickemu"
 
   # Check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
   # BUT as default behaviour from quickget is to add "#!$(which quickemu) --vm"
@@ -97,10 +100,12 @@ function_config_tune_up ()  {
   printColor "\n\n  CHECK ME: \n\n"
   cat "$TuneUpTargetFile"
   printColor "\n\n  All changes made here, may be reversed:"
-  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
+  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder"
+
+  [[ ! $QE_SystemFilePath ]] && printf "\n\n  Standard system Quickemu not found ..."
   
   if [[ $NewFileTuneUp ]]; then 
-    printf "\n\n  So far, so good  >  "
+    printf "\n\n\n  So far, so good  >  "
     # Not fully done at this point but this is used a flag to stop repeat conf checks, means the tune-up screen has been done.
     NewFileTuneUp_JustDone=1
   fi
@@ -119,8 +124,8 @@ function_config_tune_up ()  {
   elif [[ $QE_SystemFilePath ]]; then
     printColor "\n\n  Stay with the start line pointing to qqX ?   "
   fi
-  if [[ "$Conf_SysQE_Pointer" == *"$QE_SystemFilePath"* && -e "$QE_SystemFilePath" ]]; then
-    printColor "(leave as System, if unsure)"  
+  if [[ -e "$QE_SystemFilePath" ]]; then
+    printColor "(set as System, if unsure)"  
   fi
   printf "\n\n  [enter] yes, continue with 'qqX'   " 
   [[ $QE_SystemFilePath ]] && printf "[no] use System %s   " "$QE_SystemFilePath"

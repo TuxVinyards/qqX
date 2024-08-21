@@ -287,7 +287,7 @@ function_conf_error () {
   printf "\n\n  qqX Settings, VM folder & conf file(s)"  
 
   if [[ $1 ]] ; then 
-    printf "\n\n  Check %s settings, location & content ... "  "$1"
+    printf "\n\n  Check %s settings, LOCATION & CONTENT ... "  "$1"
   else 
     printf "\n\n  Check the settings and re-run this script ... " 
   fi
@@ -336,7 +336,7 @@ function_conf_error () {
     printColor "\n\n  [Enter] to edit qqX general settings"  
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
     printf "  [c] ignore and continue "
-    printColor "  [q] to quit \n\n"  
+    printf "  [q] to quit \n\n"  
 
   fi   
 

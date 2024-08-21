@@ -30,7 +30,7 @@ add_unlisted_vm_to_vm_array () {
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
     TestFolderFile="$1/$2"
 
-    [[ ! -e $TestFolderFile ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
+    [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
 
     if [[ ! ${VM_Array[0,0]} ]]; then 
     
@@ -159,16 +159,21 @@ scan_folders_list_and_add_VMs () {
     FolderPathName="${VM_Folder_List[i]}"
     Folder_Conf_String="$(ls "$FolderPathName/"*.conf 2> /dev/null)"      # list all .confs in the folder  
     Folder_Conf_String=${Folder_Conf_String//"$FolderPathName/"/}         # remove all paths, one from each entry in the string
+    [[ ! $Folder_Conf_String ]] && Folder_Conf_String="empty"             # add dummy value for when new extra folders are added
     mapfile -t  Folder_Conf_Array  <<< "$Folder_Conf_String"              # convert the line separated string to an array   
 
     if [[ ${Folder_Conf_Array[0]} ]]; then 
 
-      for TestFile in "${Folder_Conf_Array[@]}"; do 
-        # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
-        if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
-          add_unlisted_vm_to_vm_array  "$FolderPathName" "$TestFile" 
-        fi
-      done
+      if [[ ${Folder_Conf_Array[0]} == "empty" ]]; then
+        add_unlisted_vm_to_vm_array  "$FolderPathName" "empty" 
+      else
+        for TestFile in "${Folder_Conf_Array[@]}"; do 
+          # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
+          if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
+            add_unlisted_vm_to_vm_array  "$FolderPathName" "$TestFile" 
+          fi
+        done
+      fi
 
     fi
 
@@ -233,9 +238,10 @@ VM_loader_selector_and_menu () {
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 
         printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
-        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER   [enter] to edit settings file  [q] to quit " 
-        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY %s \n\n  [enter] to edit settings file  [q] to quit "  "$ExtraFolderError"
-        [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s \n\n  [enter] to edit settings file  [q] to quit " "$SelectArrayError"
+        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
+        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY %s "  "$ExtraFolderError"
+        [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
+        printf "\n\n  [enter] to edit settings file   [c] ignore and continue   [q] to quit "
 
       else
 
@@ -286,12 +292,12 @@ VM_loader_selector_and_menu () {
 
       #
 
-      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
+      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError || $VM_Selection == "c" ]]; then 
             
         ExtraFolderError=
-        VM_Selection=
         VM_InstanceName=
-        qqX_edit_settings 
+        [[ $VM_Selection != "c" ]] && qqX_edit_settings 
+        VM_Selection=
         return
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then 
@@ -403,13 +409,13 @@ VM_loader_selector_and_menu () {
 
     # change directory to where the VM is
     ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1
-    [[ ! -e "$VM_Conf_File" ]] &&  function_conf_error  ".conf file" && SelectArrayError=1
+    [[ $VM_Conf_File != "empty" && ! -e "$VM_Conf_File" ]] &&  function_conf_error  ".conf file" && SelectArrayError=1
 
     # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder 
     VM_InstanceName="${VM_Conf_File/.conf}"
 
     # Check that the dir contains the right files  &&  grep .conf for right content
-    if [[ $IgnoreFolderCheck ]]; then IgnoreFolderCheck=
+    if [[ $IgnoreFolderCheck || $VM_Conf_File == "empty" ]]; then IgnoreFolderCheck=
     elif [[ ! $(ls "$VM_InstanceName"/*.qcow2 2> /dev/null) ]]; then
       if [[ $(ls "$VM_InstanceName"/*.iso 2> /dev/null) || $(ls "$VM_InstanceName"/*.img 2> /dev/null) ]]; then 
         SelectArrayError=1; function_conf_error  "new" 
