@@ -79,6 +79,7 @@ function find_file_manager_browser()  {
       if [[ $(type -p caja) ]]; then  FileManager="caja"
       elif [[ $(type -p nautilus) ]]; then  FileManager="nautilus"
       elif [[ $(type -p dolphin) ]]; then  FileManager="dolphin"
+      elif [[ $(type -p thunar) ]]; then  FileManager="thunar"
       elif [[ $(type -p pcmanfm) ]]; then  FileManager="pcmanfm"
       elif [[ $(xdg-mime query default inode/directory) ]]; then  FileManager="xdg-open"
       else FileManager=
