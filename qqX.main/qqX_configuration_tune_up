@@ -131,8 +131,23 @@ function_config_tune_up ()  {
   [[ $QE_SystemFilePath ]] && printf "[no] use System %s   " "$QE_SystemFilePath"
   printf "[q] quit tune-up \n\n"
   read -rp "  >  "  ConfEdit_Qstart
-
-  [[ $ConfEdit_Qstart == "q" ]] && return
+    
+  if [[ $ConfEdit_Qstart == "q" ]]; then 
+    printColor "\n  Linux distros post-install:"
+    printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
+    printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
+    if [[ -e "$SharedDrive" ]]; then 
+      printColor "\n\n  ALL distros:"
+      printf "\n\n  The qqX 'shared drive' is available to help with sharing between distros"
+    else
+      printColor "\n\n  ALL distros post-install:"
+      printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
+      printf "\n  See the notes in the general settings file for installation"
+    fi
+    printf "\n\n  [enter] to continue to the VM menus \n\n"
+    read -rp "  > "
+    return 
+  fi
 
   if [[ $ConfEdit_Qstart == "no" ]]; then {
     printf '#!' ; printf "%s --vm \n\n" "$QE_SystemFilePath"
@@ -482,9 +497,18 @@ function_config_tune_up ()  {
 
     fi
 
-
-
-    printColor "\n\n  [enter] all good, continue    [r] revert back to the old config"
+    printColor "\n\n  Linux distros post-install:"
+    printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
+    printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
+    if [[ -e "$SharedDrive" ]]; then 
+      printColor "\n\n  ALL distros:"
+      printf "\n\n  The qqX 'shared drive' is available to help with sharing between distros"
+    else
+      printColor "\n\n  ALL distros post-install:"
+      printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
+      printf "\n  See the notes in the general settings file for installation"
+    fi
+    printColor "\n\n\n  [enter] all good, continue    [r] revert back to the old config"
     printf "\n\n  [e]  edit the config file in more detail   "
     
     [[ $NewFileTuneUp ]] && printf "[d]  delete the VM - something went wrong ..."
