@@ -50,7 +50,7 @@ else
 
     else
 
-      printf "   [del] delete selected VM   [mv] move or rename"
+      printf "   [del] delete selected VM   [mv] move, rename or link"
       printColor  "    [u]   hide utils & technical"
       printColor "\n\n  ---------------------------------------------------------------------------- \n"
       printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 

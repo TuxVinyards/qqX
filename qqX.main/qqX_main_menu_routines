@@ -149,6 +149,10 @@ show_main_menu_header () {
     printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
   fi
 
+  if stat "$VM_Conf_Dir/$VM_Conf_File" 2>/dev/null | grep -q "symbolic" ; then 
+    printf "\n  Symbolically linked to real path %s \n" "$(realpath "$VM_Conf_Dir/$VM_InstanceName")"
+  fi
+
 }
 
 # When a VM_InstanceName exists, check the VM disk is not corrupt  (quickemu default name only)
@@ -253,6 +257,11 @@ function_delete_Selected_VM () {
   fi
 
   if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
+
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+    printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
+    printColor "\n\n  REMOVING LINKS ONLY - VM CONTENT REMAINS AT REALPATH \n"
+  fi
 
   printColor "\n\n  Folder: %s " "$1"
   printColor "  & file: %s  to be deleted?"  "$2"
@@ -359,17 +368,29 @@ move_rename_Selected_VM () {
 
   MoveFail=
   Move_VM_Option=
+  MvTargetIsLinked=
+
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+    printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
+    printColor "\n\n  DELETE LINKS and REMAKE instead - VM CONTENT REMAINS AT REALPATH \n"
+    MvTargetIsLinked=1
+  fi
 
   printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
   printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
-  printColor "\n\n  [r] to rename  [m] to move  "; printf "[b] to go back"   
+  printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder" 
+  printf "\n\n"
+  [[ ! $MvTargetIsLinked ]] && printColor "  [r] to rename  [m] to move  [ln] make symbolic links"
+  printf "  [b] to go back"   
   printf "\n\n"
   read -rp "  >  "   Move_VM_Option
 
-  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" ]]; then 
+  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" || $Move_VM_Option == "ln" ]]; then 
 
-    printf "\n  Folder '%s' & .conf file to be MOVED and edited"  "$1"
+    if [[ $Move_VM_Option == "ln" ]]; then MakeLinksOnly=1 ; else MakeLinksOnly= ; fi
+
+    printf "\n  Folder '%s' & .conf file to be MOVED and edited or Linked"  "$1"
     printf "\n\n  For new preset group folders, edit the main settings" 
     printf "\n\n  Current Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
@@ -423,7 +444,7 @@ move_rename_Selected_VM () {
 
       Mv_NewName=
       CurrentFolderNameError=
-      printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited"  "$1"
+      printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
       printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 
@@ -447,22 +468,24 @@ move_rename_Selected_VM () {
     if [[ $Mv_NewName_Return ]]; then  
       Mv_NewName_Return= ; Move_VM_Option= ; Mv_NewName= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
     fi
-
-    if [[ $Mv_NewConf_Dir ]]; then 
-      mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
-      mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
-      set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
-    fi
-
-    if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
-
-      if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
-        mv "$1" "$Mv_NewName" || MoveFail=1
-        mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
+    if [[ $MakeLinksOnly ]]; then
+      if [[ $Mv_NewConf_Dir ]]; then 
+        ln -s "$Mv_OldFolderPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldFolderPath")" || MoveFail=1
+        ln -s "$Mv_OldConfPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldConfPath")" || MoveFail=1
       fi
-
-      if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
-
+    else
+      if [[ $Mv_NewConf_Dir ]]; then 
+        mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
+        mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
+        set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
+      fi
+      if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
+        if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
+          mv "$1" "$Mv_NewName" || MoveFail=1
+          mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
+        fi
+        if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
+      fi
     fi
   
   else  
