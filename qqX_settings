@@ -18,9 +18,10 @@
 
 Default_VM_Folder="$HOME/VMQs"
 
-# ADD any EXTRA FOLDERS or sub folders where VM's may be located:
-# leave blank for none, set one entry per folder as +=("/full/path/folder") 
+# ADD any EXTRA FOLDERS OR SUB-FOLDERS where VM's may be located:
+# leave blank for none, set one entry per folder as +=("/full/path/folder") or +=("$Default_VM_Folder/folder")
 # or multiple as quoted and space separated as in +=("/full/path/folder" "/full/path/folder" "/full/path/folder") 
+# or as in +=("$HOME/VMQs/folder" "$HOME/VMQs/folder" "$HOME/VMQs/folder") 
 
 Extra_VM_Folder+=("")
 

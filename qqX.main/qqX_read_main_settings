@@ -43,7 +43,7 @@ function_create_VM_folderList() {
 
   for xF in "${Extra_VM_Folder[@]}"; do
     [[ $xF ]] && VM_Folder_List+=("$xF")
-    [[ $xF ]] &&  [[ ! -d "$xF" ]] && ExtraFolderError="$xF Not Found"
+    [[ $xF ]] &&  [[ ! -d "$xF" ]] && ExtraFolderError="$xF Not Found or not yet Created"
   done
 
 }

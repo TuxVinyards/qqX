@@ -335,7 +335,7 @@ function_conf_error () {
     # includes "$1" = "config"
     printColor "\n\n  [Enter] to edit qqX general settings"  
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
-    printf "  [c] ignore and continue "
+    printf "  [c] ignore, re-check and continue "
     printf "  [q] to quit \n\n"  
 
   fi   
