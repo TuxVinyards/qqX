@@ -40,7 +40,7 @@ function  main_menu_actions {
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
 
-  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" ]]; then 
+  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" || $MainMenuChoice == "ln" ]]; then 
 
     move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return

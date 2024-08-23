@@ -263,10 +263,34 @@ function_delete_Selected_VM () {
     printColor "\n\n  REMOVING LINKS ONLY - VM CONTENT REMAINS AT REALPATH \n"
   fi
 
-  printColor "\n\n  Folder: %s " "$1"
-  printColor "  & file: %s  to be deleted?"  "$2"
-  printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
-  printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+  vm_selector_init_common
+  i=0
+  ConnectedLinks=
+  while [[ ${VM_Array[$i,0]} ]] ; do
+    if [[ $1 == "$(basename "${VM_Array[$i,1]}" .conf)" ]] && [[ $(pwd) != "${VM_Array[$i,0]}" ]] &&\
+    stat "${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" | grep -q "symbolic"; then
+
+      LinkPathName="${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" 
+      TestPathName="$(stat -c %N "$LinkPathName" | cut -d '>' -f2 )"
+      TestPathName="${TestPathName/" '"/}"
+      TestPathName="${TestPathName/"'"/}"
+      if [[ $TestPathName == "$(pwd)/$1" ]]; then
+        printColor "\n\n  WARNING: connected VM LINKS have been found and they will also need deleting:"
+        printf "\n\n  >>>  %s\n" "$LinkPathName"
+        ConnectedLinks=1
+      fi
+    fi
+    ((i+=1))
+  done
+
+  printColor "\n\n  Folder: %s" "$1"
+  printColor "  &  File: %s  to be deleted?"  "$2"
+  if [[ $ConnectedLinks ]]; then
+    printf  "\n\n  TO DELETE THIS VM, removal of BOTH the above FOLDER/FILE and the CONNECTED LINKS is required."
+  else
+    printf  "\n\n  To delete this VM, removal of the above folder/file is sufficient."
+  fi
+  printf "\n\n  Select [n] to manually delete using a file manager, if there are certain files that you want to keep."
   printColor "\n\n\n  Folder content: \n\n"
   ls "$1"
 
