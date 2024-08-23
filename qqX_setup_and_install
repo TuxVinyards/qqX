@@ -210,10 +210,12 @@ function print_terminal_notes {
 
   cat << Notes
  
-  Add 'UserTerm' located near the script start TO MANUALLY SPECIFY the terminal name
+  TO MANUALLY SPECIFY the terminal name, the installer script's 'UserTerm' variable may be used.
 
-  Edit the script's custom profile if actual 'Xterm' itself is to be used,
+  For actual 'XTERM' itself, also edit the installer script's 'CustomTerminalProfile' 
   eg  xterm -geometry 145x50 -fa truetype -fs 12
+
+  Open the script in a standard text editor at around line 220.
 
   Remember also that column width units are based on the size of your terminal font.
 

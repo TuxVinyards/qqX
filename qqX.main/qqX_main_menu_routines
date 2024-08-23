@@ -24,7 +24,7 @@ show_msg_pid_found() {
       if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
       else printf " \n\n  but as no KVM activity has been detected, this file can probably be deleted."
       fi
-      printf "\n\n  [enter] to return and to open File Manager \n\n"
+      printf "\n\n  [enter] to return and/or to open File Manager and check \n\n"
       read -rp "  >  "
 }
 

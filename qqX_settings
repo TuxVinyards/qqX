@@ -221,6 +221,7 @@ VM_SelectorStyle="A"
 # Setting MSR_Warnings to =1 will unhide minor warnings on the standard (non technical) interface
   MSR_Warnings=
   Verbose_MSR_dialog=
+  
 # File location for default KVM behaviour for unhandled machine-specific registers. 
 # Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently. 
 # quickemu / qwrap / qqX  default is "/etc/modprobe.d/kvm-quickemu.conf"
