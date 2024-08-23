@@ -176,7 +176,12 @@ function_config_tune_up ()  {
     printf "\n\n  qcow2 disks auto-compress & will normally occupy much less space"
     printColor "\n\n  & an empty disk only takes up 196k."
     printf "\n\n  It is easier make them larger now than to resize later ... " 
-    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   [no] leave as possibly sub-minimal  [q] quit tune-up "  
+    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   "
+    # from qqX 1.9.04/1.10.01 64G is auto supplied so this sub-minimal should no longer be present ... REVIEW 
+    if [[ ! $TuneUpDiskSizeLine ]]; then printf "[no] leave as possibly sub-minimal  "
+    else printf "[%s] leave as is  "  "$TuneUpDiskSizeLine"
+    fi
+    printf "[q] quit tune-up "  
     printf "\n\n"
     read -rp  "  >  "  ConfEdit_DiskSize
 
@@ -191,25 +196,23 @@ function_config_tune_up ()  {
     printColor "\n\n  The line "
     printf "'disk_size=' "
     if [[ $TuneUpDiskSizeLine ]]; then
-      printColor "may be removed if wished, at the end the tune-up, or left as a reminder" 
+      printColor "may be removed if wished, at the end the tune-up, or left as a reminder." 
     else
       printColor "is not present. One should have been made before first booting ..." 
     fi
     printColor "\n\n  This disk has now been created and this line now has no direct effect. " 
     if [[ ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
-      printf "\n\n  However, at this stage, it appears that the distro has not been installed,"
-      printf "\n\n  so quitting the tune up wizard, deleting the qcow disk via the file manager,"
-      printf "\n\n  and re-starting as 'new' could also be possible."
+      printf "\n\n  However, at this stage, it appears that the distro has not been installed, so quitting the tune up wizard,"
+      printf "\n\n  deleting the qcow disk via the file manager and re-starting as 'new' could also be possible."
       if [[ $TuneUpDiskSizeLine -le 64 ]]; then 
-        printf "\n\n  Using disk_size=\"64G\" or higher is recommended as qcow2 disks auto-compress " 
-        printf "\n\n  & will normally occupy much less space."
+        printf "\n\n  Using disk_size=\"64G\" or higher is recommended as qcow2 disks auto-compress & will normally occupy much less space." 
       fi
       if [[ $TuneUpDiskSizeLine ]]; then 
         printf "  Current max disk size is set as %sG" "$TuneUpDiskSizeLine"
       else
         printf "  More details via the 'disk' option from the utilities menu." 
       fi
-      printf "\n\n  It is easier make them larger now than to resize later ... " 
+      printf "  It is easier make disks larger now than to resize later ... " 
     else
       printf "\n\n  Resizing, at this stage may be effected using the qqX 'disk' utilities."
     fi
