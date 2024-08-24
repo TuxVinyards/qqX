@@ -339,6 +339,10 @@ else
     printf "\n\n"
     print_manual_uninstall_notes
 
+    if [[ "$(pgrep konsole)" ]]; then
+      printColor "\n\n  Removal of any KDE TASKBAR ICONS is recommended BEFORE proceeding"
+    fi
+
     qqX_RemovalTarget="$(type -p qqx)"
     qqX_RemovalTarget_X="$(type -p qqX)"
     qqX_Remove=
@@ -358,6 +362,7 @@ else
       [[ -e "$XDG_GUI_desktop_Folder/qqX.desktop"  ]] && sudo rm "$XDG_GUI_desktop_Folder/qqX.desktop" 
       [[ $(type -p update-desktop-database) ]] && sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
 
+      printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
       printColor "\n\n  Removal processing complete \n\n"
       read -rp "  [enter] to quit  >  "
       printf "\n\n"
@@ -456,7 +461,7 @@ else
 
     #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
-    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  
+    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  ""
     else cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
     fi
 
@@ -733,10 +738,14 @@ read -rp "  > "  End_Install
 
 if [[ $End_Install == "q" ]]; then exit ; fi
 
+# Typically KDE and when 'run in konsole' started from Dolphin. Or when Bash has been started by a Fish Shell session etc ...
+printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
+
 if [[ $Start_qqX ]]; then 
+
+  printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n" 
+
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
-    printColor "\n\n  Keep this window open until qqX is no longer running." 
-    printf "\n\n  Auto-closure of the calling script is not permitted in some desktop environments.\n\n"
     sleep 3
     eval "$Start_qqX" 
     read -rp "  >  "
@@ -744,6 +753,7 @@ if [[ $Start_qqX ]]; then
   else 
     exec bash -c "$Start_qqX" 
   fi
+
 else  
   exit 
 fi

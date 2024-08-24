@@ -298,6 +298,7 @@ function clear_main_gt_start_vars {
   # Main vars, other clearances will need less, 
   # Zsync needs special treatment, as does QGW_List_NumSelected_Next
   QGW_List_NumSelected=
+  QGW_VerifiedList_NumSelected=
   QGW_OS_Arr_NumSelected=
   QGW_OS_Arr_NameSelected=
   QGW_Release_Arr_NumSelected=
@@ -373,7 +374,7 @@ function_quick_get_wrap ()  {
 
     while true ; do
 
-      printColor "\n\n  Give [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] refresh  [B] to go back "
+      printColor "\n\n  Give [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH  [E] exit quickget "
       printf "\n\n" 
 
       [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
@@ -383,7 +384,7 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
 
-      elif [[ $QGW_List_NumSelected == "B" ]]; then  printf "\n\n" ; GT_Exit=1 ; break 
+      elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break 
 
       elif [[ $QGW_List_NumSelected == "FS"   ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
@@ -551,20 +552,10 @@ function_quick_get_wrap ()  {
 
 
     if [[ $GT_Exit ]]; then 
-      QGW_List_NumSelected=
-      QGW_VerifiedList_NumSelected=
       GT_Exit= 
-      QGW_OS_Arr_NameSelected=
-      QGW_OS_Arr_NumSelected=
-      QGW_Release_Arr_NumSelected=
-      QGW_Release_Arr_NameSelected=
-      QGW_Edition_Arr_NumSelected=
-      QGW_Edition_Arr_NameSelected=
       Zsync_OS_Name=
       Zsync_Release_Name=
-      QGW_DownloadStart=
-      QGW_DownloadSelection=
-      QGW_Download_BadLink=
+      clear_main_gt_start_vars
       return 
     fi
 
@@ -1125,6 +1116,7 @@ function_quick_get_wrap ()  {
     [[ "$QGW_DownloadSelection" == *'windows'* ]] && printf "\n\n  Microsoft downloads may sometimes hang when finished but the terminal may be safely closed, if this happens."
 
     printf   "\n\n\n  Quickemu & downloader output: "
+    tput civis
 
     ## Although quickget will run as a background process, quickget will then go on to run aria2 etc 
     #  but as even further into the background. The download programs will grab the cursor in order to report progress
@@ -1136,7 +1128,7 @@ function_quick_get_wrap ()  {
     # QUICKGET RUNS FIRST, in the background, THEN it starts a separate downloader  eg wget or aria2
 
     quickget "$QGW_DownloadSelection" &  
-
+  
     printf "\n\n\n\n\n"
     printf "\e[3A\r"
 
@@ -1188,7 +1180,8 @@ function_quick_get_wrap ()  {
 
       ##  WAITS HERE for an [enter] to finish, or stop  ##
       read -r 
-     
+      tput cnorm 
+
       for Jobs_PID in "${Jobs_Arr[@]}" ; do 
         kill "$Jobs_PID" 2> /dev/null 
       done

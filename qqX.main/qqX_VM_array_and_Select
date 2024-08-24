@@ -239,7 +239,7 @@ VM_loader_selector_and_menu () {
 
         printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
         [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
-        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY %s "  "$ExtraFolderError"
+        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
         [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
         printf "\n\n  [enter] to edit settings file   [c] ignore, re-check and continue   [q] to quit "
 
