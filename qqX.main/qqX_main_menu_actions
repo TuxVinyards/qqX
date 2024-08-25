@@ -24,6 +24,19 @@ function  main_menu_actions {
 
     show_qqX_general_help
 
+  elif [[ $MainMenuChoice == "tx" ]]; then 
+
+    printf "\n\n  Google Chrome or Microsoft Edge are Recommended"
+    printf "\n\n  For General notes on translation see: \n\n  https://github.com/TuxVinyards/qqX/wiki/Translation"
+    printColor "\n\n  [enter] to translate settings using %s  [b] to go back "  "$WebBrowser"
+    printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
+    read -rp "  >  "  TxSetCode
+    if [[ ! $TxSetCode ]]; then
+      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/blob/main/qqX_settings"  & 
+    else
+      TxSetCode= ; return
+    fi
+
   elif [[ $MainMenuChoice == "w" ]]; then 
 
     printf "\n\n  HomePage = %s" "$DistroHomePage"

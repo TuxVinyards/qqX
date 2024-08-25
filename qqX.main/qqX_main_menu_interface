@@ -286,7 +286,7 @@ else
 
     fi
     
-    printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] view or edit .conf file"
+    printf  "\n\n  [set] open settings file in text editor  [tx] translate settings in browser  [conf] view or edit .conf file"
     printf  "\n\n"
 
     if [[ $qqX_UpdaterPID ]]; then
@@ -319,7 +319,7 @@ else
 
     printf  "  [enter] refresh   "
     [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
-    printf " [q] quit \n\n"
+    printf " [h] show help & info  [q] quit \n\n"
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }
