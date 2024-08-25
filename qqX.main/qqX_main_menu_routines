@@ -469,11 +469,11 @@ move_rename_Selected_VM () {
       Mv_NewName=
       CurrentFolderNameError=
       printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
-      printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change"
+      printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change  [ln] make link"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 
 
-      [[ ! $Mv_NewName || $Mv_NewName == "n" ]] && Mv_NewName="$VM_InstanceName"  && break
+      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName"  && break
       
       for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1; done
       if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break ; fi
@@ -484,6 +484,7 @@ move_rename_Selected_VM () {
 
     Mv_NewName_Return=
     if [[ $Mv_NewName != "$VM_InstanceName" ]]; then printf "\n\n  Renaming to '%s' " "$Mv_NewName"
+    elif [[ $MakeLinksOnly ]]; then  printf "\n\n  Making link to '%s' " "$VM_InstanceName"
     else printf "\n\n  Keeping old name '%s' " "$Mv_NewName"
     fi
     printColor "\n\n  [enter] to make this happen  [b] to go back \n\n"

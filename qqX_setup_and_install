@@ -340,7 +340,7 @@ else
     print_manual_uninstall_notes
 
     if [[ "$(pgrep konsole)" ]]; then
-      printColor "\n\n  Removal of any KDE TASKBAR ICONS is recommended BEFORE proceeding"
+      printColor "\n\n  KDE: It is recommended to remove any qqX icons in the taskbar BEFORE proceeding"
     fi
 
     qqX_RemovalTarget="$(type -p qqx)"
@@ -736,10 +736,10 @@ printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 printf "   [q] to quit  \n\n "
 read -rp "  > "  End_Install
 
-if [[ $End_Install == "q" ]]; then exit ; fi
-
 # Typically KDE and when 'run in konsole' started from Dolphin. Or when Bash has been started by a Fish Shell session etc ...
 printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
+
+if [[ $End_Install == "q" ]]; then exit ; fi
 
 if [[ $Start_qqX ]]; then 
 
