@@ -746,7 +746,7 @@ if [[ $Start_qqX ]]; then
   printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n" 
 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
-    sleep 3
+    sleep 2
     eval "$Start_qqX" 
     read -rp "  >  "
     exit
