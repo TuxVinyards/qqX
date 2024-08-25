@@ -181,6 +181,8 @@ scan_folders_list_and_add_VMs () {
 
   done
 
+  if [[ $SelectArrayError ]]; then function_conf_error "$SelectArrayError"; fi
+
   if [[ ! ${VM_Array[0,0]} ]] ; then
     function_conf_error  "VM ARRAY - No VMs - Is it time to get some distros?  Also check"
     SelectArrayError=1
@@ -235,12 +237,13 @@ VM_loader_selector_and_menu () {
     
       dev_loop_check
 
+      [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
+      [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
+      [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
+
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
 
         printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
-        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
-        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
-        [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
         printf "\n\n  [enter] to edit settings file   [c] ignore, re-check and continue   [q] to quit "
 
       else

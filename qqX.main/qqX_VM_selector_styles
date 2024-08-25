@@ -58,7 +58,7 @@ function_vm_folder_item_text () {
 
   if [[ $ArrayConf_Item_Listing == "empty" ]]; then
 
-    ArrayConf_Item_Listing="EMPTY - Folder Only"
+    ArrayConf_Item_Listing="EMPTY FOLDER or Bad Path"
 
   elif [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
 

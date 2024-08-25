@@ -40,12 +40,14 @@ function_create_VM_folderList() {
     declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
   else  declare -ga VM_Folder_List=("$Default_VM_Folder")
   fi
-
   for xF in "${Extra_VM_Folder[@]}"; do
-    [[ $xF ]] && VM_Folder_List+=("$xF")
-    [[ $xF ]] &&  [[ ! -d "$xF" ]] && ExtraFolderError="$xF Not Found or not yet Created"
+    ExtraExists="$(realpath -eq "/$xF")"
+    if [[ $ExtraExists ]] ; then VM_Folder_List+=("$xF")
+    else 
+      ExtraFolderError="$xF Path ERROR or Folder Not Yet Created" 
+      VM_Folder_List+=("PATH ERROR: $xF")
+    fi
   done
-
 }
 
 # Run the function & populate the list: 
