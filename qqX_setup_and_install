@@ -153,6 +153,11 @@ if [[ ! $(type -p wget) ]]; then
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
 fi
 
+if [[ ! $(type -p spicy) ]]; then
+  printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+fi
+
 
 qqX_Version="$(./qqX --version 2>/dev/null)"
 
