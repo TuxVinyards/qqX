@@ -84,7 +84,9 @@ elif [[ ! $UserTerm ]]; then
 
     printf "\n  %s\n\n" "${TermGrep[@]}"
     printf "  Some lightweight terminals may not be compatible (See 'known-issues')"
-    printf "\n\n  Enter the number of your Terminal Emulator [n] if none of these \n\n"
+    [[ $UserTerm == "gnome-terminal" ]] && printf "\n\n  'gnome-terminal' is also used by various desktops, such as Mint Cinnamon, Budgie and Ubuntu ..."
+    printf "\n\n  Checking the menubar for help > about, could show the name ...."
+    printf "\n\n  Enter the number of your Terminal Emulator,  or  [n] none of these, do more tests \n\n"
     read -rp "  >  "  UserTerm_PID
     echo
     if [[ $UserTerm_PID == "n" ]]; then UserTerm_PID= ; UserTerm_Found= ; fi
@@ -177,6 +179,7 @@ while [[ ! $UserTerm_Found ]]; do
       echo
       echo "  To create a shortcut, a name is needed ....   Check/Recheck the script output"; echo
       echo "  You can enter the name here, if you know the correct command name"; echo
+      echo "  Checking the menubar for help > about, could show the name ...."; echo
       echo "  Or use a different method & manually add 'UserTerm' "; echo
       echo "  to the 'setup and install' script, at the start."; echo; echo
 
@@ -237,7 +240,8 @@ while [[ ! $UserTerm_Found ]]; do
 
   if [[ $UserTerm ]] ; then
     echColor " $ProbTerm UserTerm is $UserTerm" ; echo
-    echo "  Is this correct?  [enter] yes  [n] no " ; echo
+    [[ $UserTerm == "gnome-terminal" ]] && echo "  Note: 'gnome-terminal' is also used by various desktops, such as Mint Cinnamon, Budgie and Ubuntu ..." && echo
+    echo "  Is this correct?  [enter] yes, probably ...   [n] no, I am still not sure " ; echo
     read -rp "  >  "   
     echo
     if [[ $REPLY == "n" ]]; then UserTerm= ; UserTerm_Found= ; else  UserTerm_Found=1 ; fi
