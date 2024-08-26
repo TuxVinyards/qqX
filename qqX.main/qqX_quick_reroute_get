@@ -570,87 +570,89 @@ function_quick_get_wrap ()  {
 
     function choose_QGW_release {
 
-      if [[ ! $GT_Exit ]]; then
-        while true ; do
+      [[ $GT_Exit ]] && return
 
-          if [[ ! ${QGW_Releases_Array[*]} ]] ; then  printColor "\n\n  Quickemu or internet ERROR, no releases found "
-        
-          elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
+      while true ; do
 
-            printf "  One Release only:  %s " "${QGW_Releases_Array[0]}"
-            printf "\n\n  Editions choice may be be possible." 
-            printColor "\n\n  [enter] to continue"
+        if [[ ! ${QGW_Releases_Array[*]} ]] ; then  printColor "\n\n  Quickemu or internet ERROR, no releases found "
+      
+        elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
 
-          else
+          printf "  One Release only:  %s " "${QGW_Releases_Array[0]}"
+          printf "\n\n  Editions choice may be be possible." 
+          printColor "\n\n  [enter] to continue"
 
-            print_quickget_and_folder_choices  "QGW_Releases_Array"
-            printColor "\n\n\n  Give LIST number of Release"   
+        else
 
-          fi  
+          print_quickget_and_folder_choices  "QGW_Releases_Array"
+          printColor "\n\n\n  Give LIST number of Release"   
 
-          [[ $QGW_VerifiedList_NumSelected ]] && QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
+        fi  
 
-          if [[ $QGW_List_NumSelected -lt "${#QGW_OS_Array[@]}" ]]; then
-            QGW_List_NumSelected_Next="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Next+=1 ))
-          else QGW_List_NumSelected_Next="1"
-          fi
+        [[ $QGW_VerifiedList_NumSelected ]] && QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
 
-          if [[ $QGW_List_NumSelected -gt 1 ]]; then
-            QGW_List_NumSelected_Previous="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Previous-=1 ))
-          else QGW_List_NumSelected_Previous="${#QGW_OS_Array[@]}"
-          fi
+        if [[ $QGW_List_NumSelected -lt "${#QGW_OS_Array[@]}" ]]; then
+          QGW_List_NumSelected_Next="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Next+=1 ))
+        else QGW_List_NumSelected_Next="1"
+        fi
 
-          printf "\n\n  [s] scroll to next listing  [p] to previous"  
+        if [[ $QGW_List_NumSelected -gt 1 ]]; then
+          QGW_List_NumSelected_Previous="$QGW_List_NumSelected" ; (( QGW_List_NumSelected_Previous-=1 ))
+        else QGW_List_NumSelected_Previous="${#QGW_OS_Array[@]}"
+        fi
 
-          if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
-          else  printf "\n\n" ; fi
+        printf "\n\n  [s] scroll to next listing  [p] to previous"  
 
-          printf "    [b] back to main menu \n\n"   
-          read -rp "  >  "  QGW_List_NumSelected  
-          printf "\n\n"
-        
-          if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "b" ]]; then 
-            
-            [[ $QGW_List_NumSelected == "p" ]] && QGW_List_NumSelected_Next="$QGW_List_NumSelected_Previous"
-            [[ $QGW_List_NumSelected == "b" ]] && QGW_List_NumSelected_Next=
-            QGW_List_NumSelected= 
-            QGW_OS_Arr_NumSelected=
-            QGW_OS_Arr_NameSelected=
-            function_quick_get_wrap
-            return
+        if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
+        else  printf "\n\n" ; fi
 
-          elif [[ $QGW_List_NumSelected == "w" ]]; then 
+        printf "    [b] back to main menu \n\n"   
+        read -rp "  >  "  QGW_List_NumSelected  
+        printf "\n\n"
+      
+        if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "b" ]]; then 
+          
+          [[ $QGW_List_NumSelected == "p" ]] && QGW_List_NumSelected_Next="$QGW_List_NumSelected_Previous"
+          [[ $QGW_List_NumSelected == "b" ]] && QGW_List_NumSelected_Next=
+          QGW_List_NumSelected= 
+          QGW_OS_Arr_NumSelected=
+          QGW_OS_Arr_NameSelected=
+          function_quick_get_wrap
+          return
 
-            nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
-            QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
-            QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
-            QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
-            QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
+        elif [[ $QGW_List_NumSelected == "w" ]]; then 
+
+          nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+          QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
+          QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
+          QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
+          QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
 
 
-          elif [[ $QGW_List_NumSelected ]]; then 
+        elif [[ $QGW_List_NumSelected ]]; then 
 
-            [[ $QGW_List_NumSelected -gt "${#QGW_Releases_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Releases_Array[@]}"
-            QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
-            QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
-            break
+          [[ $QGW_List_NumSelected -gt "${#QGW_Releases_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Releases_Array[@]}"
+          QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
+          QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
+          break
 
-          else 
+        else 
 
-            QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
-            break
+          QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
+          break
 
-          fi
+        fi
 
-        done
-      fi
+      done
     }
 
     choose_QGW_release
 
     function choose_QGW_edition {
 
-      if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* && ! $GT_Exit ]]; then
+      [[ $GT_Exit ]] && return
+
+      if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then
 
         printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
@@ -692,7 +694,7 @@ function_quick_get_wrap ()  {
           QGW_Edition_Arr_NameSelected="${QGW_WinLangs_Array[QGW_Edition_Arr_NumSelected]}"
         fi
 
-      elif [[ ! $GT_Exit ]]; then
+      else
 
         while true; do 
 
@@ -804,8 +806,6 @@ function_quick_get_wrap ()  {
         done
 
       fi
-
-      [[ $GT_Exit ]] && return
 
     }
 
@@ -1076,11 +1076,12 @@ function_quick_get_wrap ()  {
 
   }
 
+  [[ $GT_Exit ]] && return
+
   finalize_QGW_targets
 
-
   dev_loop_check
-
+  
   if [[ $QGW_DownloadStart == "start" ]]; then
 
     QGW_DownloadStart=
@@ -1382,7 +1383,7 @@ function_quick_get_wrap ()  {
   else  
   
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-    if [[ ! $GT_Exit ]]; then  printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " ; fi
+    printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
     printf "\n\n"
     return
     

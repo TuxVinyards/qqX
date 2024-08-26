@@ -737,6 +737,11 @@ printf "   [q] to quit  \n\n "
 read -rp "  > "  End_Install
 
 # Typically KDE and when 'run in konsole' started from Dolphin. Or when Bash has been started by a Fish Shell session etc ...
+# See https://askubuntu.com/questions/19397/is-there-a-command-to-close-a-terminal-window-via-commandline
+# And https://superuser.com/questions/178587/how-do-i-detach-a-process-from-terminal-entirely
+# https://github.com/jinliu/kdotool   https://github.com/ReimuNotMoe/ydotool
+
+# Probably easier just to put a message up than mess around with dependencies ....   REVIEW 
 printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
 
 if [[ $End_Install == "q" ]]; then exit ; fi
