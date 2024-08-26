@@ -686,7 +686,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
       if [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       elif [[ $SelectedTerminalProfile ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
-      else  echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG " '"'  
+      else  echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       fi
 
       echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
@@ -736,6 +736,10 @@ printf "\n\n\n  Start qqX straight from the system's MAIN MENU,"
 printf   "\n  by typing 'qqX' the terminal, or by mouse clicks on VM or ISO files ..."
 printf "\n\n  Start qqX to edit the settings file, or before starting"
 printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
+
+if [[ $UserTerm == "qterminal" ]]; then
+  printColor "\n\n  LXQT 'qterminal' does not have size commands BUT it may be resized quite easily \n\n  and should remember its sizes between uses."
+fi
 
 [[ $Start_qqX ]] && printColor "  [enter] to close current window and start"
 printf "   [q] to quit  \n\n "

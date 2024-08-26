@@ -247,10 +247,16 @@ function  main_menu_actions {
 
     drives_and_snapshots  info
 
-    printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-    printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
+    if [[ $LiveBoot ]]; then 
+      printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
+      printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
+    else
+      printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+      printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
+    fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
-      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
+      [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
+      printf "\n\n  [enter] to return to menu \n\n"
     else printColor "\n\n  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  
 
