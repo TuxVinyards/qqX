@@ -286,7 +286,10 @@ function_conf_error () {
 
   printf "\n\n  qqX Settings, VM folder & conf file(s)"  
 
-  if [[ $1 ]] ; then 
+  if [[ $1 == "No VMs" ]] ; then 
+    printColor "\n\n  No VMs - Probably time to welcome you to qqX and invite you to get some distros." 
+    printf "\n\n  The settings file and locations can usually be left till later ..." 
+  elif [[ $1 ]] ; then 
     printf "\n\n  Check %s settings, LOCATION & CONTENT ... "  "$1"
   else 
     printf "\n\n  Check the settings and re-run this script ... " 
