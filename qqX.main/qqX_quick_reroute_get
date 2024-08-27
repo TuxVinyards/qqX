@@ -802,6 +802,8 @@ function_quick_get_wrap ()  {
             QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
             break
 
+          elif [[ ${#QGW_Editions_Array[@]} -le 1 ]] ; then  break
+
           else  QGW_List_NumSelected=
 
           fi
