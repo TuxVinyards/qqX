@@ -27,12 +27,24 @@
 
 function system_code_check_and_warn {
 
-  if [[ ! $WarnedOnQE ]] && [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
-    printColor "\n\n  CAUTION Source Version '%s' : not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
-    printf "\n\n  The qqX builtins contain certain tweaks to enable process controls but in some places there are not only"
-    printf "\n\n  improvements, there are also fixes where qqX testing has revealed upstream errors yet to be sorted."
-    printf "\n\n\n  I understand the risks ...  [enter] to continue or to change version\n\n"
+  if [[ $CodingHotSwap == "System" && ! $QE_SystemFilePath ]]; then
+    printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH " 
+    printf "\n\n  See https://github.com/quickemu-project/quickemu for more details"
+    printf "\n\n  The 'official' given location is /usr/bin, as loose files, but others may be chosen ... "
+    printf "\n\n\n  The builtin 'Echo' is an older plain System version that may be selected, if wished."
+    printf " \n\n  Unless specified, qqX will default to using FreeBird."
+    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
+    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n\n  I understand the risks ...  [enter] to continue with FreeBird and/or re-select\n\n"
     read -rp "  >  "
+    CodingHotSwap="FreeBird"
+  elif [[ ! $WarnedOnQE ]] && [[ $CodingHotSwap == "System" || $CodingHotSwap == "Echo" ]]; then
+    printColor "\n\n  CAUTION Source Version '%s' \n\n  Not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
+    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
+    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n\n  I understand the risks ...  [enter] to continue   [f] to select FreeBird\n\n"
+    read -rp "  >  "  WarnedOnQE
+    [[ $WarnedOnQE ]] && CodingHotSwap="FreeBird"
     WarnedOnQE=1
   fi
 }

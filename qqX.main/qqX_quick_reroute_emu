@@ -129,6 +129,8 @@ function quickemu {
         # whether the run is made as [v] verbose & terminated
         printf "" > "/tmp/qqX_echo_output.log"
         printf "" > "$QemuErrorLog"
+        
+        drives_and_snapshots
 
         source "/tmp/qmod-boot-temp" 
         VM_ExecBoot=

@@ -95,10 +95,10 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
   elif [[ $MainMenuChoice == "FB"   ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
   elif [[ $MainMenuChoice == "HB"   ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Ech"  ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Sys"  ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Dev"  ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Ech" || $MainMenuChoice == "ech" ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Sys" || $MainMenuChoice == "sys" ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Cust" || $MainMenuChoice == "cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Dev" || $MainMenuChoice == "dev" ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
@@ -269,7 +269,7 @@ function  main_menu_actions {
 
     drives_and_snapshots
 
-    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
+    if [[ $SharedDriveArgs && $SecondDriveArgs ]]; then 
       printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
     else printColor "  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  

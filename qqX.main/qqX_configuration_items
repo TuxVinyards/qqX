@@ -388,10 +388,10 @@ function_conf_error () {
 
 texteditor_not_found_message () {
   
-  printColor "\n\n  Unable to open settings with editor: '%s' "  "$TextEditor"
+  printColor "\n\n  Unable to open settings with an editor."
   printf "\n\n  Default or basic text editors will be tried or have been tried ..."
   printf "\n\n  Give settings file the command name of a preferred editor."
-  printf "\n\n  Settings location:  %s  \n\n  [enter] to continue \n\n"  "$qqX_SettingsFile"
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
   read -rp "  >  "
 }
 
@@ -415,7 +415,7 @@ qqX_edit_settings() {
     elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
     elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
     elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
-    elif [[ $(type -p nano) ]] ; then   TextEditor="nano"
+    elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
     fi
 
   fi
