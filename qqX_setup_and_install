@@ -344,9 +344,7 @@ else
     printf "\n\n"
     print_manual_uninstall_notes
 
-    if [[ "$(pgrep konsole)" ]]; then
-      printColor "\n\n  KDE: It is recommended to remove any qqX icons in the taskbar BEFORE proceeding"
-    fi
+    printColor "\n\n  Remove any qqX taskbar icons BEFORE proceeding. Some distros may need this this."
 
     qqX_RemovalTarget="$(type -p qqx)"
     qqX_RemovalTarget_X="$(type -p qqX)"
