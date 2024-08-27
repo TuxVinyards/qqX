@@ -39,8 +39,11 @@ custom_conf_notes () {
     disk_size=\"xxG\"   (integer, used once, for first build)
     cpu_cores=\"x\"     (even integer)
     ram=\"xG\"          (integer)
+    keyboard=           'usb' (default), 'ps2', 'virtio'
+    keyboard_layout=    'en-us' (default)
+    mouse=              'tablet' (default), 'ps2', 'usb', 'virtio'
 
-    boot=\"legacy\"     (use bios, not UEFI)
+    boot=\"legacy\"     (use bios, not UEFI) default: =\"efi\"
 
     Windows:
     tpm=\"on\"          secureboot=\"off\"
@@ -49,7 +52,8 @@ custom_conf_notes () {
     Difficult booting: 
     boot=\"legacy\"  &  gl=\"off\"  may help ...
 
-    highlight then shift-ctrl-c  to copy ...
+    highlight then shift-ctrl-c  to copy ...  
+    
   \n"
 
 }

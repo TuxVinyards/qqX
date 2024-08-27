@@ -257,9 +257,8 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     if [[ $BootMenu == "slow" ]]; then BootMenuCmd=" -boot menu=on " ; else BootMenuCmd=" -boot menu=off " ; fi
     printf "\n\n %s " "$BootMenuCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
 
-    if [[ $tpm == "on" ]]; then 
-      printf "\n\n  Secure Boot:  %s \n\n  %s \n\n\n" "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
-      printf "\n\n  %s  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
+    if [[ $secureboot == "on" ]]; then 
+      printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
     else    
       printf "\n\n  Secure Boot:  Not Set \n\n\n" >> "$QemuArgsFile"
     fi
