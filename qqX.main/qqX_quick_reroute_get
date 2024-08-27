@@ -395,13 +395,13 @@ function_quick_get_wrap ()  {
         CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
       elif [[ $QGW_List_NumSelected == "HB"   ]] ; then  
         CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
-      elif [[ $QGW_List_NumSelected == "Ech"  ]] ; then  
+      elif [[ $QGW_List_NumSelected == "Ech" || $QGW_List_NumSelected == "ech" ]] ; then  
         CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ $QGW_List_NumSelected == "Sys"  ]] ; then  
+      elif [[ $QGW_List_NumSelected == "Sys" || $QGW_List_NumSelected == "sys" ]] ; then  
         CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ $QGW_List_NumSelected == "Cust" ]] ; then  
+      elif [[ $QGW_List_NumSelected == "Cust" || $QGW_List_NumSelected == "cust" ]] ; then  
         CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ $QGW_List_NumSelected == "Dev"  ]] ; then  
+      elif [[ $QGW_List_NumSelected == "Dev" || $QGW_List_NumSelected == "dev"  ]] ; then  
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays  
 
       elif [[ $QGW_List_NumSelected == "R"  ]] ; then  refresh_QWG_selector
