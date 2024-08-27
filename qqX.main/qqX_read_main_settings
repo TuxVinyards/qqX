@@ -100,23 +100,20 @@ function find_file_manager_browser()  {
     if [[ ! $WebBrowser ]]; then
 
       WebBrowser="$(xdg-settings get default-web-browser)"
+      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web= ; fi
+      WebBrowser="${WebBrowser/'.desktop'/}"
 
-      if [[ $WebBrowser ]]; then
-
-        WebBrowser="${WebBrowser/'.desktop'/}"
-
-        if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
-        elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
-        elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
-        elif [[ $(type -p midori) ]]; then  WebBrowser="midori"
-        elif [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
-        else WebBrowser=
-        fi
-
+      if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
+      elif [[ "$WebBrowser" == *'falkon'* ]]; then WebBrowser="falkon"
+      elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
+      elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
+      elif [[ $(type -p midori) ]]; then  WebBrowser="midori"
+      elif [[ $XDG_Web ]]; then WebBrowser="xdg-open"
+      else WebBrowser=
       fi
 
     fi
-
+  
   fi
 
 }
