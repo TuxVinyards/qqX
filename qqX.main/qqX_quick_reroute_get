@@ -135,6 +135,8 @@ function show_distro_homepage_check_results {
 
 function_test_iso_url () {
 
+  [[ $GT_Exit ]] && return
+
   if ! grep -q -e '--url' "$QG_SourcePath"  && ! grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
 
     printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
@@ -175,7 +177,7 @@ function_test_iso_url () {
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay "; QGW_Download_BadLink=
       else
-        printf "  MAY NOT BE WORKING CORRECTLY"; QGW_Download_BadLink=1
+        printf "  MAY NOT BE WORKING CORRECTLY ? \n\n"; QGW_Download_BadLink=1
       fi
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
@@ -555,6 +557,7 @@ function_quick_get_wrap ()  {
     if [[ $GT_Exit ]]; then 
       Zsync_OS_Name=
       Zsync_Release_Name=
+      QGW_List_NumSelected_Next=
       clear_main_gt_start_vars
       return 
     fi
@@ -799,7 +802,7 @@ function_quick_get_wrap ()  {
             QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
             break
 
-          else  break
+          else  QGW_List_NumSelected=
 
           fi
 
@@ -978,6 +981,7 @@ function_quick_get_wrap ()  {
 
         b)
           clear_main_gt_start_vars
+          QGW_List_NumSelected_Next=
           if [[ $MainMenuZsync ]]; then 
             MainMenuZsync= 
           else 
@@ -1081,6 +1085,8 @@ function_quick_get_wrap ()  {
   finalize_QGW_targets
 
   dev_loop_check
+
+  [[ $GT_Exit ]] && return
   
   if [[ $QGW_DownloadStart == "start" ]]; then
 
@@ -1260,6 +1266,7 @@ function_quick_get_wrap ()  {
 
   fi
 
+  [[ $GT_Exit ]] && return
 
   QGW_FolderDelete=
 
