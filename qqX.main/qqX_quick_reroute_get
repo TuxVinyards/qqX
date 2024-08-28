@@ -773,7 +773,7 @@ function_quick_get_wrap ()  {
               printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
               printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
             else  
-              printColor "\n\n  Give LIST number of Edition   [b] back to main menu \n\n" 
+              printColor "\n\n  Give LIST number of Edition   [r] return to releases menu to view web page    [b] back to main menu \n\n" 
             fi
             read -rp "  >  "  QGW_List_NumSelected   
 
