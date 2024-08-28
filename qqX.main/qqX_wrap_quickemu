@@ -38,6 +38,22 @@ function system_code_check_and_warn {
     printf "\n\n\n  I understand the risks ...  [enter] to continue with FreeBird and/or re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
+
+  elif [[ $CodingHotSwap == "Custom" && ! -d "$Default_VM_Folder/qqX.custom/QE.Custom"  ]]; then
+    printColor "\n\n  Custom files should be located as detailed in the general settings file." 
+    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
+    read -rp "  >  "
+    CodingHotSwap="FreeBird"
+
+  elif [[ $CodingHotSwap == "Dev" && ! $QE_DevPath ]]; then
+    printColor "\n\n  A Dev path should be given in the general settings file." 
+    printf "\n\n  Unless qqX is started from a development or download folder, "
+    printf "\n\n  in which case the current folder's FreeSpirit builtins will be auto-selected"
+    printf "\n\n  if the variable 'QE_DevPath' has not been set."
+    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
+    read -rp "  >  "
+    CodingHotSwap="FreeBird"
+
   elif [[ ! $WarnedOnQE ]] && [[ $CodingHotSwap == "System" || $CodingHotSwap == "Echo" ]]; then
     printColor "\n\n  CAUTION Source Version '%s' \n\n  Not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
     printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."

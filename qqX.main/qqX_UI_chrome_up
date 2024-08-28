@@ -170,6 +170,8 @@ show_qqX_title_bar() {
   [[ $QG_FilePath_Short ]] &&  printf "  %s"  "$QG_FilePath_Short"
 
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
+
+  if [[ $CodingHotSwap || $DevStart ]]; then printf "\n\n  Using Code: %s " "$QE_SourcePath" ; CodingHotSwap= ; fi
   
   PWD_Folder="$(pwd)"
   HideFolderTitleBar=
