@@ -155,29 +155,30 @@ function_test_iso_url () {
     elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     else echo > "/tmp/qmod-dl-url"
     fi
-    DL_Url="$(awk '/https/{print $2 $3}' < "/tmp/qmod-dl-url")"
+    DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
     printf "" > "/tmp/qmod-dl-size"
 
     if [[ ! $DL_Url ]]; then  
-      printColor "\n\n  Quickget cannot provide a link ?? "; QGW_Download_BadLink=
+      printColor "\n\n  Quickget cannot provide a link ?? "; QGW_Download_BadLink=1
       printf "\n\n"
       iso_get_message
     else  
       DL_FileName="${DL_Url##*/}"
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --fail --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         printColor "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15  --fail --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15 --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
+        [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
         DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
         DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
       fi
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay "; QGW_Download_BadLink=
       else
-        printf "  MAY NOT BE WORKING CORRECTLY ? \n\n"; QGW_Download_BadLink=1
+        printf "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
       fi
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
@@ -188,7 +189,7 @@ function_test_iso_url () {
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
       else
-        printf "  but reported size not available ?? "
+        if [[ $DL_PotentialOkay ]]; then printf "  but reported size not available ?? " ; else printf "  Reported size not available ..." ; fi 
         [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
@@ -840,7 +841,10 @@ function_quick_get_wrap ()  {
     # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
-      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
+      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... \n\n"
+      show_distro_homepage_check_results
+    elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then 
+      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... \n\n"
       show_distro_homepage_check_results
     else
       function_test_iso_url
@@ -1403,6 +1407,7 @@ function_quick_get_wrap ()  {
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ," ; fi
 
+  clear_main_gt_start_vars
   SettingsFileAdjusted=1
   ByPass_VM_Array_Selector=1
 
