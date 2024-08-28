@@ -577,7 +577,10 @@ function_quick_get_wrap ()  {
 
       while true ; do
 
-        if [[ ! ${QGW_Releases_Array[*]} ]] ; then  printColor "\n\n  Quickemu or internet ERROR, no releases found "
+        if [[ ! ${QGW_Releases_Array[*]} ]] ; then
+
+          printColor "  Quickemu or internet ERROR, no releases found "
+          printf "\n\n  Linux ISO's: Try downloading directly from the distro's Web Pages .... \n"
       
         elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
 
