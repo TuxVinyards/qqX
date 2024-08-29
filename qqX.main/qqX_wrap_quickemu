@@ -70,7 +70,7 @@ function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
 
-  [[ $SettingsFileAdjusted ]] && sort_qqX_builtin_settings
+  [[ $SettingsFileAdjusted || $CodingHotSwap ]] && sort_qqX_builtin_settings
 
   if [[ ! -e "$QE_SourcePath" ]] ; then
     printColor  "\n\n  ERROR  Settings or Installation FilePath  QUICKEMU not found \n\n  Path = ' %s'"  "$QE_SourcePath"

@@ -166,7 +166,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
     if [[ $XDG_FileType_Recognised && ! $XDG_MimeType_Recognised ]]; then
       printf "\n\n  This ISO is a non-recognised mimetype so may not be bootable or valid. Try anyway?"
     fi
-    printColor "\n\n  [enter] choose name and folder  "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
+    printColor "\n\n  [enter] continue   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
     read -rp "  >  "  Cancel_ISO
 
     if [[ $Cancel_ISO == "c" ]]; then exit directly

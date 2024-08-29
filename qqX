@@ -48,9 +48,27 @@ qqX_Version="1.9.04"
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-## DEV: Set =1 to stop (and pause 1 sec), for easier fault tracing. Set =integer for add longer pauses. Use "0.2" etc for less. Or "0" for none.
+## DEV: for easier fault tracing use =0 to set. Set =int/float for pauses, eg =1 to pause 1 sec, "0.2" etc for less.
 NoClear=
 GeneralLoopCheck=
+# Dev Start if starting qqX directly from a source folder i.e "./"  Used as flag to show which source is being used.
+if [[ -d "./qqX.builtins" ]]; then DevStart=1 ; else DevStart= ; fi
+function dev_loop_check {
+    if [[ $GeneralLoopCheck ]]; then
+    echo
+    echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+    echo "BootMenu = $BootMenu   BootMenuMsg = $BootMenuMsg    BootMenu_Default = $BootMenu_Default   BootMenuMsg_Default = $BootMenuMsg_Default"
+    echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
+    echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
+    echo "NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
+    echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
+    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  CodingHotSwap = $CodingHotSwap"
+    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script"
+    sleep "$GeneralLoopCheck"
+  fi
+}
+
+[[ $GeneralLoopCheck ]] && printf "\n\n Pre-initialize :" &&  dev_loop_check
 
 ## INITIALIZE
 
@@ -106,22 +124,7 @@ source "$qqX_MainFolder/qqX_main_menu_routines"
 source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
-
-function dev_loop_check {
-
-    if [[ $GeneralLoopCheck ]]; then
-    echo
-    echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
-    echo "BootMenu = $BootMenu   BootMenuMsg = $BootMenuMsg    BootMenu_Default = $BootMenu_Default   BootMenuMsg_Default = $BootMenuMsg_Default"
-    echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
-    echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
-    echo "NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
-    echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
-    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  CodingHotSwap = $CodingHotSwap"
-    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script"
-    sleep "$GeneralLoopCheck"
-  fi
-}
+[[ $GeneralLoopCheck ]] && printf "\n\n Source files done:" &&  dev_loop_check
 
 function main_menu {
 

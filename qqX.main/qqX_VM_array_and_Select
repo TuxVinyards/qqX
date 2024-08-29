@@ -319,19 +319,19 @@ VM_loader_selector_and_menu () {
       elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
 
       elif [[ $VM_Selection == "FS"   ]] ; then  
-        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "FB"   ]] ; then  
-        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "HB"   ]] ; then  
-        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "Ech" || $VM_Selection == "ech" ]] ; then  
-        CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "Sys" || $VM_Selection == "sys" ]] ; then  
-        CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1;refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "Cust" || $VM_Selection == "cust" ]] ; then  
-        CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
       elif [[ $VM_Selection == "Dev" || $VM_Selection == "dev" ]] ; then  
-        CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
 
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
 

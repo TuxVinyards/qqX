@@ -126,24 +126,30 @@ OriginalPATH="$PATH"
 QE_SystemFilePath="$(type -p quickemu)"  
 QG_SystemFilePath="$(type -p quickget)"
 
+if [[ ! $QE_DevPath && $DevStart ]]; then QE_DevPath="$(realpath "./qqX.builtins/freespirit")" ; fi  
 
 function sort_qqX_builtin_settings {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
   # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
 
+  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 1 :" &&  dev_loop_check
+
   export PATH="$OriginalPATH"
   QE_SourcePath=
   QG_SourcePath=
 
-  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
+  if [[ $CodingHotSwap ]]; then QE_SourceVersion="$CodingHotSwap" ; fi
+
+  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
-    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4 
   fi  
 
-  if [[ -d "./qqX.builtins" ]]; then DevStart=1 ; else DevStart= ; fi
-
-  if [[ ! $QE_DevPath && $DevStart ]]; then QE_DevPath="$(realpath "./qqX.builtins/freespirit")" ; fi  
+  if [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then 
+    printf "\n\n  ERROR - Dev Folder not found \n\n  Re-check Installation &/or Installation instructions" 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4
+  fi  
 
   if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "system" ]]; then 
     if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then 
@@ -156,6 +162,7 @@ function sort_qqX_builtin_settings {
       QG_SourcePath=
     fi
   fi
+
   if [[ ! $QE_SourceVersion ]] || [[ $QE_SourceVersion == "FreeBird" || $QE_SourceVersion == "Freebird" || $QE_SourceVersion == "freebird" ]]; then
     QE_SourceVersion="FreeBird"
     FreePath="$qqX_BuiltinsFolder/freebird"
@@ -220,6 +227,8 @@ function sort_qqX_builtin_settings {
     printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
   fi 
+
+  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 2 :" &&  dev_loop_check
 
 }
 
@@ -311,6 +320,9 @@ function qemu_version_check {
 }
 
 qemu_version_check
+
+
+# How the Tiano BIOS/UEFI loads up:
 
 function store_bootmenu_defaults {
   [[ ! $BootMenu ]] && BootMenu="fast"
