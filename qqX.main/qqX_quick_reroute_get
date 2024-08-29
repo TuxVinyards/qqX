@@ -284,14 +284,24 @@ function show_QWG_header {
 }
 
 function show_hot_swap_line {
-  printColor "               select Quickget version:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n\n"
+  if [[ $CodingHotSwap ]]; then
+    printColor "               Using %s:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n" "$CodingHotSwap"
+  else
+    printColor "               select Quickget version:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n"
+  fi
+  if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
+    printf "\n               Code Source: %s " "$QE_SourcePath" 
+    [[ $CodingHotSwap ]] && CodingHotSwapShow= 
+  fi
+  printf "\n\n"
 }
 
 function refresh_QWG_selector {
   SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
+  clear_main_gt_start_vars
   show_QWG_header ; show_hot_swap_line 
   print_quickget_and_folder_choices  "QGW_OS_Array" 
-   QGW_List_NumSelected= 
+  QGW_List_NumSelected= 
 }
 
 InternetUp=
@@ -402,7 +412,7 @@ function_quick_get_wrap ()  {
         CodingHotSwap="System" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
       elif [[ $QGW_List_NumSelected == "Cust" || $QGW_List_NumSelected == "cust" ]] ; then  
         CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ $QGW_List_NumSelected == "Dev" || $QGW_List_NumSelected == "dev"  ]] ; then  
+      elif [[ $QGW_List_NumSelected == "Dev" || $QGW_List_NumSelected == "dev" ]] ; then  
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
 
       elif [[ $QGW_List_NumSelected == "R"  ]] ; then  refresh_QWG_selector
@@ -430,7 +440,7 @@ function_quick_get_wrap ()  {
         
       else
 
-        # clean up and zero any unrecognised values eg. XYZ ...
+        # clean up and zero any unrecognised values eg. XYZ ... should only be integers left at this point
         QGW_List_NumSelected="$(tr -cd "[:digit:]" <<< "$QGW_List_NumSelected")"
 
         if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then 
@@ -542,15 +552,20 @@ function_quick_get_wrap ()  {
 
       fi
 
-      if [[ $CodingHotSwap || $GT_Help ]]; then
+      [[ $GeneralLoopCheck ]] && printf "\n\n End of Quickget first loop, stage 1:" &&  dev_loop_check
+
+
+      if [[ $CodingHotSwapShow || $GT_Help ]]; then
         show_QWG_header ; show_hot_swap_line
         # different versions have different distro selections
-        load_QGW_OS_Array  ; print_quickget_and_folder_choices  "QGW_OS_Array" 
-        GT_Help= ; CodingHotSwap=
+        load_QGW_OS_Array ; print_quickget_and_folder_choices  "QGW_OS_Array" 
+        GT_Help= 
       fi
-        
+
       # End point of main OS selection loop
       QGW_List_NumSelected=
+
+      [[ $GeneralLoopCheck ]] && printf "\n\n End of Quickget first loop, stage 2:" &&  dev_loop_check
       
     done
 

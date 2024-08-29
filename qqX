@@ -62,8 +62,8 @@ function dev_loop_check {
     echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
     echo "NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
-    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  CodingHotSwap = $CodingHotSwap"
-    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script"
+    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  "
+    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
     sleep "$GeneralLoopCheck"
   fi
 }
