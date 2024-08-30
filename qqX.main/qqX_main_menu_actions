@@ -116,7 +116,7 @@ function  main_menu_actions {
 
     read -rp "  >  "  QL_LogView
 
-    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") && QemuErrorAlert=
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:" "usb_desc_get_descriptor") && QemuErrorAlert=
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
@@ -392,7 +392,7 @@ function  main_menu_actions {
 
   else
 
-    # refresh
+    # the [enter] to refresh option:
     MainMenuChoice=
     ShowUtilsMenu=
     VM_ExecBoot=

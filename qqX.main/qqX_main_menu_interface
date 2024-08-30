@@ -42,7 +42,7 @@ else
 
       printf  "  [u]  show utils & technical"
 
-      if [[ ! $LiveBoot ]]; then
+      if [[ ! $LiveBoot ]]; then  # REVIEW show all?
         if [[ $BootMenu == "fast" ]]; then printf "   (fastboot)"
         else  printf "   (bootmenu options active)"
         fi
@@ -70,7 +70,7 @@ else
       fi
       printf "  [iso] mount iso / boot from iso"
       if [[ ! $LiveBoot ]]; then
-        if [[ $BootMenu == "fast" ]]; then printf "   [bm] show bios bootmenu "
+        if [[ $BootMenu == "fast" ]]; then printf "   [bm] show bios bootmenu"
         else printf "   [fb] hide bios bootmenu "
         fi
       fi
