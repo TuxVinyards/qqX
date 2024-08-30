@@ -284,11 +284,8 @@ function show_QWG_header {
 }
 
 function show_hot_swap_line {
-  if [[ $CodingHotSwap ]]; then
-    printColor "               Using %s:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n" "$CodingHotSwap"
-  else
-    printColor "               select Quickget version:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n"
-  fi
+    printColor "               Using %s:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]" "$QE_SourceVersion"
+    printf "  (versions may have different lists)\n"
   if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
     printf "\n               Code Source: %s " "$QE_SourcePath" 
     [[ $CodingHotSwap ]] && CodingHotSwapShow= 
