@@ -28,7 +28,7 @@ The qqX coding hot-swap has been refined and FreeSpirit has the latest updates a
 
 An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
 
-- More in the release notes and wiki to follow in the next few days
+- More in the [release notes](#release-notes) and wiki to follow in the next few days
 
 ### Simple and Straightforward
 
