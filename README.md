@@ -16,7 +16,7 @@ Large code update with lots of new features and Quickemu improvements.
 
 The qqX coding hot-swap has been refined and FreeSpirit has the latest updates and community PR's.
 
-- qX's quickget now lets you scroll backwards and forwards between the diifferent distro info pages.
+- qqX's quickget now lets you scroll backwards and forwards between the different distro info pages.
 
   You can also scroll up and down between releases and editions and swap around your choices.
 
