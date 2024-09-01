@@ -18,8 +18,10 @@
 
 Default_VM_Folder="$HOME/VMQs"
 
-# ADD any EXTRA FOLDERS or sub folders where VM's may be located:
-# leave blank for none, or set one entry per folder as +=("/full/path/folder") 
+# ADD any EXTRA FOLDERS OR SUB-FOLDERS where VM's may be located:
+# leave blank for none, set one entry per folder as +=("/full/path/folder") or +=("$Default_VM_Folder/folder")
+# or multiple as quoted and space separated as in +=("/full/path/folder" "/full/path/folder" "/full/path/folder") 
+# or as in +=("$HOME/VMQs/folder" "$HOME/VMQs/folder" "$HOME/VMQs/folder") 
 
 Extra_VM_Folder+=("")
 
@@ -32,7 +34,6 @@ Extra_VM_Folder+=("")
 #  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1   
 #  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 X_Shade="3" 
-
 
 ## Other SETTINGS SECTIONS AVAILABLE:
 
@@ -57,13 +58,16 @@ VM_SelectorStyle="A"
 
 # OPTIONAL: select VM's to show AT THE TOP of the list
 
-# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file  eg:
+# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file  
 
-# VM_Array[0,0]="/media/xxx/Storage/VMQs" ; VM_Array[0,1]="windows-11.conf"
+# eg:
 
-# VM_Array[1,0]="/media/xxx/Storage/VMQs/MAC" ; VM_Array[1,1]="macos-catalina.conf"
+# VM_Array[0,0]="$Default_VM_Folder" ; VM_Array[0,1]="windows-11.conf"
 
-# VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="windows-insider.conf"
+# VM_Array[1,0]="$Default_VM_Folder/MAC" ; VM_Array[1,1]="macos-catalina.conf"
+
+# VM_Array[2,0]="/media/xxx/Storage/VMQs" ; VM_Array[2,1]="windows-insider.conf"
+
 
 # ADD here. Make sure to remove the '#' in order to activate the line.
 
@@ -73,8 +77,8 @@ VM_SelectorStyle="A"
 
 # VM_Array[2,0]= ; VM_Array[2,1]=
 
-# MUST BE set as CONTIGIUOUS, non-sparse 
-# ie. no numeric sequence gaps when counting the first number of each pair on each line in order...
+# MUST BE set as CONTIGIUOUS, non-sparse, no numeric sequence gaps  
+# ie:  0, 1, 2, 3 ...  when counting the first number of the first pair, on each line
 # COMMENT OUT with # any Non-Present VM entries 
 
 
@@ -157,8 +161,9 @@ VM_SelectorStyle="A"
 
 # TEXT EDITOR  
 # Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor 
-# eg. gedit, pluma, gnome-text-editor, kate ...  If not found qqX will try defaults ...
-# typing 'xdg-mime query default text/plain' at the terminal may help
+# eg. gedit, pluma, gnome-text-editor, kate, mousepad, leafpad ...  If not found qqX will try defaults ...
+# For qt based distros, eg KDE, LXQT, then Kate is recommended, for gnome base use gnome-text-editor.
+# Typing/pasting 'xdg-mime query default text/plain' at the terminal may help
   TextEditor=
 
 # FILE MANAGER
@@ -178,6 +183,8 @@ VM_SelectorStyle="A"
 
 
 ##  BOOT DEFAULTS:
+
+# For BIOS settings, see TIANO BIOS further down.
 
 # SCREEN %PERCENTAGE may be added here or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenPercent' 
 # Use just the value, eg. ="68"   Suggested values from 50 to 70 as a percentage of the physical monitor
@@ -217,6 +224,7 @@ VM_SelectorStyle="A"
 # Setting MSR_Warnings to =1 will unhide minor warnings on the standard (non technical) interface
   MSR_Warnings=
   Verbose_MSR_dialog=
+  
 # File location for default KVM behaviour for unhandled machine-specific registers. 
 # Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently. 
 # quickemu / qwrap / qqX  default is "/etc/modprobe.d/kvm-quickemu.conf"
@@ -257,6 +265,8 @@ VM_SelectorStyle="A"
 # Add QemuError_VM_Filter=("warning" "deprecated") eg. to the .conf file for INDIVIDUALLY problematic distros.
 # @ 2023/12 Defaults:  # QemuErrorFilter=("gl_version" "signal 15 from pid")
 # 2024/07 add https://discussion.fedoraproject.org/t/selinux-alert-gst-plugin-scan-getattr-run-pcscd-pcscd-comm/79378  
+# MacOS can often throw "usb_desc_get_descriptor" if the mouse/keyboard setting is not quite right,
+# but these not always critical and can be session supressed in the [ql] menu, then permanently in the .conf when the config is okay ...
 # Add any new values to the checking arrays as double quoted & space separated. Use the '+=' for further lines.
   QemuErrorFilter=("gl_version" "signal 15 from pid" "gst-plugin-scan")
 # QemuErrorFilter+=("") 
@@ -344,10 +354,17 @@ VM_SelectorStyle="A"
 # Defaults to auto-update, as below.
   RtvArmFolder=
 
-# Default is to have the 2 or 3 second option (via esc key) to access the BIOS. 
-# This is needed to select boot from ISO & is useful for Windows updates. 
-# Set = 1 if you wish to slightly speed up the boot sequence.
-  HideBootMenu=
+# The Tiano core provides a 3 second window to access the BIOS via the escape key.
+# This allows you to select a boot from ISO option and can also be useful for Windows updates. 
+# Instance Session overides can be toggled from the Utilities menu, or individually by placing 
+# 'BootMenu' either as ="fast" or ="slow" in the .conf file
+# Default ="fast" as this will slightly speed up the normal boot sequence:
+  BootMenu="fast"
+
+# Set ="fast"  to skip the ISO boot checks and instructions.
+# Default ="slow" as this only shows if BootMenu has been specifically set to slow
+# Also use 'BootMenuMsg' for individual overides in the .conf if wished.
+  BootMenuMsg="slow"
 
 
 # CUSTOM SETTINGS FILE
@@ -367,11 +384,13 @@ VM_SelectorStyle="A"
 # Place 'Custom' scripts in a 'QE.Custom' sub-folder to "$Default_VM_Folder/qqX.custom" in a similar manner
 # to that used for FreeBird. This preset path will be auto-checked.
 
-# For 'Dev' give full path of your Quickemu source clone here. QE_SourceVersion may be set above or here as an overwrite.
+# For 'Dev' give full path of your Quickemu source clone here, "$HOME/Files/myClone"
 # QE_DevPath may be left set. This path will only be used if Version is set to 'Dev'
+  QE_DevPath=
 
-  #QE_SourceVersion="Dev"
-  #QE_DevPath="~/Files/myClone"
+# QE_SourceVersion may also be set here as a temporary overwrite to the main settings at the top of the script.
+# This will get reset here, if doing a settings update ... 
+# QE_SourceVersion="Dev"
 
 # Inside the folder, all script names should be as standard. Plus, add all ancilliary scripts, such as macrecovery/chunkcheck etc.
 # qqX will select this folder and will also add it to '$PATH' to make sure the correct ancilliaries are found.

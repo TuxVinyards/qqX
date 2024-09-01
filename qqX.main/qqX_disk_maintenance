@@ -23,14 +23,21 @@ drives_and_snapshots() {
 
   #  @ 2023/08  with adding of second and shared drives,  
   #  also start accessing qemu-img directly instead of going round the houses with with quickemu calls 
-  #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select' 
-  #  $2 is for disk utility to hide the message to use the disk utility
+  #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select'
+  #  Or $1 as 'info_current' to avoid the 'refresh_conf_vars_and_values' call 
+  #  $2 "as_disk_util" is for disk utility to hide the message to use the disk utility
 
   [[ $1 == "as_disk_util" ]] && printColor "\n\n  Internal ERROR: disk uitilty needs two args \n\n"  && sleep 100
 
   Selected_Drive=
   Selected_DriveName=
-  refresh_conf_vars_and_values
+  if [[ $1 == "info_current" ]]; then
+    TwoTemp="$2"
+    set -- "info" "$TwoTemp"
+    TwoTemp=
+  else
+    refresh_conf_vars_and_values
+  fi
 
   if [[ $SecondDriveArgs ]]; then
 

@@ -34,13 +34,23 @@ function  update_old_settings_file_with_new_options {
   Template_SettingsFile="$2"
   Old_SettingsFileFolder="$3"
   
-  # USAGE: presumes this file to be run from a qqX release folder ... 
- 
-  [[ ! $Old_SettingsFile ]] &&  Old_SettingsFile="qqX_settings"
+  ## USAGE: presumes this file to be run from a qqX release folder ... 
   [[ ! $Template_SettingsFile ]] &&  Template_SettingsFile="qqX_settings"
-  [[ ! $Old_SettingsFileFolder ]] &&  Old_SettingsFileFolder="$HOME/.qqX"
 
-  #  The VM & extra folder lists are of unknown length & number so store as separate to add later.
+  # presumes standard installation placement
+  [[ ! $Old_SettingsFileFolder ]] &&  Old_SettingsFileFolder="$HOME/.qqX"
+  [[ ! $Old_SettingsFile ]] &&  Old_SettingsFile="qqX_settings"
+
+  # *and* presumes that a valid settings file has been found before this routine is called
+
+  ## DEV Array output - Set =1  file or screen or both 
+  DevSetUpdArrOutputScrn= ; DevSetUpdArrOutputFile=
+
+  ##
+
+  ## 1: OLD FILE  
+
+  #  The VM & Extra Folder lists are of unknown length & number so store as separate to add later.
 
   Grep_OLD_VM_Arrays_File="/tmp/grep.old.vm.arrays.txt"
   Grep_OLD_XF_Arrays_File="/tmp/grep.old.xf.arrays.txt"
@@ -48,19 +58,19 @@ function  update_old_settings_file_with_new_options {
   printf "" > "$Grep_OLD_VM_Arrays_File"
   printf "" > "$Grep_OLD_XF_Arrays_File"
 
-  
-  ## 1: OLD FILE  (std or as params)  Separate up the array lists & the one-liners
+  # A. Extract ALL non-commented lines
+  mapfile -t GrepArr_OLD_OneLine_Settings  <<< "$(grep '=' "$Old_SettingsFileFolder/$Old_SettingsFile" | grep -v '#')"
 
-  mapfile -t GrepArr_OLD_OneLine_Settings  <<< "$(grep "=" "$Old_SettingsFileFolder/$Old_SettingsFile")"
+  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Pre-Parse"; declare -p GrepArr_OLD_OneLine_Settings ; echo ; fi
+  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_OLD_OneLine_Settings > "/tmp/qDevSet_OldOneLineArr_PreParse.txt" ; fi
+
+
+  # B. Remove any existing, personalized folder array lists &  keep them to one side for later. (from the non-commented above)
 
   for i in "${!GrepArr_OLD_OneLine_Settings[@]}"; do
 
     case "${GrepArr_OLD_OneLine_Settings[i]}" in
-    
-      '#'*|' #'*|'  #'*|'   #'*|'    #'*)  
-        unset "GrepArr_OLD_OneLine_Settings[i]"  
-        ;;
-      
+     
       *'VM_Array['*)  
         printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_VM_Arrays_File" 
         unset "GrepArr_OLD_OneLine_Settings[i]"  
@@ -70,6 +80,8 @@ function  update_old_settings_file_with_new_options {
         printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_XF_Arrays_File"  
         unset "GrepArr_OLD_OneLine_Settings[i]"  
         ;;
+
+      *) true ;;
       
     esac
 
@@ -78,53 +90,25 @@ function  update_old_settings_file_with_new_options {
   #  Re-index as sections have been removed
   GrepArr_OLD_OneLine_Settings=("${GrepArr_OLD_OneLine_Settings[@]}")
 
-  #  Find & store the Base Name of each setting ie the Var= instead of the whole var & value
+  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Post-Parse"; declare -p GrepArr_OLD_OneLine_Settings ; echo ; fi
+  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_OLD_OneLine_Settings > "/tmp/qDevSet_OldOneLineArr_PostParse.txt" ; fi
+
+
+  # C. Find & store the Base Name of each setting ie the Var= instead of the whole var & value
   GrepArr_OLD_BaseNameSettings=()
   for i in "${!GrepArr_OLD_OneLine_Settings[@]}" ; do
-    GrepArr_OLD_BaseNameSettings+=( "$(cut -d '=' -f1 <<< "${GrepArr_OLD_OneLine_Settings[i]}")""=" )
+    GrepArr_OLD_BaseNameString="$(cut -d '=' -f1 <<< "${GrepArr_OLD_OneLine_Settings[i]}")"
+    GrepArr_OLD_BaseNameString="${GrepArr_OLD_BaseNameString// /}""="
+    GrepArr_OLD_BaseNameSettings+=( "$GrepArr_OLD_BaseNameString" )
   done
 
-
-  ## 2: TEMPLATE  FILE  (from the new release)  find & store all the one-line settings 
-
-  mapfile -t GrepArr_TEMPLATE_OneLine_Settings  <<< "$(grep "=" "$Template_SettingsFile")"
-
-  for i in "${!GrepArr_TEMPLATE_OneLine_Settings[@]}"; do
-
-    case "${GrepArr_TEMPLATE_OneLine_Settings[i]}" in
-    
-      '#'*|' #'*|'  #'*|'   #'*|'    #'*)  
-        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
-        ;;
-      
-      *'VM_Array['*)  
-        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
-        ;;
-      
-      *'Extra_VM_Folder+='*)  
-        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
-        ;;
-      
-    esac
-
-  done	
-
-  # Re-index, as previous in section 1
-  GrepArr_TEMPLATE_OneLine_Settings=("${GrepArr_TEMPLATE_OneLine_Settings[@]}")
-
-  # Plus find and store their base names too (for easy matching)
-  GrepArr_TEMPLATE_BaseNameSettings=()
-  for i in "${!GrepArr_TEMPLATE_OneLine_Settings[@]}" ; do
-    GrepArr_TEMPLATE_BaseNameSettings+=( "$(cut -d '=' -f1 <<< "${GrepArr_TEMPLATE_OneLine_Settings[i]}")""=" )
-  done
+  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Old BaseName"; declare -p GrepArr_OLD_BaseNameSettings ; echo ; fi
+  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_OLD_BaseNameSettings > "/tmp/qDevSet_OldBaseNameArr.txt" ; fi
 
 
-  ## 3: NEW FILE OUTPUT 
-  
-  # The template file with it's possibly new added sections or changed notes 
-  # but with any officially recognised old customised settings  (custom entries are separate)
+  ## 2: NEW FILE OUTPUT 
 
-  ## Make a backup to the installer folder (& check that it is a faithful copy)
+  ## A. Make a backup to the installer folder (& check that it is a faithful copy)
   # Dev: move to trash to stop clutter.
   
   D_Stamp=".""$(date +%a.%d.%b.%G.%H.%M)"
@@ -153,39 +137,60 @@ function  update_old_settings_file_with_new_options {
 
   fi
 
-  ## Create new composite file, in place of the old
+  ## B. create new composite file, in place of the old
   TargetNew="$Old_SettingsFileFolder/$Old_SettingsFile" 
   printf "" > "$TargetNew"
 
-  # Map all of update file lines to an array for outputting the new 
+
+  ## C. map ALL of template file lines to an array for outputting to the new file
   mapfile -t GrepArr_NEW  < "$Template_SettingsFile"
+
+  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "GrepArr_NEW Pre_MainLoop"; declare -p GrepArr_NEW ; echo ; fi
+  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_NEW > "/tmp/qDevSet_GrepArr_NEW_Pre_MainLoop.txt" ; fi
 
   VM_Old_TxDone=
   XF_Old_TxDone=
+
+  if [[ $DevSetUpdArrOutputFile ]]; then 
+    echo > "/tmp/qDevSet_Match_NewOld.txt"
+    echo > "/tmp/qDevSet_No_Match.txt"
+    echo > "/tmp/qDevSet_CopyOver.txt"
+    echo > "/tmp/qDevSet_iVals.txt"
+    echo > "/tmp/qDevSet_ProposedMatch.txt"
+  fi
+
+  if [[ $DevSetUpdArrOutputScrn || $DevSetUpdArrOutputFile ]]; then
+    printf "\n\n  Pre Main Loop point: \n\n"
+    # read -rp "  >  "
+  fi
+
+  ## MAIN LOOP: 
 
   for i in "${!GrepArr_NEW[@]}"; do 
 
     MatchNewOld=
     SkipCopy=
 
+    if [[ $DevSetUpdArrOutputScrn ]]; then  echo; echo "i = $i"; fi
+    if [[ $DevSetUpdArrOutputFile ]]; then  echo "i = $i" >> "/tmp/qDevSet_iVals.txt" ; fi 
+
     case "${GrepArr_NEW[i]}" in
 
-      #  Detect non-commented array zones and copy the stored customised block to the new file
-      #  Extra_VM_Folder's entries in the template are 'live' ie not commented out
+      #  Detect array zones and copy the *stored* customised block to the new file instead
+      #  one set only avoid accumulating more new ones (also the line spaces between the extra statements)
 
       *'Extra_VM_Folder+='*)  
-
-        if [[ ! $XF_Old_TxDone ]]; then
+        if [[ $XF_Old_TxDone ]]; then
+          SkipCopy=1 ; SkipLineSpace=1
+        else
           if grep -q 'Extra_VM_Folder+=' "$Grep_OLD_XF_Arrays_File" ; then
             cat "$Grep_OLD_XF_Arrays_File" >> "$TargetNew" 
             XF_Old_TxDone=1
           fi
         fi
-        # one set only avoid accumulating more new ones (also the line spaces between the extra statements)
-        [[ $XF_Old_TxDone ]] && SkipCopy=1 && SkipLineSpace=1
         ;;
       
-      '# ADD here:') 
+      *'# ADD here'*) 
 
         if [[ ! $VM_Old_TxDone ]]; then
           printf "%s\n\n" "${GrepArr_NEW[i]}" >> "$TargetNew"
@@ -198,35 +203,59 @@ function  update_old_settings_file_with_new_options {
         ;;
       
     esac
+    
+    [[ $SkipLineSpace ]] && SkipCopy=1  && SkipLineSpace=
 
-
-    # one set only avoid accumulating more new ones
+    # One Array set only, avoid accumulating 'new' ones each time
+    [[ $XF_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'xtra_VM_Folder+='* ]]  && SkipCopy=1 && SkipLineSpace=1 
     [[ $VM_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'M_Array['* ]]  && SkipCopy=1 && SkipLineSpace=1
+    
 
-    if [[ ! $SkipCopy ]] && [[ ! $SkipCopy ]] && [[ "${GrepArr_NEW[i]}" == *=* ]]; then
+    if [[ ! $SkipCopy ]] && [[ ! $SkipLineSpace ]] ; then
 
-      ProposedNew_BaseNameSetting="$(cut -d '=' -f1 <<< "${GrepArr_NEW[i]}")""="
+      if ! grep -q '#' <<< "${GrepArr_NEW[i]}" &&  grep -q '=' <<< "${GrepArr_NEW[i]}" ; then
 
-      for n in "${!GrepArr_OLD_BaseNameSettings[@]}" ; do
+        ProposedNew_BaseNameSetting=
+        ProposedNew_BaseNameSetting="$(cut -d '=' -f1 <<< "${GrepArr_NEW[i]}")"
+        ProposedNew_BaseNameSetting="${ProposedNew_BaseNameSetting// /}""="
 
-        if [[ "$ProposedNew_BaseNameSetting" == "${GrepArr_OLD_BaseNameSettings[n]}" ]]; then
-          MatchNewOld=1
-          echo "${GrepArr_OLD_OneLine_Settings[n]}" >> "$TargetNew"
-          break
-        fi 
+        for n in "${!GrepArr_OLD_BaseNameSettings[@]}" ; do
 
-      done
+          if [[ $DevSetUpdArrOutputScrn ]]; then  
+            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}" 
+          fi
+          if [[ $DevSetUpdArrOutputFile ]]; then  
+            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}" >> "/tmp/qDevSet_ProposedMatch.txt" 
+          fi 
+
+          if [[ $ProposedNew_BaseNameSetting == "${GrepArr_OLD_BaseNameSettings[n]}" ]] ; then
+            MatchNewOld=1
+            echo "${GrepArr_OLD_OneLine_Settings[n]}" >> "$TargetNew"
+            if [[ $DevSetUpdArrOutputScrn ]]; then  echo "MatchNewOld > Copy Old - ${GrepArr_OLD_OneLine_Settings[n]}"; fi
+            if [[ $DevSetUpdArrOutputFile ]]; then  echo "MatchNewOld > Copy Old - ${GrepArr_OLD_OneLine_Settings[n]}" >> "/tmp/qDevSet_Match_NewOld.txt" ; fi 
+            break
+          fi 
+        done
+
+      fi
 
       [[ ! $MatchNewOld ]] && echo "${GrepArr_NEW[i]}"  >> "$TargetNew"
 
+      if [[ $DevSetUpdArrOutputScrn && ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" ; fi
+      if [[ $DevSetUpdArrOutputFile && ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" >> "/tmp/qDevSet_No_Match.txt" ; fi
+
     elif [[ ! $SkipCopy ]]; then
 
-      if [[ $SkipLineSpace ]]; then SkipLineSpace=; else  echo "${GrepArr_NEW[i]}"  >> "$TargetNew"; fi
+      if [[ ! $SkipLineSpace ]]; then echo "${GrepArr_NEW[i]}"  >> "$TargetNew"; fi
+
+      if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Copy - ${GrepArr_NEW[i]}"; fi
+      if [[ $DevSetUpdArrOutputFile ]]; then  echo "Copy - ${GrepArr_NEW[i]}" >> "/tmp/qDevSet_CopyOver.txt" ; fi
 
     fi
 
   done
 
+  [[ $DevSetUpdArrOutputScrn ]] && printf "\n\n"
   printf "  The settings file has now been updated. \n  All recognised original settings have been transferred. \n\n"
   
 }

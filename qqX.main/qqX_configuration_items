@@ -39,8 +39,11 @@ custom_conf_notes () {
     disk_size=\"xxG\"   (integer, used once, for first build)
     cpu_cores=\"x\"     (even integer)
     ram=\"xG\"          (integer)
+    keyboard=           'usb' (default), 'ps2', 'virtio'
+    keyboard_layout=    'en-us' (default)
+    mouse=              'tablet' (default), 'ps2', 'usb', 'virtio'
 
-    boot=\"legacy\"     (use bios, not UEFI)
+    boot=\"legacy\"     (use bios, not UEFI) default: =\"efi\"
 
     Windows:
     tpm=\"on\"          secureboot=\"off\"
@@ -49,7 +52,8 @@ custom_conf_notes () {
     Difficult booting: 
     boot=\"legacy\"  &  gl=\"off\"  may help ...
 
-    highlight then shift-ctrl-c  to copy ...
+    highlight then shift-ctrl-c  to copy ...  
+    
   \n"
 
 }
@@ -286,8 +290,11 @@ function_conf_error () {
 
   printf "\n\n  qqX Settings, VM folder & conf file(s)"  
 
-  if [[ $1 ]] ; then 
-    printf "\n\n  Check %s settings, location & content ... "  "$1"
+  if [[ $1 == "No VMs" ]] ; then 
+    printColor "\n\n  No VMs - Probably time to welcome you to qqX and invite you to get some distros." 
+    printf "\n\n  The settings file and locations can usually be left till later ..." 
+  elif [[ $1 ]] ; then 
+    printf "\n\n  Check %s settings, LOCATION & CONTENT ... "  "$1"
   else 
     printf "\n\n  Check the settings and re-run this script ... " 
   fi
@@ -335,7 +342,8 @@ function_conf_error () {
     # includes "$1" = "config"
     printColor "\n\n  [Enter] to edit qqX general settings"  
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
-    printColor "  [q] to quit \n\n"  
+    printf "  [c] ignore, re-check and continue "
+    printf "  [q] to quit \n\n"  
 
   fi   
 
@@ -344,7 +352,7 @@ function_conf_error () {
 
   if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit 
 
-  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_File" 
+  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
 
   elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
   
@@ -359,6 +367,8 @@ function_conf_error () {
     elif [[ $ErrorMenuSelect == "gt" ]]; then 
 
       VM_Selection=
+      VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      cd "$Default_VM_Folder" || DefaultFolderError=1
       function_quick_get_wrap 
       return
 
@@ -382,10 +392,10 @@ function_conf_error () {
 
 texteditor_not_found_message () {
   
-  printColor "\n\n  Unable to open settings with editor: '%s' "  "$TextEditor"
+  printColor "\n\n  Unable to open settings with an editor."
   printf "\n\n  Default or basic text editors will be tried or have been tried ..."
   printf "\n\n  Give settings file the command name of a preferred editor."
-  printf "\n\n  Settings location:  %s  \n\n  [enter] to continue \n\n"  "$qqX_SettingsFile"
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
   read -rp "  >  "
 }
 
@@ -407,7 +417,9 @@ qqX_edit_settings() {
     elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
     elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
     elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
-    elif [[ $(type -p nano) ]] ; then   TextEditor="nano"
+    elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
+    elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
+    elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
     fi
 
   fi
@@ -431,14 +443,16 @@ qqX_edit_settings() {
 
         if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
 
-        elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_File" ; break
+        elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
 
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
 
         else
 
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
-          (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File") || texteditor_not_found_message
+          (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File" & ) || texteditor_not_found_message
+          printf "\n  [enter] to refresh, if editing has been completed \n\n"
+          read -rp "  >  "
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
           break
@@ -459,7 +473,6 @@ qqX_edit_settings() {
 
     else 
 
-      [[ $CodingHotSwap ]] && CodingHotSwap=
       (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
 
       if [[ $DefaultFolderError ]]; then 
@@ -491,10 +504,17 @@ function refresh_conf_vars_and_values {
 
   # A blank clearance will have been created at first session start.  
 
-  source "$ConfClearanceLog"
-
   if [[ -e $VM_Conf_File ]]; then
 
+    # this code only runs if a conf file has been specified, otherwise does nothing ...
+    # but make sure that the calling code has put us in the right place, if a conf file is there
+    if [[ "$(pwd)" != "$VM_Conf_Dir" ]]; then function_conf_error  "Conf Refresh:  WRONG FOLDER ," ; fi
+
+    # And make sure that $VM_Conf_File has not somehow inherited the whole path
+    VM_Conf_File="$(basename "$VM_Conf_File")"
+    if [[ ! -e "$VM_Conf_Dir/$VM_Conf_File" ]]; then function_conf_error  "Conf Refresh:  WRONG FOLDER/FILE ," ; fi
+
+    source "$ConfClearanceLog"
     SecondDrive=
     SharedDrive=
     DriveLocationError=
@@ -503,15 +523,19 @@ function refresh_conf_vars_and_values {
     SharedDriveArgs=
     MacLegacyDrive=
     QemuError_VM_Filter=()
+    Custom_SDL_ScreenSize=
+    Custom_SDL_ScreenPercent=
+    ACCESS=
+    QemuArgsCustomFile=
+    QemuErrorLog=
+    #reload_bootmenu_defaults  # REVIEW  leave off as if active then utils menu bm function reverts to defaults after booting once ...
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
-
-    source "$VM_Conf_File"
 
     # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
     printf "#%s/%s" "$VM_Conf_Dir" "$VM_InstanceName"  > "$ConfClearanceLog"
-    mapfile -t ConfClearance_Arr < "$VM_Conf_File"
+    mapfile -t ConfClearance_Arr < "$VM_Conf_Dir/$VM_Conf_File"
 
     for Line in "${ConfClearance_Arr[@]}"; do
       if [[ $Line ]] && [[ "$Line" == *'='* ]]; then
@@ -528,14 +552,19 @@ function refresh_conf_vars_and_values {
 
     done
 
-    # check any menu values that are based on the file .conf 
+    source "$ConfClearanceLog"
+    source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
+
+    # check any menu values that are based on the file .conf 
 
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
+    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
 

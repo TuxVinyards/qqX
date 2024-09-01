@@ -87,31 +87,45 @@ show_CLI_usage () {
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
 #  Further processing is done in the 'qqX_api_and_mouse_tidyup' script, after other functions have been loaded
 
-# echo "$@"  ; echo  
+# echo "$@"  ; echo  ; read
+
+if [[ $1 ]]; then RunMouseApiTidy=1 ; else RunMouseApiTidy= ; fi
 
 if [[ $1 == "XDG" ]]; then 
 
   if [[ -e "$2" ]]; then
 
+    XDG_FileType_Recognised=
+    XDG_MimeType_Recognised=
+    XDG_MimeType_is_ISO=
+    XDG_MimeType_is_QCOW=
+    XDG_ISO_Name=
     XDG_MimeType="$(mimetype "$2" 2>/dev/null)"
+    CurrentFolder="$(dirname "$2")"
    
     if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then XDG_MimeType_is_QCOW=1
 
-    elif [[ "$XDG_MimeType" == *'application/x-cd-image' ]] && [[ "$2" == *'.iso' ]]; then 
+    elif [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'application/vnd.efi.iso' ]] && [[ "$2" == *'.iso' ]]; then 
 
       XDG_MimeType_is_ISO=1
       XDG_ISO_Name="$2"
       XDG_MimeType_Recognised=1
 
-    elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
-    
-     QCOW_RightClick= 
+    elif [[ "$2" == *'.iso' ]]; then 
 
-      # conforms to  -vm | --vm  file.conf
+      XDG_MimeType_is_ISO=
+      XDG_ISO_Name="$2"
+      XDG_FileType_Recognised=1
+
+    elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
+      # then is a conf file open-with and appears to conform to standard quickemu .conf layout
+      QCOW_RightClick=
+      QCOW_RightClick_NON_qqX=
       VM_Conf_Dir="$(dirname "$2")"
       [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
       VM_Conf_File="$(basename "$2")"
       VM_InstanceName="${VM_Conf_File/'.conf'/}"
+      cd "$VM_Conf_Dir" || ExtraFolderError=1
       shift $#
 
     elif [[ "$XDG_MimeType" == *'text/plain' ]] ; then
@@ -144,6 +158,7 @@ if [[ $1 == "XDG" ]]; then
 
       XDG_StartVariant=1
       XDG_MimeType_Recognised=
+      XDG_FileType_Recognised=
       XDG_MimeType_is_QCOW=  
       
     fi
@@ -208,30 +223,6 @@ else
 fi
 
 if [[ $AllowMoreLocale ]]; then export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; else  export "LC_ALL=C" ; fi
-
-
-# Determine possible XDG folders 
-
-find_xdg_start_folder () {
-
-  #  For a .desktop start, to be run after the settings file has been loaded so that a $Default_VM_Folder can be available
-
-  if [[ ! $(ls "$HOME/"*.conf 2> /dev/null) ]] && [[ -d "$Default_VM_Folder" ]]; then
-
-    cd "$Default_VM_Folder"  || printf "\n\n XDG .desktop starter  >  Default_VM_Folder not found " 
-    CurrentFolder="$Default_VM_Folder"
-
-  else
-
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
-    CurrentFolder="$HOME"
-
-  fi
-
-}
-
-
-[[ $XDG_GeneralDesktopStart ]] &&  find_xdg_start_folder
 
 
 if [[ $XDG_MimeType_is_QCOW ]]; then

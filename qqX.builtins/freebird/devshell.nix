@@ -43,7 +43,7 @@ mkShell {
       -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMFFull.firmware}","${pkgs.OVMFFull.variables}" |' \
       -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMF.firmware}","${pkgs.OVMF.variables}" |' \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
-      -e 's,\$(command -v smbd),${pkgs.samba}/bin/smbd,' \
+      -e 's,\$(type -p smbd),${pkgs.samba}/bin/smbd,' \
       quickemu > $PWD/.direnv/bin/quickemu
     chmod +x $PWD/.direnv/bin/quickemu
   '';

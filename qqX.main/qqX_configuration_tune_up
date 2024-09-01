@@ -25,8 +25,8 @@ function_config_tune_up ()  {
   
   TuneUpTargetFile="$1" 
 
-  if [[ ! -e $TuneUpTargetFile ]]; then 
-    printColor "\n\n  Internal ERROR  tune up .conf file not found \n\n  %s \n\n"
+  if [[ "$(dirname "$TuneUpTargetFile")" == '.' ]]; then 
+    printColor "\n\n  Internal ERROR  tune up .conf file not found or missing path \n\n  %s \n\n"
     sleep 100
   fi
 
@@ -50,74 +50,138 @@ function_config_tune_up ()  {
     sleep 100
   fi
 
-  TuneUpOldFile="$TuneUp_InstanceName/OldConfig.$TuneUpDate.conf"
-
-  cp "$TuneUpTargetFile"  "$TuneUpOldFile"
-
-  # check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
-  # default behaviour from quickget is to add "#!$(which quickemu) --vm"
-  # and from ver 1.8 on, builtins or custom will make a non standard mod 
-  # if bypassing the tune-up, unless tweaked here:
-
-  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$System_qqX_Path" )"
-  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
-
-  TuneUpTmpCopy="/tmp/TuneUpTargetFile.tmp"
+  TuneUpTmpCopy="/tmp/TuneUpTargetCopy.tmp"
+  TuneUpTmpOriginal="/tmp/TuneUpTargetOriginal.tmp"
   TuneUpTargetDraft="/tmp/TuneUpTargetDraft.tmp"
-  cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+  cp  "$TuneUpTargetFile"  "$TuneUpTmpOriginal"
+
+  # Possibly twice, but check paths as this script might be running for the first time on a brand new installation
+  Installed_qqX_Path="$(type -p qqX)"
+
+  # We should be using 'QE_SystemFilePath' declared at the start of qqX, and before any builtins or re-routes happen,
+  # otherwise finding the filepath gets a bit complex so attempt to use the standard or warn ...
+  [[ ! $QE_SystemFilePath ]] && [[ -e "/usr/bin/quickemu" ]] && QE_SystemFilePath="/usr/bin/quickemu"
+
+  # Check starter, where QE_SystemFilePath is normally '/usr/bin/quickemu'
+  # BUT as default behaviour from quickget is to add "#!$(which quickemu) --vm"
+  # this means that from ver 1.8 on, the builtins or custom will get added instead.
+  # Unless a few fixes get added here:
+
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep qq)"
+  [[ "$Conf_qqX_Pointer" == *'builtins'* ]] && Conf_qqX_Pointer=
+  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
+  [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
   if [[ ! $Conf_qqX_Pointer && ! $Conf_SysQE_Pointer ]]; then 
-    printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetFile" 
-    tail -n +2 "$TuneUpTmpCopy" >> "$TuneUpTargetFile" 
-    cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
+    if [[ $Installed_qqX_Path ]]; then {
+      printf '#!' ; printf "%s --vm \n\n" "$Installed_qqX_Path" 
+      } > "$TuneUpTargetFile" 
+    elif [[ -e "/usr/bin/qqX" ]]; then  {
+      printf "#!/usr/bin/qqX --vm \n\n" 
+      } > "$TuneUpTargetFile" 
+    else {
+      printf "#!/usr/bin/qqX --vm \n\n# the qqX path should be checked ..." 
+      } > "$TuneUpTargetFile" 
+    fi
+    tail -n +2 "$TuneUpTmpOriginal" >> "$TuneUpTargetFile" 
   fi
+
+  if ! grep -q -s 'disk_size=' "$TuneUpTargetFile" ; then
+    printf "\ndisk_size=\"64G\"" >> "$TuneUpTargetFile" 
+  fi
+
+  TuneUpOldFile="$TuneUp_InstanceName/OldConfig.$TuneUpDate.conf"
+  cp "$TuneUpTargetFile"  "$TuneUpOldFile"
+  cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
   [[ $GeneralLoopCheck ]] && echo && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer" && echo "Conf_SysQE_Pointer = $Conf_SysQE_Pointer"  && echo 
   dev_loop_check
 
   printColor "\n\n  CHECK ME: \n\n"
-  cat "$TuneUpTmpCopy"
+  cat "$TuneUpTargetFile"
   printColor "\n\n  All changes made here, may be reversed:"
-  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder\n"
+  printf "\n\n  A backup of your current configuration has now been date recorded & placed in the Distro Folder"
+
+  [[ ! $QE_SystemFilePath ]] && printf "\n\n  Standard system Quickemu not found ..."
   
   if [[ $NewFileTuneUp ]]; then 
-    printf "\n\n  So far, so good  >  "
+    printf "\n\n\n  So far, so good  >  "
     # Not fully done at this point but this is used a flag to stop repeat conf checks, means the tune-up screen has been done.
     NewFileTuneUp_JustDone=1
   fi
 
-  if [[ ! $Conf_qqX_Pointer ]]; then
+  # Re-scan, even though from qqX 1.9.04 this pointer should now have been created, if a new install, 
+  # a pointer to 'quickemu' could exist on an older config.
+  Conf_qqX_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep qq)"
+  [[ "$Conf_qqX_Pointer" == *'builtins'* ]] && Conf_qqX_Pointer=
+  Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
+  [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
-    ConfEdit_Qstart=
-    printColor "\n\n  The start line may be edited to point to qqX"  
-    printf "\n\n  Change the start line to point to qqX ?"  
-    printf "\n\n  [enter] yes, go for it    [no] use System %s  [q] quit tune-up \n\n"  "$QE_SystemFilePath"
-    read -rp "  >  "  ConfEdit_Qstart
+  ConfEdit_Qstart=
 
-    [[ $ConfEdit_Qstart == "q" ]] && return
-
-    if [[ $ConfEdit_Qstart == "no" ]]; then printf "#!%s --vm \n\n" "$QE_SystemFilePath" > "$TuneUpTargetDraft"  
-    else printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
-    fi
-
-  else  printf "#!%s --vm \n\n" "$System_qqX_Path" > "$TuneUpTargetDraft" 
-
+  if [[ "$Conf_qqX_Pointer" != *"$Installed_qqX_Path"* ]]; then
+    printColor "\n\n  Change the start line to point to qqX ?   "
+  elif [[ $QE_SystemFilePath ]]; then
+    printColor "\n\n  Stay with the start line pointing to qqX ?   "
   fi
+  if [[ -e "$QE_SystemFilePath" ]]; then
+    printColor "(set as System, if unsure)"  
+  fi
+  printf "\n\n  [enter] yes, continue with 'qqX'   " 
+  [[ $QE_SystemFilePath ]] && printf "[no] use System %s   " "$QE_SystemFilePath"
+  printf "[q] quit tune-up \n\n"
+  read -rp "  >  "  ConfEdit_Qstart
+    
+  if [[ $ConfEdit_Qstart == "q" ]]; then 
+    printColor "\n  Linux distros post-install:"
+    printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
+    printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
+    if [[ -e "$SharedDrive" ]]; then 
+      printColor "\n\n  ALL distros:"
+      printf "\n\n  The qqX 'shared drive' is available to help with sharing between distros"
+    else
+      printColor "\n\n  ALL distros post-install:"
+      printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
+      printf "\n  See the notes in the general settings file for installation"
+    fi
+    printf "\n\n  [enter] to continue to the VM menus \n\n"
+    read -rp "  > "
+    return 
+  fi
+
+  if [[ $ConfEdit_Qstart == "no" ]]; then {
+    printf '#!' ; printf "%s --vm \n\n" "$QE_SystemFilePath"
+    } > "$TuneUpTargetDraft"  
+  else {
+    printf '#!' ; printf "%s --vm \n\n"  "$(type -p qqX)"
+    } > "$TuneUpTargetDraft" 
+  fi
+
 
   dev_loop_check
 
+  # qcow disk
+  ConfLine="$(grep -s 'disk_img' "$TuneUpTmpCopy")"
+  TuneUpDisk="$(cut -d '=' -f 2 <<< "$ConfLine")"
+  TuneUpDisk="${TuneUpDisk//'"'/}"
+
   # disk size  (for existing installs use the 'disk' util)
-
   ConfLine="$(grep -s 'disk_size' "$TuneUpTmpCopy")"
+  TuneUpDiskSizeLine="$(tr -cd '[:digit:]' <<< "$ConfLine")"
 
-  if [[ $NewFileTuneUp ]]; then
+  if [[ $NewFileTuneUp ]] || [[ ! -e "$TuneUpDisk" ]]; then
 
     ConfEdit_DiskSize=
     printColor "\n\n  Suggest adding disk_size=\"64G\" or higher if expecting to create snapshots: " 
     printf "\n\n  qcow2 disks auto-compress & will normally occupy much less space"
     printColor "\n\n  & an empty disk only takes up 196k."
     printf "\n\n  It is easier make them larger now than to resize later ... " 
-    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   [no] leave as possibly sub-minimal  [q] quit tune-up "  
+    printf  "\n\n\n  [enter] 128G  or  [number] in Gb 32, 64, 192   "
+    # from qqX 1.9.04/1.10.01 64G is auto supplied so this sub-minimal should no longer be present ... REVIEW 
+    if [[ ! $TuneUpDiskSizeLine ]]; then printf "[no] leave as possibly sub-minimal  "
+    else printf "[%s] leave as is  "  "$TuneUpDiskSizeLine"
+    fi
+    printf "[q] quit tune-up "  
     printf "\n\n"
     read -rp  "  >  "  ConfEdit_DiskSize
 
@@ -126,12 +190,34 @@ function_config_tune_up ()  {
     [[ $ConfEdit_DiskSize ]]  &&  ConfEdit_DiskSize="$(tr -cd "[:digit:]" <<< "$ConfEdit_DiskSize")"
     [[ $ConfEdit_DiskSize ]] && printf "disk_size=\"%sG\"\n"  "$ConfEdit_DiskSize"  >> "$TuneUpTargetDraft"
 
-  else  
-
+  elif [[ -e "$TuneUpDisk" ]]; then
+  
+    printColor "\n  ---------------------------------------------------------------------------- "
     printColor "\n\n  The line "
     printf "'disk_size=' "
-    printColor "may be removed if wished, at the end the tune-up, or left as a reminder" 
-    printColor "\n\n  The disk has now been created. This line now has no direct effect. \n" 
+    if [[ $TuneUpDiskSizeLine ]]; then
+      printColor "may be removed if wished, at the end the tune-up, or left as a reminder." 
+    else
+      printColor "is not present. One should have been made before first booting ..." 
+    fi
+    printColor "\n\n  This disk has now been created and this line now has no direct effect. " 
+    if [[ ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
+      printf "\n\n  However, at this stage, it appears that the distro has not been installed, so quitting the tune up wizard,"
+      printf "\n\n  deleting the qcow disk via the file manager and re-starting as 'new' could also be possible."
+      if [[ $TuneUpDiskSizeLine -le 64 ]]; then 
+        printf "\n\n  Using disk_size=\"64G\" or higher is recommended as qcow2 disks auto-compress & will normally occupy much less space." 
+      fi
+      if [[ $TuneUpDiskSizeLine ]]; then 
+        printf "  Current max disk size is set as %sG" "$TuneUpDiskSizeLine"
+      else
+        printf "  More details via the 'disk' option from the utilities menu." 
+      fi
+      printf "  It is easier make disks larger now than to resize later ... " 
+    else
+      printf "\n\n  Resizing, at this stage may be effected using the qqX 'disk' utilities."
+    fi
+    printColor "\n\n  ---------------------------------------------------------------------------- "
+
     if [[ $ConfLine ]]; then printf "%s\n" "$ConfLine" >> "$TuneUpTargetDraft" ; fi
 
   fi
@@ -414,9 +500,18 @@ function_config_tune_up ()  {
 
     fi
 
-
-
-    printColor "\n\n  [enter] all good, continue    [r] revert back to the old config"
+    printColor "\n\n  Linux distros post-install:"
+    printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
+    printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
+    if [[ -e "$SharedDrive" ]]; then 
+      printColor "\n\n  ALL distros:"
+      printf "\n\n  The qqX 'shared drive' is available to help with sharing between distros"
+    else
+      printColor "\n\n  ALL distros post-install:"
+      printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
+      printf "\n  See the notes in the general settings file for installation"
+    fi
+    printColor "\n\n\n  [enter] all good, continue    [r] revert back to the old config"
     printf "\n\n  [e]  edit the config file in more detail   "
     
     [[ $NewFileTuneUp ]] && printf "[d]  delete the VM - something went wrong ..."
@@ -454,24 +549,17 @@ function_config_tune_up ()  {
     fi
 
   done
-
-  # usage case options are complex, so generally do a refresh all and return to vm selector menu ...  REVIEW 
   
   if [[ $NewFileTuneUp ]]; then 
 
-    SettingsFileAdjusted=1
+    ConfSettingsAdjusted=1
     SelectArrayError=
     IgnoreSecondCheckNew=1
 
     # set here, before refresh
     VM_Conf_Dir="$TuneUp_Conf_Dir"
-    VM_Conf_File="$TuneUpTargetFile"
+    VM_Conf_File="$(basename "$TuneUpTargetFile")"
     VM_InstanceName="$TuneUp_InstanceName"
-
-    # ByPass_VM_Array_Loader=1
-    # ByPass_VM_Array_Selector=1
-
-    refresh_sources_and_load_VM_arrays
 
   else
 

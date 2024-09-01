@@ -24,7 +24,7 @@ show_msg_pid_found() {
       if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
       else printf " \n\n  but as no KVM activity has been detected, this file can probably be deleted."
       fi
-      printf "\n\n  [enter] to return and to open File Manager \n\n"
+      printf "\n\n  [enter] to return and/or to open File Manager and check \n\n"
       read -rp "  >  "
 }
 
@@ -106,11 +106,8 @@ vm_pid_kill_menu() {
   done
 
   KillPID_Menu=
-
   KillPID_Menu_Exited=1
-
   P_Kill_WaitSecs="$P_Kill_WaitSecs_PreSet"
-
   refresh_and_load_quickemu_sources
   refresh_conf_vars_and_values
 
@@ -132,9 +129,10 @@ show_main_menu_header () {
   if [[ $fixed_iso ]]; then Mounted_ISO="$fixed_iso" ; fixed_iso= ; fi
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
-  if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(ERROR)" 
-  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" 
-  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)" 
+  LiveBoot=
+  if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
+  elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
+  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
   fi
@@ -148,7 +146,11 @@ show_main_menu_header () {
   # Note .conf won't exist at first load, at VM selector menu
 
   if [[ ! $NewFileTuneUp && ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] ; then 
-    printColor "\n    ERROR  Check .conf Drive & Iso Img settings \n"
+    printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
+  fi
+
+  if stat "$VM_Conf_Dir/$VM_Conf_File" 2>/dev/null | grep -q "symbolic" ; then 
+    printf "\n  Symbolically linked to real path %s \n" "$(realpath "$VM_Conf_Dir/$VM_InstanceName")"
   fi
 
 }
@@ -256,10 +258,39 @@ function_delete_Selected_VM () {
 
   if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
 
-  printColor "\n\n  Folder: %s " "$1"
-  printColor "  & file: %s  to be deleted?"  "$2"
-  printf  "\n\n  To delete a VM, removal of the above folder/file is sufficient."
-  printf "\n\n  Select [n] to manually delete, & to possibly retain individual files, using a file manager."
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+    printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
+    printColor "\n\n  REMOVING LINKS ONLY - VM CONTENT REMAINS AT REALPATH \n"
+  fi
+
+  vm_selector_init_common
+  i=0
+  ConnectedLinks=
+  while [[ ${VM_Array[$i,0]} ]] ; do
+    if [[ $1 == "$(basename "${VM_Array[$i,1]}" .conf)" ]] && [[ $(pwd) != "${VM_Array[$i,0]}" ]] &&\
+    stat "${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" | grep -q "symbolic"; then
+
+      LinkPathName="${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" 
+      TestPathName="$(stat -c %N "$LinkPathName" | cut -d '>' -f2 )"
+      TestPathName="${TestPathName/" '"/}"
+      TestPathName="${TestPathName/"'"/}"
+      if [[ $TestPathName == "$(pwd)/$1" ]]; then
+        printColor "\n\n  WARNING: connected VM LINKS have been found and they will also need deleting:"
+        printf "\n\n  >>>  %s\n" "$LinkPathName"
+        ConnectedLinks=1
+      fi
+    fi
+    ((i+=1))
+  done
+
+  printColor "\n\n  Folder: %s" "$1"
+  printColor "  &  File: %s  to be deleted?"  "$2"
+  if [[ $ConnectedLinks ]]; then
+    printf  "\n\n  TO DELETE THIS VM, removal of BOTH the above FOLDER/FILE and the CONNECTED LINKS is required."
+  else
+    printf  "\n\n  To delete this VM, removal of the above folder/file is sufficient."
+  fi
+  printf "\n\n  Select [n] to manually delete using a file manager, if there are certain files that you want to keep."
   printColor "\n\n\n  Folder content: \n\n"
   ls "$1"
 
@@ -334,7 +365,7 @@ list_current_folder_instance_names () {
   mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
   for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
 
-  printf "\n  Folders:   "
+  printf "\n  Containing:   "
   if [[ ! ${CurrentFolderNames[*]} ]]; then printColor " NONE FOUND \n\n" 
   else 
     printf "\n\n" 
@@ -361,23 +392,35 @@ move_rename_Selected_VM () {
 
   MoveFail=
   Move_VM_Option=
+  MvTargetIsLinked=
+
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+    printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
+    printColor "\n\n  DELETE LINKS and REMAKE instead - VM CONTENT REMAINS AT REALPATH \n"
+    MvTargetIsLinked=1
+  fi
 
   printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
   printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
-  printColor "\n\n  [r] to rename  [m] to move  "; printf "[b] to go back"   
+  printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder" 
+  printf "\n\n"
+  [[ ! $MvTargetIsLinked ]] && printColor "  [r] to rename  [m] to move  [ln] make symbolic links"
+  printf "  [b] to go back"   
   printf "\n\n"
   read -rp "  >  "   Move_VM_Option
 
-  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" ]]; then 
+  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" || $Move_VM_Option == "ln" ]]; then 
 
-    printf "\n  Folder '%s' & .conf file to be MOVED and edited"  "$1"
+    if [[ $Move_VM_Option == "ln" ]]; then MakeLinksOnly=1 ; else MakeLinksOnly= ; fi
+
+    printf "\n  Folder '%s' & .conf file to be MOVED and edited or Linked"  "$1"
     printf "\n\n  For new preset group folders, edit the main settings" 
-    printColor "\n\n  Current Folder: '%s'" "$(pwd)"
+    printf "\n\n  Current Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
 
     while true; do
-
+      
       printColor "\n\n  [number] select a different group folder "
       printf " [b] to go back\n\n"
       read -rp  "  >  "  Move_FolderOption
@@ -392,7 +435,8 @@ move_rename_Selected_VM () {
         [0-9]|[0-9][0-9]) 
           Mv_NewConf_Dir="${VM_Folder_List[Move_FolderOption]}" 
           if [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then  Move_FolderOption= 
-          else printf "\n  Selected: '%s'"  "$Mv_NewConf_Dir"  
+          else 
+            printf "\n\n  Selected: '%s' "  "$Mv_NewConf_Dir"  
           fi
           printColor "\n\n  [enter] to confirm " ; printf " [r] re-select \n\n"
           [[ $Move_FolderOption ]] && read -rp "  >  " Move_FolderOption
@@ -410,7 +454,7 @@ move_rename_Selected_VM () {
     Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
 
     Move_VM_Option="r"
-    if cd "$Mv_NewConf_Dir"; then printf "\n  Changing to folder '%s'\n"  "$Mv_NewConf_Dir"
+    if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
 
@@ -424,12 +468,12 @@ move_rename_Selected_VM () {
 
       Mv_NewName=
       CurrentFolderNameError=
-      printf "\n\n  Folder '%s' & .conf file to be RE-NAMED and edited"  "$1"
-      printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change"
+      printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
+      printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change  [ln] make link"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 
 
-      [[ ! $Mv_NewName || $Mv_NewName == "n" ]] && Mv_NewName="$VM_InstanceName"  && break
+      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName"  && break
       
       for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1; done
       if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break ; fi
@@ -440,6 +484,7 @@ move_rename_Selected_VM () {
 
     Mv_NewName_Return=
     if [[ $Mv_NewName != "$VM_InstanceName" ]]; then printf "\n\n  Renaming to '%s' " "$Mv_NewName"
+    elif [[ $MakeLinksOnly ]]; then  printf "\n\n  Making link to '%s' " "$VM_InstanceName"
     else printf "\n\n  Keeping old name '%s' " "$Mv_NewName"
     fi
     printColor "\n\n  [enter] to make this happen  [b] to go back \n\n"
@@ -448,22 +493,24 @@ move_rename_Selected_VM () {
     if [[ $Mv_NewName_Return ]]; then  
       Mv_NewName_Return= ; Move_VM_Option= ; Mv_NewName= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
     fi
-
-    if [[ $Mv_NewConf_Dir ]]; then 
-      mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
-      mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
-      set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
-    fi
-
-    if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
-
-      if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
-        mv "$1" "$Mv_NewName" || MoveFail=1
-        mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
+    if [[ $MakeLinksOnly ]]; then
+      if [[ $Mv_NewConf_Dir ]]; then 
+        ln -s "$Mv_OldFolderPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldFolderPath")" || MoveFail=1
+        ln -s "$Mv_OldConfPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldConfPath")" || MoveFail=1
       fi
-
-      if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
-
+    else
+      if [[ $Mv_NewConf_Dir ]]; then 
+        mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
+        mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
+        set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
+      fi
+      if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
+        if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
+          mv "$1" "$Mv_NewName" || MoveFail=1
+          mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
+        fi
+        if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
+      fi
     fi
   
   else  
@@ -767,17 +814,18 @@ iso_select_mount_and_boot () {
     IsoList=()
     mapfile -t IsoList <<< "$(ls "$VM_InstanceName"/*.iso 2>/dev/null)"
 
-    printColor "\n\n  ISO formated disk images should be copied into the individual VM folder"
+    printColor "\n\n  ISO formated disk images may be copied into the individual VM folder"
     printf "\n\n  One or more may be added.  If more than one, an ISO should be selected from the list."
     printf "\n\n  Current Quickemu code is retricted to one only to be present as mounted at a time."
 
     printf "\n\n\n  To boot from a selected ISO, press the 'esc' key when the start up screen appears."
     printf "\n\n  To auto-mount an ISO when the VM is selected, set 'fixed_iso=\"VM_InstanceName/name.iso\"' in the .conf file"
-    printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is required."
+    printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for partition management."
     printf "\n"
 
-    if [[ "$BootAlert" == *'New:'* || "$BootAlert" == *'Live:'*  ]]; then
-      printf "\n\n  CAUTION: You are already standard booting from ISO. A fixed drive doesn't yet exist"
+    if [[ $LiveBoot ]]; then
+      printf "\n\n  CAUTION: You are already standard booting from an ISO. "
+      printf "\n\n  The distro has not yet been installed to the disk."
     fi
 
     if [[ ! ${IsoList[*]} ]]; then 
@@ -789,14 +837,20 @@ iso_select_mount_and_boot () {
       print_quickget_and_folder_choices  IsoList
     fi
 
-    [[ $Mounted_ISO ]] && printColor "\n\n  %s  is currently mounted" "$Mounted_ISO"
+    if [[ $Mounted_ISO ]]; then printColor "\n\n  %s  is currently mounted" "$Mounted_ISO"
+    else printColor "\n\n  No ISO is currently mounted"
+    fi
 
     IsoSelect=
     printf "\n\n" 
-    if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
-    elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount " 
+    if [[ $LiveBoot ]]; then
+      printColor "  [b] to go back"
+    else
+      if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
+      elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount " 
+      fi
+      printf "  [b] to go back"
     fi
-    printf "  [b] to go back"
 
     printf "\n\n"
     read -rp "  >  "  IsoSelect

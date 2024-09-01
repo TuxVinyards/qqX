@@ -36,20 +36,18 @@ function_create_VM_folderList() {
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings:  Default Folder NOT found \n\n" ; sleep 1 ; DefaultFolderError=1 ; fi
   
   # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
-
   if [[ "$CurrentFolder" != "$Default_VM_Folder" ]] && [[ "$(ls "$CurrentFolder/"*.conf 2> /dev/null)" ]] ; then   
     declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
   else  declare -ga VM_Folder_List=("$Default_VM_Folder")
   fi
-
   for xF in "${Extra_VM_Folder[@]}"; do
-
-    [[ $xF ]] && VM_Folder_List+=("$xF")
-
-    [[ $xF ]] &&  [[ ! -d "$xF" ]] && ExtraFolderError="$xF"
-
+    ExtraExists="$(realpath -eq "/$xF")"
+    if [[ $ExtraExists ]] ; then VM_Folder_List+=("$xF")
+    else 
+      ExtraFolderError="$xF Path ERROR or Folder Not Yet Created" 
+      VM_Folder_List+=("PATH ERROR: $xF")
+    fi
   done
-
 }
 
 # Run the function & populate the list: 
@@ -83,6 +81,7 @@ function find_file_manager_browser()  {
       if [[ $(type -p caja) ]]; then  FileManager="caja"
       elif [[ $(type -p nautilus) ]]; then  FileManager="nautilus"
       elif [[ $(type -p dolphin) ]]; then  FileManager="dolphin"
+      elif [[ $(type -p thunar) ]]; then  FileManager="thunar"
       elif [[ $(type -p pcmanfm) ]]; then  FileManager="pcmanfm"
       elif [[ $(xdg-mime query default inode/directory) ]]; then  FileManager="xdg-open"
       else FileManager=
@@ -101,22 +100,20 @@ function find_file_manager_browser()  {
     if [[ ! $WebBrowser ]]; then
 
       WebBrowser="$(xdg-settings get default-web-browser)"
+      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web= ; fi
+      WebBrowser="${WebBrowser/'.desktop'/}"
 
-      if [[ $WebBrowser ]]; then
-
-        WebBrowser="${WebBrowser/'.desktop'/}"
-
-        if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
-        elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
-        elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
-        elif [[ $(xdg-settings get default-web-browser) ]]; then WebBrowser="xdg-open"
-        else WebBrowser=
-        fi
-
+      if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
+      elif [[ "$WebBrowser" == *'falkon'* ]]; then WebBrowser="falkon"
+      elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
+      elif [[ $(type -p falkon) ]]; then  WebBrowser="falkon"
+      elif [[ $(type -p midori) ]]; then  WebBrowser="midori"
+      elif [[ $XDG_Web ]]; then WebBrowser="xdg-open"
+      else WebBrowser=
       fi
 
     fi
-
+  
   fi
 
 }
@@ -129,20 +126,30 @@ OriginalPATH="$PATH"
 QE_SystemFilePath="$(type -p quickemu)"  
 QG_SystemFilePath="$(type -p quickget)"
 
+if [[ ! $QE_DevPath && $DevStart ]]; then QE_DevPath="$(realpath "./qqX.builtins/freespirit")" ; fi  
 
 function sort_qqX_builtin_settings {
 
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
   # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
 
+  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 1 :" &&  dev_loop_check
+
   export PATH="$OriginalPATH"
   QE_SourcePath=
   QG_SourcePath=
 
-  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -e "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
+  if [[ $CodingHotSwap ]]; then QE_SourceVersion="$CodingHotSwap" ; fi
+
+  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
-    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
-  fi        
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4 
+  fi  
+
+  if [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then 
+    printf "\n\n  ERROR - Dev Folder not found \n\n  Re-check Installation &/or Installation instructions" 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4
+  fi  
 
   if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "system" ]]; then 
     if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then 
@@ -155,6 +162,7 @@ function sort_qqX_builtin_settings {
       QG_SourcePath=
     fi
   fi
+
   if [[ ! $QE_SourceVersion ]] || [[ $QE_SourceVersion == "FreeBird" || $QE_SourceVersion == "Freebird" || $QE_SourceVersion == "freebird" ]]; then
     QE_SourceVersion="FreeBird"
     FreePath="$qqX_BuiltinsFolder/freebird"
@@ -219,6 +227,8 @@ function sort_qqX_builtin_settings {
     printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
   fi 
+
+  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 2 :" &&  dev_loop_check
 
 }
 
@@ -311,4 +321,25 @@ function qemu_version_check {
 
 qemu_version_check
 
+
+# How the Tiano BIOS/UEFI loads up:
+
+function store_bootmenu_defaults {
+  [[ ! $BootMenu ]] && BootMenu="fast"
+  [[ ! $BootMenuMsg ]] && BootMenuMsg="slow"
+  BootMenu_Default="$BootMenu"   
+  BootMenuMsg_Default="$BootMenuMsg"  
+}
+
+function reload_bootmenu_defaults {
+  BootMenu="$BootMenu_Default"   
+  BootMenuMsg="$BootMenuMsg_Default"  
+}
+
+function clear_bootmenu_vars {
+  BootMenu= ; BootMenu_Default=  
+  BootMenuMsg= ; BootMenuMsg_Default= 
+}
+
+store_bootmenu_defaults
 

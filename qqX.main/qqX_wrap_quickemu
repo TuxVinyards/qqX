@@ -27,12 +27,39 @@
 
 function system_code_check_and_warn {
 
-  if [[ ! $WarnedOnQE ]] && [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
-    printColor "\n\n  CAUTION Source Version '%s' : not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
-    printf "\n\n  The qqX builtins contain certain tweaks to enable process controls but in some places there are not only"
-    printf "\n\n  improvements, there are also fixes where qqX testing has revealed upstream errors yet to be sorted."
-    printf "\n\n\n  I understand the risks ...  [enter] to continue or to change version\n\n"
+  if [[ $CodingHotSwap == "System" && ! $QE_SystemFilePath ]]; then
+    printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH " 
+    printf "\n\n  See https://github.com/quickemu-project/quickemu for more details"
+    printf "\n\n  The 'official' given location is /usr/bin, as loose files, but others may be chosen ... "
+    printf "\n\n\n  The builtin 'Echo' is an older plain System version that may be selected, if wished."
+    printf " \n\n  Unless specified, qqX will default to using FreeBird."
+    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
+    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n\n  I understand the risks ...  [enter] to continue with FreeBird and/or re-select\n\n"
     read -rp "  >  "
+    CodingHotSwap="FreeBird"
+
+  elif [[ $CodingHotSwap == "Custom" && ! -d "$Default_VM_Folder/qqX.custom/QE.Custom"  ]]; then
+    printColor "\n\n  Custom files should be located as detailed in the general settings file." 
+    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
+    read -rp "  >  "
+    CodingHotSwap="FreeBird"
+
+  elif [[ $CodingHotSwap == "Dev" && ! $QE_DevPath ]]; then
+    printColor "\n\n  Dev path not present: This should be given in the general settings file." 
+    printf "\n\n  Alternatively, if started from a development or download folder, "
+    printf "\n\n  the current folder's FreeSpirit builtins will be auto-selected ...."
+    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
+    read -rp "  >  "
+    CodingHotSwap="FreeBird"
+
+  elif [[ ! $WarnedOnQE ]] && [[ $CodingHotSwap == "System" || $CodingHotSwap == "Echo" ]]; then
+    printColor "\n\n  CAUTION Source Version '%s' \n\n  Not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
+    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
+    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n\n  I understand the risks ...  [enter] to continue   [f] to select FreeBird\n\n"
+    read -rp "  >  "  WarnedOnQE
+    [[ $WarnedOnQE ]] && CodingHotSwap="FreeBird"
     WarnedOnQE=1
   fi
 }
@@ -42,7 +69,7 @@ function find_quickemu_source_functions_and_vars {
 
   ## Load the right version of quickemu  (from settings)
 
-  [[ $SettingsFileAdjusted ]] && sort_qqX_builtin_settings
+  [[ $SettingsFileAdjusted || $CodingHotSwap ]] && sort_qqX_builtin_settings
 
   if [[ ! -e "$QE_SourcePath" ]] ; then
     printColor  "\n\n  ERROR  Settings or Installation FilePath  QUICKEMU not found \n\n  Path = ' %s'"  "$QE_SourcePath"
@@ -233,20 +260,24 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     if [[ $SecondDriveArgs ]]; then 
       printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
-      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile"
+      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile" 
     fi
 
-    if [[ $tpm == "on" ]]; then 
-      printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
-      printf "\n\n  %s  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsShortFile"
+    if [[ $NoSmartcardSupport ]]; then  { 
+      printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: "
+      printf "\n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" 
+      } | tee -a "$QemuArgsFile" &> /dev/null
+    fi
+
+    if [[ $BootMenu == "slow" ]]; then BootMenuCmd=" -boot menu=on " ; else BootMenuCmd=" -boot menu=off " ; fi
+    printf "\n\n %s " "$BootMenuCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+
+    if [[ $secureboot == "on" ]]; then 
+      printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
     else    
-      printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+      printf "\n\n  Secure Boot:  Not Set \n\n\n" >> "$QemuArgsFile"
     fi
 
-    printf "\n\n\n" >> "$QemuArgsShortFile"
-
-    [[ $NoSmartcardSupport ]] && printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: \n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" >> "$QemuArgsFile"
-    printf "\n\n\n"  >> "$QemuArgsFile"
 
     if [[ $VerboseArgs ]]; then 
       # hold the launch till we have checked the config 
@@ -284,8 +315,6 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     [[ ! -e "$QemuArgsFile" ]] && printColor "\n\n  ERROR QemuArgsFile %s failed to create \n\n"  "$QemuArgsFile" && sleep 3 && exit 1
     [[ ! -e "$QemuVirtHardwareRecord" ]]  &&  cp "$QemuArgsFile"  "$QemuVirtHardwareRecord"
-
-    if [[ $HideBootMenu ]]; then BootMenuCmd= ; else BootMenuCmd=" -boot menu=on " ; fi
 
     if [[ $UseCustomBootArgs ]]; then
 
@@ -366,7 +395,7 @@ function refresh_and_load_quickemu_sources {
   find_quick_version_numbers
   qemu_version_check
   clear_custom_boot_vars
-
+  
 }
 
 

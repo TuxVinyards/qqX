@@ -42,15 +42,24 @@ else
 
       printf  "  [u]  show utils & technical"
 
+      if [[ ! $LiveBoot ]]; then  # REVIEW show all?
+        if [[ $BootMenu == "fast" ]]; then printf "   (fastboot)"
+        else  printf "   (bootmenu options active)"
+        fi
+      fi
+
     else
 
-      printf "   [del] delete selected VM   [mv] move or rename"
+      printf "   [del] delete selected VM   [mv] move, rename or link"
       printColor  "    [u]   hide utils & technical"
       printColor "\n\n  ---------------------------------------------------------------------------- \n"
       printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
       printf "\n\n  [2c] create [2d] delete a second virtual hard-drive  [3] create shared drive "
-      printf "\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n"
 
+      printf "\n\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] "
+      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
+
+      printf "\n"
       if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
       else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	
       fi
@@ -60,14 +69,16 @@ else
       else printf "\n\n  [cc]  create a custom boot file "
       fi
       printf "  [iso] mount iso / boot from iso"
-
-      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help "
+      if [[ ! $LiveBoot ]]; then
+        if [[ $BootMenu == "fast" ]]; then printf "   [bm] show bios bootmenu"
+        else printf "   [fb] hide bios bootmenu "
+        fi
+      fi
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
       printColor "\n\n  ---------------------------------------------------------------------------- "
 
     fi
-
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
     printf "\n"
 
@@ -154,7 +165,7 @@ else
     if [[ -f "$VM_InstanceName/rtv.date.txt" ]]; then
 
       SyncDateNow="$(date +%s)"
-      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt")"
+      SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt" 2>/dev/null)"
       LastRtvUpd="$((SyncDateNow - SyncDateOld))"
 
       if [[ $RtvManualOnly ]]; then 
@@ -175,7 +186,7 @@ else
           printf "\n\n  Tiano Core Security Updates .....  "
           refresh_tiano_vars &
           wait "$!" 
-          RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log")"
+          RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log" 2>/dev/null)"
           [[ $RtvMacGet == "Okay" ]] && printf "All Good"
           [[ $RtvMacGet == "Fail" ]] && printColor "\n\n  Failed to update. See rtv logs in the VM folder ...."
 
@@ -220,7 +231,7 @@ else
         if [[ -f "$VM_InstanceName/zsync.date.txt" ]]; then
 
           SyncDateNow="$(date +%s)"
-          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt")"
+          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt" 2>/dev/null)"
           LastZsync="$((SyncDateNow - SyncDateOld))"
 
           printf "\n\n"
@@ -275,7 +286,7 @@ else
 
     fi
     
-    printf  "\n\n  [h]   show help & info   [set] open settings file in text editor   [conf] view or edit .conf file"
+    printf  "\n\n  [set] open settings file in text editor  [tx] translate settings in browser  [conf] view or edit .conf file"
     printf  "\n\n"
 
     if [[ $qqX_UpdaterPID ]]; then
@@ -290,7 +301,25 @@ else
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s " "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
-    printf  "  [enter] refresh    [q] quit \n\n"
+    if  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
+        # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
+      if [[ $VM_InstanceName == "ubuntu-"[0-9]* ]]; then  DistroHomePage="https://ubuntu.com/"
+      else
+        # first listing, some may have two
+        QGW_OS_Info="$(grep "${VM_InstanceName%%-*})" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+        QGW_OS_Info="${QGW_OS_Info//';;'/}"
+        QGW_OS_Info="${QGW_OS_Info//'"'/}"
+
+        QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+        mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+        DistroHomePage="${QGW_OS_Info_ARR[2]}"
+      fi
+    else DistroHomePage=
+    fi
+
+    printf  "  [enter] refresh   "
+    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
+    printf " [h] show help & info  [q] quit \n\n"
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }

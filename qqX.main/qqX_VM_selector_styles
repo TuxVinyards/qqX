@@ -44,10 +44,10 @@ function_vm_folder_item_text () {
 
   [[ "$ArrayConf_Item_Listing" == 'windows'* ]] || [[ "$ArrayConf_Item_Listing" == 'macos'* ]] && MSR_DistrosFound=1
 
-  [[ ${#ArrayConf_Item_Listing} -gt "24" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:24}"
+  # item max display length
+  [[ ${#ArrayConf_Item_Listing} -gt "22" ]] &&  ArrayConf_Item_Listing="${ArrayConf_Item_Listing:0:22}"
 
-  ## Decide on item text to print
-
+  ## Decide on suffix (if needed)
   QcowTarget=
   QcowTarget="$(grep -s 'disk_img' "$ArrayConf_Item" )"   
   QcowTarget="${QcowTarget/'disk_img='/}"  
@@ -56,7 +56,11 @@ function_vm_folder_item_text () {
   # Newly downloaded VMs will have a qcow disk path in the .conf file 
   # BUT the disk won't be be there yet, not until quickemu has done a first run against the .conf
 
-  if [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
+  if [[ $ArrayConf_Item_Listing == "empty" ]]; then
+
+    ArrayConf_Item_Listing="EMPTY FOLDER or Bad Path"
+
+  elif [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
 
     ArrayConf_Item_Listing+=" (new)"
 

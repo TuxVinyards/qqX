@@ -24,12 +24,36 @@ function  main_menu_actions {
 
     show_qqX_general_help
 
+  elif [[ $MainMenuChoice == "tx" ]]; then 
+
+    printf "\n\n  Google Chrome or Microsoft Edge are Recommended"
+    printf "\n\n  For General notes on translation see: \n\n  https://github.com/TuxVinyards/qqX/wiki/Translation"
+    printColor "\n\n  [enter] to translate settings using %s  [b] to go back "  "$WebBrowser"
+    printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
+    read -rp "  >  "  TxSetCode
+    if [[ ! $TxSetCode ]]; then
+      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/blob/main/qqX_settings"  & 
+    else
+      TxSetCode= ; return
+    fi
+
+  elif [[ $MainMenuChoice == "w" ]]; then 
+
+    printf "\n\n  HomePage = %s" "$DistroHomePage"
+    printColor "\n\n  [enter] to load in browser  [b] to go back \n\n"
+    read -rp "  >  "  LoadHomePage
+    if [[ ! $LoadHomePage ]]; then
+      nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & 
+    else
+      LoadHomePage= ; return
+    fi
+
   elif [[ $MainMenuChoice == "del" ]]; then 
 
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
 
-  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" ]]; then 
+  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" || $MainMenuChoice == "ln" ]]; then 
 
     move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
@@ -68,13 +92,13 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "rtv" ]] ; then RunRtvCheck=1 ; refresh_tiano_vars ; RunRtvCheck=
 
-  elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
-  elif [[ $MainMenuChoice == "FB"   ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "HB"   ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Ech"  ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Sys"  ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Dev"  ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays 
+  elif [[ $MainMenuChoice == "FB"   ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "HB"   ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Ech" || $MainMenuChoice == "ech" ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Sys" || $MainMenuChoice == "sys" ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Cust" || $MainMenuChoice == "cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Dev" || $MainMenuChoice == "dev" ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
@@ -92,14 +116,14 @@ function  main_menu_actions {
 
     read -rp "  >  "  QL_LogView
 
-    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:") && QemuErrorAlert=
+    [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:" "usb_desc_get_descriptor") && QemuErrorAlert=
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
-  elif [[ $MainMenuChoice == "conf" ]] ; then qqX_edit_settings  conf
+  elif [[ $MainMenuChoice == "conf" ]] ; then  qqX_edit_settings  conf 
 
   elif [[ $MainMenuChoice == "ce" ]] ; then qqX_edit_settings  custom
 
@@ -109,17 +133,37 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "iso" ]] ; then iso_select_mount_and_boot
 
+  elif [[ $MainMenuChoice == "fb" || $MainMenuChoice == "bm" ]] ; then 
+  
+    if [[ $BootMenu == "fast" ]]; then  BootMenu="slow" ; BootMenuMsg="slow"
+    elif [[ $BootMenu == "slow" ]]; then  BootMenu="fast" ; BootMenuMsg="fast"
+    fi
+
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
 
-  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_File" 
+  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" 
 
-  elif [[ $MainMenuChoice == "gt" ]] ; then  function_quick_get_wrap 
+  elif [[ $MainMenuChoice == "gt" ]] ; then  
+  
+    # see "vm" option
+    source "$ConfClearanceLog"
+    VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+    QemuErrorLog=
+    MainDrive=
+    Mounted_ISO=
+    IsoImg=
+    QemuArgsCustomFile=
+    #clear, then load defaults
+    reload_bootmenu_defaults
+    cd "$Default_VM_Folder" || DefaultFolderError=1
+    function_quick_get_wrap 
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then MainMenuZsync=1 ; function_quick_get_wrap
     else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
     fi
+    refresh_conf_vars_and_values
 
   elif [[ $MainMenuChoice == "m" ]] ; then KVM_MSR_selector_LoadHelp=1 ; select_msr_config
 
@@ -203,10 +247,16 @@ function  main_menu_actions {
 
     drives_and_snapshots  info
 
-    printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-    printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
+    if [[ $LiveBoot ]]; then 
+      printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
+      printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
+    else
+      printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
+      printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
+    fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
-      printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
+      [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
+      printf "\n\n  [enter] to return to menu \n\n"
     else printColor "\n\n  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  
 
@@ -219,7 +269,7 @@ function  main_menu_actions {
 
     drives_and_snapshots
 
-    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
+    if [[ $SharedDriveArgs && $SecondDriveArgs ]]; then 
       printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
     else printColor "  [enter] to return to menu \n\n" ; fi
     read -rp "  >  "  
@@ -290,6 +340,7 @@ function  main_menu_actions {
   
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
+    # also see "gt" option
     ByPass_VM_Array_Selector=
     ByPass_VM_Array_Loader=
     VM_Conf_Dir=
@@ -341,15 +392,18 @@ function  main_menu_actions {
 
   else
 
-    # refresh
+    # the [enter] to refresh option:
     MainMenuChoice=
     ShowUtilsMenu=
+    VM_ExecBoot=
     refresh_and_load_quickemu_sources
     refresh_conf_vars_and_values
+    ConfSettingsAdjusted=1
 
   fi
 
   [[ $MainMenuChoice != "u" ]] && ShowUtilsMenu=
+  VM_ExecBoot=
 
 }
 

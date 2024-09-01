@@ -10,7 +10,7 @@ function ignore_msrs_always() {
     # Make sure the host has /etc/modprobe.d
     if [ -d /etc/modprobe.d ]; then
         # Skip if ignore_msrs is already enabled, assumes initramfs has been rebuilt
-        if grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
+        if ! grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
             echo "options kvm ignore_msrs=Y" | sudo tee /etc/modprobe.d/kvm-quickemu.conf
             sudo update-initramfs -k all -u
         fi
@@ -322,6 +322,10 @@ function configure_cpu() {
     HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
+
+    if [ "${HOST_CPU_SOCKETS}" = "-" ]; then
+        HOST_CPU_SOCKETS=1
+    fi
 
     CPU_MODEL="host"
     QEMU_ACCEL="tcg"
@@ -1180,7 +1184,9 @@ function configure_file_sharing() {
         fi
 
         # SMB
-        if [ -x "$(command -v smbd)" ]; then
+        # We need to search in NixOS compatible paths as well as the standard location
+        # since /usr/sbin/smbd may not be in the PATH.
+        if [ -x "$(command -v smbd)" ] || [ -x "/usr/sbin/smbd" ]; then
             NET+=",smb=${PUBLIC}"
             echo " - smbd:     On guest: smb://10.0.2.4/qemu"
         fi
@@ -1285,8 +1291,15 @@ function vm_boot() {
     args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
-        -rtc base=localtime,clock=host,driftfix=slew
         -pidfile "${VMDIR}/${VMNAME}.pid")
+
+    if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ] || [ "${guest_os}" == "reactos" ] || [ "${guest_os}" == "freedos" ]; then
+        # shellcheck disable=SC2054
+        args+=(-rtc base=localtime,clock=host,driftfix=slew)
+    else
+        # shellcheck disable=SC2054
+        args+=(-rtc base=utc,clock=host)
+    fi
 
     # shellcheck disable=SC2206
     args+=(${VIDEO} -display ${DISPLAY_RENDER})
@@ -1987,7 +2000,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.6.02"
+readonly VERSION="FS 4.9.6.05"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"

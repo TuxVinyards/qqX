@@ -10,7 +10,7 @@ quick_report() {
         PRETTY_NAME="Unknown OS"
     fi
 
-    if command -v quickemu &> /dev/null; then
+    if type -p quickemu &> /dev/null; then
         VERSION=$(quickemu --version)
         echo \
 "----------------------------------
@@ -39,7 +39,7 @@ quick_report() {
         exit 1
     fi
 
-    if command -v curl &> /dev/null; then
+    if type -p curl &> /dev/null; then
         VERSION=$(curl --version)
         echo \
 "----------------------------------
@@ -55,7 +55,7 @@ quick_report() {
 ----------------------------------"
     fi
 
-    if command -v qemu-system-"$(uname -m)" &> /dev/null; then
+    if type -p qemu-system-"$(uname -m)" &> /dev/null; then
         VERSION=$(qemu-system-"$(uname -m)" -version | head -1 | cut -d' ' -f4)
         echo \
 "----------------------------------
