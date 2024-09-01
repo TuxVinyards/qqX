@@ -106,42 +106,7 @@ function  update_old_settings_file_with_new_options {
   if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_OLD_BaseNameSettings > "/tmp/qDevSet_OldBaseNameArr.txt" ; fi
 
 
-  ## 2: TEMPLATE  FILE  (from the new release)   
-
-  # A. find & store all the one-line *settings*
-  mapfile -t GrepArr_TEMPLATE_OneLine_Settings  <<< "$(grep '=' "$Template_SettingsFile" | grep -v '#')"
-
-  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Template PreParse"; declare -p GrepArr_TEMPLATE_OneLine_Settings ; echo ; fi
-  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_TEMPLATE_OneLine_Settings > "/tmp/qDevSet_TemplateArr_PreParse.txt" ;fi
-
-  # B. remove all the folder entries, to be replaced with older ones, if they exist ...
-  for i in "${!GrepArr_TEMPLATE_OneLine_Settings[@]}"; do
-
-    case "${GrepArr_TEMPLATE_OneLine_Settings[i]}" in
-      
-      *'VM_Array['*)  
-        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
-        ;;
-      
-      *'Extra_VM_Folder+='*)  
-        unset "GrepArr_TEMPLATE_OneLine_Settings[i]"  
-        ;;
-      
-    esac
-
-  done	
-
-  # Re-index, as previous in section 1
-  GrepArr_TEMPLATE_OneLine_Settings=("${GrepArr_TEMPLATE_OneLine_Settings[@]}")
-
-  if [[ $DevSetUpdArrOutputScrn ]]; then  echo "Template PostParse"; declare -p GrepArr_TEMPLATE_OneLine_Settings ; echo ; fi
-  if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_TEMPLATE_OneLine_Settings > "/tmp/qDevSet_TemplateArr_PostParse.txt" ; fi
-
-
-  ## 3: NEW FILE OUTPUT 
-  
-  # The template file with it's possibly new added sections or changed notes 
-  # but with any officially recognised old customised settings  (custom entries are separate)
+  ## 2: NEW FILE OUTPUT 
 
   ## A. Make a backup to the installer folder (& check that it is a faithful copy)
   # Dev: move to trash to stop clutter.
