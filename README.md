@@ -132,7 +132,7 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
 
-  - Users still on version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. Use the installer/updater ....
+  - Users still on version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
 
 ### Reliability
 
