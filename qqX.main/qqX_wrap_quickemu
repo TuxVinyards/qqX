@@ -41,16 +41,15 @@ function system_code_check_and_warn {
 
   elif [[ $CodingHotSwap == "Custom" && ! -d "$Default_VM_Folder/qqX.custom/QE.Custom"  ]]; then
     printColor "\n\n  Custom files should be located as detailed in the general settings file." 
-    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
+    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
   elif [[ $CodingHotSwap == "Dev" && ! $QE_DevPath ]]; then
-    printColor "\n\n  A Dev path should be given in the general settings file." 
-    printf "\n\n  Unless qqX is started from a development or download folder, "
-    printf "\n\n  in which case the current folder's FreeSpirit builtins will be auto-selected"
-    printf "\n\n  if the variable 'QE_DevPath' has not been set."
-    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
+    printColor "\n\n  Dev path not present: This should be given in the general settings file." 
+    printf "\n\n  Alternatively, if started from a development or download folder, "
+    printf "\n\n  the current folder's FreeSpirit builtins will be auto-selected ...."
+    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 

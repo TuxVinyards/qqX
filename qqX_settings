@@ -35,7 +35,6 @@ Extra_VM_Folder+=("")
 #  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 X_Shade="3" 
 
-
 ## Other SETTINGS SECTIONS AVAILABLE:
 
   #  'QUICKEMU' & 'QUICKGET'  SOURCE
@@ -59,13 +58,16 @@ VM_SelectorStyle="A"
 
 # OPTIONAL: select VM's to show AT THE TOP of the list
 
-# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file  eg:
+# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file  
 
-# VM_Array[0,0]="/media/xxx/Storage/VMQs" ; VM_Array[0,1]="windows-11.conf"
+# eg:
 
-# VM_Array[1,0]="/media/xxx/Storage/VMQs/MAC" ; VM_Array[1,1]="macos-catalina.conf"
+# VM_Array[0,0]="$Default_VM_Folder" ; VM_Array[0,1]="windows-11.conf"
 
-# VM_Array[2,0]="$Default_VM_Folder" ; VM_Array[2,1]="windows-insider.conf"
+# VM_Array[1,0]="$Default_VM_Folder/MAC" ; VM_Array[1,1]="macos-catalina.conf"
+
+# VM_Array[2,0]="/media/xxx/Storage/VMQs" ; VM_Array[2,1]="windows-insider.conf"
+
 
 # ADD here. Make sure to remove the '#' in order to activate the line.
 
@@ -75,8 +77,8 @@ VM_SelectorStyle="A"
 
 # VM_Array[2,0]= ; VM_Array[2,1]=
 
-# MUST BE set as CONTIGIUOUS, non-sparse 
-# ie. no numeric sequence gaps when counting the first number of each pair on each line in order...
+# MUST BE set as CONTIGIUOUS, non-sparse, no numeric sequence gaps  
+# ie:  0, 1, 2, 3 ...  when counting the first number of the first pair, on each line
 # COMMENT OUT with # any Non-Present VM entries 
 
 
@@ -382,11 +384,13 @@ VM_SelectorStyle="A"
 # Place 'Custom' scripts in a 'QE.Custom' sub-folder to "$Default_VM_Folder/qqX.custom" in a similar manner
 # to that used for FreeBird. This preset path will be auto-checked.
 
-# For 'Dev' give full path of your Quickemu source clone here. QE_SourceVersion may be set above or here as an overwrite.
+# For 'Dev' give full path of your Quickemu source clone here, "$HOME/Files/myClone"
 # QE_DevPath may be left set. This path will only be used if Version is set to 'Dev'
+  QE_DevPath=
 
-  #QE_SourceVersion="Dev"
-  #QE_DevPath="~/Files/myClone"
+# QE_SourceVersion may also be set here as a temporary overwrite to the main settings at the top of the script.
+# This will get reset here, if doing a settings update ... 
+# QE_SourceVersion="Dev"
 
 # Inside the folder, all script names should be as standard. Plus, add all ancilliary scripts, such as macrecovery/chunkcheck etc.
 # qqX will select this folder and will also add it to '$PATH' to make sure the correct ancilliaries are found.

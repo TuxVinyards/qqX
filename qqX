@@ -52,7 +52,7 @@ if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then 
 NoClear=
 GeneralLoopCheck=
 # Dev Start if starting qqX directly from a source folder i.e "./"  Used as flag to show which source is being used.
-if [[ -d "./qqX.builtins" ]]; then DevStart=1 ; else DevStart= ; fi
+if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
 function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
