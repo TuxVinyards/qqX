@@ -262,7 +262,7 @@ function csv_data() {
     local HAS_ZSYNC=0
 
     # Check if zsync is available
-    if type -p zsync &>/dev/null; then
+    if command -v zsync &>/dev/null; then
         HAS_ZSYNC=1
     fi
 
@@ -787,7 +787,7 @@ function releases_linuxlite() {
 }
 
 function releases_linuxmint() {
-    echo 21.3 21.2 21.1 21 20.3 20.2
+    echo 22 21.3 21.2 21.1 21 20.3 20.2
 }
 
 function editions_linuxmint() {
@@ -875,7 +875,7 @@ function editions_openindiana() {
 
 function releases_opensuse() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
+    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) aeon microos tumbleweed
 }
 
 function releases_oraclelinux() {
@@ -996,12 +996,7 @@ function releases_sparkylinux() {
 
 function editions_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    if [ -z "${RELEASE}" ]; then
-        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
-    else
-        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
-    fi
-    
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
 }
 
 function releases_spirallinux() {
@@ -1260,7 +1255,7 @@ function zsync_get() {
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
-    elif type -p zsync &>/dev/null; then
+    elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
         else
@@ -1463,8 +1458,8 @@ EOF
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
         fi
 
-        # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == "11" ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
+        # Enable TPM for Windows 11 and Windows Server 2022
+        if [[ "${OS}" == "windows" && "${RELEASE}" == "11" || "${OS}" == "windows-server" && "${RELEASE}" == "2022" ]]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
@@ -2016,20 +2011,20 @@ function get_macos() {
     CWD="$(dirname "${0}")"
     if [ -x "${CWD}/chunkcheck" ]; then
         CHUNKCHECK="${CWD}/chunkcheck"
-    elif [ -x "$(type -p chunkcheck)" ]; then
-        CHUNKCHECK="$(type -p chunkcheck)"
+    elif [ -x "$(command -v chunkcheck)" ]; then
+        CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
     appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
-                           -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+                           -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
     info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" \
                            -b "session=\"${appleSession}\"" \
                            -H "Content-Type: text/plain" \
                            -d $'cid='"$(generate_id 16)"$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='"$(generate_id 64)"$'\nfg='"$(generate_id 64)"$'\nos='${OS_TYPE} \
-                           http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+                           https://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
     downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
     downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
     chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
@@ -2210,6 +2205,9 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
+    elif [ "${RELEASE}" == "aeon" ]; then
+        ISO="opensuse-aeon.x86_64.iso"
+        URL="https://mirrorcache.opensuse.org/tumbleweed/appliances/iso"
     elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
@@ -3428,10 +3426,10 @@ function create_config() {
     make_vm_config "${INPUT}" "${FIXED_ISO}"
 }
 
-# Use type -p command to check if quickemu is in the system's PATH and
+# Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
 function resolve_quickemu() {   
-    type -p quickemu || \
+    command -v quickemu || \
     if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
@@ -3464,7 +3462,7 @@ Advanced usage:
 
 Arguments:
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
@@ -3494,14 +3492,14 @@ fi
 QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
-CURL=$(type -p curl)
+CURL=$(command -v curl)
 if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
-QEMU_IMG=$(type -p qemu-img)
+QEMU_IMG=$(command -v qemu-img)
 if [ ! -x "${QEMU_IMG}" ]; then
     echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
     exit 1
@@ -3535,7 +3533,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.6.04"
+        echo "FS 4.9.6.05"
         exit 0;;
     --help|-help|--h|-h)
         help_message
