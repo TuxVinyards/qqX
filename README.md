@@ -8,15 +8,27 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.9.03](#release-notes)
+## [Latest release 1.10.01](#release-notes)
 
-Further updates and consolidates the raft of tweaks and adjustments to the new Quickemu code.
+Large code update with lots of new features and Quickemu improvements.
 
-MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and the qqX built-ins can now be hot-swapped.
+- MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and Windows languages are now sorted.
 
-Adds option to boot from ISO for disk management and makes custom boot files easier.
+The qqX coding hot-swap has been refined and FreeSpirit has the latest updates and community PR's.
 
-- 1.9.04 is now pre-release downloadable
+- qX's quickget now lets you scroll backwards and forwards between the diifferent distro info pages.
+
+  You can also scroll up and down between releases and editions and swap around your choices.
+
+- The downloader tells you the download size and checks the link for viability.
+
+- The option to boot from ISO for disk management has been further polished
+
+  and you can now create sym-linked instances between folders too ...
+
+An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
+
+- More in the release notes and wiki to follow in the next few days
 
 ### Simple and Straightforward
 
@@ -102,21 +114,29 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 ## Release notes
 
-- @ Aug 12: the next release should be finalized before long. This adds Windows languages and improved distro editions selection.
-  Other features also include being able scroll through the distro info pages, and from any given start point. And finally some control over boot management and being able to select whether we boot from the virtual hard drive or from the ISO. Very useful for partition management and disk maintenance.
+- @ Sept 1 - Version 1.10.01  
 
-- Next release, [1.9.04](https://github.com/TuxVinyards/qqX/commits/1.9.04/)  is currently usable but there are one or two i's to dot and t's to cross. The few little fixes needed for XFCE have been done.  Testing was also carried out on Solus following a Discord [request](https://discord.com/channels/712850672223125565/739446818252783647/1271221009478975488) for help ...  See the installer notes.
+  - Adds Windows languages and sorts the Quickemu problems too. You can now download French, not just 'French Canadian' for example.
+  
+  - There's an improved distro editions selection mechanism which allows you to scroll up and down between releases and editions, depending on what you find and how you decide.
 
-- Given that 1.9.04 also contains a few bug fixes, not just new features, it will probably be numbered as 1.9.05 or 1.10.01 when released so that anyone wanting to upgrade now doesn't miss out on the update messages.  Also 1.9.03 can be installed as a downgrade if needed ...
+- Other features also include being able scroll through the distro info pages, and from any given start point.
+  
+- And finally some control over boot management and being able to select whether we boot from the virtual hard drive or from the ISO. Very useful for partition management and disk maintenance.
 
-- 1.9.04 is currently downloadable [here](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.9.04.zip)
+- You can now organize folders by various categories. The _same_ machine can now be listed in two or three folders at once. All by the magic of 'symbolic links'.  Expect a wiki page shortly to explain in full detail.
 
-- The github changes behind the wget 302 / SHA error now has a fix in place.
-  Users wanting to update version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly.
+  - The ability to download any given Linux ISO and install it, has had a make over as well.
+
+- This release has had extra extensive testing, ranging from the slickness of 'Garuda Dr460nized' to the lightness of LXQT
+
+- FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
+
+  - Users still on version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. Use the installer/updater ....
 
 ### Reliability
 
-- Testing is always carried out on a variety of mainstream distros before release.
+- Testing is always carried out on a variety of mainstream distros before release. (more so on 1.10)
 
 - All scripts are carefully Shellcheck linted & have full error handling routines.
 
