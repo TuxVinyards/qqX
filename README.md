@@ -32,13 +32,13 @@ An extended testing program has now added extra handling routines for KDE 6, XFC
 
 ### Simple and Straightforward
 
-- A complete menu system within a unique hybrid interface.
+- A complete menu system within a unique Linux hybrid interface.
 
-- Browse, download, install and organise countless distros
+- Simple list browse, download, and organise countless distros
 
-- Run integrated and Windows and MacOS set ups
+- Easy install Virtual Linux, Windows and MacOS. Plus others.
 
-- Explore multiple display modes, utilities, optimizers and tools
+- Multiple display modes, utilities, optimizers and tools
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
@@ -98,27 +98,21 @@ Whilst earlier releases added:
 
 Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
-- From version 1.8 onwards, the installation of quickemu is not essential. However, the easiest route to installing all the necessary components and dependencies is to just follow the standard Quickemu setup, as in the instructions on the [quickemu-project pages](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
-
-  In the case of some host distros, such as Fedora, manual installation of quickemu to 'PATH' may now be omitted.
-
-  qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
-
-- Download qqX. The latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest). You can also make your first download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
+- From version 1.8 onwards, the installation of quickemu is not essential but qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
 
   Normal [Filesystem_Hierarchy_Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) Linux is generally expected.
 
   No further software, support structures or dependencies should be needed.
 
-See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
+- See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 ## Release notes
 
 - @ Sept 1 - Version 1.10.01  
 
-  - Adds Windows languages and sorts the Quickemu problems too. You can now download French, not just 'French Canadian' for example.
+- Adds Windows languages and sorts the Quickemu problems too. You can now download French, not just 'French Canadian' for example.
   
-  - There's an improved distro editions selection mechanism which allows you to scroll up and down between releases and editions, depending on what you find and how you decide.
+- There's an improved distro editions selection mechanism which allows you to scroll up and down between releases and editions, depending on what you find and how you decide.
 
 - Other features also include being able scroll through the distro info pages, and from any given start point.
   
@@ -126,13 +120,16 @@ See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 
 - You can now organize folders by various categories. The _same_ machine can now be listed in two or three folders at once. All by the magic of 'symbolic links'.  Expect a wiki page shortly to explain in full detail.
 
-  - The ability to download any given Linux ISO and install it, has had a make over as well.
+- The ability to download any given Linux ISO and install it, has had a make over as well.
 
 - This release has had extra extensive testing, ranging from the slickness of 'Garuda Dr460nized' to the lightness of LXQT
 
 - FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
 
-  - Users still on version 1.8.04 and previous should download [the latest release](<https://github.com/TuxVinyards/qqX/releases/latest>) directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
+- Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
+
+- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
+
 
 ### Reliability
 
