@@ -12,23 +12,23 @@
 
 Large code update with lots of new features and Quickemu improvements.
 
+An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
+
 - MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and Windows languages are now sorted.
 
-The qqX coding hot-swap has been refined and FreeSpirit has the latest updates and community PR's.
+- The qqX coding hot-swap has been refined and FreeSpirit has the latest updates and community PR's.
 
 - qqX's quickget now lets you scroll backwards and forwards between the different distro info pages.
 
-  You can also scroll up and down between releases and editions and swap around your choices.
+- You can also scroll up and down between releases and editions and swap around your choices.
 
 - The downloader tells you the download size and checks the link for viability.
 
 - The option to boot from ISO for disk management has been further polished
 
-  and you can now create sym-linked instances between folders too ...
+- Folders can now be sym-linked between each other to help organize.
 
-An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
-
-- More in the [release notes](#release-notes) and wiki to follow in the next few days
+More in the [release notes](#release-notes) and wiki to follow in the next few days
 
 ### Simple and Straightforward
 
@@ -129,7 +129,6 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
 
 - The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
-
 
 ### Reliability
 
