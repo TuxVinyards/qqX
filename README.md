@@ -26,7 +26,7 @@ An extended testing program has now added extra handling routines for KDE 6, XFC
 
 - The option to boot from ISO for disk management has been further polished
 
-- Folders can now be sym-linked between each other to help organize.
+- [Folders](https://github.com/TuxVinyards/qqX/wiki/Folders-and-Organisation) can now be sym-linked between each other to help organize.
 
 More in the [release notes](#release-notes) and wiki to follow in the next few days
 
