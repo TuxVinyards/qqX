@@ -527,8 +527,8 @@ function create_new_drives {
         
           elif [[ $MainMenuChoice == "3" ]]; then
 
+            [[ ! -d "$Default_VM_Folder/SharedDrive" ]] && mkdir "$Default_VM_Folder/SharedDrive"
             "$QEMU_IMG"  create -q -f qcow2 "$Default_VM_Folder/SharedDrive/shared.qcow2" "${SecondDriveCreateSize}G"
-
             [[ -e "$Default_VM_Folder/SharedDrive//shared.qcow2" ]] && DriveCreated=3
 
             # 'sed' can get very HIEROGLYPHICAL  https://stackoverflow.com/a/9453461

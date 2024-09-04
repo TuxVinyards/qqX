@@ -92,7 +92,10 @@ check_for_qqX_updates() {
     [[ ${#qqX_LatestVer_Arr[1]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[1] "%.2d" "${qqX_LatestVer_Arr[1]}"
     [[ ${#qqX_LatestVer_Arr[2]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[2] "%.2d" "${qqX_LatestVer_Arr[2]}"
 
-    #legacy 3dp pre "0.09.00.017"
+    # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
+    # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
+
+    # legacy 3dp pre "0.09.00.017"
 
     [[ ${#qqX_LatestVer_Arr[3]} -gt 2 ]] && qqX_LatestVer_Arr[3]="${qqX_LatestVer_Arr[3]:(-2)}"
     [[ ${#qqX_LatestVer_Arr[3]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[3] "%.2d" "${qqX_LatestVer_Arr[3]}"
