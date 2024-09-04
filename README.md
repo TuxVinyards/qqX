@@ -28,7 +28,7 @@ An extended testing program has now added extra handling routines for KDE 6, XFC
 
 - [Folders](https://github.com/TuxVinyards/qqX/wiki/Folders-and-Organisation) can now be sym-linked between each other to help organize.
 
-More in the [release notes](#release-notes) and wiki to follow in the next few days
+More in the [release notes](#release-notes) and wiki pages
 
 ### Simple and Straightforward
 
@@ -104,7 +104,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
   No further software, support structures or dependencies should be needed.
 
-- See the installer [wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
+- See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 ## Release notes
 
@@ -128,7 +128,11 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
 
-- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button. The 'dev' branch may be newer and may have the very latest tweaks and bug fixes too ...
+- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
+
+- The 'dev' [branch](https://github.com/TuxVinyards/qqX/branches) may be newer and may have the very latest tweaks and bug fixes too. Branches with a third number element of '0' are auto designated as beta when loaded.
+
+- 1.10.0.02 is now available and has a fix for a shared drive creation glitch. qqX will alert you when 1.10.02 is placed as release. Feel free to download this if needed.
 
 ### Reliability
 
