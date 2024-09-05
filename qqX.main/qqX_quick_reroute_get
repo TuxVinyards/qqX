@@ -762,7 +762,7 @@ function_quick_get_wrap ()  {
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
               printf "  No editions to select in any of the releases ..."
               printColor "\n\n  [enter] to continue   "
-              printf "[r] choose a different release anyway ...  [b] back to main menu \n\n" 
+              printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n" 
             elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
               printf "  This distro is single release option only .... "
               printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
@@ -811,14 +811,14 @@ function_quick_get_wrap ()  {
             QGW_Edition_Arr_NameSelected=
             function_quick_get_wrap
             return
+          
+          elif [[ ${#QGW_Editions_Array[@]} -le 1 ]] ; then  break
 
           elif [[ "$QGW_List_NumSelected" == [0-9] || "$QGW_List_NumSelected" == [0-9][0-9] ]]; then
             [[ $QGW_List_NumSelected -gt "${#QGW_Editions_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Editions_Array[@]}"
             QGW_Edition_Arr_NumSelected=$((QGW_List_NumSelected-1))
             QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[QGW_Edition_Arr_NumSelected]}"
             break
-
-          elif [[ ${#QGW_Editions_Array[@]} -le 1 ]] ; then  break
 
           else  QGW_List_NumSelected=
 
