@@ -94,8 +94,11 @@ check_for_qqX_updates() {
 
     # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
     # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-
-    # legacy 3dp pre "0.09.00.017"
+    # The 4th register may also be used for dev-point or micro point branching for small tweaks and small fixes
+    #
+    # To clarify and expand eg for Version 1.10 - 1.10.0.01 would be beta 1 and 1.10.0.02 beta 2 etc,
+    # then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
+    # or 1.10.02 as the next point release, with possibly a new small feature or two.
 
     [[ ${#qqX_LatestVer_Arr[3]} -gt 2 ]] && qqX_LatestVer_Arr[3]="${qqX_LatestVer_Arr[3]:(-2)}"
     [[ ${#qqX_LatestVer_Arr[3]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[3] "%.2d" "${qqX_LatestVer_Arr[3]}"

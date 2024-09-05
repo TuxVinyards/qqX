@@ -119,14 +119,14 @@ fi
 export SHELL="$OS_BashLocation"
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
-  printf "\n\n  Check for your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
+  printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
 
 if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
-  printf "\n\n  Check for your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
+  printf "\n\n  Check your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
