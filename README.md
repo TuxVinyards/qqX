@@ -130,9 +130,9 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
 
-- The 'dev' [branch](https://github.com/TuxVinyards/qqX/branches) may be newer and may have the very latest tweaks and bug fixes too. Branches with a third number element of '0' are auto designated as beta when loaded.
+- The 'dev' [branch](https://github.com/TuxVinyards/qqX/branches) may be newer and may have the very latest tweaks and bug fixes too. Branches with a single third number element of '0' are auto designated as beta when loaded.
 
-- 1.10.0.02 is now available and has a fix for a shared drive creation glitch. qqX will alert you when 1.10.02 is placed as release. Feel free to download this if needed.
+- 1.10.01.02 is now available as a micro-point release with fixes for a shared drive creation glitch and a theoretical quickget no-editions array message.
 
 ### Reliability
 
