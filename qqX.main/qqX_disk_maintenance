@@ -510,9 +510,7 @@ function create_new_drives {
         fi
 
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
-
         NewDriveCreate=
-
         read -rp "  > "  NewDriveCreate
 
         if [[ $NewDriveCreate != "b" ]]; then
@@ -520,9 +518,7 @@ function create_new_drives {
           if [[ $MainMenuChoice == "2" ]]; then 
 
             printf "SecondDrive=\"%s/storage.qcow2\"" "$VM_InstanceName"  >> "$VM_Conf_File"
-
             "$QEMU_IMG"  create -q -f qcow2 "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" "${SecondDriveCreateSize}G"
-
             [[ -e "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" ]] && DriveCreated=2
         
           elif [[ $MainMenuChoice == "3" ]]; then
@@ -530,13 +526,6 @@ function create_new_drives {
             [[ ! -d "$Default_VM_Folder/SharedDrive" ]] && mkdir "$Default_VM_Folder/SharedDrive"
             "$QEMU_IMG"  create -q -f qcow2 "$Default_VM_Folder/SharedDrive/shared.qcow2" "${SecondDriveCreateSize}G"
             [[ -e "$Default_VM_Folder/SharedDrive//shared.qcow2" ]] && DriveCreated=3
-
-            # 'sed' can get very HIEROGLYPHICAL  https://stackoverflow.com/a/9453461
-
-            # 'awk' ?  https://stackoverflow.com/a/32995760
-            #  awk :  https://stackoverflow.com/a/6541653   https://stackoverflow.com/tags/awk/info 
-            #  sed awk easy methods: https://www.ubuntumint.com/insert-line-specific-line-number-linux/
-            #  date ref awk:  https://unix.stackexchange.com/a/599097
 
             #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options  
             #  Make sure sed command works in --posix  if testing on gnu sed ...
@@ -547,18 +536,16 @@ function create_new_drives {
             if [[ "$(sed --version | head -n 1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
               # do a grep -c (count) & make sure that other than in comments (#) there is only one entry that is possible
-              
               SharedDriveSettingsLine="$(grep -s -n 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | cut -d ':' -f 1)"
               printf "\n\n  Backing up settings file to /tmp and changing line %s \n\n"  "$SharedDriveSettingsLine"
-
               eval cp "$qqX_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
               eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$qqX_SettingsFile"
 
             else 
 
-              printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n"
-              grep 'SharedDrive=' "$qqX_SettingsFile"
-              printf "\n\n"
+              printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n  Here: \n\n"
+              grep -B 3 'SharedDrive=' "$qqX_SettingsFile"
+              printf "\n\n  To read SharedDrive=\"%s/SharedDrive/shared.qcow2\" \n\n" "$Default_VM_Folder"
 
             fi
 
@@ -571,9 +558,7 @@ function create_new_drives {
             printf "\n\n  Use Gparted or similar to set a device table and add partition(s)"
             printf "\n\n  Read notes in main settings if older MacOS or if Windows present."
 
-          else
-
-            printColor "\n\n  Something went wrong. Drive not created "
+          else  printColor "\n\n  Something went wrong. Drive not created "
 
           fi
 
