@@ -101,6 +101,7 @@ Whilst earlier releases added:
 Start from scratch:
 
 - From version 1.8 onwards, the installation of quickemu is _not_ essential ...
+- Most users need only install 'qemu' and 'spice-gtk'. Some distro versions may require 'curl', 'jq' and 'bc'.
 
 Or test out the qqX difference on your existing VM's:
 
