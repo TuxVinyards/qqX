@@ -226,7 +226,7 @@ function print_terminal_notes {
   For first installs or profile re-imposition this installer script may be directly edited.
   Open the script in a standard text editor at around line 240.
 
-  If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited.
+  If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited (hidden) 
   MAKE SURE to SELECT option [r] reconfigure desktop launcher, as this where the terminal command is finally used.
 
   It is quite common for different distros to rename or tweak a standard terminal.
@@ -542,6 +542,9 @@ if [[ ! $SkipMkLauncher ]]; then
       printf "\n  UserTerm=\"%s\"" "$UserTerm"
       printf "\n\n  CustomTerminalProfile=\"%s\"\n" "$CustomTerminalProfile"
     } > "$HOME/.qqX/qqX_term.conf"
+  elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+    # empty or errored file, so remove it
+    rm "$HOME/.qqX/qqX_term.conf"
   fi
 
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
