@@ -68,6 +68,7 @@ show_CLI_usage () {
   printf     "\n\n  qqX --version  &  qqX --help  as standard"
   printf     "\n\n\n  Plain 'qqX' to start the distro/vm selector menu"    
   printf     "\n\n  Or qqX --vm  [path/to/vms-folder/]vm-name.conf to start something specific."
+  printf     "\n\n  To set up an ISO: 'qqX XDG iso_name.iso' or /path/iso_name.iso"
 
   printf     "\n\n\n  Mouse click - Right:"
   printf     "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."

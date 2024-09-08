@@ -50,6 +50,8 @@ Easy _install the latest_ and greatest.
 
 _No need to wait_ for Quickget to add in the distros or releases that you want.
 
+- At the command line, simply `qqX XDG iso_name.iso` or /path/iso_name.iso
+
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
 
 Start specific VM's straight from the folder
