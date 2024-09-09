@@ -183,7 +183,7 @@ function manage_and_repair_disks {
     if [[ $DiskChkStatus == "Okay" ]]; then
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
-      printf "\n\n  Correction is advised if the content exceeds the theoretical envelope"
+      printf "\n\n  Copy on Write and snapshots can sometimes make envelope size can be appear lower than the contents ..."
 
     fi
 
@@ -197,15 +197,17 @@ function manage_and_repair_disks {
     # Check there is disk free space to make a backup  
 
     if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
+    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" 
+    fi
 
-    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" ; fi
+    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+    DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
 
-      DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
-      DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
+    printf "\n\n  Checking for backup disk space on host drive ..."
 
     if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
 
-      printColor "\n\n  WARNING: insufficient or very low space on host drive"
+      printColor "\n\n  WARNING: insufficient or very low space."
     
     else
 
@@ -213,17 +215,14 @@ function manage_and_repair_disks {
       if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
       elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
       else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
-     fi
+      fi
 
     fi
     
     printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
-    printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
-
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  A back-up will be made. All processes will remove any snapshots ...  [b] back to menu " 
+    printf "\n\n  A BACK-UP WILL BE MADE. All processes will remove any snapshots ...  [b] back to menu " 
 
   fi
 
@@ -242,8 +241,10 @@ function manage_and_repair_disks {
 
     if [[ $DiskManage == "rz" ]]; then
 
-      printf "\n\n  This will resize the external envelope. For internal partitions, use gparted" 
-      printColor "\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n\n"
+      printf "  This will resize the external envelope. Internal partitions may require additional treatment."
+      printf "\n\n  For main drive partitions, follow up with the [iso] utility > 'gparted' is recommended."
+      printf "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing " 
+      printColor "\n\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n\n"
       read -rp "  >  "  ResizePlus
       printf "\n\n"
       ResizePlus="$(tr -cd "[:digit:]" <<< "$ResizePlus")"
@@ -296,14 +297,17 @@ function manage_and_repair_disks {
 
       [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
       [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
-      [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
-
       # option 'rd' is basically 'convert' process only  (all options do this as standard)
-      printColor "\n\n  Drive Updated ..."
+      if [[ $DiskManage == "rz" ]]; then 
+        "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
+        "$QEMU_IMG" info "$Selected_Drive"
+        printColor "\n\n  Drive Updated ..."
+      fi
 
     else  printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
 
     fi
+
 
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  

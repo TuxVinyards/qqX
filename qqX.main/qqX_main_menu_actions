@@ -280,7 +280,6 @@ function  main_menu_actions {
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
     manage_and_repair_disks
-    drives_and_snapshots  info
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
 
