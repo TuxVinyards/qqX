@@ -298,8 +298,8 @@ function manage_and_repair_disks {
       [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
       [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
       # option 'rd' is basically 'convert' process only  (all options do this as standard)
-      if [[ $DiskManage == "rz" ]]; then 
-        "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
+      if [[ $DiskManage == "rz" || $DiskManage == "rd" ]]; then 
+        [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
         "$QEMU_IMG" info "$Selected_Drive"
         printColor "\n\n  Drive Updated ..."
       fi
