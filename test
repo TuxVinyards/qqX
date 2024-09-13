@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+if command -v xxxterm ; then true
+
+elif [ -n "$(command -v xterm)" ] ; then xterm -geometry 145x45 -fa truetype -fs 12 -e 'bash -c "./qqX_setup_and_install"'; fi 
+
+exit 
