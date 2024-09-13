@@ -110,7 +110,7 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
     printf "\n\n  Bash has been located at %s" "$OS_BashLocation"
   fi
 
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
@@ -120,14 +120,14 @@ export SHELL="$OS_BashLocation"
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
 
 if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
   printf "\n\n  Check your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
@@ -135,27 +135,27 @@ fi
 ##  Check for 'curl' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'jq' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'bc' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p bc) ]]; then
   printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'wget' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p wget) ]]; then
   printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 
 
