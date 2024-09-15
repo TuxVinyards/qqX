@@ -38,8 +38,9 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154 
 
-export "LC_NUMERIC=C"
-export "LC_COLLATE=C"
+# Use C.UTF-8 as more locale and Qt friendly https://wiki.archlinux.org/title/Locale  (Also see qqX_Initialize)
+export "LC_NUMERIC=C.UTF-8"
+export "LC_COLLATE=C.UTF-8"
 
 # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
 # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.

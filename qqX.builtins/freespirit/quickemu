@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export LC_ALL=C
+# Use qqX UTF8  locale, not:  export LC_ALL=C
 
 if ((BASH_VERSINFO[0] < 4)); then
     echo "Sorry, you need bash 4.0 or newer to run this script."
