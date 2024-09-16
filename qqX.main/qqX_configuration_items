@@ -399,9 +399,9 @@ texteditor_not_found_message () {
   read -rp "  >  "
 }
 
-qqX_edit_settings() {
+find_texteditor () {
 
-  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
+  [[ $TextEditor && ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
 
   if [[ ! $TextEditor ]]; then
   
@@ -423,13 +423,16 @@ qqX_edit_settings() {
     fi
 
   fi
+}
 
-  if [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
-  
+
+qqX_edit_settings() {
+
+  find_texteditor
+
+  if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
   else
-
     # Run the editor: 
-
     if [[ $1 == "conf" ]]; then
 
       printf "\n\n"
@@ -442,13 +445,9 @@ qqX_edit_settings() {
         read -rp "  >  "   ConfEdit_Select
 
         if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
-
         elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
-
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
-
         else
-
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
           (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File" & ) || texteditor_not_found_message
           printf "\n  [enter] to refresh, if editing has been completed \n\n"
@@ -456,9 +455,7 @@ qqX_edit_settings() {
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
           break
-
         fi
-
       done
       
     elif [[ $1 == "custom" ]]; then
@@ -474,7 +471,6 @@ qqX_edit_settings() {
     else 
 
       (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
-
       if [[ $DefaultFolderError ]]; then 
         printColor "\n\n  A qqX restart is required ...."
         printf "\n\n  [enter] to close \n\n"

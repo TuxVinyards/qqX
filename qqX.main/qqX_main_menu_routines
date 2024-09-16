@@ -118,8 +118,8 @@ show_main_menu_header () {
 
   [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
 
-  [[ ! $InstancePID ]] && printf "\033c"  && show_qqX_title_bar   
-
+  printf "\033c"
+  show_qqX_title_bar   
   printf "\n"
   printColor "    %s " "$VM_InstanceName" 
 

@@ -116,6 +116,7 @@ function  update_old_settings_file_with_new_options {
   if [[ -d ".git" ]] && [[ $(type -p gio 2>/dev/null) ]]; then 
 
     gio trash "$Old_SettingsFileFolder/$Old_SettingsFile"
+    printColor "\n\n\n  Starting Update: "
     printf "\n\n  OLD SETTINGS file has been moved TO THE TRASH BIN (for recovery, if needed)\n\n"
 
   else

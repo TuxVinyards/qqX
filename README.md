@@ -34,8 +34,6 @@ More in the [release notes](#release-notes) and wiki pages
 
 - A complete menu system within a unique Linux hybrid interface.
 
-- Can be run from the desktop or from the terminal ...
-
 - Simple list browse, download, and organise countless distros
 
 - Easy install Virtual Linux, Windows and MacOS. Plus others.
@@ -100,7 +98,7 @@ Whilst earlier releases added:
 
 ## How to Install
 
-Start from scratch:
+Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - From version 1.8 onwards, the installation of quickemu is _not_ essential ...
 - Most users need only install 'qemu' and 'spice-gtk'. Some distro versions may require 'curl', 'jq' and 'bc'.
@@ -109,11 +107,11 @@ Or test out the qqX difference on your existing VM's:
 
 - qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
 
-Normal standards compliant Linux is generally expected.
+  Normal [Filesystem_Hierarchy_Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) Linux is generally expected.
 
-No further software, support structures or dependencies should generally be needed.
+  No further software, support structures or dependencies should be needed.
 
-See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
+- See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 ## Release notes
 
@@ -127,13 +125,13 @@ See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
   
 - And finally some control over boot management and being able to select whether we boot from the virtual hard drive or from the ISO. Very useful for partition management and disk maintenance.
 
-- You can now organize folders by various categories. The _same_ machine can now be listed in two or three folders at once. All by the magic of 'symbolic links'.  See the wiki page for [details](https://github.com/TuxVinyards/qqX/wiki/Folders-and-Organisation)
+- You can now organize folders by various categories. The _same_ machine can now be listed in two or three folders at once. All by the magic of 'symbolic links'.  Expect a wiki page shortly to explain in full detail.
 
 - The ability to download any given Linux ISO and install it, has had a make over as well.
 
 - This release has had extra extensive testing, ranging from the slickness of 'Garuda Dr460nized' to the lightness of LXQT
 
-- FreeBird is default and based on quickemu @ Aug 4 whilst FreeSpirit is based on [Aug 29](https://github.com/TuxVinyards/quickemu/tree/freespirit-29-aug-2024) and @ Sept 6 continues to be solid.
+- FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
 
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
 
@@ -148,8 +146,6 @@ See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more detai
 - All scripts are carefully Shellcheck linted & have full error handling routines.
 
 - qqX always makes backups, as is _standard good practice_ with _any_ software.
-
-- Newer [branches](https://github.com/TuxVinyards/qqX/branches), if present, may have the latest tweaks or features, and may possibly have bug fixes. Branches with a single third number element of '0' are auto designated as beta when loaded.
 
 ### Improvements
 

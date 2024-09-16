@@ -110,7 +110,7 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
     printf "\n\n  Bash has been located at %s" "$OS_BashLocation"
   fi
 
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
@@ -120,14 +120,14 @@ export SHELL="$OS_BashLocation"
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
 
 if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
   printf "\n\n  Check your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
-  printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
+  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
@@ -135,27 +135,27 @@ fi
 ##  Check for 'curl' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'jq' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'bc' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p bc) ]]; then
   printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 ##  Check for 'wget' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p wget) ]]; then
   printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to continue > " ; fi
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
 
 
@@ -213,31 +213,53 @@ Notes
 
 function print_terminal_notes {
 
+  # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     
+  # ( NB use of escape EOF, or quotes, not used )
+
   cat << Notes
  
   TO MANUALLY SPECIFY the terminal name, the installer script's 'UserTerm' variable may be used.
 
+  From qqX version 1.10.02 onwards, a 'CustomTerminalProfile' will now be stored in the qqX settings folder.
+  This file will be checked and auto-read when carrying out updates.
+
+  For first installs or profile re-imposition this installer script may be directly edited.
+  Open the script in a standard text editor at around line 240.
+
+  If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited (hidden) 
+  MAKE SURE to SELECT option [r] reconfigure desktop launcher, as this where the terminal command is finally used.
+
+  It is quite common for different distros to rename or tweak a standard terminal.
+  Typing the terminal name, followed by '--help' should give you a list of the parameters that you can use.
+  Note that options can vary slightly and can also be subject to theming or desktop environment overides.
+
   For actual 'XTERM' itself, also edit the installer script's 'CustomTerminalProfile' 
   eg  xterm -geometry 145x50 -fa truetype -fs 12
 
-  Open the script in a standard text editor at around line 220.
+  For CUSTOM PROFILES, only one profile line is required and the actual sizes are best stated.
+  Auto-updating size variable lines are difficult to set, due to 'escaping' routines, 
+  but may be initially be copied, if wished. Size variables will eventually become overwritten as numerics. 
+  eg.  CustomTerminalProfile=" --geometry=145x50 --hide-menubar --title=qqX "
 
-  Remember also that column width units are based on the size of your terminal font.
+  Remember that width and height are column/row units which are based on the size of your terminal font
+  and that the window size will alter when the font size is changed.
 
 Notes
 
 }
 
-# See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     ( NB use of escape EOF, or quotes, not used )
+## SET TERMINAL SIZES & PROFILE  
 
-UserTerm=
-CustomTerminalProfile=
-
-## SET TERMINAL SIZES
-
+# Changes made to height and width values will be transitory only. 
+# Use 'CustomTerminalProfile' for customization ....  
 Term_Width=145
 Term_Height=50
 Term_Taller=55
+
+# EDIT HERE to either set or to rewrite 'qqX_term.conf' 
+UserTerm=
+CustomTerminalProfile=
+
 
 # REVIEW qqX 1.9  changes desktop command slightly and 'desktop-file-validate' no says to remove the single quotes: --title='qqX'
 
@@ -457,12 +479,11 @@ else
       read -rp "  >  "  MkDefDir
 
       if [[ ! $MkDefDir && ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+      #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
     fi
 
     if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
-
-    #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
     if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  ""
     else cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
@@ -509,9 +530,32 @@ fi
 
 if [[ ! $SkipMkLauncher ]]; then
 
+  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
+    source "$HOME/.qqX/qqX_term.conf" 
+  fi
+
+  if [[ $UserTerm || $CustomTerminalProfile ]]; then
+    # from an edit at the start of the installer (which also allows for overwrites of qqX_term.conf)
+    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
+    if [[ ! $UserTerm ]]; then AddFound_UserTerm=1 ; else AddFound_UserTerm= ; fi
+    {
+      printf "\n  UserTerm=\"%s\"" "$UserTerm"
+      printf "\n\n  CustomTerminalProfile=\"%s\"\n" "$CustomTerminalProfile"
+    } > "$HOME/.qqX/qqX_term.conf"
+  elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+    # empty or errored file, so remove it
+    rm "$HOME/.qqX/qqX_term.conf"
+  fi
+
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
   [[ ! $UserTerm ]] && source "$(pwd)/qqX.system/qqX_termfind"
 
+  if [[ $AddFound_UserTerm && $UserTerm ]]; then
+    {
+      printf "\n  UserTerm=\"%s\"" "$UserTerm"
+      printf "\n\n  CustomTerminalProfile=\"%s\"\n" "$CustomTerminalProfile"
+    } > "$HOME/.qqX/qqX_term.conf"
+  fi
 
   ## HOW THE INTERFACE WILL LOOK
 
@@ -519,47 +563,64 @@ if [[ ! $SkipMkLauncher ]]; then
   echo
   qqX_logo_title  "Setting up the desktop:"
 
-  printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
+  if [[ $UserTerm ]]; then
 
-  if [[ ! $CustomTerminalProfile ]]; then 
+    printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
 
-    printf "\n\n  Use extra height (%s) to help show multifile or quickget output better"  "$Term_Taller"
-    printf   "\n  but be aware this will hide more of the file manager output"
-    printf   "\n  while some menu screens may contain empty space."
-    printf "\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
+    if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
+      printf "\n\n  A custom terminal profile is being used: \n\n"
+      cat "$HOME/.qqX/qqX_term.conf" 
+    fi
+
+    if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+
+      printf "\n\n  Use extra height (%s) to help show multifile or quickget output better"  "$Term_Taller"
+      printf   "\n  but be aware this will hide more of the file manager output"
+      printf   "\n  while some menu screens may contain empty space."
+      printf "\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
+
+    fi
+
+    printf "\n\n  Note that when starting qqX directly from the command line, the system's window sizes will apply."
+    printf   "\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+    printf "\n\n  Remember that column width units are based on the size of your terminal font,"
+    printf   "\n  so changing the font will also change the physical terminal size."
+    printf "\n\n\n"
+
+    # REVIEW add W H number entry?
+
+    printColor "  [enter] continue "
+    if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
+      printColor "at standard height "
+      printf "   [t] extra height   or "
+    fi
+
+  else  
+  
+    print_terminal_notes
+    printColor "\n  https://github.com/TuxVinyards/qqX/wiki "
+    printf "\n\n  https://github.com/TuxVinyards/qqX/wiki/Translation \n\n"
 
   fi
 
-  printf "\n\n  Note that qqX uses system default sizes if starting from the command line."
-  printf   "\n  System defaults may usually be changed in the terminal settings, under 'profile'"
-  printf "\n\n  Remember that column width units are based on the size of your terminal font,"
-  printf   "\n  so changing the font will also change the physical terminal size."
-  printf "\n\n\n"
-
-  # REVIEW add W H number entry?
-
-  printColor "  [enter] continue at standard height "
-  [[ ! $CustomTerminalProfile ]] && printf "   [t] extra height   or"
-  printf "   [q] to exit \n\n"
+  printf "  [q] to exit \n\n"
   read -rp "  > "   TerminalHeightChoice
 
-  if [[ $TerminalHeightChoice == "q" ]]; then
+  if [[ ! $UserTerm || $TerminalHeightChoice == "q" ]]; then
 
     sleep 0.6 ; exit 
 
   elif [[ $TerminalHeightChoice == "t" ]]; then
 
     printf "\n  Height selected = %s " "$Term_Taller"
-
     MateTerminalProfile="$MateTerminalProfile_Taller"
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
     XfceTerminalProfile="$XfceTerminalProfile_Taller"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
 
-  else
+  elif  [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
 
     printf "\n  Height selected = %s " "$Term_Height"
-
     MateTerminalProfile="$MateTerminalProfile_Standard"
     GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
     XfceTerminalProfile="$XfceTerminalProfile_Standard"
@@ -567,18 +628,18 @@ if [[ ! $SkipMkLauncher ]]; then
 
   fi
 
-  # REVIEW  tidy the growing repetitiveness at some point ... ??
-
   SelectedTerminalProfile=
 
-  if [[ $CustomTerminalProfile ]]; then  SelectedTerminalProfile="$CustomTerminalProfile"
+  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+    # allows for zero entry profiles having been written
+    GrepLine="$(eval grep -s  CustomTerminalProfile  "$HOME/.qqX/qqX_term.conf")"
+    [[ $GrepLine ]] && eval "$GrepLine"
+    SelectedTerminalProfile="$CustomTerminalProfile"
   elif [[ $UserTerm == "mate-terminal" ]]; then SelectedTerminalProfile="$MateTerminalProfile"
   elif [[ $UserTerm == "gnome-terminal" ]]; then SelectedTerminalProfile="$GnomeTerminalProfile"
   elif [[ $UserTerm == "xfce4-terminal" ]]; then SelectedTerminalProfile="$XfceTerminalProfile"
   elif [[ $UserTerm == "konsole" ]]; then 
     SelectedTerminalProfile="$KonsoleTerminalProfile"
-    # make session allow terminal to close, when started as a terminal from inside a dolphin window
-    export DOLPHIN_TERM_ACTIVE=1
   fi
 
   printf "\n"
@@ -693,7 +754,7 @@ if [[ ! $SkipMkLauncher ]]; then
       # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
       # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
 
-      printf "MimeType=application/x-qemu-disk;application/x-cd-image\n"
+      printf "MimeType=application/x-qemu-disk;application/x-cd-image;application/vnd.efi.iso\n"
       echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
       echo "#"
       echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"

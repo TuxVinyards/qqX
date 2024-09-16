@@ -90,6 +90,23 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "set" ]] ; then  qqX_edit_settings
 
+  elif [[ $MainMenuChoice == "tmc" ]] ; then  
+
+    find_texteditor
+    if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+    else
+      if [[  -e  "$HOME/.qqX/qqX_term.conf" ]]; then 
+        printColor "\n\n  Follow up by running the latest release installer for changes to the Terminal config to take effect"
+        printf  "\n\n  [enter] to edit or view \n\n"
+        read -rp "  >  "
+        (nohup &> /dev/null   "$TextEditor" "$HOME/.qqX/qqX_term.conf"  & )  || texteditor_not_found_message
+      else  
+        printColor "\n\n  Read the installer notes and run the latest release installer to create a Terminal config ..."
+        printf  "\n\n  [enter] to return \n\n"
+        read -rp "  >  "
+      fi
+    fi
+
   elif [[ $MainMenuChoice == "rtv" ]] ; then RunRtvCheck=1 ; refresh_tiano_vars ; RunRtvCheck=
 
   elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays 
@@ -263,7 +280,6 @@ function  main_menu_actions {
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
     manage_and_repair_disks
-    drives_and_snapshots  info
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
 

@@ -103,14 +103,14 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
     printColor "\n\n See  https://qemu.readthedocs.io  "
     printf  "> QEMU disk image utility may be useful"
-
     RightClickReRouted=1
     right_click_re_route
     
-  else  printColor "\n\n  [enter] to continue  \n\n"  ; read -rp  "  >  "
-    
+  else  
+    printColor "\n\n  [enter] to continue    [c] to cancel and close \n\n"  
+    read -rp  "  >  "  IsoQuit
+    [[ $IsoQuit ]] && exit directly 
   fi
-  
   
   if [[ ! $QCOW_RightClick_NON_qqX ]]; then 
   
@@ -122,21 +122,17 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     else
 
       if [[ ! -d  "$VM_Conf_Dir"  ]]; then 
-
         printColor "\n\n  Directory:  %s  not found "  "$VM_Conf_Dir "
         function_conf_error  " COMMAND LINE Path Instruction,"
-
-      else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
-
+      else  
+        cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
       fi
 
     fi
 
     if [[ ! -f "$VM_Conf_Dir/$VM_Conf_File" ]]; then 
-
       printColor "\n\n  Conf:  %s  not found "  "$VM_Conf_File"
       function_conf_error  " COMMAND LINE .Conf Instruction,"
-
     fi
 
   elif [[ $RightClickReRouted ]]; then true
