@@ -34,7 +34,7 @@ An extended testing program has now added extra handling routines for KDE 6, XFC
 
 More in the [release notes](#release-notes) and wiki pages
 
-### Launch from the Linux desktop or the from command line
+### Launch from the Linux desktop or from the command line
 
 _No need to wait_ for Quickget to add in the distros or releases that you want.
 
