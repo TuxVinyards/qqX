@@ -8,8 +8,6 @@
 
 - Offers a complete menu system within a unique hybrid interface
 
-- Launch from the Linux desktop or the command line.
-
 - More up-to-date and easier to mod than Gnome Boxes
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
@@ -36,53 +34,53 @@ An extended testing program has now added extra handling routines for KDE 6, XFC
 
 More in the [release notes](#release-notes) and wiki pages
 
+### Launch from the Linux desktop or the from command line
+
+_No need to wait_ for Quickget to add in the distros or releases that you want.
+
+- Download, right click and install
+
+![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
+
+- Or at the terminal `qqX XDG /path/distroname.iso`
+
 ### Simple and Straightforward
 
 - Simple list browse, download, and organise countless distros
 
 - Multiple display modes, utilities, optimizers and tools
 
+- Choice of [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) or 5 built-in _menu styles_
+
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
-
-Easy _install the latest_ and greatest.
-
-![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
-
-_No need to wait_ for Quickget to add in the distros or releases that you want.
-
-- Download, right click and install
-
-- Or at the command line, simply `qqX XDG /path/distroname.iso`
-
-![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
-
-Start specific VM's straight from the filemanager
-
-### Get the latest fixes
-
-No need to wait for Quickemu bug fixes to make their way through the system either. Any new input from the quickemu community can be put to work.
 
 - Easy [installation](#how-to-install)
 
 - Always up-to-date text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
-## Screenshots and features
+### Get the latest fixes
 
-Release 1.1.03 improved the _main menu_ & added a gtk display option, whilst 1.5.02 added GL toggle:
+No need to wait for Quickemu bug fixes to make their way through the system either.
+
+- Built-in code releases ensure that any new input from the quickemu community can be quickly put to work.
+
+### Start the _main menu_ via the desktop or command line
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
-Release 1.5.02 added _alphabetical zooming_ into list sections for the Quick Get multi distro menu:
+### Start specific VM's straight from the filemanager
+
+![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
+
+### Search the distro lists with _alphabetical zooming_
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
-
-Release 1.7.01 added a choice of 5 _menu styles_ and of  [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) and 1.7.03 added:
 
 - A _handy distro rename function_ which helps with upgrades and will update all the .conf internals in one click.
 
 Release 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
 
-Whilst earlier releases added:
+And earlier releases added:
 
 - Distro homepage browser and link checker
   
