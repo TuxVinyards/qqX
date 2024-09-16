@@ -8,7 +8,7 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.10.01](#release-notes)
+## [Latest release 1.10.02](#release-notes)
 
 Large code update with lots of new features and Quickemu improvements.
 
@@ -138,6 +138,8 @@ Or test out the qqX difference on your existing VM's:
 - The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
 
 - 1.10.01.02 is now available as a micro-point release with fixes for a shared drive creation glitch and a theoretical quickget no-editions array message.
+
+@ Sept 16 - Version 1.10.02  Adds a few fixes and tweaks. Plus more improvements for KDE6 / Qt6 / Wayland / XFCE etc
 
 ### Reliability
 

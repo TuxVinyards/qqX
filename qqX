@@ -50,7 +50,7 @@ export "LC_COLLATE=C.UTF-8"
 # then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
 # or 1.10.02 as the next point release, with possibly a new small feature or two.
 
-qqX_Version="1.10.01.02"
+qqX_Version="1.10.02"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
