@@ -754,7 +754,7 @@ if [[ ! $SkipMkLauncher ]]; then
       # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
       # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
 
-      printf "MimeType=application/x-qemu-disk;application/x-cd-image\n"
+      printf "MimeType=application/x-qemu-disk;application/x-cd-image;application/vnd.efi.iso\n"
       echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
       echo "#"
       echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
