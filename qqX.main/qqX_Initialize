@@ -33,16 +33,12 @@ qqX_logo_plain() {
 if  [[ $NoClear ]]; then 
 
 	printf () {
-
 		# shellcheck disable=SC2199
 		# checks for occurence of the clearing pattern within the parameter text, treating the text as a single string
-
 		if [[ "$@" ==  '\033c'* ]]; then
-
 			# shellcheck disable=SC2124
 			# see http://www.tldp.org/LDP/abs/html/internalvariables.html#APPREF
 			# and http://mywiki.wooledge.org/BashGuide/Parameters#Special_Parameters_and_Variables
-
 			PFtext="$@"
 			PFtext=${PFtext//'\033c'/}			# remove all escape clears from the printf instruction
       command echo
@@ -50,12 +46,22 @@ if  [[ $NoClear ]]; then
       sleep "$NoClear"
 			command printf "$PFtext"
     else
-
       # let all other printf commands through
       command printf "$@"
-
     fi
+	}
 
+else 
+
+	printf () {
+		# shellcheck disable=SC2199
+		if [[ "$@" ==  '\033c'* ]]; then
+      # add belt and braces for differing terminal behaviour eg. konsole
+      tput clear
+			command printf "$@"
+    else
+      command printf "$@"
+    fi
 	}
 
 fi
