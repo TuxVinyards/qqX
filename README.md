@@ -18,20 +18,6 @@ Large code update with lots of new features and Quickemu improvements.
 
 An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
 
-- MacOS remains [much faster](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) in qqX and Windows languages are now sorted.
-
-- The qqX coding hot-swap has been refined and FreeSpirit has the latest updates and community PR's.
-
-- qqX's quickget now lets you scroll backwards and forwards between the different distro info pages.
-
-- You can also scroll up and down between releases and editions and swap around your choices.
-
-- The downloader tells you the download size and checks the link for viability.
-
-- The option to boot from ISO for disk management has been further polished
-
-- [Folders](https://github.com/TuxVinyards/qqX/wiki/Folders-and-Organisation) can now be sym-linked between each other to help organize.
-
 More in the [release notes](#release-notes) and wiki pages
 
 ### Launch from the Linux desktop or from the command line
@@ -42,7 +28,7 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
 
-- Or at the terminal `qqX XDG /path/distroname.iso`
+- Or at the terminal `qqX XDG /path/distro.iso`
 
 ### Simple and Straightforward
 
@@ -50,7 +36,7 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 - Multiple display modes, utilities, optimizers and tools
 
-- Choice of [Custom Menus](https://github.com/TuxVinyards/qqX/wiki/Custom-Menus) or 5 built-in _menu styles_
+- Choice of Custom Menus or 5 built-in _menu styles_
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
