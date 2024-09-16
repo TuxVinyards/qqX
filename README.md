@@ -2,9 +2,15 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Improves on Quickemu's very basic front-ends for [Qemu / KVM](https://qemu.readthedocs.io)
+- Adds fixes, tools and general improvements to the Quickemu system
 
-- More up-to-date and easier to mod than Gnome Boxes.
+- for the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
+
+- Offers a complete menu system within a unique hybrid interface
+
+- Launch from the Linux desktop or the command line.
+
+- More up-to-date and easier to mod than Gnome Boxes
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
@@ -32,11 +38,7 @@ More in the [release notes](#release-notes) and wiki pages
 
 ### Simple and Straightforward
 
-- A complete menu system within a unique Linux hybrid interface.
-
 - Simple list browse, download, and organise countless distros
-
-- Easy install Virtual Linux, Windows and MacOS. Plus others.
 
 - Multiple display modes, utilities, optimizers and tools
 
@@ -48,11 +50,13 @@ Easy _install the latest_ and greatest.
 
 _No need to wait_ for Quickget to add in the distros or releases that you want.
 
-- At the command line, simply `qqX XDG iso_name.iso` or /path/iso_name.iso
+- Download, right click and install
+
+- Or at the command line, simply `qqX XDG /path/distroname.iso`
 
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
 
-Start specific VM's straight from the folder
+Start specific VM's straight from the filemanager
 
 ### Get the latest fixes
 
@@ -107,15 +111,19 @@ Or test out the qqX difference on your existing VM's:
 
 - qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.
 
-  Normal [Filesystem_Hierarchy_Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) Linux is generally expected.
-
-  No further software, support structures or dependencies should be needed.
+For standard Linux, no further software, support structures or dependencies should be needed.
 
 - See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
+- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
+
 ## Release notes
 
-- @ Sept 1 - Version 1.10.01  
+@ Sept 16 - Version 1.10.02  
+
+- General collection of fixes and tweaks. Plus more improvements for KDE6 / Qt6 / Wayland / XFCE etc
+
+ @ Sept 1 - Version 1.10.01  
 
 - Adds Windows languages and sorts the Quickemu problems too. You can now download French, not just 'French Canadian' for example.
   
@@ -134,12 +142,6 @@ Or test out the qqX difference on your existing VM's:
 - FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
 
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
-
-- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
-
-- 1.10.01.02 is now available as a micro-point release with fixes for a shared drive creation glitch and a theoretical quickget no-editions array message.
-
-@ Sept 16 - Version 1.10.02  Adds a few fixes and tweaks. Plus more improvements for KDE6 / Qt6 / Wayland / XFCE etc
 
 ### Reliability
 
