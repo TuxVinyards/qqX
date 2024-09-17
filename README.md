@@ -60,27 +60,27 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ### Search the distro lists with _alphabetical zooming_
 
+- Includes distro homepage browser, link checker and download size reportage
+
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-- A _handy distro rename function_ which helps with upgrades and will update all the .conf internals in one click.
+### Range of utilities and functions
 
-Release 1.6.02 introduced [custom boot parameters](https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters) and the ability to run [Arm64, Risc-V +](<https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types>)
+- Backups and snapshot management
 
-And earlier releases added:
-
-- Distro homepage browser and link checker
+- Controls for Secondary storage
   
 - Configuration tune-up wizard
 
-- Boot up Screen sizing (default & individual)
-
-- Multiple snapshot management, including of shared disks.
-
-- A days count on 'daily-live' ISO's
-
 - Qcow2 repair, resize and diagnostics
 
-- Secondary storage creation
+- Boot manager and ISO boot selector
+
+- Custom boot parameters and the ability to run [Arm64, Risc-V +](https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types)
+
+- .conf updater for rename and move
+
+- Controls for screen size and days count on 'daily-live' ISO's
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
