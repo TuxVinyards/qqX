@@ -88,19 +88,19 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
-- Installer includes an easy un-installer, if you don't like it .....
+Installer includes an easy un-installer, if you don't like it .....
 
 - From version 1.8 onwards, the installation of quickemu is _not_ essential.
 
 - Most users need only install 'qemu' and 'spice-gtk'. Some distro versions may require 'curl', 'jq' and 'bc'.
-
-- qqX will happily work alongside quickgui or any quickemu shortcuts, if you already have them.
 
 For standard Linux, no further software, support structures or dependencies should be needed.
 
 - See the [installer wiki](https://github.com/TuxVinyards/qqX/wiki) for more details
 
 - The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) but you can also download via the **code/clone** button.
+
+- qqX will happily work alongside quickgui or any quickemu shortcuts, if you already have them.
 
 ## Release notes
 
