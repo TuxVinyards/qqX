@@ -86,17 +86,17 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ## How to Install
 
-Start from scratch. Or safely test out the qqX difference on your existing VM's.
+For standard Linux, most users will only need to install `qemu` `spice-gtk` and `qqX`
 
-- For standard Linux, most users need only install 'qemu' and 'spice-gtk'.
+- Some distro versions may need `curl` `jq` and `bc`
 
-- Some distro versions may need 'curl', 'jq' and 'bc'.
-
-- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest) 
+- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest)
 
  No further software, support structures or dependencies should be required.
 
 - The qqX installer includes an easy un-installer, if you don't like it .....
+
+Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Quickemu and Quickgui may be installed but are _not essential_.
 
