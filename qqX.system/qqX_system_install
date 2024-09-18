@@ -231,7 +231,7 @@ function print_terminal_notes {
   From qqX version 1.10.02 onwards, a 'CustomTerminalProfile' will now be stored in the qqX settings folder.
   This file will be checked and auto-read when carrying out updates.
 
-  For first installs or profile re-imposition this installer script may be directly edited.
+  For first installs or profile re-imposition the 'system' installer script may be directly edited.
   Open the script in a standard text editor at around line 240.
 
   If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited (hidden) 
@@ -241,35 +241,38 @@ function print_terminal_notes {
   Typing the terminal name, followed by '--help' should give you a list of the parameters that you can use.
   Note that options can vary slightly and can also be subject to theming or desktop environment overides.
 
-  For actual 'XTERM' itself, also edit the installer script's 'CustomTerminalProfile' 
-  eg  xterm -geometry 145x50 -fa truetype -fs 12
+  Remember that width and height are normally expressed as font based column/row units,
+  so the terminal window size will usually alter when the font size is changed.
 
-  For CUSTOM PROFILES, only one profile line is required and the actual sizes are best stated.
-  Auto-updating size variable lines are difficult to set, due to 'escaping' routines, 
-  but may be initially be copied, if wished. Size variables will eventually become overwritten as numerics. 
-  eg.  CustomTerminalProfile=" --geometry=145x50 --hide-menubar --title=qqX "
-
-  Remember that width and height are column/row units which are based on the size of your terminal font
-  and that the window size will alter when the font size is changed.
+  Some terminals do not have a -geometry parameter and must be pre-set in the actual terminal.
+  For example, 'qterminal' which also uses PIXELS.  Try 1500 x 1000. 
 
 Notes
 
 }
 
-## SET TERMINAL SIZES & PROFILE  
+## SET TERMINAL SIZES & PROFILE 
 
-# Changes made to height and width values will be transitory only. 
-# Use 'CustomTerminalProfile' for customization ....  
+# Changes made here, to height and width values, will be one-time only.  
+# Also to UserTerm.
+
 Term_Width=145
 Term_Height=50
 Term_Taller=55
 
-# EDIT HERE to either set or to rewrite 'qqX_term.conf' 
 UserTerm=
+
+# EDIT HERE to either set or to rewrite 'qqX_term.conf' (in the settings folder)
+
+# Add UserTerm and the required profile, with the required sizes being stated as numbers or variables.
+# eg.  CustomTerminalProfile=" --geometry=145x50 --hide-menubar --title=qqX "
+# or   CustomTerminalProfile="" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
+
+# The use of CustomTerminalProfile will also cause UserTerm to be stored. 
+# Any variables copied from below will eventually become stored as numerics.
+
 CustomTerminalProfile=
 
-
-# REVIEW qqX 1.9  changes desktop command slightly and 'desktop-file-validate' no says to remove the single quotes: --title='qqX'
 
 # MATE:
 MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
@@ -283,11 +286,18 @@ GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-m
 XfceTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 XfceTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 
+# LxTerminal:
+LxTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --title=qqX "
+LxTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --title=qqX "
+
+# XTERM:
+XtermTerminalProfile_Taller=" -geometry ${Term_Width}x${Term_Taller} -fa truetype -fs 12 -fg white -bg black"
+XtermTerminalProfile_Standard=" -geometry ${Term_Width}x${Term_Height} -fa truetype -fs 12 -fg white -bg black"
+
 # KONSOLE:
 KonsoleTitle="qqX"
 KonsoleTerminalProfile_Taller=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Taller} "
 KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Height}"
-# REVIEW  normal KDE behaviour is to overide the launcher options if 'remember konsole size and position' has been set
 
 ##  Check we are in the right place
 if [[ ! -d "$(pwd)/qqX.system" ]]; then 
@@ -550,9 +560,30 @@ if [[ ! $SkipMkLauncher ]]; then
       printf "\n  UserTerm=\"%s\"" "$UserTerm"
       printf "\n\n  CustomTerminalProfile=\"%s\"\n" "$CustomTerminalProfile"
     } > "$HOME/.qqX/qqX_term.conf"
+
   elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
     # empty or errored file, so remove it
     rm "$HOME/.qqX/qqX_term.conf"
+ 
+  elif [[ "$(cat "/tmp/qqX.termlist" 2>/dev/null)"  ]]; then 
+
+    mapfile -t TermChooseArr <<< "$(cat "/tmp/qqX.termlist" 2>/dev/null)"
+    UserTerm="${TermChooseArr[0]}" 
+    printColor "\n\n  Found:"
+    i=0 ; n=1
+    while [[ "${TermChooseArr[i]}" ]]; do
+      printf "\n\n  %s  %s" "$n" "${TermChooseArr[i]}"
+      ((i+=1))
+      ((n+=1))
+    done
+    printf "\n\n  [enter] for %s  or  [number] of terminal to use \n\n"  "$UserTerm"
+    read -rp "  >  "  TermChoose
+    if [[ $TermChoose ]]; then 
+      TermChoose="$(tr -cd '[:digit:]' <<< "$TermChoose")"
+      i="$((TermChoose-=1))"
+      UserTerm="${TermChooseArr[i]}"
+    fi
+
   fi
 
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
@@ -576,23 +607,28 @@ if [[ ! $SkipMkLauncher ]]; then
     printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
 
     if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
-      printf "\n\n  A custom terminal profile is being used: \n\n"
+      printf "\n\n  A stored terminal profile is being used: \n\n"
       cat "$HOME/.qqX/qqX_term.conf" 
     fi
 
     if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then 
-
-      printf "\n\n  Use extra height (%s) to help show multifile or quickget output better"  "$Term_Taller"
-      printf   "\n  but be aware this will hide more of the file manager output"
-      printf   "\n  while some menu screens may contain empty space."
-      printf "\n\n  The setting 'CustomTerminalProfile' near the start of this script, may also be edited."
-
+      printf "\n\n  Use extra height (%s) if you have high numbers of Vm's"  "$Term_Taller"
+      printf   "\n  You may also edit/create a 'CustomTerminalProfile' to store different values."
+      printf   "\n  See the notes near the start of the 'system' folder's installer script."
     fi
 
-    printf "\n\n  Note that when starting qqX directly from the command line, the system's window sizes will apply."
-    printf   "\n  System defaults may usually be changed in the terminal settings, under 'profile'"
-    printf "\n\n  Remember that column width units are based on the size of your terminal font,"
-    printf   "\n  so changing the font will also change the physical terminal size."
+    printf "\n\n  Remember that column width units are normally based on the size of your terminal font,"
+    printf   "\n  so changing the font will usually change the physical terminal size."
+
+    printf "\n\n  System defaults may usually be changed in the terminal settings, under 'profile'"
+
+    printf "\n\n  The system's terminal size will apply when starting qqX directly from the command line."
+    printf   "\n  And may overide any options if 'remember size and position' has been set."
+
+    printf "\n\n  Select 'standard' if in doubt, or where terminals do not have a -geometry parameter."
+
+    printf "\n\n  If your terminal uses PIXELS, for example 'qterminal', try 1500 x 1000 in the settings."
+
     printf "\n\n\n"
 
     # REVIEW add W H number entry?
@@ -624,6 +660,8 @@ if [[ ! $SkipMkLauncher ]]; then
     MateTerminalProfile="$MateTerminalProfile_Taller"
     GnomeTerminalProfile="$GnomeTerminalProfile_Taller"
     XfceTerminalProfile="$XfceTerminalProfile_Taller"
+    XtermTerminalProfile="$XtermTerminalProfile_Taller"
+    LxTerminalProfile="$LxTerminalProfile_Taller"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
 
   elif  [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
@@ -632,6 +670,8 @@ if [[ ! $SkipMkLauncher ]]; then
     MateTerminalProfile="$MateTerminalProfile_Standard"
     GnomeTerminalProfile="$GnomeTerminalProfile_Standard"
     XfceTerminalProfile="$XfceTerminalProfile_Standard"
+    XtermTerminalProfile="$XtermTerminalProfile_Standard"
+    LxTerminalProfile="$LxTerminalProfile_Standard"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
 
   fi
@@ -646,8 +686,9 @@ if [[ ! $SkipMkLauncher ]]; then
   elif [[ $UserTerm == "mate-terminal" ]]; then SelectedTerminalProfile="$MateTerminalProfile"
   elif [[ $UserTerm == "gnome-terminal" ]]; then SelectedTerminalProfile="$GnomeTerminalProfile"
   elif [[ $UserTerm == "xfce4-terminal" ]]; then SelectedTerminalProfile="$XfceTerminalProfile"
-  elif [[ $UserTerm == "konsole" ]]; then 
-    SelectedTerminalProfile="$KonsoleTerminalProfile"
+  elif [[ $UserTerm == "lxterminal" ]]; then SelectedTerminalProfile="$LxTerminalProfile"
+  elif [[ $UserTerm == "uxterm" || $UserTerm == "xterm" ]]; then SelectedTerminalProfile="$XtermTerminalProfile"
+  elif [[ $UserTerm == "konsole" ]]; then SelectedTerminalProfile="$KonsoleTerminalProfile"
   fi
 
   printf "\n"
@@ -842,4 +883,6 @@ fi
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
+# https://code.visualstudio.com/  (recommended)
+# vim:tabstop=2:shiftwidth=2:expandtab
 

@@ -1,54 +1,26 @@
 #!/usr/bin/env sh
 
-##  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files 
+# Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+
+#  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files 
+#  OR  run the target script "./qqX_system_install"  from qqX.system folder directly
 
 #  From version 1.10.03  a posix friendly .sh script is used as a wrapper, to make sure that it double click executes properly
 #  in Qt / KDE XFCE etc desktop environments.  
 
-# Either, from the main qqX release download folder run "./qqX_setup_and_install"  
-# OR  run the target script "./qqX_system_install"  from qqX.system folder directly
+#   IF: your file manager allows > double mouse click & 'run in terminal' or 'execute'
 
-##  TO INSTALL:  
-#   if your file manager allows > mouse click & 'run as program' or 'run in terminal'
-#   OR: 
-#   in the folder > right click > open in terminal >  type "./qqX_setup_and_install"   (note prefix ./)
+#   OR:  in the folder > right click > 'run as program' or 'run in konsole' or 'run in terminal'
 
-##  CUSTOM TERMINAL SIZES & PROFILE  may be set just after the initial system checks 
+#   OR:  in the folder > right click > open in terminal >  type "./qqX_setup_and_install"   (note prefix ./)
+
+#   Set 'UserTerm' for any newer or non-standard TERMINAL NAME here: 
+    UserTerm=
+
+#   CUSTOM terminal sizes & profile may also be set just after the initial system checks 
 #   in the target script "./qqX_system_install" in the qqX.system folder 
 
-#   OR a terminal name may set here, a few lines further down. See 'UserTerm'
-
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
-#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-
-# 	Otherwise:  
-
-# Licence  GPL3   https://www.gnu.org/licenses 
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# https://www.gnu.org/licenses  
-
-# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
-
-##  qqX - quickemu quickget X terminal project   
-# https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
-# shellcheck disable=SC1090
-# shellcheck disable=SC2317
-# shellcheck disable=SC2034
-
-
-UserTerm=
+#   If needed, the target script may also be used directly.
 
 printf "" > "/tmp/qqX.termlist"
 
@@ -57,7 +29,7 @@ fi
 
 # https://stackoverflow.com/questions/35385962/arrays-in-a-posix-compliant-shell#35385978
 
-set -- "gnome-terminal" "mate-terminal" "konsole" "qterminal" "xfce4-terminal" "alacritty" "uxterm" "xterm"
+set -- "gnome-terminal" "mate-terminal" "konsole" "xfce4-terminal" "lxterminal" "uxterm" "xterm" "qterminal" "alacritty" "kitty"
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -77,3 +49,29 @@ elif [ -n "${UserTerm}" ]; then
 else
   exit
 fi
+
+# Licence  GPL3   https://www.gnu.org/licenses 
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# https://www.gnu.org/licenses  
+
+# IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
+
+# But, that said, and without prejudice to the above, 
+# SMALL CODE SNIPPETS, eg the function printColor, MAY BE USED PERMISSIVELY  
+# in projects, as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+
+# qqX - quickemu quickget X terminal project  
+
+# https://code.visualstudio.com/  (recommended)
+# vim:tabstop=2:shiftwidth=2:expandtab

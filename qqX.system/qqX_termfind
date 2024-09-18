@@ -39,20 +39,29 @@ printColor "\n\n  To create shortcut launchers, the name of a Linux Terminal Emu
 if [[ ! $UserTerm ]]; then
 
   echo "  Checking ...."; echo
-  ## Almost all terminal emulators have 'term' as part of the name. 
-  #  Check here for notable exceptions:
 
+  ## Almost all terminal emulators have 'term' as part of the name. 
+  #  Check here for the notable exception:
   UserTerm="$(pgrep -li  "konsole" )"
 
-  if [[ "$UserTerm" == *konsole* ]]; then
-    UserTerm="konsole"
-    echo "  UserTerm is $UserTerm" ; echo
-    echo "  Is this correct?  [enter] yes  [n] no " ; echo
-    read -rp "   >  "   
-    echo
-    if [[ $REPLY == "n" ]]; then UserTerm=; else UserTerm_Found=1; fi
+  TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
+  if [[ $TermWordChk ]]; then 
+    printf "\n  Terminal might be \'%s\' \n\n" "$(basename "$TermWordChk")"
+    [[ ! $UserTerm ]] && UserTerm="$(basename "$TermWordChk")"
+  else
+    printf "\n  Terminal might be: \n\n" 
+    pgrep -a term
+    printf "\n\n"
   fi
 
+  if [[ $UserTerm ]]; then
+    printColor "\n\n  UserTerm is %s ? " "$UserTerm" 
+    printf "\n\n  Is this correct?  [enter] yes  [n] no, possibly not \n\n" 
+    read -rp "   >  "   FirstTermChk
+    echo
+    if [[ $FirstTermChk == "n" ]]; then UserTerm=; else UserTerm_Found=1; fi
+  fi
+  
 fi
 
 if [[ $WSL_Install ]]; then
@@ -100,10 +109,17 @@ elif [[ ! $UserTerm ]]; then
       UserTerm="${UserTerm##*/}"
     else
       echo "  Error:  PID not found"; echo
-      UserTerm=
-      UserTerm_PID=
-      UserTerm_Found=
+      UserTerm= ; UserTerm_PID= ; UserTerm_Found=
      fi
+  fi
+
+  if [[ $UserTerm && ! $(type -p "$UserTerm") ]]; then UserTerm= 
+  fi
+
+  if [[ ! $UserTerm ]]; then
+    TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
+    if [[ $TermWordChk ]]; then  UserTerm="$TermWordChk" ;  UserTerm_Found=
+    fi
   fi
 
 fi
@@ -115,9 +131,8 @@ while [[ ! $UserTerm_Found ]]; do
     if [[ ! $WSL_Install ]]; then 
 
       PID_Term_ProbeArr=()
-
       echo
-      echColor "  Basic tests unable to find name of your terminal emulator"; echo
+      echColor "  Basic tests are unable to find name of your terminal emulator"; echo
 
       # LOAD NOTES from function at start of calling script qqX installer
       print_terminal_notes
@@ -170,11 +185,16 @@ while [[ ! $UserTerm_Found ]]; do
         
       done
 
+      TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
+      if [[ $TermWordChk ]]; then  printf "\n  Terminal might also be \'%s\' \n" "$(basename "$TermWordChk")" 
+      fi
+
     fi
 
     if [[ $TermFind_ReRun || $WSL_Install ]]; then
 
-      if [[ $ErrorPID && ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= ; fi
+      if [[ $ErrorPID && ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= 
+      fi
 
       echo
       echo "  To create a shortcut, a name is needed ....   Check/Recheck the script output"; echo
@@ -204,7 +224,7 @@ while [[ ! $UserTerm_Found ]]; do
       else
 
         if [[ -d "/proc/$UserTerm_PID" ]]; then
-          UserTerm="$(realpath /proc/"$UserTerm_PID"/exe)"
+          UserTerm="$(realpath /proc/"$UserTerm_PID"/exe 2>/dev/null)"
           UserTerm="${UserTerm##*/}"
         else
           UserTerm=
@@ -262,3 +282,5 @@ echo; echColor "  Terminal = $UserTerm"; echo
 read -rp "  [enter] to continue > "
 echo
 
+# https://code.visualstudio.com/  (recommended)
+# vim:tabstop=2:shiftwidth=2:expandtab
