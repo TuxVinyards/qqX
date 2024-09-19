@@ -14,13 +14,16 @@
 
 #   OR:  in the folder > right click > open in terminal >  type "./qqX_setup_and_install"   (note prefix ./)
 
-#   Set 'UserTerm' for any newer or non-standard TERMINAL NAME here: 
+#   OR:  in the qqX.system folder > right click > open in terminal >  type "./qqX_system_install"   (note prefix ./)
+
+#   Set 'UserTerm' FOR ANY NEWER OR NON-STANDARD TERMINAL name here: 
     UserTerm=
 
 #   CUSTOM terminal sizes & profile may also be set just after the initial system checks 
 #   in the target script "./qqX_system_install" in the qqX.system folder 
 
-#   If needed, the target script may also be used directly.
+#   SETTING UP A CUSTOM TERMINAL PROFILE is recommended as this will cause the values to be stored for future updates.
+#   See notes in the target script.
 
 printf "" > "/tmp/qqX.termlist"
 
@@ -28,8 +31,9 @@ if [ -n "${UserTerm}" ]; then  printf "%s\n" "${UserTerm}" > "/tmp/qqX.termlist"
 fi
 
 # https://stackoverflow.com/questions/35385962/arrays-in-a-posix-compliant-shell#35385978
+# NB type -p is not supported in 'dash' so command -v needed 
 
-set -- "gnome-terminal" "mate-terminal" "konsole" "xfce4-terminal" "lxterminal" "uxterm" "xterm" "qterminal" "alacritty" "kitty"
+set -- "gnome-terminal" "mate-terminal" "konsole" "xfce4-terminal" "lxterminal" "uxterm" "xterm" "qterminal" "alacritty" 
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -40,8 +44,13 @@ done
 if [ -n "$(cat "/tmp/qqX.termlist")" ]; then UserTerm="$(head -n 1 "/tmp/qqX.termlist")"
 fi
 
+if [ -z "${UserTerm}" ]; then TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
+  if [ -n "${TermWordChk}" ]; then UserTerm="$(basename "${TermWordChk}")"
+  fi
+fi
+
 if [ "${UserTerm}" = "gnome-terminal" ]; then
-  "${UserTerm}" --geometry 145x50 -- 'bash -c "./qqX.system/qqX_system_install"'
+  "${UserTerm}" --geometry 145x50 -- bash -c "./qqX.system/qqX_system_install"
 elif [ "${UserTerm}" = "uxterm" ] || [ "${UserTerm}" = "xterm" ]; then
   "${UserTerm}" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e 'bash -c "./qqX.system/qqX_system_install"'
 elif [ -n "${UserTerm}" ]; then
