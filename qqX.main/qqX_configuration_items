@@ -492,6 +492,31 @@ qqX_edit_settings() {
 
 }
 
+function refresh_logfile_locations {
+
+    QemuArgsFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_args_List.txt"
+    QemuArgsShortFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_List.txt"
+    QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
+    QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
+
+    # Qemu_IMG log > eg. for disk repair functions 
+    Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
+    if [[ $(cat "$Qemu_IMG_ErrorLog" 2>/dev/null) ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
+
+    # Qemu SYSTEM log  # keep log, only clear if booting up afresh (in menu actions)
+    if [[ -d  "$VM_Conf_Dir/$VM_InstanceName" ]]; then
+      QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
+      [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
+    fi
+}
+
+function alert_on_new {
+    # test for 'new' - will have have an iso/img but not a main drive, yet (but also double check if 'just done')
+    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then  
+      if [[ $IgnoreSecondCheckNew || $VM_Renamed ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
+    fi
+}
+
 function refresh_conf_vars_and_values {
 
   # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
@@ -552,15 +577,15 @@ function refresh_conf_vars_and_values {
     source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
-
+  
     # check any menu values that are based on the file .conf 
-
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
-    QemuErrorLog="$VM_Conf_Dir/$VM_InstanceName/${VM_InstanceName}.qemu.error.log"
-    [[ ! -e "$QemuErrorLog" ]] && printf "" >  "$QemuErrorLog"
+    
+    refresh_logfile_locations
+
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
 
