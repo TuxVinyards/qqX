@@ -27,7 +27,7 @@
 
 printf "" > "/tmp/qqX.termlist"
 
-if [ -n "${UserTerm}" ]; then  printf "%s\n" "${UserTerm}" > "/tmp/qqX.termlist"
+if [ -n "$UserTerm" ]; then  printf "%s\n" "$UserTerm" > "/tmp/qqX.termlist"
 fi
 
 # https://stackoverflow.com/questions/35385962/arrays-in-a-posix-compliant-shell#35385978
@@ -44,17 +44,23 @@ done
 if [ -n "$(cat "/tmp/qqX.termlist")" ]; then UserTerm="$(head -n 1 "/tmp/qqX.termlist")"
 fi
 
-if [ -z "${UserTerm}" ]; then TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
-  if [ -n "${TermWordChk}" ]; then UserTerm="$(basename "${TermWordChk}")"
+if [ -z "$UserTerm" ]; then TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
+  if [ -n "$TermWordChk" ]; then UserTerm="$(basename "$TermWordChk")"
   fi
 fi
 
-if [ "${UserTerm}" = "gnome-terminal" ]; then
-  "${UserTerm}" --geometry 145x50 -- bash -c "./qqX.system/qqX_system_install"
-elif [ "${UserTerm}" = "uxterm" ] || [ "${UserTerm}" = "xterm" ]; then
-  "${UserTerm}" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e 'bash -c "./qqX.system/qqX_system_install"'
-elif [ -n "${UserTerm}" ]; then
-  "${UserTerm}" -e 'bash -c "./qqX.system/qqX_system_install"'
+if [ "$UserTerm" = "gnome-terminal" ]; then
+  "$UserTerm" --geometry 145x50 -- bash -c "./qqX.system/qqX_system_install"
+elif [ "$UserTerm" = "konsole" ]; then
+  "$UserTerm" --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=145 -p TerminalRows=50  -e 'bash -c "./qqX.system/qqX_system_install"'
+elif [ "$UserTerm" = "xfce4-terminal" ]; then
+  "$UserTerm" --geometry=145x50 --hide-menubar --hide-toolbar  -e 'bash -c "./qqX.system/qqX_system_install"'
+elif [ "$UserTerm" = "lxterminal" ]; then
+  "$UserTerm" --geometry=145x50 -e 'bash -c "./qqX.system/qqX_system_install"'
+elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
+  "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e 'bash -c "./qqX.system/qqX_system_install"'
+elif [ -n "$UserTerm" ]; then
+  "$UserTerm" -e 'bash -c "./qqX.system/qqX_system_install"'
 else
   exit
 fi
