@@ -16,14 +16,14 @@
 
 #   OR:  in the qqX.system folder > right click > open in terminal >  type "./qqX_system_install"   (note prefix ./)
 
-#   Set 'UserTerm' FOR ANY NEWER OR NON-STANDARD TERMINAL name here: 
+#   FOR ANY NEWER OR NON-STANDARD TERMINAL, SETTING UP A CUSTOM TERMINAL PROFILE IS RECOMMENDED
+#   as this will cause the values to be stored for future updates.
+
+#   CUSTOM terminal sizes & profile should be set just after the initial system checking lines
+#   in the target script "./qqX_system_install" in the qqX.system folder. See notes in the target script.
+
+#   Terminal name may also be set here, for one-time usage, if '-e' exec functions are recognised: 
     UserTerm=
-
-#   CUSTOM terminal sizes & profile may also be set just after the initial system checks 
-#   in the target script "./qqX_system_install" in the qqX.system folder 
-
-#   SETTING UP A CUSTOM TERMINAL PROFILE IS RECOMMENDED as this will cause the values to be stored for future updates.
-#   See notes in the target script.
 
 printf "" > "/tmp/qqX.termlist"
 
