@@ -22,7 +22,7 @@
 #   CUSTOM terminal sizes & profile may also be set just after the initial system checks 
 #   in the target script "./qqX_system_install" in the qqX.system folder 
 
-#   SETTING UP A CUSTOM TERMINAL PROFILE is recommended as this will cause the values to be stored for future updates.
+#   SETTING UP A CUSTOM TERMINAL PROFILE IS RECOMMENDED as this will cause the values to be stored for future updates.
 #   See notes in the target script.
 
 printf "" > "/tmp/qqX.termlist"
@@ -33,7 +33,7 @@ fi
 # https://stackoverflow.com/questions/35385962/arrays-in-a-posix-compliant-shell#35385978
 # NB type -p is not supported in 'dash' so command -v needed 
 
-set -- "gnome-terminal" "mate-terminal" "konsole" "xfce4-terminal" "lxterminal" "uxterm" "xterm" "qterminal" "alacritty" 
+set -- "gnome-terminal" "mate-terminal" "konsole" "xfce4-terminal" "lxterminal" "roxterm" "uxterm" "xterm" "qterminal" "alacritty" 
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -50,17 +50,17 @@ if [ -z "$UserTerm" ]; then TermWordChk="$(pgrep -a term | grep qqX | awk '{prin
 fi
 
 if [ "$UserTerm" = "gnome-terminal" ]; then
-  "$UserTerm" --geometry 145x50 -- bash -c "./qqX.system/qqX_system_install"
+  "$UserTerm" --geometry 145x50 -- "./qqX.system/qqX_system_install"
 elif [ "$UserTerm" = "konsole" ]; then
-  "$UserTerm" --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=145 -p TerminalRows=50  -e 'bash -c "./qqX.system/qqX_system_install"'
+  "$UserTerm" --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=145 -p TerminalRows=50  -e  "./qqX.system/qqX_system_install"
 elif [ "$UserTerm" = "xfce4-terminal" ]; then
-  "$UserTerm" --geometry=145x50 --hide-menubar --hide-toolbar  -e 'bash -c "./qqX.system/qqX_system_install"'
-elif [ "$UserTerm" = "lxterminal" ]; then
-  "$UserTerm" --geometry=145x50 -e 'bash -c "./qqX.system/qqX_system_install"'
+  "$UserTerm" --geometry=145x50 --hide-menubar --hide-toolbar  -e "./qqX.system/qqX_system_install"
+elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
+  "$UserTerm" --geometry=145x50 -e "./qqX.system/qqX_system_install"
 elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
-  "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e 'bash -c "./qqX.system/qqX_system_install"'
+  "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e "./qqX.system/qqX_system_install"
 elif [ -n "$UserTerm" ]; then
-  "$UserTerm" -e 'bash -c "./qqX.system/qqX_system_install"'
+  "$UserTerm" -e "./qqX.system/qqX_system_install"
 else
   exit
 fi

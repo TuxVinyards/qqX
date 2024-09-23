@@ -265,11 +265,13 @@ UserTerm=
 # EDIT HERE to either set or to rewrite 'qqX_term.conf' (in the settings folder)
 
 # Add UserTerm and the required profile, with the required sizes being stated as numbers or variables.
-# eg.  CustomTerminalProfile=" --geometry=145x50 --hide-menubar --title=qqX "
-# or   CustomTerminalProfile="" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
+# eg.  CustomTerminalProfile=" --geometry=145x50 --hide-menubar --title=qqX  -e "
+# or   CustomTerminalProfile="" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX  -- "
+
+# NB the Profile should finish with ' -e ' or ' -- ' or any specific execute command variant that the terminal requires
 
 # The use of CustomTerminalProfile will also cause UserTerm to be stored. 
-# Any variables copied from below will eventually become stored as numerics.
+# Any size variables copied from below will eventually become stored as numerics.
 
 CustomTerminalProfile=
 
@@ -682,7 +684,9 @@ if [[ ! $SkipMkLauncher ]]; then
     # allows for zero entry profiles having been written
     GrepLine="$(eval grep -s  CustomTerminalProfile  "$HOME/.qqX/qqX_term.conf")"
     [[ $GrepLine ]] && eval "$GrepLine"
-    SelectedTerminalProfile="$CustomTerminalProfile"
+    GrepLine="$(eval grep -s  UserTerm  "$HOME/.qqX/qqX_term.conf")"
+    [[ $GrepLine ]] && eval "$GrepLine"
+    # generates "$CustomTerminalProfile" & "$UserTerm"
   elif [[ $UserTerm == "mate-terminal" ]]; then SelectedTerminalProfile="$MateTerminalProfile"
   elif [[ $UserTerm == "gnome-terminal" ]]; then SelectedTerminalProfile="$GnomeTerminalProfile"
   elif [[ $UserTerm == "xfce4-terminal" ]]; then SelectedTerminalProfile="$XfceTerminalProfile"
@@ -791,10 +795,14 @@ if [[ ! $SkipMkLauncher ]]; then
       echo "Comment=qqX - quickemu quickget X terminal project"
 
       # needs quotes  - plus REVIEW  -e  deprecation in other terminals
-
-      if [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
-      elif [[ $SelectedTerminalProfile ]]; then echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
-      else  echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      if [[ $CustomTerminalProfile ]]; then 
+        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      elif [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then 
+        echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      elif [[ $SelectedTerminalProfile ]]; then 
+        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      else  
+        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       fi
 
       echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
