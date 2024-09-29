@@ -97,6 +97,8 @@ if [[ $1 ]]; then RunMouseApiTidy=1 ; else RunMouseApiTidy= ; fi
 
 if [[ $1 == "XDG" ]]; then 
 
+  [[ $2 == "%f" ]] && shift
+
   if [[ -e "$2" ]]; then
 
     XDG_FileType_Recognised=
