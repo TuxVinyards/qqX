@@ -218,6 +218,15 @@ function  main_menu_actions {
     printf "\n\n" 
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
+
+    elif ! grep -sqi sdl <<< "$(qemu-system-x86_64 -display help)" ; then 
+
+      printColor "\n\n  SDL cannot be found:"
+      printf "\n\n  OpenSUSE distros lack -official- support for 'qemu-ui-sdl' "
+      printf "\n\n  This may apply to others ??  Community tweaks might be available."
+      printf "\n\n  [enter] to return \n\n"
+      read -rp "  >  "
+
     else
 
       if [[ $MainMenuChoice == "df"  ]]; then  
