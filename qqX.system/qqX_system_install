@@ -63,10 +63,9 @@
 
 #  $1 as 'Upgrade'  may be supplied to change the menu look eg "./qqX_setup_and_install Upgrade"  (see qqX updater function)
 
-# https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability
-# shellcheck disable=SC1090
-# shellcheck disable=SC2317
-# shellcheck disable=SC2034
+# https://www.shellcheck.net/wiki/SC1090 for file sourcing, SC2317 for reachability, etc
+
+# shellcheck disable=SC1090,SC1091,SC2317,SC2034
 
 # Posix caller will look in the system folder for this script but it is designed to work from the main folder.
 if [[ ! -d "./qqX.system" ]]; then
@@ -122,9 +121,6 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
   read -rp  "  >  "   FHS_Alert
   [[ $FHS_Alert ]] &&  exit 
 fi
-
-# Set this session to bash. Attempt to make things work better if subsitute shell has been used eg. fishshell
-export SHELL="$OS_BashLocation"
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
