@@ -64,18 +64,24 @@ elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
 elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
   "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e "./qqX.system/qqX_system_install"
 
-elif [ -n "$UserTerm" ]; then  # size params not available: "qterminal" "alacritty" etc 
+elif [ -n "$UserTerm" ]; then  
+  # size params not available: "qterminal" "alacritty" etc 
   "$UserTerm" -e "./qqX.system/qqX_system_install"
 
-elif [ -t 1 ] ; then
+elif [ -t 1 ] ; then  
+  # if stdout is available give message:  https://stackoverflow.com/a/911213
   printf "\n\n    TERMINAL NAME not found  \n\n"
   grep -m 1 -A 10 'IF:' "$0"
   printf "\n\n    [enter] to exit \n\n    "
   read -r reply
-  exit
 
-else
-  exit
+fi
+
+# Exit the script. But also check whether it has been run with a --hold optioned terminal, as Dolphin does, for example.
+PidRun="$(ps -eF | grep sh | grep "$$" | grep "$0" | tr -cd '[:print:]' | awk '{print $3}')"
+
+if [ -n "$PidRun" ]; then  kill "$PidRun" 
+else exit
 fi
 
 # Licence  GPL3   https://www.gnu.org/licenses 
