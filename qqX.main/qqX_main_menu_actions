@@ -348,13 +348,36 @@ function  main_menu_actions {
 
     fi
   
-  elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3" ]] ; then
+  elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3c" ]] ; then
 
     create_new_drives
 
   elif [[ $MainMenuChoice == "2d" ]]; then
 
     function_delete_SecondDrive
+
+  elif [[ $MainMenuChoice == "3m" ]]; then
+
+    if [[ ! -e $SharedDrive ]]; then  
+      printColor "\n\n  ERROR: A Shared drive has not been set up or created"
+    else 
+      if [[ $SharedDrive_Mount || $SharedDriveArgs ]]; then 
+        SharedDrive_Mount=
+        SharedDrive_Conf="no-shared"
+        printColor "\n\n  The Shared drive has been UN mounted"
+      else 
+        SharedDrive_Conf=
+        SharedDrive_Mount=1
+        printColor "\n\n  The Shared drive has been mounted"
+        if [[ $LiveBoot ]]; then 
+          printf "\n\n  CAUTION: if intending to install from a Live ISO," 
+          printf "\n\n  certain distro installers may not be clear about which drive is being used."
+        fi
+      fi
+      set_drive_paths
+    fi
+    printf "\n\n  [enter] to return \n\n" 
+    read -rp "  >  "
     
   elif [[ $MainMenuChoice == "v" ]] ; then
 

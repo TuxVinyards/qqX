@@ -460,14 +460,31 @@ function create_new_drives {
   DriveCreated=
 
   [[ $MainMenuChoice == "2c" ]] && MainMenuChoice="2"
+  [[ $MainMenuChoice == "3c" ]] && MainMenuChoice="3"
 
-  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs || $SharedDrive_Conf == "no-shared" ]] ; then 
-    
-    printColor "\n\n  ERROR:  a shared drive already exists. Check VM conf and general settings.\n\n"
+  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDrive ]] ; then 
+     
+    printColor "\n\n  ERROR:  A shared drive appears to already have been set up. Check VM conf and general settings."
+    printf "\n\n  Shared drive is set as '%s'" "$SharedDrive"
+    if [[ -e "$SharedDrive" ]]; then 
+      printf " and has been found." 
+      check_disk_is_okay "$SharedDrive" 
+      printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
+    else printf " but cannot be found."
+    fi
+    printf "\n\n"
 
-  elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then 
+  elif [[ $MainMenuChoice == "2" ]] && [[ "$SecondDrive" ]] ; then 
   
-    printColor "\n\n  ERROR:  a second drive already exists. Check VM conf and general settings.\n\n"
+    printColor "\n\n  ERROR:  A second appears to already have been set up. Check VM conf and general settings."
+    printf "\n\n  Second drive is set as '%s' \n\n" "$SecondDrive"
+    if [[ -e "$SecondDrive" ]]; then 
+      printf " and has been found." 
+      check_disk_is_okay "$SecondDrive" 
+      printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
+    else printf " but cannot be found."
+    fi
+    printf "\n\n"
 
   else
 
