@@ -33,9 +33,9 @@ fi
 # https://stackoverflow.com/questions/35385962/arrays-in-a-posix-compliant-shell#59353917
 # NB type -p is not supported in 'dash' so command -v needed 
 
-# priority to main stream user bases and those offering geometry parameters
+# Priority to main stream user bases and those offering geometry parameters
 set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "lxterminal" "roxterm" "uxterm" "xterm" 
-set "$@" -- "qterminal" "alacritty" "kitty"
+set "$@" -- "qterminal" "alacritty" "foot" "kitty" "wezterm"
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -43,9 +43,12 @@ while [ -n "$1" ] ; do
   shift
 done 
 
+# Priority listing should have placed the top entry as being the most main stream and being one with sufficient size.
+# At this stage we are looking for something reliable to run the actual terminal selection script.
 if [ -n "$(cat "/tmp/qqX.termlist")" ]; then UserTerm="$(head -n 1 "/tmp/qqX.termlist")"
 fi
 
+# If there is still nothing, try a barrel scrape for something running that might have 'term' in the name ...
 if [ -z "$UserTerm" ]; then TermGrep="$(pgrep -a term | grep qqX | tr -cd '[:print:]' | awk '{print $2}')"
   if [ -n "$TermGrep" ]; then UserTerm="$(basename "$TermGrep")"
   fi
@@ -69,11 +72,22 @@ elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
 elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
   "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e "./qqX.system/qqX_system_install"
 
+elif [ "$UserTerm" = "foot" ] ; then
+  # The popular choice for lightweight Wayland is Alacritty, which is set higher up the list.
+  # FOO Terminal is starting to appear in places but tests have shown it to throw trivial warnings when switching shells.
+  "$UserTerm"  "./qqX.system/qqX_system_install"  2>/dev/null
+
 elif [ "$UserTerm" = "kitty" ] ; then
+  # Unlikely to be a primary terminal but added as is quite popular, especially with cross-platform users.
   "$UserTerm"  "./qqX.system/qqX_system_install"
 
+elif [ "$UserTerm" = "wezterm" ] ; then
+  # As with kitty, but slightly more idiosyncratic.
+  "$UserTerm" start --cwd "$(pwd)" -- "./qqX.system/qqX_system_install"
+
 elif [ -n "$UserTerm" ]; then  
-  # size params not available: "qterminal" "alacritty" etc 
+  # Standard start but size params not available: "qterminal" "alacritty" etc 
+  # Terminals will normally accept '-e' even if it is not the preferred method  # REVIEW 
   "$UserTerm" -e "./qqX.system/qqX_system_install"
 
 elif [ -t 1 ] ; then  
