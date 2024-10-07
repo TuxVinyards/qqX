@@ -275,9 +275,9 @@ function  main_menu_actions {
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
       printf   "\n  The virtual Disk Size is usually larger than the space occupied"
-      printf "\n\n  but double counting from snapshots in can make it appear to be larger." 
-      printf "\n\n  Actual disk size may be reduced by deleting excess snapshots."
-      printf "\n\n  Virtual size may be adjusted using the qqX [disk] utility"
+      printf "\n\n  but double counting from snapshots can sometimes make it appear smaller." 
+      printf "\n\n  Actual disk size may be reduced by deleting older snapshots."
+      printf "\n\n  Virtual size may be increased using the qqX [disk] utility."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
       [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
