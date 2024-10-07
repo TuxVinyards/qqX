@@ -373,6 +373,9 @@ list_current_folder_instance_names () {
 
 move_rename_Selected_VM () {  
 
+  printf "\033c"
+  show_qqX_title_bar
+
   if [[ ! $1 && ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Move Rename Internal Params: VM Name & VM config file (NO PATH) must be given"
@@ -397,7 +400,7 @@ move_rename_Selected_VM () {
     MvTargetIsLinked=1
   fi
 
-  printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
+  printColor "\n\n  Distro Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
   printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
   printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder" 
@@ -411,14 +414,14 @@ move_rename_Selected_VM () {
 
     if [[ $Move_VM_Option == "ln" ]]; then MakeLinksOnly=1 ; else MakeLinksOnly= ; fi
 
-    printf "\n  Folder '%s' & .conf file to be MOVED and edited or Linked"  "$1"
+    printf "\n  Distro Folder '%s' & .conf file to be MOVED and edited or LINKED"  "$1"
     printf "\n\n  For new preset group folders, edit the main settings" 
-    printf "\n\n  Current Folder: '%s' \n" "$(pwd)"
+    printf "\n\n  Current Grouping Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
 
     while true; do
       
-      printColor "\n\n  [number] select a different group folder "
+      printColor "\n\n  [number] select a group folder "
       printf " [b] to go back\n\n"
       read -rp  "  >  "  Move_FolderOption
 
