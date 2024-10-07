@@ -149,8 +149,8 @@ drives_and_snapshots() {
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
    
     "$QEMU_IMG" info "$Selected_Drive"
-
     check_disk_is_okay "$Selected_Drive"
+    Selected_DriveSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
 
     if [[ $2 != "as_disk_util" ]]; then
 
@@ -450,7 +450,16 @@ function qqX_snapshot_delete {
 
       fi
 
-      "$QEMU_IMG" info "$Selected_Drive"
+      "$QEMU_IMG" info "$Selected_Drive" 
+
+      Selected_Drive_NewSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
+      if [[ "$Selected_Drive_NewSize" == *GiB* ]] && [[ "$Selected_DriveSize" == *GiB* ]]; then
+        SelDrvOld="${Selected_DriveSize//'GiB'/}"
+        SelDrvNew="${Selected_Drive_NewSize//'GiB'/}"
+        SelDrv_SpaceSaved="$(bc <<< "$SelDrvOld - $SelDrvNew ") GiB"
+      fi
+
+      printColor "\n\n Initial Disk Size: %s  -  Space Saved: %s \n"  "$Selected_DriveSize"  "$SelDrv_SpaceSaved"
 
     fi
 
