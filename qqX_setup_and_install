@@ -34,8 +34,11 @@ fi
 # NB type -p is not supported in 'dash' so command -v needed 
 
 # Priority to main stream user bases and those offering geometry parameters
-set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "lxterminal" "roxterm" "uxterm" "xterm" 
-set "$@" -- "qterminal" "alacritty" "foot" "kitty" "wezterm"
+# 85% of users are probably covered by the first four: "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" 
+# 95% probably when "qterminal" "alacritty" are added
+# Popular, but generally found as post-install additions to the above, "kitty" "wezterm" are added for good measure
+set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "qterminal" "lxterminal" "roxterm" "uxterm" "xterm" 
+set "$@" -- "alacritty" "foot" "kitty" "wezterm"
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -66,15 +69,31 @@ elif [ "$UserTerm" = "mate-terminal" ]; then
 elif [ "$UserTerm" = "xfce4-terminal" ]; then
   "$UserTerm" --geometry=145x50 --hide-menubar --hide-toolbar  -e "./qqX.system/qqX_system_install"
 
+elif [ "$UserTerm" = "qterminal" ]; then
+  # create profile for geometry
+  if [ -e "$HOME/.config/qterminal.org/qterminal.ini" ]; then
+    QTermIni_User="$HOME/.config/qterminal.org/qterminal.ini"
+    QTermIni_Tmp="/tmp/qq-qterminal.ini" 
+    # sed -i is not always present, use grep. 
+    # But not 'grep -i' as lower case 'size=@' is separate from other camelCase entries with *Size=@
+    grep -B 500 'size=@' "$QTermIni_User" | head -n -1 > "$QTermIni_Tmp"
+    echo "size=@(1200 600)" >> "$QTermIni_Tmp"
+    grep -A 500 'size=@' "$QTermIni_User" | tail -n +2 >> "$QTermIni_Tmp"
+    "$UserTerm" -p "$QTermIni_Tmp" -e "./qqX.system/qqX_system_install"
+  else
+    "$UserTerm" -e "./qqX.system/qqX_system_install"
+  fi
 elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
   "$UserTerm" --geometry=145x50 -e "./qqX.system/qqX_system_install"
 
 elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
   "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e "./qqX.system/qqX_system_install"
 
+# A popular (and cross-platform) choice for lightweight Wayland is Alacritty, which is higher up the 'set' list.
+
 elif [ "$UserTerm" = "foot" ] ; then
-  # The popular choice for lightweight Wayland is Alacritty, which is set higher up the list.
-  # FOO Terminal is starting to appear in places but tests have shown it to throw trivial warnings when switching shells.
+    # FOO Terminal is starting to appear in places for Wayland
+    # but @ 2024 tests have shown it to throw trivial warnings when switching shells, hence the '2>/dev/null'
   "$UserTerm"  "./qqX.system/qqX_system_install"  2>/dev/null
 
 elif [ "$UserTerm" = "kitty" ] ; then
@@ -82,11 +101,11 @@ elif [ "$UserTerm" = "kitty" ] ; then
   "$UserTerm"  "./qqX.system/qqX_system_install"
 
 elif [ "$UserTerm" = "wezterm" ] ; then
-  # As with kitty, but slightly more idiosyncratic.
+  # As with kitty, but a slightly more idiosyncratic command line
   "$UserTerm" start --cwd "$(pwd)" -- "./qqX.system/qqX_system_install"
 
 elif [ -n "$UserTerm" ]; then  
-  # Standard start but size params not available: "qterminal" "alacritty" etc 
+  # Standard start but size params not available: "alacritty" etc 
   # Terminals will normally accept '-e' even if it is not the preferred method  # REVIEW 
   "$UserTerm" -e "./qqX.system/qqX_system_install"
 
