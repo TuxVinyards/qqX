@@ -38,7 +38,7 @@ fi
 # 95% probably when "qterminal" "alacritty" are added
 # Popular, but generally found as post-install additions to the above, "kitty" "wezterm" are added for good measure
 set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "qterminal" "lxterminal" "roxterm" "uxterm" "xterm" 
-set "$@" -- "alacritty" "foot" "kitty" "wezterm"
+set "$@" -- "alacritty" "kitty" "wezterm" "foot"
 
 while [ -n "$1" ] ; do 
   if [ -n "$(command -v "$1")" ] ; then printf "%s\n" "$1" >> "/tmp/qqX.termlist"
@@ -72,17 +72,32 @@ elif [ "$UserTerm" = "xfce4-terminal" ]; then
 elif [ "$UserTerm" = "qterminal" ]; then
   # create profile for geometry
   if [ -e "$HOME/.config/qterminal.org/qterminal.ini" ]; then
-    QTermIni_User="$HOME/.config/qterminal.org/qterminal.ini"
-    QTermIni_Tmp="/tmp/qq-qterminal.ini" 
+    TermConf_User="$HOME/.config/qterminal.org/qterminal.ini"
+    TermConf_Tmp="/tmp/qq-qterminal.ini" 
     # sed -i is not always present, use grep. 
     # But not 'grep -i' as lower case 'size=@' is separate from other camelCase entries with *Size=@
-    grep -B 500 'size=@' "$QTermIni_User" | head -n -1 > "$QTermIni_Tmp"
-    echo "size=@(1200 600)" >> "$QTermIni_Tmp"
-    grep -A 500 'size=@' "$QTermIni_User" | tail -n +2 >> "$QTermIni_Tmp"
-    "$UserTerm" -p "$QTermIni_Tmp" -e "./qqX.system/qqX_system_install"
+    grep -B 500 'size=@' "$TermConf_User" | head -n -1 > "$TermConf_Tmp"
+    echo "size=@(1200 600)" >> "$TermConf_Tmp"
+    grep -A 500 'size=@' "$TermConf_User" | tail -n +2 >> "$TermConf_Tmp"
+    "$UserTerm" -p "$TermConf_Tmp" -e "./qqX.system/qqX_system_install"
   else
     "$UserTerm" -e "./qqX.system/qqX_system_install"
   fi
+
+elif [ "$UserTerm" = "alacritty" ]; then
+  # create profile for geometry
+  if [ -e "$HOME/.config/alacritty/alacritty.toml" ]; then
+    TermConf_User="$HOME/.config/alacritty/alacritty.toml"
+    TermConf_Tmp="/tmp/qq-alacritty.toml" 
+    # sed -i is not always present, use grep. 
+    grep -B 500 'window.dimensions' "$TermConf_User" > "$TermConf_Tmp"
+    { echo "columns = 150" ; echo "lines = 45"; } >> "$TermConf_Tmp"
+    grep -A 500 'window.dimensions' "$TermConf_User" | tail -n +4 >> "$TermConf_Tmp"
+    "$UserTerm" --config-file "$TermConf_Tmp" -e "./qqX.system/qqX_system_install"
+  else
+    "$UserTerm" -e "./qqX.system/qqX_system_install"
+  fi
+
 elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
   "$UserTerm" --geometry=145x50 -e "./qqX.system/qqX_system_install"
 
@@ -91,21 +106,22 @@ elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
 
 # A popular (and cross-platform) choice for lightweight Wayland is Alacritty, which is higher up the 'set' list.
 
-elif [ "$UserTerm" = "foot" ] ; then
-    # FOO Terminal is starting to appear in places for Wayland
-    # but @ 2024 tests have shown it to throw trivial warnings when switching shells, hence the '2>/dev/null'
-  "$UserTerm"  "./qqX.system/qqX_system_install"  2>/dev/null
-
 elif [ "$UserTerm" = "kitty" ] ; then
   # Unlikely to be a primary terminal but added as is quite popular, especially with cross-platform users.
   "$UserTerm"  "./qqX.system/qqX_system_install"
 
+elif [ "$UserTerm" = "foot" ] ; then
+    # FOO Terminal is a lightweight terminal starting to appear in places for Wayland
+    # but @ 2024 tests have shown it to throw trivial warnings when switching shells, 
+    # hence the '2>/dev/null' and placement (for now) towards the end
+  "$UserTerm"  "./qqX.system/qqX_system_install"  2>/dev/null
+
 elif [ "$UserTerm" = "wezterm" ] ; then
-  # As with kitty, but a slightly more idiosyncratic command line
+  # As with kitty, but has a slightly more idiosyncratic command line and doesn't close as others do
   "$UserTerm" start --cwd "$(pwd)" -- "./qqX.system/qqX_system_install"
 
 elif [ -n "$UserTerm" ]; then  
-  # Standard start but size params not available: "alacritty" etc 
+  # Standard start for unknown possibilities, size params not used: 
   # Terminals will normally accept '-e' even if it is not the preferred method  # REVIEW 
   "$UserTerm" -e "./qqX.system/qqX_system_install"
 
