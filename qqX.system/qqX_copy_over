@@ -16,7 +16,7 @@ source "qqX.system/Func_echo_colors"
 
 function copy_files {
 	printf "\n"
-	sudo cp  qqX.main/*   /usr/share/qqX/qqX.main/  || CopyFail=1
+	sudo cp  -r qqX.main  /usr/share/qqX/  || CopyFail=1
 	sudo cp  qqX   /usr/bin/qqX  || CopyFail=1
 	source "qqX.system/qqX_settings_update_transposer"
 	source "qqX.system/Func_echo_colors"
@@ -25,7 +25,7 @@ function copy_files {
 
 function copy_builtins {
 	printf "\n"
-	sudo cp -r qqX.builtins/*   /usr/share/qqX/qqX.builtins/  || CopyFail=1
+	sudo cp -r qqX.builtins   /usr/share/qqX/  || CopyFail=1
 	source "qqX.system/qqX_settings_update_transposer"
 	source "qqX.system/Func_echo_colors"
 	printf "\n Builtins Copied \n"
