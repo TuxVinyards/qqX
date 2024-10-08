@@ -217,16 +217,16 @@ else
 
     filter_and_flag_qemu_errors
 
-    if [[ $QemuErrorAlert ]]; then printColor "  [ql]  show qemu error log"
-
+    if [[ $QemuErrorAlert ]]; then 
+      printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then 
-
-      if [[ $(type -p "$FileManager") ]]; then printf "   [f]  open VM folder in file manager"
+      if [[ $(type -p "$FileManager") ]]; then 
+        printf "   [f] open VM folder"
+        [[ $SharedDrive ]] && printf " [3f] Shared Drive "
+        printf "in file manager"
       else  printColor "   [set]  ERROR file manager not found" 
       fi
-
     fi
-
 
     if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
     

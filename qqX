@@ -95,6 +95,11 @@ if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not fo
 if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
 if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
+# NON-FHS installs should normally locate Main and Built-Ins in with this file, so ./ will locate things
+
+# The default location for the .desktop file, from ver 1.9 onwards, is '/usr/share/applications'
+XDG_GUI_desktop_Folder="/usr/share/applications"
+
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
 declare -gA VM_Array=()
 declare -ga Extra_VM_Folder=()

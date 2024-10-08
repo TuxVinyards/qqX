@@ -185,9 +185,11 @@ fi
 qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
 qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
 
+#  NB For non FHS OS packaging, also edit at start of main file 'qqX' ...  
+#  WiP: attention may need to be given to the qqX updater too ...
+
 #  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 #  And from 1.8 the subfolder qqX.builtins
-#  For non FHS OS's also edit at start of main file 'qqX' ...
 
 qqX_Std_Share_Path="/usr/share/qqX"   
 
