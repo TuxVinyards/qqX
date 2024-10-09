@@ -24,5 +24,8 @@ sleep 100
 
 #  TODO 
 
+# add a note to set a 3rd up, if not done
+
+
 # nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
 

@@ -669,6 +669,36 @@ function_delete_SecondDrive () {
   
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
+
+}
+
+function mount_qcow2_in_host_fm {
+
+  # Designed to accept $1 as a drive designate but currently only Shared Drive is probably necessary 
+  # and multi-partition drives with boot sectors are complicated.  REVIEW  adding Second Drive
+
   
+  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
+    printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
+    printf "\n\n  [enter] to return \n\n"
+    read -rp "  >  "
+    return
+  fi
+  if [[ ! $SharedDrive ]]; then 
+    printColor "\n\n  A Shared Drive needs to be set up first, via the qqX Utils menu."
+    printf "\n\n  [enter] to return \n\n"
+    read -rp "  >  "
+    return
+  fi
+  # Read the .desktop file for Terminal_Start as needs to run in a separate terminal to ensure qqX main does NOT get elevated permissions
+  # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
+  Terminal_Start=
+  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
+  if [[ $GrepExecLine ]]; then 
+    GrepExecLine="${GrepExecLine/'Exec='/}" 
+    Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+  fi
+  eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_shared_drive" &
+
 
 }

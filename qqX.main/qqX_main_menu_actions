@@ -135,23 +135,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
-  elif [[ $MainMenuChoice == "3f" ]] ; then  
-
-    if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
-      printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
-      printf "\n\n  [enter] to return \n\n"
-      read -rp "  >  "
-      return
-    fi
-    # Read the .desktop file for Terminal_Start as needs to run in a separate terminal to ensure qqX main does NOT get elevated permissions
-    # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
-    Terminal_Start=
-    GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
-    if [[ $GrepExecLine ]]; then 
-      GrepExecLine="${GrepExecLine/'Exec='/}" 
-      Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
-    fi
-    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_shared_drive" &
+  elif [[ $MainMenuChoice == "3f" ]] ; then  mount_qcow2_in_host_fm  shared
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
