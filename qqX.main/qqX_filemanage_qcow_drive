@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+# 	Otherwise:  
+#   Licence  GPL3   https://www.gnu.org/licenses 
+##  qqX - quickemu quickget X terminal project   
+
+## ShellCheck global disables:
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
+
+#  MOUNTS and UNMOUNTS the Shared Drive, or other, if present, in the designated HOST File Manager
+#  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
+
+# A custom version for this file may be created, if wished, and placed next to this one
+# at/as "$qqX_MainFolder/custom_filemanage_qcow_drive" which will be auto-detected and run by function 'mount_qcow2_in_host_fm' 
+
+source "/tmp/qqX_nbd_vars"
+source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+qqX_logo_printf_title "File Manager Utility for mounting QCOW2 drives"
+
+if [[ ! $(type -p "$FileManager") ]] ; then 
+  printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager"
+else
+  printf "\n\n\n  Open VM disks and browse using '%s' " "$FileManager"
+  printf "\n\n  This is terminal window is process separated from qqX and may/should be left open, repositioned or minimized"
+  printf "\n\n  Elevated permissions will be required to mount the drives"
+  printf "\n\n  Script name and location:  %s" "$0"
+  printf "\n"
+fi
+
+TargetDrive="$SharedDrive"
+
+while true; do
+
+  DriveSelect=
+  printf "\n\n  Selected = '%s'" "$TargetDrive"
+  if [[ ! $TargetDrive || ! -e "$TargetDrive" ]]; then 
+    printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
+  fi
+  printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive   [q] to quit "
+  printColor "\n\n\n  [enter] to continue  or  [number] for different selection"
+  printf "\n\n"
+  read -rp "  >  " DriveSelect
+
+  if [[ ! $DriveSelect ]]; then break
+  elif [[ $DriveSelect == "1" ]]; then TargetDrive="$MainDrive"
+  elif [[ $DriveSelect == "2" ]]; then TargetDrive="$SecondDrive"
+  elif [[ $DriveSelect == "3" ]]; then TargetDrive="$SharedDrive"
+  elif [[ $DriveSelect == "q" ]]; then exit directly
+  else printColor "\n\n  '%s' not recognised ...." "$DriveSelect"
+  fi
+
+done
+
+echo; echo  " initial menu only, not yet finished ..."
+
+sleep 100
+
+
+
+# nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
+

@@ -135,7 +135,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
-  elif [[ $MainMenuChoice == "3f" ]] ; then  mount_qcow2_in_host_fm  shared
+  elif [[ $MainMenuChoice == "qf" ]] ; then  mount_qcow2_in_host_fm  
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 

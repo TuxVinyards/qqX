@@ -222,7 +222,7 @@ else
     elif [[ $FileManager ]]; then 
       if [[ $(type -p "$FileManager") ]]; then 
         printf "   [f] open VM folder"
-        [[ $SharedDrive ]] && printf " [3f] Shared Drive "
+        [[ $SharedDrive ]] && printf "  [qf] qcow2 Drive "
         printf "in file manager"
       else  printColor "   [set]  ERROR file manager not found" 
       fi
