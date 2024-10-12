@@ -7,22 +7,34 @@ assignees: ''
 
 ---
 
-Standard  elimination and substitution methods should be used prior to posting: 
+### General Description
 
-Does it happen to all VM's  & does it happen when you try directly with quickemu itself?  
+Include: Host OS and version, qqX, Quickemu & Qemu versions ...
 
-Have you tried different Virtual Machines.  If it only happens  to one VM then re-install the machine or try creating another version on your main host or on another, if you have one.
+### Screenshots & Error messages
 
-Did the problems start when Quickemu or Qemu updated?   Have you tried the reverting back to an older version.?  Notes are in the qqX general settings file ...
+### Description of tests conducted and results
 
-Problems with quickemu or quickget should be submitted at https://github.com/quickemu-project/quickemu  Qemu at https://gitlab.com/qemu-project/qemu/-/issues
+Standard  elimination and substitution methods should be used prior to posting:
 
-For advice and discussion try the quickemu  forum at https://discord.gg/sNmz3uw
+- Does it happen to all VM's & does it happen when you try directly with quickemu itself?  
 
-### General Description:
+Have you tried different Virtual Machines?
 
-Host OS ,  qqX, quickemu &  Qemu versions:
+- If it only happens to one VM then re-install the machine or try creating another version.
 
-### Screenshots & Error messages:
+Did the problems start when somthing was updated?
 
-### Description of tests conducted and results:
+- Both older and newer versions of Quickemu are available as qqX builtins
+
+- Make sure that you have checked the [qqX branches](https://github.com/TuxVinyards/qqX/branches). Fixes may already have been committed.
+
+When checking the issues list make sure the filter is not just `is:issue is:open`
+
+Also try the closed tab `is:issue is:closed`
+
+Problems with quickemu or quickget should be submitted at <https://github.com/quickemu-project/quickemu>  
+
+Qemu problems at <https://gitlab.com/qemu-project/qemu/-/issues>
+
+For advice and discussion try the quickemu  forum at <https://discord.gg/sNmz3uw>
