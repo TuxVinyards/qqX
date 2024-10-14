@@ -117,6 +117,7 @@ function find_file_manager_browser()  {
 
 # NB Also needs calling if re-loading the settings file  See refresh_sources_and_load_VM_arrays
 find_file_manager_browser
+find_texteditor
 
 # Set the original initial value of paths as found on start up. Check Once.
 OriginalPATH="$PATH"

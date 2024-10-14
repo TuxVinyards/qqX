@@ -504,6 +504,7 @@ refresh_sources_and_load_VM_arrays() {
   refresh_and_load_quickemu_sources
   store_bootmenu_defaults
   find_file_manager_browser
+  find_texteditor
 
   CurrentFolder="$Default_VM_Folder"
   function_create_VM_folderList  
