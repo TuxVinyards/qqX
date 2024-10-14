@@ -683,8 +683,11 @@ function mount_qcow2_in_host_fm {
 
   # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
 
+  find_texteditor
+
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
     printf "\n FileManager=\"%s\"" "$FileManager"
+    printf "\n TextEditor=\"%s\"" "$TextEditor"
     printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
     printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
     printf "\n MainDrive=\"%s\"" "$MainDrive"
