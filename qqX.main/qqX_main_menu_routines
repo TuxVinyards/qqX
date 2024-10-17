@@ -362,8 +362,8 @@ list_current_folder_instance_names () {
   mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
   for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
 
-  printf "\n  Containing:   "
-  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor " NONE FOUND \n\n" 
+  # printf "\n  Containing:   "  # set each title case by case
+  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor "  NONE FOUND \n\n" 
   else 
     printf "\n\n" 
     print_quickget_and_folder_choices  "CurrentFolderNames"  6 
@@ -453,7 +453,9 @@ move_rename_Selected_VM () {
     Mv_OldFolderPath="$(realpath "$VM_InstanceName")"
     Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
 
+    # set mv to use 'r' as multi-purpose 
     Move_VM_Option="r"
+
     if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
@@ -461,7 +463,8 @@ move_rename_Selected_VM () {
   fi
 
   if [[ $Move_VM_Option == "r" ]]; then  
-
+  
+    printf "\n  Currently Containing:   "  
     list_current_folder_instance_names
 
     while true; do
@@ -473,10 +476,13 @@ move_rename_Selected_VM () {
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 
 
-      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName"  && break
+      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName" 
       
-      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1; done
-      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break ; fi
+      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1
+      done
+
+      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
+      fi
 
     done
 
@@ -520,6 +526,7 @@ move_rename_Selected_VM () {
   fi
 
   if [[ $MoveFail ]]; then printColor "\n  Hmm. Something went wrong.  \n"  ; else printColor "\n  Success  '%s'\n"  "$(pwd)" ; fi
+  printf "\n  Now Containing:   " 
   list_current_folder_instance_names
 
   ConfLine="$(grep -s 'macos_release=' "${Mv_NewName}.conf")"
