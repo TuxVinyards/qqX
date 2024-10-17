@@ -938,8 +938,8 @@ function_quick_get_wrap ()  {
 
       if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then  
         printf "\n\n"
-        [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] && printf "  [r] reselect release  or "
-        [[ "${#QGW_Editions_Array[@]}" -gt 1 ]] && printf "  [e] reselect edition  or "
+        [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] && printf "  [r] reselect release, view distro web pages   or "
+        [[ "${#QGW_Editions_Array[@]}" -gt 1 ]] && printf "  [e] reselect edition, release or view distro web pages,   or "
       fi
 
       if [[ $QGW_Download_BadLink ]]; then
