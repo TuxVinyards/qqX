@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Use qqX UTF8  locale, not:  export LC_ALL=C
+# Use qqX C.UTF-8 locale, not:  export LC_ALL=C
 
 if ((BASH_VERSINFO[0] < 4)); then
     echo "Sorry, you need bash 4.0 or newer to run this script."
@@ -971,12 +971,18 @@ function configure_storage() {
 }
 
 function configure_display() {
+    # Determine which audio driver use between Pulseaudio or ALSA
+    local AUDIO_DRIVER="pa"
+    if ! command -v pacmd >/dev/null 2>&1 ; then
+      AUDIO_DRIVER="alsa"
+    fi
+
     # Setup the appropriate audio device based on the display output
     # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
     case ${display} in
         cocoa) AUDIO_DEV="coreaudio,id=audio0";;
         none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
-        *) AUDIO_DEV="pa,id=audio0";;
+        *) AUDIO_DEV="${AUDIO_DRIVER},id=audio0";;
     esac
 
     # Determine a sane resolution for Linux guests.
@@ -2000,7 +2006,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.6.05"
+readonly VERSION="FS 4.9.6.06"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
