@@ -384,42 +384,6 @@ function_conf_error () {
 
 }
 
-texteditor_not_found_message () {
-  
-  printColor "\n\n  Unable to open settings or show some help sections without an editor."
-  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
-  printf "\n\n  Give settings file the command name of a preferred editor."
-  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
-  read -rp "  >  "
-}
-
-find_texteditor () {
-
-  [[ $TextEditor && ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
-
-  if [[ ! $TextEditor ]]; then
-  
-    DefaultTextEditor="$(xdg-mime query default text/plain)"
-    EditorTest="${DefaultTextEditor/.desktop/}"
-    EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
-
-    # orggnomeTextEditor etc will fail
-    [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
-
-    if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
-    elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
-    elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
-    elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
-    elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
-    elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
-    elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
-    elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
-    fi
-
-  fi
-}
-
-
 qqX_edit_settings() {
 
   if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
