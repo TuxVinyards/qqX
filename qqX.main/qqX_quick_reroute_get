@@ -368,6 +368,9 @@ function_quick_get_wrap ()  {
 
     QGW_OS_Arr_NameSelected="$Zsync_OS_Name"
     QGW_Release_Arr_NameSelected="$Zsync_Release_Name"
+    declare -ga QGW_Releases_Array=()
+    QGW_Releases_Array[0]="$QGW_Release_Arr_NameSelected"
+    declare -ga QGW_Editions_Array=()
 
   else
 
@@ -593,6 +596,7 @@ function_quick_get_wrap ()  {
   function choose_QGW_release {
 
     [[ $GT_Exit ]] && return
+    [[ $MainMenuZsync ]] && return
 
     while true ; do
 
@@ -629,7 +633,7 @@ function_quick_get_wrap ()  {
       printf "\n\n  [s] scroll to next listing  [p] to previous"  
 
       if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
-      else  printf "\n\n" ; fi
+      fi
 
       printf "    [b] back to main menu \n\n"   
       read -rp "  >  "  QGW_List_NumSelected  
@@ -674,6 +678,7 @@ function_quick_get_wrap ()  {
   function choose_QGW_edition {
 
     [[ $GT_Exit ]] && return
+    [[ $MainMenuZsync ]] && return
 
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then
 
