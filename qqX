@@ -221,7 +221,7 @@ tput  cnorm
 
 ## CODING STYLE 
 
-#  A more modern style of coding is used for qqX than that used for quickemu:
+#  A more modern, more Bash orientated, style of coding is used for qqX than that used for quickemu:
 
 #  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
 #  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
@@ -249,7 +249,7 @@ tput  cnorm
 #  SPACE:  Give your code some room to breathe. But also keep your code tight enough to view on smaller screens.    
 #  Place it into clear logic blocks. Make it easy to follow & easy to see what is happening.  
 
-#  SED & AWK:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
+#  SED, AWK and REGEX:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
 #  If you must use them, keep things very simple & explain the sections.  
 #  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
 

@@ -127,7 +127,7 @@ show_main_menu_header () {
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   LiveBoot=
-  if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
+  if  [[  ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
   elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
   elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
@@ -142,7 +142,7 @@ show_main_menu_header () {
 
   # Note .conf won't exist at first load, at VM selector menu
 
-  if [[ ! $NewFileTuneUp && ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] ; then 
+  if [[ ! $NewFileTuneUp ]] && [[ ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]] ; then 
     printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
   fi
 
@@ -163,7 +163,7 @@ function check_disk_is_okay {
     if [[ $CheckArg == "PrintErrors" ]]; then PrintErrors=1 ; shift ; fi
   done
 
-  if [[ $1 && ! $2 ]]; then
+  if [[ $1 ]] && [[ ! $2 ]]; then
 
     DiskCheckFolderName="$(dirname "$1")"
     DiskCheck_Disk="$(basename "$1")"
@@ -241,7 +241,7 @@ filter_and_flag_qemu_errors () {
 
 function_delete_Selected_VM () {
 
-  if [[ ! $1 && ! $2 ]]; then
+  if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
     sleep 2 ;  return
@@ -376,7 +376,7 @@ move_rename_Selected_VM () {
   printf "\033c"
   show_qqX_title_bar
 
-  if [[ ! $1 && ! $2 ]]; then
+  if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Move Rename Internal Params: VM Name & VM config file (NO PATH) must be given"
     printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 

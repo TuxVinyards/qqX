@@ -85,7 +85,7 @@ function check_screen_percentage_and_output {
     if  grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then  
       SDL_ScreenSize_Cmd=" --screenpct  $SDL_ScreenPercent"
     else
-      if [[ ! $QE_495_Script && ! $QE_496_Script ]]; then 
+      if [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then 
         printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
         SDL_ScreenSize_Error="> not possible with this qe-version"
       fi
@@ -132,7 +132,7 @@ function check_screen_percentage_and_output {
     # Mac seems to be able to use 1280 and then takes control of the outcome itself, once set up.
     # Unless it's Sequoia where it needs to be specified in the conf file:
     if [[ $guest_os == "macos" ]]; then 
-      if [[ $MacScreenRes && ! $Custom_SDL_ScreenSize ]]; then
+      if [[ $MacScreenRes ]] && [[ ! $Custom_SDL_ScreenSize ]]; then
         SDL_ScreenSize="$MacScreenRes"
       else xRes=1280 && yRes=720
       fi
@@ -386,7 +386,7 @@ function_conf_error () {
 
 qqX_edit_settings() {
 
-  if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+  if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
   else
     # Run the editor: 
     if [[ $1 == "conf" ]]; then

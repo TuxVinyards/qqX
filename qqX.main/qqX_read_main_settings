@@ -111,7 +111,7 @@ texteditor_not_found_message () {
 
 find_texteditor () {
 
-  [[ $TextEditor && ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
+  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
   if [[ ! $TextEditor ]]; then
     DefaultTextEditor="$(xdg-mime query default text/plain)"
     EditorTest="${DefaultTextEditor/.desktop/}"

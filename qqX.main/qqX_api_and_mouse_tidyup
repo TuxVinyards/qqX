@@ -57,7 +57,7 @@ right_click_re_route () {
   fi
 }
 
-if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised && ! $XDG_FileType_Recognised ]]; then
+if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]] && [[ ! $XDG_FileType_Recognised ]]; then
 
   if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1 "  "$XDG_MimeType"
   else  show_CLI_usage 
@@ -160,7 +160,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
     printf "\n\n  dragonflybsd | freebsd | netbsd | openbsd  should work but the .conf file"
     printf "\n\n  will need manually editing so guest_os= reads appropriately as one of the above,"
     printf "\n\n  plus 'boot=\"legacy\"' may be required for one or two of these. \n"
-    
+
     if [[ $XDG_FileType_Recognised ]] && [[ ! $XDG_MimeType_Recognised ]]; then
       printf "\n\n  WARNING: The ISO formatting is a non-recognised mimetype so may not be bootable or valid. Try anyway? \n"
     fi     
@@ -336,7 +336,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 fi
 
 
-if [[ -e "$VM_Conf_Dir/$VM_Conf_File" && ! $QCOW_RightClick_NON_qqX ]]; then
+if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ ! $QCOW_RightClick_NON_qqX ]]; then
 
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
   [[ $VM_Conf_File ]] && source "$VM_Conf_File"

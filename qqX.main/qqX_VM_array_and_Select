@@ -269,7 +269,7 @@ VM_loader_selector_and_menu () {
 
         [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
-        if [[ $MenuStylePreviewed && ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
+        if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
         elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
         fi
 
@@ -409,7 +409,7 @@ VM_loader_selector_and_menu () {
 
     # change directory to where the VM is
     ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1
-    [[ $VM_Conf_File != "empty" && ! -e "$VM_Conf_File" ]] &&  function_conf_error  ".conf file" && SelectArrayError=1
+    [[ $VM_Conf_File != "empty" ]] && [[ ! -e "$VM_Conf_File" ]] &&  function_conf_error  ".conf file" && SelectArrayError=1
 
     # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder 
     VM_InstanceName="${VM_Conf_File/.conf}"

@@ -90,7 +90,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "tmc" ]] ; then  
 
     find_texteditor
-    if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+    if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
     else
       if [[  -e  "$HOME/.qqX/qqX_term.conf" ]]; then 
         printColor "\n\n  Follow up by running the latest release installer for changes to the Terminal config to take effect"

@@ -113,7 +113,7 @@ elif [[ ! $UserTerm ]]; then
      fi
   fi
 
-  if [[ $UserTerm && ! $(type -p "$UserTerm") ]]; then UserTerm= 
+  if [[ $UserTerm ]] && [[ ! $(type -p "$UserTerm") ]]; then UserTerm= 
   fi
 
   if [[ ! $UserTerm ]]; then
@@ -193,7 +193,7 @@ while [[ ! $UserTerm_Found ]]; do
 
     if [[ $TermFind_ReRun || $WSL_Install ]]; then
 
-      if [[ $ErrorPID && ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= 
+      if [[ $ErrorPID ]] && [[ ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= 
       fi
 
       echo

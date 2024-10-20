@@ -78,7 +78,7 @@ function quickemu {
 
     gl="$qqX_GL_Mode"  
     fixed_iso="$Mounted_ISO"
-    [[ $guest_os == "macos" && ! $cpu_cores ]] && cpu_cores=8
+    [[ $guest_os == "macos" ]] && [[ ! $cpu_cores ]] && cpu_cores=8
     source "/tmp/qmod-actions-temp" 
 
     if [[ $VM_ExecBoot ]]; then

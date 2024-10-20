@@ -69,7 +69,7 @@ function_config_tune_up ()  {
   Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
   [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
-  if [[ ! $Conf_qqX_Pointer && ! $Conf_SysQE_Pointer ]]; then 
+  if [[ ! $Conf_qqX_Pointer ]] && [[ ! $Conf_SysQE_Pointer ]]; then 
     if [[ $Installed_qqX_Path ]]; then {
       printf '#!' ; printf "%s --vm \n\n" "$Installed_qqX_Path" 
       } > "$TuneUpTargetFile" 

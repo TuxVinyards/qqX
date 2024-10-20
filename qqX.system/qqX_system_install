@@ -498,7 +498,7 @@ else
       printColor "  [n] not yet >> edit the settings file later ... \n\n" 
       read -rp "  >  "  MkDefDir
 
-      if [[ ! $MkDefDir && ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+      if [[ ! $MkDefDir ]] && [[ ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
       #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
     fi
@@ -512,9 +512,9 @@ else
     cp -r "qqX.system/icons"  "$HOME/.qqX" 
     printColor "\n\n  Installing settings file and desktop icons \n\n"
 
-    if [[ ! $(type -p qqx) && ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
+    if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
-      [[ ! $(type -p qqx) && ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
+      [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
       [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
       printf "\n\n  [enter] to close & investigate \n\n"

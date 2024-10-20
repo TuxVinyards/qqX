@@ -35,7 +35,7 @@ Counter=0
 
 while true ; do
 
-	if [[ $Counter == 0 && ! $DevSetUpdArrOutputScrn ]]; then 
+	if [[ $Counter == 0 ]] && [[ ! $DevSetUpdArrOutputScrn ]]; then 
 		printf "\033c"
 		printf "\n From %s" "$SourceFolder"
 		printColor "\n\n COPY the qqX script to usr/bin" 
