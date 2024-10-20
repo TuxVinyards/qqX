@@ -514,9 +514,7 @@ function_quick_get_wrap ()  {
             QGW_OS_HomePage="$(tr -cd "[:print:]" <<< "$QGW_OS_HomePage")"
 
           elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
-
-              # 4.9.2 onwards seems to be okay  REVIEW  
-
+            # 4.9.2 onwards seems to be okay  REVIEW  
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
               # first listing, some may have two
@@ -529,10 +527,11 @@ function_quick_get_wrap ()  {
 
               QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
               QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
-              [[ $QGW_OS_InfoText ]] && printf "\n\n"  && fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
-              
             fi
+          fi
 
+          if [[ $QGW_OS_InfoText ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
+          else printf "\n\n  Not available, see webpage for more details \n\n"
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
@@ -1147,7 +1146,7 @@ function_quick_get_wrap ()  {
     fi
 
     function show_rcksum_progress {
-      
+
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
       LastZsync="0" 
       [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
