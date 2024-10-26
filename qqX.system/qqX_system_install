@@ -71,8 +71,8 @@
 if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 5 ]; then 
   echo; echo "  Sorry, you need Bash, probably 5.0 or newer to run this script."; echo
   echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
-  echo "  Your version: "; echo
-  bash --version
+  if [ -n "$(command -v bash)" ]; then echo "  Your version: "; echo ; bash --version ; echo
+  fi
   echo ; echo "  Press [enter] to try anyway   [e]  to  exit and update  >  " 
   read -r   UpdateBash
   if [ -n "$UpdateBash" ]; then echo;  exit 1
