@@ -67,22 +67,29 @@
 
 # shellcheck disable=SC1090,SC1091,SC2317,SC2034
 
-# Posix caller will look in the system folder for this script 
-# but the installer was originally designed to work from the main folder, so move there:
-if [[ ! -d "./qqX.system" ]]; then
-  cd .. || echo "  Problems switching to main folder"
-fi
-if [[ ! "$(type -p bash)" ]] || ((BASH_VERSINFO[0] < 5)); then
-  echo; echo "  Sorry, you probably need Bash 5.0 or newer to run this script."; echo
+# Posix compliant Bash check
+if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 5 ]; then 
+  echo; echo "  Sorry, you need Bash, probably 5.0 or newer to run this script."; echo
   echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
   echo "  Your version: "; echo
   bash --version
+  echo ; echo "  Press [enter] to try anyway   [e]  to  exit and update  >  " 
+  read -r   UpdateBash
+  if [ -n "$UpdateBash" ]; then echo;  exit 1
+  else  
+    echo; echo "  I understand the risks and have made backups" 
+    echo ; echo "  [enter] to confirm  [e] to exit > " 
+    read -r   UpdateBash
+  fi
   echo
-  read -rp "  Press [enter] to try anyway   [e]  to  exit and update  >  "    UpdateBash
-  if [[ $UpdateBash ]]; then echo;  exit 1; 
-  else  echo; echo "  I understand the risks and have made backups" ; echo ; read -rp "  [enter] to confirm  [e] to exit > " UpdateBash ; fi
-  echo
-  [[ $UpdateBash ]] &&  exit 1
+  if [ -n "$UpdateBash" ]; then echo;  exit 1
+  fi
+fi
+
+# Posix caller in the main folder will look in the system folder for this script 
+# but the installer was originally designed to work from the main folder, so move there:
+if [[ ! -d "./qqX.system" ]]; then
+  cd .. || echo "  Problems switching to main folder"
 fi
 
 HideFHSwarnings=     # To disable FHS warnings. Set =1
