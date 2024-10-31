@@ -148,9 +148,15 @@ See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for d
 
 ### FAQs and Help
 
-- Lots available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help)
+- Lots of _Quickemu Help_ available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help) too, not just qqX
 
-For general Quickemu problems, there is a chat forum at <https://discord.gg/sNmz3uw>
+- Full  Quickemu [MacOS installation guide](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) and walk through
+
+- Qemu / qqX  guide to disk resizing and [disk maintenance](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing)
+
+- And more ...
+
+Also try the Quickemu forum at <https://discord.gg/sNmz3uw>
 
 ## Why Bash?
 
