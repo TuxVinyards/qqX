@@ -228,8 +228,13 @@ else
 
 fi
 
-if [[ $AllowMoreLocale ]]; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8" ; else  export "LC_ALL=C.UTF-8" ; fi
-# Use C.UTF-8 as more locale and Qt friendly https://wiki.archlinux.org/title/Locale
+if [[ $AllowMoreLocale ]]; then 
+  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
+  else export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; fi
+else
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then  export "LC_ALL=C.UTF-8" ;  else export "LC_ALL=C" ; fi
+fi
 
 if [[ $XDG_MimeType_is_QCOW ]]; then
 
