@@ -146,7 +146,7 @@ if [[ $1 == "XDG" ]]; then
       echo; echo; echo "<<" 
       head -n 20 "$2"
       echo ">>" ; echo
-      FileLines="$(wc -l < "$2")"
+      FileLines="$(grep -c ^ "$2")"
       printf "\n This current file is plain text only. " 
       [[ $FileLines -gt 20 ]] && printf " File length %s lines \n"  "$FileLines"  &&  TextAll="[a] view full text & quit   "
       echo
