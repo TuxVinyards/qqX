@@ -191,9 +191,9 @@ scan_folders_list_and_add_VMs () {
 VM_loader_selector_and_menu () {  
 
   ShowUtilsMenu=
-  ShowCustomBootMenu=
+  ShowCustomBootStyle=
   ShowDefault_Hybrid=
-  ForceCustomBootMenu=
+  ForceCustomBootStyle=
 
   # Loader should be run on first start up. 
   # But otherwise may be bypassed if array present and nothing new added, or if settings not changed ... 
@@ -486,7 +486,7 @@ refresh_sources_and_load_VM_arrays() {
   Extra_VM_Folder=()
   VM_Array=()   
   QemuErrorFilter=()
-  clear_bootmenu_vars
+  clear_boot_style_vars
 
   # clear possible flags
   VM_SettingsError=
@@ -495,14 +495,14 @@ refresh_sources_and_load_VM_arrays() {
   IgnoreSecondCheckNew=
   KVM_MSR_Error=
   ShowUtilsMenu=
-  ForceCustomBootMenu=
+  ForceCustomBootStyle=
 
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
   source "$qqX_SettingsFile" 
 
   [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap" 
   refresh_and_load_quickemu_sources
-  store_bootmenu_defaults
+  store_boot_style_defaults
   find_file_manager_browser
   find_texteditor
 

@@ -151,8 +151,8 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "fb" || $MainMenuChoice == "bm" ]] ; then 
   
-    if [[ $BootMenu == "fast" ]]; then  BootMenu="slow" ; BootMenuMsg="slow"
-    elif [[ $BootMenu == "slow" ]]; then  BootMenu="fast" ; BootMenuMsg="fast"
+    if [[ $BootStyle == "fast" ]]; then  BootStyle="slow" ; BootStyleMsg="slow"
+    elif [[ $BootStyle == "slow" ]]; then  BootStyle="fast" ; BootStyleMsg="fast"
     fi
 
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
@@ -170,7 +170,7 @@ function  main_menu_actions {
     IsoImg=
     QemuArgsCustomFile=
     #clear, then load defaults
-    reload_bootmenu_defaults
+    reload_boot_style_defaults
     cd "$Default_VM_Folder" || DefaultFolderError=1
     function_quick_get_wrap 
 
@@ -201,7 +201,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "C" ]] ; then 
 
-    if [[ $ShowCustomBootMenu ]]; then  ForceCustomBootMenu="hide" ; else  ForceCustomBootMenu="show" ; fi
+    if [[ $ShowCustomBootStyle ]]; then  ForceCustomBootStyle="hide" ; else  ForceCustomBootStyle="show" ; fi
     MainMenuChoice=
   
   elif [[ $MainMenuChoice == "c" ]] ; then 

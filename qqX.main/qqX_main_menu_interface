@@ -46,8 +46,8 @@ else
       printf  "  [u]  show utils & technical"
 
       if [[ ! $LiveBoot ]]; then  # REVIEW show all?
-        if [[ $BootMenu == "fast" ]]; then printf "   (fastboot)"
-        else  printf "   (bootmenu options active)"
+        if [[ $BootStyle == "fast" ]]; then printf "   (fastboot)"
+        else  printf "   (boot_style options active)"
         fi
       fi
 
@@ -77,8 +77,8 @@ else
       fi
       printf "  [iso] mount iso / boot from iso"
       if [[ ! $LiveBoot ]]; then
-        if [[ $BootMenu == "fast" ]]; then printf "   [bm] show bios bootmenu"
-        else printf "   [fb] hide bios bootmenu "
+        if [[ $BootStyle == "fast" ]]; then printf "   [bm] show bios boot_style"
+        else printf "   [fb] hide bios boot_style "
         fi
       fi
 
@@ -99,17 +99,17 @@ else
 
       if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
      
-      if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootMenu= ; else ShowCustomBootMenu=1 ; fi
+      if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootStyle= ; else ShowCustomBootStyle=1 ; fi
 
-      [[ $ForceCustomBootMenu == "hide" ]] && ShowCustomBootMenu=  && ShowDefault_Hybrid=1
-      [[ $ForceCustomBootMenu == "show" ]] && ShowCustomBootMenu=1 && ShowDefault_Hybrid=
+      [[ $ForceCustomBootStyle == "hide" ]] && ShowCustomBootStyle=  && ShowDefault_Hybrid=1
+      [[ $ForceCustomBootStyle == "show" ]] && ShowCustomBootStyle=1 && ShowDefault_Hybrid=
 
-      [[ $PreferHybridCustomMenus ]] && [[ ! $ForceCustomBootMenu ]] && ShowDefault_Hybrid=1 && ShowCustomBootMenu=
+      [[ $PreferHybridCustomMenus ]] && [[ ! $ForceCustomBootStyle ]] && ShowDefault_Hybrid=1 && ShowCustomBootStyle=
 
     else
 
-      #[[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
-      if [[ $ShowCustomBootMenu || $ShowDefault_Hybrid ]]; then   
+      #[[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
+      if [[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]]; then   
         SettingsFileAdjusted=1
         refresh_sources_and_load_VM_arrays 
       fi
@@ -118,7 +118,7 @@ else
 
     print_kvm_status_warnings
     
-    if [[ $ShowCustomBootMenu ]] ; then
+    if [[ $ShowCustomBootStyle ]] ; then
 
       # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
       printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"

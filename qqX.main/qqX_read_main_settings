@@ -337,22 +337,22 @@ qemu_version_check
 
 # How the Tiano BIOS/UEFI loads up:
 
-function store_bootmenu_defaults {
-  [[ ! $BootMenu ]] && BootMenu="fast"
-  [[ ! $BootMenuMsg ]] && BootMenuMsg="slow"
-  BootMenu_Default="$BootMenu"   
-  BootMenuMsg_Default="$BootMenuMsg"  
+function store_boot_style_defaults {
+  [[ ! $BootStyle ]] && BootStyle="fast"
+  [[ ! $BootStyleMsg ]] && BootStyleMsg="slow"
+  BootStyle_Default="$BootStyle"   
+  BootStyleMsg_Default="$BootStyleMsg"  
 }
 
-function reload_bootmenu_defaults {
-  BootMenu="$BootMenu_Default"   
-  BootMenuMsg="$BootMenuMsg_Default"  
+function reload_boot_style_defaults {
+  BootStyle="$BootStyle_Default"   
+  BootStyleMsg="$BootStyleMsg_Default"  
 }
 
-function clear_bootmenu_vars {
-  BootMenu= ; BootMenu_Default=  
-  BootMenuMsg= ; BootMenuMsg_Default= 
+function clear_boot_style_vars {
+  BootStyle= ; BootStyle_Default=  
+  BootStyleMsg= ; BootStyleMsg_Default= 
 }
 
-store_bootmenu_defaults
+store_boot_style_defaults
 

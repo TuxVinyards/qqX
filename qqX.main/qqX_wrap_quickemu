@@ -266,8 +266,8 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
       } | tee -a "$QemuArgsFile" &> /dev/null
     fi
 
-    if [[ $BootMenu == "slow" ]]; then BootMenuCmd=" -boot menu=on " ; else BootMenuCmd=" -boot menu=off " ; fi
-    printf "\n\n %s " "$BootMenuCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+    if [[ $BootStyle == "slow" ]]; then BootStyleCmd=" -boot menu=on " ; else BootStyleCmd=" -boot menu=off " ; fi
+    printf "\n\n %s " "$BootStyleCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
 
     if [[ $secureboot == "on" ]]; then 
       printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
@@ -326,7 +326,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
             
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-      eval "$QEMU"  "${args[*]}" "$BootMenuCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      eval "$QEMU"  "${args[*]}" "$BootStyleCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
 
     fi
 

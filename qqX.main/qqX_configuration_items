@@ -506,7 +506,7 @@ function refresh_conf_vars_and_values {
     ACCESS=
     QemuArgsCustomFile=
     QemuErrorLog=
-    #reload_bootmenu_defaults  # REVIEW  leave off as if active then utils menu bm function reverts to defaults after booting once ...
+    #reload_boot_style_defaults  # REVIEW  leave off as if active then utils menu bm function reverts to defaults after booting once ...
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
 

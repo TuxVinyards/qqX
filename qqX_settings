@@ -357,14 +357,14 @@ VM_SelectorStyle="A"
 # The Tiano core provides a 3 second window to access the BIOS via the escape key.
 # This allows you to select a boot from ISO option and can also be useful for Windows updates. 
 # Instance Session overides can be toggled from the Utilities menu, or individually by placing 
-# 'BootMenu' either as ="fast" or ="slow" in the .conf file
+# 'BootStyle' either as ="fast" or ="slow" in the .conf file
 # Default ="fast" as this will slightly speed up the normal boot sequence:
-  BootMenu="fast"
+  BootStyle="fast"
 
 # Set ="fast"  to skip the ISO boot checks and instructions.
-# Default ="slow" as this only shows if BootMenu has been specifically set to slow
-# Also use 'BootMenuMsg' for individual overides in the .conf if wished.
-  BootMenuMsg="slow"
+# Default ="slow" as this only shows if BootStyle has been specifically set to slow
+# Also use 'BootStyleMsg' for individual overides in the .conf if wished.
+  BootStyleMsg="slow"
 
 
 # CUSTOM SETTINGS FILE

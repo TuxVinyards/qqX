@@ -88,7 +88,7 @@ function quickemu {
 
       Mounted_ISO_Return=
 
-      if [[ $Mounted_ISO && $BootMenu == "slow" && $BootMenuMsg == "slow" ]]; then
+      if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
         printColor "  To access the BIOS or boot an ISO, press 'esc' when 'Start boot Option' appears" 
         printf "\n\n  Mounted ISO: Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. "
         printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for disk management."
@@ -97,7 +97,7 @@ function quickemu {
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
         read -rp "  >  "  Mounted_ISO_Return
 
-      elif [[ ! $Mounted_ISO && $BootMenu == "slow" && $BootMenuMsg == "slow" ]]; then
+      elif [[ ! $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
         printColor "  To access the BIOS press 'esc' when 'Start boot Option' appears" 
         if [[ $img ]]; then 
           printf "\n\n  A 'live boot' ISO may be usable for disk management"
@@ -110,11 +110,11 @@ function quickemu {
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
         read -rp "  >  "  Mounted_ISO_Return
 
-      elif [[ $BootMenu == "fast" ]]; then
+      elif [[ $BootStyle == "fast" ]]; then
         printColor "  BIOS Boot Manager may be session enabled in utils ..."
         printf "\n\n  Use the qqX [iso] utility to select a specific bootable image file \n\n"
 
-      elif [[ $BootMenu == "slow" ]]; then
+      elif [[ $BootStyle == "slow" ]]; then
         printColor "  Press 'esc' to access BIOS Boot Manager, when 'Start boot Option' appears"
         [[ ! $Mounted_ISO ]] && printf "\n\n  NO ISO/DVD has been mounted ... "
         printf "\n\n  Use the qqX [iso] utility to select a specific bootable image file \n\n"

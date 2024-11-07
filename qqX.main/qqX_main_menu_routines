@@ -740,8 +740,8 @@ clear_custom_boot_vars () {
   MenuCustomMachine=
   MenuCustomSystemBaseName=
   ShowDefault_Hybrid=
-  ShowCustomBootMenu=
-  ForceCustomBootMenu=
+  ShowCustomBootStyle=
+  ForceCustomBootStyle=
 }
 
 
