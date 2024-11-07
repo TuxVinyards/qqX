@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # NB Avoid use of "#!/usr/bin/env bash" in this script 
 # as it will mask process names & inhibit process controls.
@@ -145,23 +145,20 @@ function main_menu {
   while true ; do
 
     MainMenuChoice=
-    SnapTitle=
-    SnapNumber=
-    SnapName=
+    SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
 
     if [[ $KillPID_Menu_Exited ]] ; then
-      KillPID_Menu_Exited=  
-      UseCustomBootArgs=  
+      KillPID_Menu_Exited=  ;  UseCustomBootArgs=  
       if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
         printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
       else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
       fi
     fi
 
-    [[ ! $MainMenuChoice ]] && main_menu_interface
+    main_menu_interface
     main_menu_actions
-    [[ $VM_Renamed || ! $VM_InstanceName ]] && break
+    [[ $VM_Renamed ]] || [[ ! $VM_InstanceName ]] && return
 
   done
 } 
