@@ -161,18 +161,16 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "gt" ]] ; then  
   
-    # see "vm" option
-    source "$ConfClearanceLog"
-    VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
-    QemuErrorLog=
-    MainDrive=
-    Mounted_ISO=
-    IsoImg=
-    QemuArgsCustomFile=
-    #clear, then load defaults
-    reload_boot_style_defaults
-    cd "$Default_VM_Folder" || DefaultFolderError=1
-    function_quick_get_wrap 
+    # also see "vm" option
+
+    # no need to reload the arrays
+    ByPass_VM_Array_Loader=1
+    # but run the selector
+    ByPass_VM_Array_Selector=
+    # signal to run the selector with absent VM_InstanceName and return to qqX main loop
+    VM_InstanceName=
+    Run_GT=1
+    return
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 

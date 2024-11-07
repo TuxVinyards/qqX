@@ -222,78 +222,83 @@ VM_loader_selector_and_menu () {
 
     while true; do
 
-      printf "\033c"
-      show_qqX_title_bar
-
-      if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="$Default_VM_SelectorStyle" ; fi  
-
-      for Style in {A..Z} ; do
-        if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
-      done
-
-      [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
-
-      if [[ $New_VM_Conf_File ]] && [[ ! $CurrentFolder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
-        printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
-      fi
-    
-      dev_loop_check
-
-      [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
-      [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
-      [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
-
-      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
-
-        printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
-        printf "\n\n  [enter] to edit settings file   [c] ignore, re-check and continue   [q] to quit "
-
+      if [[ $Run_GT ]]; then  Run_GT= ; VM_Selection="gt"
+      
       else
+        printf "\033c"
+        show_qqX_title_bar
 
-        printf "\n\n  [number] to select a VM"        
-        printf "   [set] view or edit settings file"
-        printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
+        if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="$Default_VM_SelectorStyle" ; fi  
 
-        if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
-          printf "   ("
-          [[ $LiveDistrosFound ]] && printf "L=LiveISO"
-          [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
-          [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
-          printf ")"
+        for Style in {A..Z} ; do
+          if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
+        done
+
+        [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
+
+        if [[ $New_VM_Conf_File ]] && [[ ! $CurrentFolder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
+          printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
+        fi
+      
+        dev_loop_check
+
+        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
+        [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
+        [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
+
+        if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
+
+          printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
+          printf "\n\n  [enter] to edit settings file   [c] ignore, re-check and continue   [q] to quit "
+
+        else
+
+          printf "\n\n  [number] to select a VM"        
+          printf "   [set] view or edit settings file"
+          printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
+
+          if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
+            printf "   ("
+            [[ $LiveDistrosFound ]] && printf "L=LiveISO"
+            [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
+            [[ $ZsyncDistrosFound ]] && printf "Z=Zsync"
+            printf ")"
+          fi
+
+          VM_Array_NameZero="${VM_Array[0,1]}"
+          VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
+
+          if [[ $(cat "$qqX_Upd_VarsTmpFile" 2>/dev/null) ]]; then source "$qqX_Upd_VarsTmpFile"; fi
+
+          if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
+
+          printf "%s  "  "${VM_Array_NameZero^^}"
+          printf "    [gt] quickget a new distro    [h] Help   [f] FreeBird   [r] refresh   [q] quit"
+
+          [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
+
+          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
+          elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
+          fi
+
         fi
 
-        VM_Array_NameZero="${VM_Array[0,1]}"
-        VM_Array_NameZero="${VM_Array_NameZero/'.conf'/}"
+        vm_menu_interface_refresh () {
+          ByPass_VM_Array_Loader=
+          ByPass_VM_Array_Selector=
+          ListTitleFolderOld=
+          InvertStyleColors=
+          MenuStylePreviewed=
+          VM_Conf_Dir=
+          VM_Conf_File=
+          VM_InstanceName=
+          VM_Selection=
+        }
 
-        if [[ $(cat "$qqX_Upd_VarsTmpFile" 2>/dev/null) ]]; then source "$qqX_Upd_VarsTmpFile"; fi
-
-        if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
-
-        printf "%s  "  "${VM_Array_NameZero^^}"
-        printf "    [gt] quickget a new distro    [h] Help   [f] FreeBird   [r] refresh   [q] quit"
-
-        [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
-
-        if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
-        elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
-        fi
+        printf "\n\n"
+        read -rp  "   >  "  VM_Selection
 
       fi
-
-      vm_menu_interface_refresh () {
-        ByPass_VM_Array_Loader=
-        ByPass_VM_Array_Selector=
-        ListTitleFolderOld=
-        InvertStyleColors=
-        MenuStylePreviewed=
-        VM_Conf_Dir=
-        VM_Conf_File=
-        VM_InstanceName=
-        VM_Selection=
-      }
-
-      printf "\n\n"
-      read -rp  "   >  "  VM_Selection
 
       #
 
