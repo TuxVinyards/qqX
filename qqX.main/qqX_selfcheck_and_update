@@ -70,10 +70,9 @@ check_for_qqX_updates() {
 
   if [[ $qqX_LatestRelease ]]; then
 
-    #qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
-
-    if [[ "$(tr ',' '\n' < "/tmp/latest-qqX" | grep -c 'download_url')" == "2" ]] ; then
-      qqX_Latest_Secure_TarBall="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -m 1 'download_url' | cut -d ':' -f 2- | tr -d '}' | tr -d '"')"
+    # find tarball > eg. "https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
+    if [[ "$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -c download)" == "2" ]] ; then
+      qqX_Latest_Secure_TarBall="$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -m 1 download)"
       qqX_Latest_Secure_TarSha="${qqX_Latest_Secure_TarBall}.sha256"
     fi
 
@@ -127,7 +126,7 @@ function download_new_release {
 
     if [[ ! $qqX_Latest_Secure_TarBall ]] ; then printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
     else 
-      printf "\n\n %s \n"  "$qqX_Latest_Secure_TarBall"
+      printf "\n\n  %s \n"  "$qqX_Latest_Secure_TarBall"
       AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -A 12 'body')"
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
