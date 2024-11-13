@@ -43,15 +43,10 @@ if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; ex
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
 fi
 
-# Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
-# Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-# The 4th register may also be used for dev-point or micro point branching for small tweaks and small fixes
-#
-# To clarify and expand eg for Version 1.10 - 1.10.0.01 would be beta 1 and 1.10.0.02 beta 2 etc,
-# then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
-# or 1.10.02 as the next point release, with possibly a new small feature or two.
-
-qqX_Version="1.10.02"
+# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
+# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
+  qqX_Version="1.10.02"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
@@ -118,6 +113,11 @@ ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+# Ver 1.11.0  add  'floatversion'  and  wrapper function to call it
+floatversion () { 
+  "$qqX_MainFolder/floatversion" "$@" 
+}
 
 [[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s \n\n QG_SourcePath = %s \n"  "$QE_SourcePath" "$QG_SourcePath"
 

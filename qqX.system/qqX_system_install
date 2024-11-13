@@ -77,7 +77,7 @@ if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 
   read -r   UpdateBash
   if [ -n "$UpdateBash" ]; then echo;  exit 1
   else  
-    echo; echo "  I understand the risks and have made backups" 
+    echo; echo "  I have backups and I understand that some processes may fail to work .... " 
     echo ; echo "  [enter] to confirm  [e] to exit > " 
     read -r   UpdateBash
   fi

@@ -276,26 +276,18 @@ function find_quick_version_numbers {
 
 find_quick_version_numbers
 
+
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
-IFS='.' read -ra qqX_CurrentVer_Arr <<< "$qqX_Version"
+# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
+# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# Non-major numbers remain padded to 2dp to make easier reading in file managers
 
-# qqX_CurrentVer_Arr[0] remains unpadded  (& to the left of the decimal point)
-
-[[ ${#qqX_CurrentVer_Arr[1]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[1] "%.2d" "${qqX_CurrentVer_Arr[1]}"
-[[ ${#qqX_CurrentVer_Arr[2]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[2] "%.2d" "${qqX_CurrentVer_Arr[2]}"
-
-#legacy 3dp pre "0.09.00.017"
-[[ ${#qqX_CurrentVer_Arr[3]} -gt 2 ]] && qqX_CurrentVer_Arr[3]="${qqX_CurrentVer_Arr[3]:(-2)}"
-[[ ${#qqX_CurrentVer_Arr[3]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[3] "%.2d" "${qqX_CurrentVer_Arr[3]}"
-
-qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
-
-if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then  qqX_CurrentReleaseType="beta"
+if [[ $qqX_Version == *[[:alpha:]]* ]] ; then  qqX_CurrentReleaseType="beta"
 else qqX_CurrentReleaseType="release"
 fi
 
-# Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
+## Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
 # Sets defaults, if not given in main settings. But also for later, so systems can be swapped out.
 
 [[ ! $QEMU_Default_SystemType ]] &&  QEMU_Default_SystemType="qemu-system-x86_64"
