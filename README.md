@@ -2,7 +2,7 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Adds fixes, tools and general improvements to the Quickemu system
+- Adds fixes, tools and general improvements to the [Quickemu](https://github.com/quickemu-project/quickemu) system
 
 - for the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
 
