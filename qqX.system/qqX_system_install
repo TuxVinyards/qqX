@@ -880,7 +880,7 @@ if [[ $End_Install == "q" ]]; then exit ; fi
 
 if [[ $Start_qqX ]]; then 
 
-  printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n" 
+  printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 2

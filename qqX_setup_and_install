@@ -5,7 +5,7 @@
 #  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files 
 #  OR  run the target script "./qqX_system_install"  from qqX.system folder directly
 
-#  From version 1.10.03  a posix friendly .sh script is used as a wrapper, to make sure that it double click executes properly
+#  From version 1.10.03  A POSIX FRIENDLY .sh SCRIPT is USED AS A WRAPPER, to make sure that it double click executes properly
 #  in Qt / KDE XFCE etc desktop environments.  
 
 #   IF: your file manager allows > double mouse click & 'run in terminal' or 'execute'
@@ -159,7 +159,8 @@ fi
 # Exit the script. But also check whether it has been run with a --hold optioned terminal, as Dolphin does, for example.
 PidRun="$(ps -eF | grep sh | grep "$$" | grep "$0" | tr -cd '[:print:]' | awk '{print $3}')"
 
-if [ -n "$PidRun" ]; then  kill "$PidRun" 
+# Needs SIGHUP in KDE or logs out of desktop session... See https://en.wikipedia.org/wiki/Signal_(IPC)#Handling_signals
+if [ -n "$PidRun" ]; then  kill -s 1 "$PidRun" 
 else exit
 fi
 
