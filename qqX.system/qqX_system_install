@@ -876,8 +876,7 @@ read -rp "  > "  End_Install
 # Probably easier just to put a message up than mess around with dependencies ....   REVIEW 
 printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
 
-# New terminal sessions shouldn't inherit any elevated permissions but some environments. 
-# But shut down sudo anyway ...
+# New terminal sessions shouldn't inherit any elevated permissions but some environments could vary, so reset sudo ...
 sudo -k
 
 if [[ $End_Install == "q" ]]; then exit ; fi
