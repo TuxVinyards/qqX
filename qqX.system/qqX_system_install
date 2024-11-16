@@ -876,21 +876,21 @@ read -rp "  > "  End_Install
 # Probably easier just to put a message up than mess around with dependencies ....   REVIEW 
 printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
 
+# New terminal sessions shouldn't inherit any elevated permissions but some environments. 
+# But shut down sudo anyway ...
+sudo -k
+
 if [[ $End_Install == "q" ]]; then exit ; fi
 
 if [[ $Start_qqX ]]; then 
-
   printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
-
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 2
     eval "$Start_qqX" 
     read -rp "  >  "
     exit
-  else 
-    exec bash -c "$Start_qqX" 
+  else exec bash -c "$Start_qqX" 
   fi
-
 else  
   exit 
 fi
