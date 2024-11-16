@@ -672,7 +672,7 @@ function_delete_SecondDrive () {
 
 }
 
-function mount_qcow2_in_host_fm {
+function qcow2_filemanage {
  
   if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
     printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
