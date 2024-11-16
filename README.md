@@ -18,6 +18,8 @@ Large code update with lots of new features and Quickemu improvements.
 
 An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
 
+@ Nov 16th, one or two discrete features of the [development branch](https://github.com/TuxVinyards/qqX/tree/1.10.03-dev) are still in progress but it is [stable and downloadable](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.10.03-dev.zip) and has several improvements, fixes and updates ....
+
 More in the [release notes](#release-notes) and wiki pages
 
 ### Launch from the Linux desktop or from the command line
@@ -127,6 +129,28 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 - FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
 
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
+
+@ Nov 16th, one or two discrete features of the [development branch](https://github.com/TuxVinyards/qqX/tree/1.10.03-dev) are still in progress but it is [stable and downloadable](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.10.03-dev.zip) and has several improvements, fixes and updates ....
+
+- adds several quickget distro updates
+
+- adds a fix for Arch hosts EFI
+
+- adds a new version manager and checker
+  
+- adds some improved menus and menu sub-features
+
+- improves vm selector transfer speed
+
+- further improves terminal handling on Qt based desktops
+
+Coming soon  
+
+- Should be formally released when new feature _mounting of qcow2 drives in a file manager_ is completed ....
+
+- But download now. All development work should now be only on this section.
+
+- Also a couple more distro URL updates should make the window too. But only that.
 
 ### Reliability
 
