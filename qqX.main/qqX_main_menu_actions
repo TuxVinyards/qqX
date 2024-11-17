@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 function  main_menu_actions {
 
@@ -93,7 +90,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "tmc" ]] ; then  
 
     find_texteditor
-    if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+    if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
     else
       if [[  -e  "$HOME/.qqX/qqX_term.conf" ]]; then 
         printColor "\n\n  Follow up by running the latest release installer for changes to the Terminal config to take effect"
@@ -138,6 +135,8 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
+  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanage  
+
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
   elif [[ $MainMenuChoice == "conf" ]] ; then  qqX_edit_settings  conf 
@@ -152,8 +151,8 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "fb" || $MainMenuChoice == "bm" ]] ; then 
   
-    if [[ $BootMenu == "fast" ]]; then  BootMenu="slow" ; BootMenuMsg="slow"
-    elif [[ $BootMenu == "slow" ]]; then  BootMenu="fast" ; BootMenuMsg="fast"
+    if [[ $BootStyle == "fast" ]]; then  BootStyle="slow" ; BootStyleMsg="slow"
+    elif [[ $BootStyle == "slow" ]]; then  BootStyle="fast" ; BootStyleMsg="fast"
     fi
 
   elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
@@ -162,25 +161,34 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "gt" ]] ; then  
   
-    # see "vm" option
-    source "$ConfClearanceLog"
-    VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
-    QemuErrorLog=
-    MainDrive=
-    Mounted_ISO=
-    IsoImg=
-    QemuArgsCustomFile=
-    #clear, then load defaults
-    reload_bootmenu_defaults
-    cd "$Default_VM_Folder" || DefaultFolderError=1
-    function_quick_get_wrap 
+    # also see "vm" option
+
+    # no need to reload the arrays
+    ByPass_VM_Array_Loader=1
+    # but run the selector
+    ByPass_VM_Array_Selector=
+    # signal to run the VM selection initializer with absent VM_InstanceName and return to qqX main loop
+    VM_InstanceName=
+    # run the clearance sections but signal to go straight to the downloads menu, no need to load the selector one.
+    Run_GT=1
+    return
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 
-    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then MainMenuZsync=1 ; function_quick_get_wrap
+    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then 
+      printf "\n\n  Updating the live boot development iso with any changes"
+      printColor "\n\n  May take a while to compare & synchronize"
+      if [[ $LastZsync -gt 200000 ]]; then 
+        printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
+        printf "\n\n  Deletion and re-download can sometimes be quicker ...."
+      fi
+      printf "\n\n  [enter] to continue   [b] to go back \n\n"
+      read -rp "  >  "  ZsyncRemind
+      if [[ $ZsyncRemind ]]; then ZsyncRemind= 
+      else MainMenuZsync=1 ; function_quick_get_wrap ; refresh_conf_vars_and_values
+      fi
     else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
     fi
-    refresh_conf_vars_and_values
 
   elif [[ $MainMenuChoice == "m" ]] ; then KVM_MSR_selector_LoadHelp=1 ; select_msr_config
 
@@ -192,7 +200,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "C" ]] ; then 
 
-    if [[ $ShowCustomBootMenu ]]; then  ForceCustomBootMenu="hide" ; else  ForceCustomBootMenu="show" ; fi
+    if [[ $ShowCustomBootStyle ]]; then  ForceCustomBootStyle="hide" ; else  ForceCustomBootStyle="show" ; fi
     MainMenuChoice=
   
   elif [[ $MainMenuChoice == "c" ]] ; then 
@@ -221,6 +229,15 @@ function  main_menu_actions {
     printf "\n\n" 
 
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
+
+    elif ! grep -sqi sdl <<< "$(qemu-system-x86_64 -display help)" ; then 
+
+      printColor "\n\n  SDL cannot be found:"
+      printf "\n\n  OpenSUSE distros lack -official- support for 'qemu-ui-sdl' "
+      printf "\n\n  This may apply to others ??  Community tweaks might be available."
+      printf "\n\n  [enter] to return \n\n"
+      read -rp "  >  "
+
     else
 
       if [[ $MainMenuChoice == "df"  ]]; then  
@@ -268,13 +285,16 @@ function  main_menu_actions {
       printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
-      printf "\n  Resize using qqX [disk] utility if the disk size exceeds the (theoretical) virtual size"
-      printf "\n\n  To boot from an ISO 'live boot' disk use the [iso] utility"
+      printf   "\n  The * virtual * Disk Size usually starts off as much larger than the actual size occupied."
+      printf "\n\n  Deleting older snapshots will not only reduce the amount of data that needs storing,"
+      printf "\n\n  but also increase sizing accuracy and limit double counting problems." 
+      printf "\n\n  When there is an actual shortage of space, use the qqX [disk] utility to increase the envelope."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
       [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
       printf "\n\n  [enter] to return to menu \n\n"
-    else printColor "\n\n  [enter] to return to menu \n\n" ; fi
+    else printColor "\n\n  [enter] to return to menu \n\n"
+    fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
@@ -287,7 +307,8 @@ function  main_menu_actions {
 
     if [[ $SharedDriveArgs && $SecondDriveArgs ]]; then 
       printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
-    else printColor "  [enter] to return to menu \n\n" ; fi
+    else printColor "  [enter] to return to menu \n\n"
+    fi
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then
@@ -300,22 +321,15 @@ function  main_menu_actions {
     printf "\n\n"
     read -rp "  >  "  SnapTitle
     printf "\n\n"	
-
     [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
-    
     if [[ $SnapTitle != "b" ]]; then 
-    
       # remove spaces, make title dot separated, as easier to IFS
       SnapTitle="${SnapTitle// /.}"
-
       "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
-
       "$QEMU_IMG" info "$Selected_Drive"
-
       printColor "\n\n  Drive Updated ..."
       printf "\n\n  [enter] to return to menu \n\n "
       read -rp "  >  "  
-
     fi
 
   elif  [[ $MainMenuChoice == "sd" ]] ; then
@@ -342,13 +356,36 @@ function  main_menu_actions {
 
     fi
   
-  elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3" ]] ; then
+  elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3c" ]] ; then
 
     create_new_drives
 
   elif [[ $MainMenuChoice == "2d" ]]; then
 
     function_delete_SecondDrive
+
+  elif [[ $MainMenuChoice == "3m" ]]; then
+
+    if [[ ! -e $SharedDrive ]]; then  
+      printColor "\n\n  ERROR: A Shared drive has not been set up or created"
+    else 
+      if [[ $SharedDrive_Mount || $SharedDriveArgs ]]; then 
+        SharedDrive_Mount=
+        SharedDrive_Conf="no-shared"
+        printColor "\n\n  The Shared drive has been UN mounted"
+      else 
+        SharedDrive_Conf=
+        SharedDrive_Mount=1
+        printColor "\n\n  The Shared drive has been mounted"
+        if [[ $LiveBoot ]]; then 
+          printf "\n\n  CAUTION: if intending to install from a Live ISO," 
+          printf "\n\n  certain distro installers may not be clear about which drive is being used."
+        fi
+      fi
+      set_drive_paths
+    fi
+    printf "\n\n  [enter] to return \n\n" 
+    read -rp "  >  "
     
   elif [[ $MainMenuChoice == "v" ]] ; then
 
@@ -357,18 +394,13 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
     # also see "gt" option
+
+    # no need to reload the arrays
+    ByPass_VM_Array_Loader=1
+    # but run the selector
     ByPass_VM_Array_Selector=
-    ByPass_VM_Array_Loader=
-    VM_Conf_Dir=
-    VM_Conf_File=
+    # signal to run the selector with absent VM_InstanceName and return to qqX main loop
     VM_InstanceName=
-    MainDrive=
-    Mounted_ISO=
-    IsoImg=
-    NewFileTuneUp=
-    NewFileTuneUp_JustDone=
-    cd "$Default_VM_Folder" || DefaultFolderError=1
-    refresh_sources_and_load_VM_arrays
     return
 
   elif [[ $MainMenuChoice == "xa" ]] ; then

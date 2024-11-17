@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+##  qqX component to be located in folder 'qqX.main'
+
+##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
+# 	Otherwise:  
+#   Licence  GPL3   https://www.gnu.org/licenses 
+##  qqX - quickemu quickget X terminal project   
+
+## ShellCheck global disables:
+# https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
+
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009  
+
+#  MOUNTS and UNMOUNTS the Shared Drive, or other, if present, in the designated HOST File Manager
+#  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
+
+#  A CUSTOM VERSION for this file MAY BE CREATED, if wished, and placed next to this one
+#  at/as "$qqX_MainFolder/custom_filemanage_qcow_drive" which will be auto-detected and run by function 'qcow2_filemanage' 
+
+source "/tmp/qqX_nbd_vars"
+source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+if [[ ! $(type -p "$FileManager") ]] ; then 
+  printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager" ; sleep 100
+fi
+
+show_nbd_help () {
+  printColor "\n\n  Script name and location:  %s" "$0"
+  printf "\n\n  View script for notes on creating Custom versions or for details of its functions" 
+  [[ $TextEditor ]] && printf "\n\n  [H] View script in Text Editor"
+  printf "\n\n"
+}
+
+TargetDrive="$SharedDrive"
+
+while true; do
+
+  printf "\033c"
+  qqX_logo_printf_title "File Manager Utility for mounting/unmounting QCOW2 drives"
+  printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
+  printf "\n\n  The elevated permissions required to mount the drives will remain isolated."  
+  printf "\n"
+
+  [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
+
+  DriveSelect=
+  printColor "\n\n  Distro Focus = '%s' " "$VM_InstanceName"
+
+  printf "\n\n  Mounted Drive(s): \n"
+  ps -eF | grep nbd | grep qcow
+
+  printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive   [h] help   [q] to quit "
+
+  printf "\n\n  Selected Drive = '%s'" "$TargetDrive"
+  if [[ ! $TargetDrive || ! -e "$TargetDrive" ]]; then 
+    printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
+  fi
+
+  printColor "\n\n\n  [enter] to continue  or  [number] for different selection"
+  printf "\n\n"
+  read -rp "  >  " DriveSelect
+
+  if   [[ $DriveSelect == "1" ]]; then TargetDrive="$MainDrive"
+  elif [[ $DriveSelect == "2" ]]; then TargetDrive="$SecondDrive"
+  elif [[ $DriveSelect == "3" ]]; then TargetDrive="$SharedDrive"
+  elif [[ $DriveSelect == "h" ]]; then ShowHelp=1
+  elif [[ $DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0"
+  elif [[ $DriveSelect == "q" ]]; then exit directly
+  elif [[ $DriveSelect ]]; then printColor "\n\n  '%s' not recognised ...." "$DriveSelect"
+  else  
+    echo; echo  " initial menu only, not yet finished ..."
+
+    #  TODO  if mounted then offer open in fm now OR un mount & vice versa 
+
+
+    # nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
+  fi
+
+done
+
+

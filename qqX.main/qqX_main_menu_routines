@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 show_msg_pid_found() {
       printColor "  WARNING:  QEMU may be running this machine elsewhere" 
@@ -130,7 +127,7 @@ show_main_menu_header () {
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   LiveBoot=
-  if  [[  ! -e "$MainDrive" && ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
+  if  [[  ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
   elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
   elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
@@ -145,7 +142,7 @@ show_main_menu_header () {
 
   # Note .conf won't exist at first load, at VM selector menu
 
-  if [[ ! $NewFileTuneUp && ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" && ! -e "$IsoImg" ]] ; then 
+  if [[ ! $NewFileTuneUp ]] && [[ ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]] ; then 
     printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
   fi
 
@@ -166,7 +163,7 @@ function check_disk_is_okay {
     if [[ $CheckArg == "PrintErrors" ]]; then PrintErrors=1 ; shift ; fi
   done
 
-  if [[ $1 && ! $2 ]]; then
+  if [[ $1 ]] && [[ ! $2 ]]; then
 
     DiskCheckFolderName="$(dirname "$1")"
     DiskCheck_Disk="$(basename "$1")"
@@ -244,7 +241,7 @@ filter_and_flag_qemu_errors () {
 
 function_delete_Selected_VM () {
 
-  if [[ ! $1 && ! $2 ]]; then
+  if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
     sleep 2 ;  return
@@ -261,6 +258,8 @@ function_delete_Selected_VM () {
   if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
     printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
     printColor "\n\n  REMOVING LINKS ONLY - VM CONTENT REMAINS AT REALPATH \n"
+    SelectedLinks=1
+  else SelectedLinks=
   fi
 
   vm_selector_init_common
@@ -295,7 +294,9 @@ function_delete_Selected_VM () {
   ls "$1"
 
   if [[ $TrashingAvailable ]]; then 
-    printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"  
+    if [[ $SelectedLinks ]]; then  printColor "\n\n  [enter] safely move the links to the recoverable trash bin"  
+    else printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin" 
+    fi 
     printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
   else
     printColor "\n\n  [enter] use the file manager to move things the trash bin "
@@ -365,8 +366,8 @@ list_current_folder_instance_names () {
   mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
   for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
 
-  printf "\n  Containing:   "
-  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor " NONE FOUND \n\n" 
+  # printf "\n  Containing:   "  # set each title case by case
+  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor "  NONE FOUND \n\n" 
   else 
     printf "\n\n" 
     print_quickget_and_folder_choices  "CurrentFolderNames"  6 
@@ -376,7 +377,10 @@ list_current_folder_instance_names () {
 
 move_rename_Selected_VM () {  
 
-  if [[ ! $1 && ! $2 ]]; then
+  printf "\033c"
+  show_qqX_title_bar
+
+  if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Move Rename Internal Params: VM Name & VM config file (NO PATH) must be given"
     printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
@@ -400,7 +404,7 @@ move_rename_Selected_VM () {
     MvTargetIsLinked=1
   fi
 
-  printColor "\n\n  Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
+  printColor "\n\n  Distro Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
   printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
   printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder" 
@@ -414,14 +418,14 @@ move_rename_Selected_VM () {
 
     if [[ $Move_VM_Option == "ln" ]]; then MakeLinksOnly=1 ; else MakeLinksOnly= ; fi
 
-    printf "\n  Folder '%s' & .conf file to be MOVED and edited or Linked"  "$1"
+    printf "\n  Distro Folder '%s' & .conf file to be MOVED and edited or LINKED"  "$1"
     printf "\n\n  For new preset group folders, edit the main settings" 
-    printf "\n\n  Current Folder: '%s' \n" "$(pwd)"
+    printf "\n\n  Current Grouping Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
 
     while true; do
       
-      printColor "\n\n  [number] select a different group folder "
+      printColor "\n\n  [number] select a group folder "
       printf " [b] to go back\n\n"
       read -rp  "  >  "  Move_FolderOption
 
@@ -453,7 +457,9 @@ move_rename_Selected_VM () {
     Mv_OldFolderPath="$(realpath "$VM_InstanceName")"
     Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
 
+    # set mv to use 'r' as multi-purpose 
     Move_VM_Option="r"
+
     if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
@@ -461,7 +467,8 @@ move_rename_Selected_VM () {
   fi
 
   if [[ $Move_VM_Option == "r" ]]; then  
-
+  
+    printf "\n  Currently Containing:   "  
     list_current_folder_instance_names
 
     while true; do
@@ -473,10 +480,13 @@ move_rename_Selected_VM () {
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
       read -rp "  >  "  Mv_NewName 
 
-      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName"  && break
+      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName" 
       
-      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1; done
-      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break ; fi
+      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1
+      done
+
+      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
+      fi
 
     done
 
@@ -520,6 +530,7 @@ move_rename_Selected_VM () {
   fi
 
   if [[ $MoveFail ]]; then printColor "\n  Hmm. Something went wrong.  \n"  ; else printColor "\n  Success  '%s'\n"  "$(pwd)" ; fi
+  printf "\n  Now Containing:   " 
   list_current_folder_instance_names
 
   ConfLine="$(grep -s 'macos_release=' "${Mv_NewName}.conf")"
@@ -729,8 +740,8 @@ clear_custom_boot_vars () {
   MenuCustomMachine=
   MenuCustomSystemBaseName=
   ShowDefault_Hybrid=
-  ShowCustomBootMenu=
-  ForceCustomBootMenu=
+  ShowCustomBootStyle=
+  ForceCustomBootStyle=
 }
 
 

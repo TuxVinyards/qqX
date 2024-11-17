@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # NB Avoid use of "#!/usr/bin/env bash" in this script 
 # as it will mask process names & inhibit process controls.
@@ -38,19 +38,15 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154 
 
-# Use C.UTF-8 as more locale and Qt friendly https://wiki.archlinux.org/title/Locale  (Also see qqX_Initialize)
-export "LC_NUMERIC=C.UTF-8"
-export "LC_COLLATE=C.UTF-8"
+#  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale (Also see qqX_Initialize)
+if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
+else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
+fi
 
-# Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
-# Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-# The 4th register may also be used for dev-point or micro point branching for small tweaks and small fixes
-#
-# To clarify and expand eg for Version 1.10 - 1.10.0.01 would be beta 1 and 1.10.0.02 beta 2 etc,
-# then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
-# or 1.10.02 as the next point release, with possibly a new small feature or two.
-
-qqX_Version="1.10.02"
+# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
+# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
+  qqX_Version="1.10.02"
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
@@ -64,11 +60,12 @@ function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
     echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
-    echo "BootMenu = $BootMenu   BootMenuMsg = $BootMenuMsg    BootMenu_Default = $BootMenu_Default   BootMenuMsg_Default = $BootMenuMsg_Default"
+    echo "BootStyle = $BootStyle   BootStyleMsg = $BootStyleMsg    BootStyle_Default = $BootStyle_Default   BootStyleMsg_Default = $BootStyleMsg_Default"
     echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
     echo "NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
+    echo "SharedDrive = $SharedDrive SharedDrive_Conf = $SharedDrive_Conf SharedDrive_Mount = $SharedDrive_Mount"
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  "
     echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
     sleep "$GeneralLoopCheck"
@@ -94,6 +91,11 @@ if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not fo
 if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
 if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
+# NON-FHS installs should normally locate Main and Built-Ins in with this file, so ./ will locate things
+
+# The default location for the .desktop file, from ver 1.9 onwards, is '/usr/share/applications'
+XDG_GUI_desktop_Folder="/usr/share/applications"
+
 # Declare global associative VM ARRAY & other initializing global vars. Make ready to read settings.
 declare -gA VM_Array=()
 declare -ga Extra_VM_Folder=()
@@ -111,6 +113,11 @@ ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+# Ver 1.11.0  add  'floatversion'  and  wrapper function to call it
+floatversion () { 
+  "$qqX_MainFolder/floatversion" "$@" 
+}
 
 [[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s \n\n QG_SourcePath = %s \n"  "$QE_SourcePath" "$QG_SourcePath"
 
@@ -138,23 +145,20 @@ function main_menu {
   while true ; do
 
     MainMenuChoice=
-    SnapTitle=
-    SnapNumber=
-    SnapName=
+    SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
 
     if [[ $KillPID_Menu_Exited ]] ; then
-      KillPID_Menu_Exited=  
-      UseCustomBootArgs=  
+      KillPID_Menu_Exited=  ;  UseCustomBootArgs=  
       if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
         printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
       else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
       fi
     fi
 
-    [[ ! $MainMenuChoice ]] && main_menu_interface
+    main_menu_interface
     main_menu_actions
-    [[ $VM_Renamed || ! $VM_InstanceName ]] && break
+    [[ $VM_Renamed ]] || [[ ! $VM_InstanceName ]] && return
 
   done
 } 
@@ -215,7 +219,7 @@ tput  cnorm
 
 ## CODING STYLE 
 
-#  A more modern style of coding is used for qqX than that used for quickemu:
+#  A more modern, more Bash orientated, style of coding is used for qqX than that used for quickemu:
 
 #  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
 #  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
@@ -228,7 +232,7 @@ tput  cnorm
 #  Some of quickemu's variables can be very ambiguous eg. '$VERSION' but in some places have to be used. 
 #  Except for the .conf file, where they are lowercase, they are generally CAPS and very brief ...
 
-#  BRACKETS:  if [[ $Foo ]] && [[ ! $Bar ]] ...   Avoid:  if [ -n ${FOO} ] && [ -z ${bar} ] ....
+#  BRACKETS:  if [[ $Foo ]] && [[ ! $Bar ]] ...   Posix Style is not needed:  if [ -n ${FOO} ] && [ -z ${bar} ] ....
 
 #  The [[ double bracket ]] system is now the standard method in the Bash Manual.
 #  See  https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  
@@ -243,7 +247,7 @@ tput  cnorm
 #  SPACE:  Give your code some room to breathe. But also keep your code tight enough to view on smaller screens.    
 #  Place it into clear logic blocks. Make it easy to follow & easy to see what is happening.  
 
-#  SED & AWK:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
+#  SED, AWK and REGEX:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
 #  If you must use them, keep things very simple & explain the sections.  
 #  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
 

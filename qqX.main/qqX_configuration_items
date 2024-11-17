@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
 
 
 custom_conf_notes () {
@@ -88,7 +85,7 @@ function check_screen_percentage_and_output {
     if  grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then  
       SDL_ScreenSize_Cmd=" --screenpct  $SDL_ScreenPercent"
     else
-      if [[ ! $QE_495_Script && ! $QE_496_Script ]]; then 
+      if [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then 
         printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
         SDL_ScreenSize_Error="> not possible with this qe-version"
       fi
@@ -135,7 +132,7 @@ function check_screen_percentage_and_output {
     # Mac seems to be able to use 1280 and then takes control of the outcome itself, once set up.
     # Unless it's Sequoia where it needs to be specified in the conf file:
     if [[ $guest_os == "macos" ]]; then 
-      if [[ $MacScreenRes && ! $Custom_SDL_ScreenSize ]]; then
+      if [[ $MacScreenRes ]] && [[ ! $Custom_SDL_ScreenSize ]]; then
         SDL_ScreenSize="$MacScreenRes"
       else xRes=1280 && yRes=720
       fi
@@ -228,20 +225,17 @@ function set_drive_paths {
 
   if [[ $SharedDrive ]]; then 
 
-    eval "$(grep -s SharedDrive_Conf "$VM_Conf_File")"
+    # if not toggled from the main menu, then read the .conf file
+    [[ ! $SharedDrive_Mount ]] && eval "$(grep -s SharedDrive_Conf "$VM_Conf_File" | grep -v '#')"
 
     if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then 
-
-      SharedDrive=
       SharedDriveArgs=
 
     elif [[ -e "$SharedDrive" ]]; then
-
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
       SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
 
     elif [[ $SharedDrive ]]; then 
-
       DriveLocationError="ERROR SharedDrive NOT found (main settings)"
 
     fi
@@ -390,47 +384,9 @@ function_conf_error () {
 
 }
 
-texteditor_not_found_message () {
-  
-  printColor "\n\n  Unable to open settings with an editor."
-  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
-  printf "\n\n  Give settings file the command name of a preferred editor."
-  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
-  read -rp "  >  "
-}
-
-find_texteditor () {
-
-  [[ $TextEditor && ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
-
-  if [[ ! $TextEditor ]]; then
-  
-    DefaultTextEditor="$(xdg-mime query default text/plain)"
-    EditorTest="${DefaultTextEditor/.desktop/}"
-    EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
-
-    # orggnomeTextEditor etc will fail
-    [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
-
-    if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
-    elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
-    elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
-    elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
-    elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
-    elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
-    elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
-    elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
-    fi
-
-  fi
-}
-
-
 qqX_edit_settings() {
 
-  find_texteditor
-
-  if [[ $TextEditor && ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
+  if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
   else
     # Run the editor: 
     if [[ $1 == "conf" ]]; then
@@ -450,7 +406,7 @@ qqX_edit_settings() {
         else
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
           (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File" & ) || texteditor_not_found_message
-          printf "\n  [enter] to refresh, if editing has been completed \n\n"
+          printf "\n  [enter] to return, or when editing has been completed, to refresh \n\n"
           read -rp "  >  "
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values
@@ -542,6 +498,7 @@ function refresh_conf_vars_and_values {
     SharedDrive_Conf=
     SecondDriveArgs=
     SharedDriveArgs=
+    SharedDrive_Mount=
     MacLegacyDrive=
     QemuError_VM_Filter=()
     Custom_SDL_ScreenSize=
@@ -549,7 +506,7 @@ function refresh_conf_vars_and_values {
     ACCESS=
     QemuArgsCustomFile=
     QemuErrorLog=
-    #reload_bootmenu_defaults  # REVIEW  leave off as if active then utils menu bm function reverts to defaults after booting once ...
+    #reload_boot_style_defaults  # REVIEW  leave off as if active then utils menu bm function reverts to defaults after booting once ...
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
 

@@ -3,7 +3,7 @@
 #  - https://www.shellcheck.net/wiki/SC2317
 #  - Disable globally because many functions are called indirectly
 # shellcheck disable=SC2317
-# Use qqX UTF8  locale, not:  export LC_ALL=C
+# Use qqX C.UTF-8 locale, not:  export LC_ALL=C
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
@@ -132,7 +132,7 @@ function pretty_name() {
 
 # Just in case quickget want use it
 function os_homepage() {
-    os_info "${1}" | cut -d'|' -f 4
+    os_info "${1}" | cut -d'|' -f 3
 }
 
 function error_specify_os() {
@@ -583,13 +583,8 @@ function editions_biglinux() {
 }
 
 function releases_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/gnome/" | grep "\.iso" | cut -c81- | cut -d'"' -f2 | cut -d'-' -f2)
-}
-
-function editions_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/" | grep "\[DIR\]" | cut -c81-90 | cut -d'/' -f1 | grep -v testing | sort -u)
+    # there is now just a single latest iso
+    echo latest
 }
 
 function releases_bodhi() {
@@ -605,12 +600,13 @@ function releases_bunsenlabs() {
 }
 
 function releases_cachyos() {
+    # new cdn setup 10/2024
     echo latest
 }
 
 function editions_cachyos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.cachyos.org/ISO/" | grep "title=" | grep -v testing | grep -v cli | cut -d'"' -f4 | cut -d '/' -f1 | sort)
+    # desktop version now installs different desktop environments
+    echo desktop handheld
 }
 
 function releases_centos-stream() {
@@ -759,7 +755,7 @@ function releases_guix() {
 }
 
 function releases_haiku() {
-    echo r1beta4 r1beta3
+    echo r1beta5 r1beta4 r1beta3
 }
 
 function editions_haiku() {
@@ -780,6 +776,10 @@ function releases_kdeneon() {
 
 function releases_kolibrios() {
     echo latest
+}
+
+function editions_kolibrios() {
+    echo en_US  ru_RU  it_IT  es_ES
 }
 
 function releases_linuxlite() {
@@ -823,7 +823,8 @@ function releases_manjaro() {
 }
 
 function releases_mxlinux() {
-    echo 23.3
+    # needs header, so not web_pipe:
+    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i -m 1 'location' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
 }
 
 function editions_mxlinux() {
@@ -900,7 +901,7 @@ function editions_peppermint() {
 }
 
 function releases_popos() {
-    echo 22.04 21.10 20.04
+    echo 22.04 20.04
 }
 
 function editions_popos() {
@@ -1217,7 +1218,7 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1543,6 +1544,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
     echo "${URL} ${HASH}"
 }
 
@@ -1612,8 +1614,8 @@ function get_biglinux() {
 
 function get_blendos() {
     local HASH=""
-    local ISO="blendos-${RELEASE}-stable-${EDITION}.iso"
-    local URL="https://mirror.ico277.xyz/blendos/${EDITION}"
+    local ISO="blendOS.iso"
+    local URL="https://kc1.mirrors.199693.xyz/blend/isos/testing"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1639,12 +1641,10 @@ function get_bunsenlabs() {
 
 function get_cachyos() {
     local HASH=""
-    local REL=""
-    local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n 1)
-    local ISO="cachyos-${EDITION}-linux-${REL}.iso"
-    HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
-    echo "${URL}/${REL}/${ISO} ${HASH}"
+    local URL=""
+    URL="$(web_pipe "https://cachyos.org/download/" | tr '&' '\n' | grep "ISO/${EDITION}" | grep -v 'iso.sha' | grep -v 'iso.sig' | cut -d';' -f2)"
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
 }
 
 function get_centos-stream() {
@@ -1915,8 +1915,8 @@ function get_kdeneon() {
 
 function get_kolibrios() {
     local HASH=""
-    local ISO="kolibri.iso"
-    local URL="https://builds.kolibrios.org/eng"
+    local ISO="latest-iso.7z"
+    local URL="http://builds.kolibrios.org/${EDITION}"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3306,7 +3306,7 @@ function open_homepage() {
     if [ -z "$(os_info "${1}")" ]; then
         error_specify_os
     else
-        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        URL="$(os_info "${1}" | cut -d'|' -f 3)"
         # shellcheck disable=SC2034
         XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
         exit 0
@@ -3350,12 +3350,24 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
+            fi;;
+        kolibrios)
+            if [[ ${ISO} = *".7z" ]]; then
+                if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
+                else
+                    7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+                    rm -f "${VM_PATH}/${ISO}"
+                    ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                    ISO="$(basename "${ISO}")"
+                fi
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"  
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
     esac
     make_vm_config "${ISO}"
@@ -3533,7 +3545,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.6.05"
+        echo "FS 4.9.6.06"
         exit 0;;
     --help|-help|--h|-h)
         help_message

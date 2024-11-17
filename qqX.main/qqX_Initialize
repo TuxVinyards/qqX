@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 
 qqX_logo_plain() {
@@ -100,6 +97,8 @@ if [[ $1 ]]; then RunMouseApiTidy=1 ; else RunMouseApiTidy= ; fi
 
 if [[ $1 == "XDG" ]]; then 
 
+  [[ $2 == "%f" ]] && shift
+
   if [[ -e "$2" ]]; then
 
     XDG_FileType_Recognised=
@@ -147,7 +146,7 @@ if [[ $1 == "XDG" ]]; then
       echo; echo; echo "<<" 
       head -n 20 "$2"
       echo ">>" ; echo
-      FileLines="$(wc -l < "$2")"
+      FileLines="$(grep -c ^ "$2")"
       printf "\n This current file is plain text only. " 
       [[ $FileLines -gt 20 ]] && printf " File length %s lines \n"  "$FileLines"  &&  TextAll="[a] view full text & quit   "
       echo
@@ -229,8 +228,13 @@ else
 
 fi
 
-if [[ $AllowMoreLocale ]]; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8" ; else  export "LC_ALL=C.UTF-8" ; fi
-# Use C.UTF-8 as more locale and Qt friendly https://wiki.archlinux.org/title/Locale
+if [[ $AllowMoreLocale ]]; then 
+  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
+  else export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; fi
+else
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then  export "LC_ALL=C.UTF-8" ;  else export "LC_ALL=C" ; fi
+fi
 
 if [[ $XDG_MimeType_is_QCOW ]]; then
 

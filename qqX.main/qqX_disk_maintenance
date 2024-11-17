@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 
 drives_and_snapshots() {
@@ -45,14 +42,19 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
     else
-      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo; fi
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo 
+      else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo 
+      fi
     fi
 
-    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo ; else check_disk_is_okay "$SecondDrive" ; fi
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo 
+    else check_disk_is_okay "$SecondDrive" 
+    fi
 
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
+    fi
     printf "\n\n"
 
   fi
@@ -63,14 +65,17 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
     else
-      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo ; else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo; fi
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo
+      else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo
+      fi
     fi
 
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
 
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
+    fi
     printf "\n\n"
 
   fi
@@ -87,14 +92,19 @@ drives_and_snapshots() {
 
     if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
     else
-      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo ; else "$QEMU_IMG" snapshot -l "$MainDrive"; echo; fi
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo
+      else "$QEMU_IMG" snapshot -l "$MainDrive"; echo
+      fi
     fi
 
-    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo ; else check_disk_is_okay "$MainDrive" ; fi
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$MainDrive" ; echo
+    else check_disk_is_okay "$MainDrive"
+    fi
 
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" ; fi
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" 
+    fi
     printf "\n\n"
 
   fi
@@ -139,8 +149,8 @@ drives_and_snapshots() {
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
    
     "$QEMU_IMG" info "$Selected_Drive"
-
     check_disk_is_okay "$Selected_Drive"
+    Selected_DriveSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
 
     if [[ $2 != "as_disk_util" ]]; then
 
@@ -440,7 +450,16 @@ function qqX_snapshot_delete {
 
       fi
 
-      "$QEMU_IMG" info "$Selected_Drive"
+      "$QEMU_IMG" info "$Selected_Drive" 
+
+      Selected_Drive_NewSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
+      if [[ "$Selected_Drive_NewSize" == *GiB* ]] && [[ "$Selected_DriveSize" == *GiB* ]]; then
+        SelDrvOld="${Selected_DriveSize//'GiB'/}"
+        SelDrvNew="${Selected_Drive_NewSize//'GiB'/}"
+        SelDrv_SpaceSaved="$(bc <<< "$SelDrvOld - $SelDrvNew ") GiB"
+      fi
+
+      printColor "\n\n Initial Disk Size: %s  -  Space Saved: %s \n"  "$Selected_DriveSize"  "$SelDrv_SpaceSaved"
 
     fi
 
@@ -463,14 +482,31 @@ function create_new_drives {
   DriveCreated=
 
   [[ $MainMenuChoice == "2c" ]] && MainMenuChoice="2"
+  [[ $MainMenuChoice == "3c" ]] && MainMenuChoice="3"
 
-  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDriveArgs || $SharedDrive_Conf == "no-shared" ]] ; then 
-    
-    printColor "\n\n  ERROR:  a shared drive already exists. Check VM conf and general settings.\n\n"
+  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDrive ]] ; then 
+     
+    printColor "\n\n  ERROR:  A shared drive appears to already have been set up. Check VM conf and general settings."
+    printf "\n\n  Shared drive is set as '%s'" "$SharedDrive"
+    if [[ -e "$SharedDrive" ]]; then 
+      printf " and has been found." 
+      check_disk_is_okay "$SharedDrive" 
+      printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
+    else printf " but cannot be found."
+    fi
+    printf "\n\n"
 
-  elif [[ $MainMenuChoice == "2" ]] && [[ $SecondDriveArgs ]] ; then 
+  elif [[ $MainMenuChoice == "2" ]] && [[ "$SecondDrive" ]] ; then 
   
-    printColor "\n\n  ERROR:  a second drive already exists. Check VM conf and general settings.\n\n"
+    printColor "\n\n  ERROR:  A second appears to already have been set up. Check VM conf and general settings."
+    printf "\n\n  Second drive is set as '%s' \n\n" "$SecondDrive"
+    if [[ -e "$SecondDrive" ]]; then 
+      printf " and has been found." 
+      check_disk_is_okay "$SecondDrive" 
+      printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
+    else printf " but cannot be found."
+    fi
+    printf "\n\n"
 
   else
 
@@ -633,6 +669,44 @@ function_delete_SecondDrive () {
   
   printColor "\n\n  [enter] to return or continue \n\n" 
   read -rp "  > "
-  
+
+}
+
+function qcow2_filemanage {
+ 
+  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
+    printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
+    printf "\n\n  [enter] to return \n\n"
+    read -rp "  >  "
+    return
+  fi
+
+  # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
+
+  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+    printf "\n FileManager=\"%s\"" "$FileManager"
+    printf "\n TextEditor=\"%s\"" "$TextEditor"
+    printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
+    printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
+    printf "\n MainDrive=\"%s\"" "$MainDrive"
+    printf "\n SecondDrive=\"%s\"" "$SecondDrive"
+    printf "\n SharedDrive=\"%s\"" "$SharedDrive"
+  } > "/tmp/qqX_nbd_vars"
+
+  Terminal_Start=
+  # Read the .desktop file for Terminal_Start instruction
+  # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
+  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
+  if [[ $GrepExecLine ]]; then 
+    GrepExecLine="${GrepExecLine/'Exec='/}" 
+    Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+  fi
+
+  # allow for custom mounting scripts
+  if [[ -e "$qqX_MainFolder/custom_filemanage_qcow_drive" ]]; then 
+    eval "$Terminal_Start" "$qqX_MainFolder/custom_filemanage_qcow_drive" &
+  else
+    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" &
+  fi
 
 }

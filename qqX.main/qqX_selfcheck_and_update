@@ -35,7 +35,6 @@
 #  Updated 2024/04 to work with changes to fedora 40 and github
 
 #  Make sure shell is set during session to decimal separator of dot 
-
 #  If LC_ALL=C changes too much, just set the numeric.  
 #  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
 
@@ -46,12 +45,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 
 
@@ -69,30 +65,21 @@ echo > "$qqX_Upd_VarsTmpFile"
 check_for_qqX_updates() {
 
   # Quietly do a check for new releases 
+  curl -sLf -o "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest" 
+  qqX_LatestRelease="$(floatversion -M "$(grep -i 'tag_name' "/tmp/latest-qqX")")"
 
-  wget -q -T2 -t2 -O "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest" 
-
-  qqX_LatestRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -m 1 tag_name | cut -d ':' -f 2 | tr -d '"' | tr -d ' ')"
-
-  
   if [[ $qqX_LatestRelease ]]; then
 
-    #qqX_Latest_Secure_TarTest="https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
-
-    if [[ "$(tr ',' '\n' < "/tmp/latest-qqX" | grep -c 'download_url')" == "2" ]] ; then
-      qqX_Latest_Secure_TarBall="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -m 1 'download_url' | cut -d ':' -f 2- | tr -d '}' | tr -d '"')"
+    # find tarball > eg. "https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
+    if [[ "$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -c download)" == "2" ]] ; then
+      qqX_Latest_Secure_TarBall="$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -m 1 download)"
       qqX_Latest_Secure_TarSha="${qqX_Latest_Secure_TarBall}.sha256"
     fi
 
-    IFS='.' read -ra qqX_LatestVer_Arr <<< "$qqX_LatestRelease"
+    # Versioning, normally as x.xx.xx-suffix > major.minor.point and with optional suffix as -beta.01 etc
+    # Loosely following 'semantic versioning' but non-major non-zero numbers padded to 2dp to make easier reading in file managers
 
-    # Current Version is carried out at the start, in similar way
-    # qqX_LatestVer_Arr[0] remains unpadded  (& to the left of the decimal point)
-
-    [[ ${#qqX_LatestVer_Arr[1]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[1] "%.2d" "${qqX_LatestVer_Arr[1]}"
-    [[ ${#qqX_LatestVer_Arr[2]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[2] "%.2d" "${qqX_LatestVer_Arr[2]}"
-
-    # Versioning, normally as x.x.2dp > major.minor.point  Or beta as x.x.0.2dp > major.minor.0.dev-point.
+    # Changes @ 24/11 with intro of 'floatversion' from system of:  beta as x.x.0.2dp > major.minor.0.dev-point.
     # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
     # The 4th register may also be used for dev-point or micro point branching for small tweaks and small fixes
     #
@@ -100,17 +87,10 @@ check_for_qqX_updates() {
     # then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
     # or 1.10.02 as the next point release, with possibly a new small feature or two.
 
-    [[ ${#qqX_LatestVer_Arr[3]} -gt 2 ]] && qqX_LatestVer_Arr[3]="${qqX_LatestVer_Arr[3]:(-2)}"
-    [[ ${#qqX_LatestVer_Arr[3]} -lt 2 ]] && printf -v qqX_LatestVer_Arr[3] "%.2d" "${qqX_LatestVer_Arr[3]}"
-
-    qqX_LatestVer_Float="${qqX_LatestVer_Arr[0]}.${qqX_LatestVer_Arr[1]}${qqX_LatestVer_Arr[2]}${qqX_LatestVer_Arr[3]}"
-
-    #  Flag up release type.  Also used in qqX general title to show if using beta or release.
-
-    if [[ "${qqX_LatestVer_Arr[3]}" ]] && [[ "${qqX_LatestVer_Arr[2]}" == "00" ]]; then  qqX_LatestReleaseType="beta"
-
+    # Flag up release type.
+    # Current Version is carried out at the start, in similar way
+    if [[ $qqX_LatestRelease == *[[:alpha:]]* ]] ; then  qqX_LatestReleaseType="beta"
     else qqX_LatestReleaseType="release"
-    
     fi
 
     #  If current ver is beta OR if beta notifications are requested in the general settings:
@@ -122,21 +102,15 @@ check_for_qqX_updates() {
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
 
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
-   
-      if [[ $(bc <<< "$qqX_LatestVer_Float > $qqX_CurrentVer_Float" 2>/dev/null) == "1" ]]; then 
-
+      if  floatversion --gt "$qqX_LatestRelease  $qqX_Version" ; then
         { printf "\n\n qqX_UpdateAvail=\"1\""   
           printf "\n\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease" 
           printf "\n\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall" 
           printf "\n\n qqX_Latest_Secure_TarSha=\"%s\""  "$qqX_Latest_Secure_TarSha" 
           printf "\n\n qqX_LatestReleaseType=\"%s\""  "$qqX_LatestReleaseType" 
-          printf "\n\n qqX_LatestVer_Float=\"%s\""  "$qqX_LatestVer_Float" 
         } >> "$qqX_Upd_VarsTmpFile"
-
       else  printf "\n\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
-
       fi
-
     fi
 
   fi 
@@ -147,19 +121,12 @@ check_for_qqX_updates() {
 function download_new_release {
 
     printf "\033c \n\n"
-
     qqX_logo_printf_title  "qqX updater"
-
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    if [[ ! $qqX_Latest_Secure_TarBall ]] ; then
-
-      printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
-
+    if [[ ! $qqX_Latest_Secure_TarBall ]] ; then printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
     else 
-
-      printf "\n\n %s \n"  "$qqX_Latest_Secure_TarBall"
-
+      printf "\n\n  %s \n"  "$qqX_Latest_Secure_TarBall"
       AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -A 12 'body')"
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
@@ -169,21 +136,14 @@ function download_new_release {
       AboutRelease="${AboutRelease//'\n'/}"
       AboutRelease="${AboutRelease//'\r'/}"
       AboutRelease="${AboutRelease//'}'/}"
-
       IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
-
       for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n * %s"  "$Line" ; fi ; done
-
       # as long as there are no trailing colons or spaces in release list, prints a tidied up bullet-point summary
-
     fi
 
     printf "\n\n\n"
-
     while true ; do
-
       printf "  Neatly download the release into its own sub-folder at: "
-
       [[ $Specified_Updates_Location ]] && printf "\n\n  [s] Specified folder  %s"  "$Specified_Updates_Location"
       [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder  %s"  "$HOME/Downloads"
 
@@ -200,21 +160,13 @@ function download_new_release {
       read -rp "  >  "  qqX_LatestTarBall_Folder
       printf "\n\n"
 
-
       if [[ $qqX_LatestTarBall_Folder == "s" ]]; then  qqX_LatestTarBall_Folder="$Specified_Updates_Location" ; break
-
       elif [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
-
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
-
       elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
-      
         nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
-
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
-
       else qqX_LatestTarBall_Folder="$Default_VM_Folder" ; break
-
       fi
 
     done
@@ -233,27 +185,20 @@ function download_new_release {
       cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
-        
         eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"  "$qqX_Latest_Secure_TarBall"
         echo
         eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256"  "$qqX_Latest_Secure_TarSha"
         SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
-
         printColor "\n  SHA256 Check: %s "  "$SHA_Check"
-
         [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
-      
       else  eval curl -L -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" "$qqX_Latest_Secure_TarBall"
-
       fi
 
       printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
 
       if [[ $BetaTxReleasePoint ]]; then 
-      
         printf "\n\n\n  Transitioning from beta to release ...  If required,"
         printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
-
       fi
 
       printColor "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
@@ -262,15 +207,11 @@ function download_new_release {
       read -rp "  >  "  qqX_UpdateExit
 
       if [[ $qqX_UpdateExit != "r" ]]; then 
-
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
-
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
         cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
-
         # move current execution away from this script and to the installer
         exec  bash -c "./qqX_setup_and_install  Upgrade" 
-
       fi
 
       sleep 0.6

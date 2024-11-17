@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
 
 
 function_config_tune_up ()  {
@@ -72,7 +69,7 @@ function_config_tune_up ()  {
   Conf_SysQE_Pointer="$(head -n 1 "$TuneUpTargetFile" | grep '#!' | grep "$QE_SystemFilePath" )"
   [[ "$Conf_SysQE_Pointer" == *'builtins'* ]] && Conf_SysQE_Pointer=
 
-  if [[ ! $Conf_qqX_Pointer && ! $Conf_SysQE_Pointer ]]; then 
+  if [[ ! $Conf_qqX_Pointer ]] && [[ ! $Conf_SysQE_Pointer ]]; then 
     if [[ $Installed_qqX_Path ]]; then {
       printf '#!' ; printf "%s --vm \n\n" "$Installed_qqX_Path" 
       } > "$TuneUpTargetFile" 
@@ -133,7 +130,7 @@ function_config_tune_up ()  {
   read -rp "  >  "  ConfEdit_Qstart
     
   if [[ $ConfEdit_Qstart == "q" ]]; then 
-    printColor "\n  Linux distros post-install:"
+    printColor "\n  POST-INSTALL Linux distros:"
     printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
     printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
     if [[ -e "$SharedDrive" ]]; then 
@@ -144,7 +141,7 @@ function_config_tune_up ()  {
       printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
       printf "\n  See the notes in the general settings file for installation"
     fi
-    printf "\n\n  [enter] to continue to the VM menus \n\n"
+    printf "\n\n  [enter] to continue to the menus \n\n"
     read -rp "  > "
     return 
   fi
@@ -500,7 +497,7 @@ function_config_tune_up ()  {
 
     fi
 
-    printColor "\n\n  Linux distros post-install:"
+    printColor "\n\n  POST-INSTALL Linux distros:"
     printf "\n\n  Installing spice-vdagent IN THE GUEST may help enable SPICE copy/paste and USB redirection."
     printf "\n\n  Installing spice-webdavd in the GUEST may help enable sharing to a defined Public folder."
     if [[ -e "$SharedDrive" ]]; then 

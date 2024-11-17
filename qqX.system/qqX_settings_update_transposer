@@ -242,8 +242,8 @@ function  update_old_settings_file_with_new_options {
 
       [[ ! $MatchNewOld ]] && echo "${GrepArr_NEW[i]}"  >> "$TargetNew"
 
-      if [[ $DevSetUpdArrOutputScrn && ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" ; fi
-      if [[ $DevSetUpdArrOutputFile && ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" >> "/tmp/qDevSet_No_Match.txt" ; fi
+      if [[ $DevSetUpdArrOutputScrn ]] && [[ ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" ; fi
+      if [[ $DevSetUpdArrOutputFile ]] && [[ ! $MatchNewOld ]]; then  echo "No Match > Copy New - ${GrepArr_NEW[i]}" >> "/tmp/qDevSet_No_Match.txt" ; fi
 
     elif [[ ! $SkipCopy ]]; then
 

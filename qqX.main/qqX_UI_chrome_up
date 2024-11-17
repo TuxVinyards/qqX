@@ -11,13 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154  
-
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
 
 #  GENERAL COLOR & THEMING   (see settings)
 
@@ -71,7 +67,7 @@ echColor () {
 
 
 # General default title:
-qqX_title="[quickemu quickget X terminal project] - $qqX_CurrentReleaseType: $qqX_Version "
+qqX_title="[quickemu quickget X terminal project] - $qqX_Version "
 
 ## qqX chrome up  
 
@@ -232,7 +228,7 @@ function multi_instance_checks {
   if [[ $MultiInstanceCount -gt 1 ]]; then 
 
     tput sc
-    printColor "\n\n  WARNING: more than one instance of qqX appears to be running "  
+    qqX_logo_printf_title  "WARNING: more than one instance of qqX appears to be running "
     printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed. "
     printf "\n\n\n  For *simple* usage, it can be safe to continue ..."
     printf "\n\n  BUT as long as the other instance's code base has not been hot-swapped."

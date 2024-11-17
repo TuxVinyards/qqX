@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 
 ##  ADD-IN of ORIGINAL quickemu functions & the needed variables
@@ -31,11 +28,11 @@ function system_code_check_and_warn {
     printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH " 
     printf "\n\n  See https://github.com/quickemu-project/quickemu for more details"
     printf "\n\n  The 'official' given location is /usr/bin, as loose files, but others may be chosen ... "
-    printf "\n\n\n  The builtin 'Echo' is an older plain System version that may be selected, if wished."
-    printf " \n\n  Unless specified, qqX will default to using FreeBird."
+    printf "\n\n\n  The builtin 'Echo' is an older plain System version that may be selected, if wished,"
+    printf " \n\n  but qqX will default to using FreeBird and FreeSpirit will have the latest mods."
     printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
     printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
-    printf "\n\n\n  I understand the risks ...  [enter] to continue with FreeBird and/or re-select\n\n"
+    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
@@ -57,7 +54,7 @@ function system_code_check_and_warn {
     printColor "\n\n  CAUTION Source Version '%s' \n\n  Not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
     printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
     printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
-    printf "\n\n\n  I understand the risks ...  [enter] to continue   [f] to select FreeBird\n\n"
+    printf "\n\n\n  I have backups and I understand ....  [enter] to continue   [f] to select FreeBird\n\n"
     read -rp "  >  "  WarnedOnQE
     [[ $WarnedOnQE ]] && CodingHotSwap="FreeBird"
     WarnedOnQE=1
@@ -269,8 +266,8 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
       } | tee -a "$QemuArgsFile" &> /dev/null
     fi
 
-    if [[ $BootMenu == "slow" ]]; then BootMenuCmd=" -boot menu=on " ; else BootMenuCmd=" -boot menu=off " ; fi
-    printf "\n\n %s " "$BootMenuCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
+    if [[ $BootStyle == "slow" ]]; then BootStyleCmd=" -boot menu=on " ; else BootStyleCmd=" -boot menu=off " ; fi
+    printf "\n\n %s " "$BootStyleCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
 
     if [[ $secureboot == "on" ]]; then 
       printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
@@ -329,7 +326,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
             
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-      eval "$QEMU"  "${args[*]}" "$BootMenuCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      eval "$QEMU"  "${args[*]}" "$BootStyleCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
 
     fi
 

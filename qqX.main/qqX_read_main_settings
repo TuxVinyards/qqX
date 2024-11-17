@@ -11,12 +11,9 @@
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
-# And SC1090,SC2024, SC154 for necessity of dynamic file sourcing
+# And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242
-#  shellcheck disable=SC1090 
-#  shellcheck disable=SC2034
-#  shellcheck disable=SC2154 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
 
 ## VM selector style default
@@ -68,16 +65,12 @@ iso=
 
 function find_file_manager_browser()  {
 
-  ## Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
+  # Check if a default File Manager and a default Web Browser are set or are available, or if suppressed
 
   if [[ $FileManager == "no" ]]; then FileManager=
-
   else
-
     [[ $FileManager ]] && [[ ! $(type -p "$FileManager") ]] && FileManager=
-
     if [[ ! $FileManager ]] ; then
-
       if [[ $(type -p caja) ]]; then  FileManager="caja"
       elif [[ $(type -p nautilus) ]]; then  FileManager="nautilus"
       elif [[ $(type -p dolphin) ]]; then  FileManager="dolphin"
@@ -86,23 +79,16 @@ function find_file_manager_browser()  {
       elif [[ $(xdg-mime query default inode/directory) ]]; then  FileManager="xdg-open"
       else FileManager=
       fi
-
     fi
-
   fi
-
   if [[ $WebBrowser == "no" ]]; then WebBrowser=
-
   else
-
     [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
-
     if [[ ! $WebBrowser ]]; then
-
       WebBrowser="$(xdg-settings get default-web-browser)"
-      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web= ; fi
+      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web= 
+      fi
       WebBrowser="${WebBrowser/'.desktop'/}"
-
       if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
       elif [[ "$WebBrowser" == *'falkon'* ]]; then WebBrowser="falkon"
       elif [[ $(type -p 'google-chrome') ]]; then  WebBrowser="google-chrome"
@@ -111,15 +97,42 @@ function find_file_manager_browser()  {
       elif [[ $XDG_Web ]]; then WebBrowser="xdg-open"
       else WebBrowser=
       fi
-
     fi
-  
   fi
+}
 
+texteditor_not_found_message () {
+  printColor "\n\n  Unable to open settings or show some help sections without an editor."
+  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
+  printf "\n\n  Give settings file the command name of a preferred editor."
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
+  read -rp "  >  "
+}
+
+find_texteditor () {
+
+  [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
+  if [[ ! $TextEditor ]]; then
+    DefaultTextEditor="$(xdg-mime query default text/plain)"
+    EditorTest="${DefaultTextEditor/.desktop/}"
+    EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
+    # orggnomeTextEditor etc will fail
+    [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
+    if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
+    elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
+    elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
+    elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
+    elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
+    elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
+    elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
+    elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
+    fi
+  fi
 }
 
 # NB Also needs calling if re-loading the settings file  See refresh_sources_and_load_VM_arrays
 find_file_manager_browser
+find_texteditor
 
 # Set the original initial value of paths as found on start up. Check Once.
 OriginalPATH="$PATH"
@@ -263,26 +276,18 @@ function find_quick_version_numbers {
 
 find_quick_version_numbers
 
+
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
-IFS='.' read -ra qqX_CurrentVer_Arr <<< "$qqX_Version"
+# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
+# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# Non-major numbers remain padded to 2dp to make easier reading in file managers
 
-# qqX_CurrentVer_Arr[0] remains unpadded  (& to the left of the decimal point)
-
-[[ ${#qqX_CurrentVer_Arr[1]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[1] "%.2d" "${qqX_CurrentVer_Arr[1]}"
-[[ ${#qqX_CurrentVer_Arr[2]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[2] "%.2d" "${qqX_CurrentVer_Arr[2]}"
-
-#legacy 3dp pre "0.09.00.017"
-[[ ${#qqX_CurrentVer_Arr[3]} -gt 2 ]] && qqX_CurrentVer_Arr[3]="${qqX_CurrentVer_Arr[3]:(-2)}"
-[[ ${#qqX_CurrentVer_Arr[3]} -lt 2 ]] && printf -v qqX_CurrentVer_Arr[3] "%.2d" "${qqX_CurrentVer_Arr[3]}"
-
-qqX_CurrentVer_Float="${qqX_CurrentVer_Arr[0]}.${qqX_CurrentVer_Arr[1]}${qqX_CurrentVer_Arr[2]}${qqX_CurrentVer_Arr[3]}"
-
-if [[ "${qqX_CurrentVer_Arr[3]}" ]] && [[ "${qqX_CurrentVer_Arr[2]}" == "00" ]]; then  qqX_CurrentReleaseType="beta"
+if [[ $qqX_Version == *[[:alpha:]]* ]] ; then  qqX_CurrentReleaseType="beta"
 else qqX_CurrentReleaseType="release"
 fi
 
-# Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
+## Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)
 # Sets defaults, if not given in main settings. But also for later, so systems can be swapped out.
 
 [[ ! $QEMU_Default_SystemType ]] &&  QEMU_Default_SystemType="qemu-system-x86_64"
@@ -324,22 +329,22 @@ qemu_version_check
 
 # How the Tiano BIOS/UEFI loads up:
 
-function store_bootmenu_defaults {
-  [[ ! $BootMenu ]] && BootMenu="fast"
-  [[ ! $BootMenuMsg ]] && BootMenuMsg="slow"
-  BootMenu_Default="$BootMenu"   
-  BootMenuMsg_Default="$BootMenuMsg"  
+function store_boot_style_defaults {
+  [[ ! $BootStyle ]] && BootStyle="fast"
+  [[ ! $BootStyleMsg ]] && BootStyleMsg="slow"
+  BootStyle_Default="$BootStyle"   
+  BootStyleMsg_Default="$BootStyleMsg"  
 }
 
-function reload_bootmenu_defaults {
-  BootMenu="$BootMenu_Default"   
-  BootMenuMsg="$BootMenuMsg_Default"  
+function reload_boot_style_defaults {
+  BootStyle="$BootStyle_Default"   
+  BootStyleMsg="$BootStyleMsg_Default"  
 }
 
-function clear_bootmenu_vars {
-  BootMenu= ; BootMenu_Default=  
-  BootMenuMsg= ; BootMenuMsg_Default= 
+function clear_boot_style_vars {
+  BootStyle= ; BootStyle_Default=  
+  BootStyleMsg= ; BootStyleMsg_Default= 
 }
 
-store_bootmenu_defaults
+store_boot_style_defaults
 
