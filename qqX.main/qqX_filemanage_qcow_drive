@@ -27,12 +27,11 @@ source "$qqX_MainFolder/qqX_UI_chrome_up"
 if [[ ! $(type -p "$FileManager") ]] ; then 
   printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager" ; sleep 100
 fi
-
 # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
-# New PID always goes on end of list but 'grep -c' fails inside while loop so use PID check.
-ThisPID="$(ps T | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -1)"
+# New PID always goes on end of list but 'grep -c' tests fail inside the while loop so use PID check.
+ThisPID="$(ps T | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
 while ps -ef | grep 'qqX_filemanage' | grep -q qcow ; do
-  ChkPID="$(ps -ef | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -1)"
+  ChkPID="$(ps -ef | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
   if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" ; fi
 done
 
