@@ -92,7 +92,7 @@ while true; do
   qf_DriveSelect=
   printColor "\n\n  Distro Focus = '%s' " "$VM_InstanceName"
 
-  printf "\n\n  Mounted Drive(s): \n"
+  printf "\n\n  Qemu NBD connected Drive(s): \n"
   ps -ef | grep nbd | grep qcow
 
   printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive "
@@ -103,7 +103,7 @@ while true; do
     printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
   fi
 
-  printColor "\n\n\n  [enter] open selected mounted drive in file manager  or  [number] for different selection"
+  printColor "\n\n\n  [enter] open selected drive in file manager  or  [number] for different selection"
   printf "\n\n  [h] help   [q] to quit "
 
   printf "\n\n"
