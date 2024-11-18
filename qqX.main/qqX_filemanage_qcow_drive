@@ -19,7 +19,8 @@
 #  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
 
 #  A CUSTOM VERSION for this file MAY BE CREATED, if wished, and placed next to this one
-#  at/as "$qqX_MainFolder/custom_filemanage_qcow_drive" which will be auto-detected and run by function 'qcow2_filemanage' 
+#  at/as "$qqX_MainFolder/custom_filemanage_qcow_drive" which will be auto-detected 
+#  and run by function 'qcow2_filemanage' in the main qqX program in the disk maintenance script
 
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
@@ -45,6 +46,7 @@ show_nbd_help () {
 }
 
 TargetDrive="$SharedDrive"
+TargetName="Shared Drive"
 
 while true; do
 
@@ -56,41 +58,50 @@ while true; do
 
   [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
 
-  DriveSelect=
+  qf_DriveSelect=
   printColor "\n\n  Distro Focus = '%s' " "$VM_InstanceName"
 
   printf "\n\n  Mounted Drive(s): \n"
   ps -eF | grep nbd | grep qcow
 
-  printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive   [h] help   [q] to quit "
+  printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive   [m] mount  [u] un-mount "
 
-  printf "\n\n  Selected Drive = '%s'" "$TargetDrive"
+  printf "\n\n  Selected = %s  '%s'" "$TargetName" "$TargetDrive"
+
   if [[ ! $TargetDrive || ! -e "$TargetDrive" ]]; then 
     printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
   fi
 
-  printColor "\n\n\n  [enter] to continue  or  [number] for different selection"
+  printColor "\n\n\n  [enter] open selected mounted drive in file manager  or  [number] for different selection"
+  printf "\n\n  [h] help   [q] to quit "
+
   printf "\n\n"
-  read -rp "  >  " DriveSelect
+  read -rp "  >  " qf_DriveSelect
 
-  if   [[ $DriveSelect == "1" ]]; then TargetDrive="$MainDrive"
-  elif [[ $DriveSelect == "2" ]]; then TargetDrive="$SecondDrive"
-  elif [[ $DriveSelect == "3" ]]; then TargetDrive="$SharedDrive"
-  elif [[ $DriveSelect == "h" ]]; then ShowHelp=1
-  elif [[ $DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0"
-  elif [[ $DriveSelect == "q" ]]; then exit directly
-  elif [[ $DriveSelect ]]; then printColor "\n\n  '%s' not recognised ...." "$DriveSelect"
+  if   [[ $qf_DriveSelect == "1" ]]; then TargetDrive="$MainDrive" ; TargetName="Main Drive"
+  elif [[ $qf_DriveSelect == "2" ]]; then TargetDrive="$SecondDrive" ; TargetName="Second Drive"
+  elif [[ $qf_DriveSelect == "3" ]]; then TargetDrive="$SharedDrive" ; TargetName="Shared Drive"
+  elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
+  elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0"
+  elif [[ $qf_DriveSelect == "q" ]]; then exit directly
+  elif [[ $qf_DriveSelect == "m" ]]; then true
+  elif [[ $qf_DriveSelect == "u" ]]; then true
   else  
-    echo; echo  " initial menu only, not yet finished ..."
+      # TODO  test if selected is mounted & add [m] to mount option 
+      printf "\n\n  %s is mounted" "$TargetName"
+      printColor "\n\n  [enter] to continue  [r] to reselect"
+      printf "\n\n"
+      read -rp "  >  " qf_DriveSelect
 
-    sudo ls 
+      if [[ $qf_DriveSelect != "r" ]]; then 
 
-    sleep 1000
+        printf "\n\n  opening ... "  ; sleep 3
 
-    #  TODO  if mounted then offer open in fm now OR un mount & vice versa 
+      fi
+
+      # nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
 
 
-    # nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
   fi
 
 done
