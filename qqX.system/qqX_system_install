@@ -377,7 +377,11 @@ else
 
   cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
 
-  printColor "\n  [enter] to auto-install from this terminal"
+  printf "\n  Good Practice:  Make sure these scripts have been securely downloaded "
+  printf "\n\n  and if re-run, that only you or trusted people have had access to them where they are stored."
+  printf "\n\n  If in doubt, download a fresh copy. "
+
+  printColor "\n\n  [enter] to auto-install from this terminal"
   [[ $(type -p qqx) || $(type -p qqX) ]] &&  printf "\n\n  [u] un-install scripts and settings  [enter] re-install/upgrade"
   printf "   [m] use manual installation"
   printf "   [q] to quit \n\n"
@@ -392,7 +396,7 @@ else
     printf "\n\n"
     print_manual_uninstall_notes
 
-    printColor "\n\n  Remove any qqX taskbar icons BEFORE proceeding. Some distros may need this this."
+    printColor "\n\n  Remove any qqX taskbar icons BEFORE proceeding. Some distros may need this."
 
     qqX_RemovalTarget="$(type -p qqx)"
     qqX_RemovalTarget_X="$(type -p qqX)"
@@ -447,7 +451,9 @@ else
       printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
 
-      printf "\n\n  NOTE command line installation only. Use auto for desktop launchers and shortcuts"
+      printf "\n\n  NOTE command line installation only. Auto-install is needed for desktop launchers and shortcuts"
+      printf "\n"
+      print_manual_uninstall_notes
 
       printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
       read -rp  "  >  "  SeparateSudo
@@ -457,7 +463,7 @@ else
 
     if [[  $SeparateSudo != "y" ]]; then
 
-      printColor "\n  Auto-Installing .... \n\n"
+      printColor "\n  Auto-Installing .... \n\n  "
       sudo cp "qqX" "$qqX_Std_File_Path"
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
       [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
@@ -472,9 +478,7 @@ else
     # And check that the right version is there:
 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
-    
       printColor "\n  ...... All good " 
-
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
     fi
 
@@ -505,12 +509,14 @@ else
       printColor "  [n] not yet >> edit the settings file later ... \n\n" 
       read -rp "  >  "  MkDefDir
 
-      if [[ ! $MkDefDir ]] && [[ ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" ; fi
+      if [[ ! $MkDefDir ]] && [[ ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" 
+      fi
       #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
 
     fi
 
-    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
+    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n"
+    fi 
 
     if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  ""
     else cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
@@ -551,7 +557,8 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
   printf "[r] to reconfigure \n\n"
   read -rp "  >  "  SkipMkLauncher
 
-  if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 ; fi
+  if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 
+  fi
 
 fi
 
