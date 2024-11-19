@@ -703,8 +703,8 @@ function qcow2_filemanage {
   fi
 
   # allow for custom mounting scripts
-  if [[ -e "$qqX_MainFolder/custom_filemanage_qcow_drive" ]]; then 
-    eval "$Terminal_Start" "$qqX_MainFolder/custom_filemanage_qcow_drive" &
+  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+    eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" &
   else
     eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" &
   fi

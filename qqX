@@ -91,6 +91,9 @@ if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not fo
 if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
 if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
+# secure folder keeping custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
+qqX_CustomFolder="$(dirname "$qqX_MainFolder")""qqX.custom"
+
 # NON-FHS installs should normally locate Main and Built-Ins in with this file, so ./ will locate things
 
 # The default location for the .desktop file, from ver 1.9 onwards, is '/usr/share/applications'
