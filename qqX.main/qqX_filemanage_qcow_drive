@@ -54,7 +54,7 @@ check_sudo_nbd_active () {
   # https://superuser.com/a/1183480/2243702  
   if ! sudo -nv 2>/dev/null ; then printf "\n\n  " ; sudo -v
   fi
-  if ! lsmod | grep -q nbd ; then sudo modprobe nbd 
+  if ! lsmod | grep -q nbd ; then sudo modprobe nbd max_part=8
   fi
 }
 
@@ -78,6 +78,7 @@ fi
 
 TargetDrive="$SharedDrive"
 TargetName="Shared Drive"
+TargetDevice="/dev/nbd3"
 
 while true; do
 
@@ -92,8 +93,15 @@ while true; do
   qf_DriveSelect=
   printColor "\n\n  Distro Focus = '%s' " "$VM_InstanceName"
 
-  printf "\n\n  Qemu NBD connected Drive(s): \n"
-  ps -ef | grep nbd | grep qcow
+  printf "\n\n  Connected Drive(s): \n"
+  if ps -ef | grep nbd1 | grep -q qcow; then printf "\n  Main Drive"; fi
+  if ps -ef | grep nbd2 | grep -q qcow; then printf "\n  Second Drive"; fi
+  if ps -ef | grep nbd3 | grep -q qcow; then printf "\n  Shared Drive"; fi
+
+  printf "\n\n  Mounted Drive(s): \n"
+  if mount -fl | grep -q '/dev/nbd1'; then printf "\n  Main Drive"; fi
+  if mount -fl | grep -q '/dev/nbd2'; then printf "\n  Second Drive"; fi
+  if mount -fl | grep -q '/dev/nbd3'; then printf "\n  Shared Drive"; fi
 
   printf "\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive "
 
@@ -126,11 +134,15 @@ while true; do
 
     if [[ $qf_DriveSelect != "r" ]]; then 
 
-      printf "\n\n  qemu-nbd connecting / disconnecting ... "  ; sleep 2
-
-      if [[ $TargetConnected ]]; then sudo qemu-nbd -d "$TargetDevice"
-      else sudo qemu-nbd -c "$TargetDevice"  -f qcow2 "$TargetDrive"
+      if [[ $TargetConnected ]]; then 
+        printf "\n\n  qemu-nbd disconnecting ... "  
+        sudo qemu-nbd -d "$TargetDevice"
+      else
+        printf "\n\n  qemu-nbd connecting ... " 
+        cd "$(dirname "$TargetDrive")" || printColor "\n\n  ERROR cd Target Dir"
+        sudo qemu-nbd -c "$TargetDevice"  -f qcow2  "$(basename "$TargetDrive")"
       fi
+      sleep 5
 
     fi
 
