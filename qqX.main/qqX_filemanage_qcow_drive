@@ -55,7 +55,7 @@ check_sudo_nbd_active () {
   # https://superuser.com/a/1183480/2243702  
   if ! sudo -nv 2>/dev/null ; then printf "\n\n  " ; sudo -v
   fi
-  if ! lsmod | grep -q nbd ; then sudo modprobe nbd max_part=8
+  if ! lsmod | grep -q nbd ; then sudo modprobe nbd max_part=8 nbds_max=4
   fi
 }
 
@@ -70,11 +70,9 @@ nbd_disconnect_non_valid () {
   # Disconnect any previously connected non-shared drives from any previous VM's
   # NB qemu connection is not the same as host file system mounting
   if ps -ef | grep nbd | grep -q qcow ; then
-    MainPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
-    if [[ $MainPathName ]] && [[ "$MainPathName" != "$TargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd1
+    if [[ $MainGreppedPathName ]] && [[ "$MainGreppedPathName" != "$MainTargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd1
     fi
-    SecondPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
-    if [[ $SecondPathName ]] && [[ "$SecondPathName" != "$TargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd2
+    if [[ $SecondGreppedPathName ]] && [[ "$SecondGreppedPathName" != "$SecondTargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd2
     fi
     printf "\n\n"
     # https://stackoverflow.com/questions/17921544/get-last-field-using-awk-substr#17921589
@@ -89,6 +87,9 @@ TargetDrive="$SharedDrive"
 TargetPathName="$SharedDrive"
 TargetName="Shared Drive"
 TargetDevice="/dev/nbd3"
+MainTargetPathName="$VM_Conf_Dir/$MainDrive"
+SecondTargetPathName="$VM_Conf_Dir/$SecondDrive"
+SharedTargetPathName="$SharedDrive"
 
 while true; do
 
@@ -109,15 +110,27 @@ while true; do
   if [[ -e "$SharedDrive" ]]; then printf " Shared   "; fi
 
   printf "\n\n  Connected Drive(s): "
-  if ps -ef | grep nbd1 | grep -q qcow; then printf " Main    "; fi
-  if ps -ef | grep nbd2 | grep -q qcow; then printf " Second  "; fi
-  if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  "; fi
+  if ps -ef | grep nbd1 | grep -q qcow; then printf " Main    " ; MainConnected=1 ; else MainConnected= ; fi
+  if ps -ef | grep nbd2 | grep -q qcow; then printf " Second  " ; SecondConnected=1 ; else SecondConnected= ; fi
+  if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  " ; SharedConnected=1 ; else SharedConnected= ; fi
 
   printf "\n\n  Mounted Drive(s):   "
   if mount -fl | grep -q '/dev/nbd1'; then printf " Main    "; fi
   if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; fi
   if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; fi
 
+  if [[ $MainConnected ]]; then     
+    MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
+    if [[ "$MainGreppedPathName" != "$MainTargetPathName" ]]; then 
+      printf "\n\n  WARNING: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
+    fi
+  fi
+  if [[ $SecondConnected ]]; then     
+    SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
+    if [[ "$SecondGreppedPathName" != "$SecondTargetPathName" ]]; then 
+      printf "\n\n  WARNING: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
+    fi
+  fi
 
   printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive "
 
@@ -131,9 +144,9 @@ while true; do
   read -rp "  >  " qf_DriveSelect
 
   if   [[ $qf_DriveSelect == "1" ]]; then 
-    TargetDrive="$MainDrive" ; TargetPathName="$VM_Conf_Dir/$TargetDrive" ; TargetName="Main Drive" ; TargetDevice="/dev/nbd1"
+    TargetDrive="$MainDrive" ; TargetPathName="$MainTargetPathName" ; TargetName="Main Drive" ; TargetDevice="/dev/nbd1"
   elif [[ $qf_DriveSelect == "2" ]]; then 
-    TargetDrive="$SecondDrive" ; TargetPathName="$VM_Conf_Dir/$TargetDrive" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2"
+    TargetDrive="$SecondDrive" ; TargetPathName="$SecondTargetPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2"
   elif [[ $qf_DriveSelect == "3" ]]; then 
     TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
