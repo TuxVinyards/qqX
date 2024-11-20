@@ -686,6 +686,7 @@ function qcow2_filemanage {
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
     printf "\n FileManager=\"%s\"" "$FileManager"
     printf "\n TextEditor=\"%s\"" "$TextEditor"
+    printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
     printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
     printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
     printf "\n MainDrive=\"%s\"" "$MainDrive"
