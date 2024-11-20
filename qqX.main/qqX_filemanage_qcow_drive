@@ -59,12 +59,6 @@ check_sudo_nbd_active () {
   fi
 }
 
-check_if_target_is_connected () {
-  if ps -ef | grep nbd | grep qcow | grep -q "$TargetPathName" ; then
-    printf "\n\n  %s is QEMU connected" "$TargetName" ; TargetConnected=1
-  else  printf "\n\n  %s is NOT QEMU CONNECTED" "$TargetName" ; TargetConnected=
-  fi
-}
 
 nbd_disconnect_non_valid () {
   # Disconnect any previously connected non-shared drives from any previous VM's
@@ -105,17 +99,17 @@ while true; do
   printColor "\n\n  %s " "${VM_InstanceName^^}"
 
   printf "\n\n  Available Drive(s): "
-  if [[ -e "$MainDrive" ]] && [[ ! $LiveBoot ]]; then printf " Main    "; fi
-  if [[ -e "$SecondDrive" ]]; then printf " Second   "; fi
-  if [[ -e "$SharedDrive" ]]; then printf " Shared   "; fi
+  if [[ -e "$MainDrive" ]] && [[ ! $LiveBoot ]]; then printf "  Main   "; fi
+  if [[ -e "$SecondDrive" ]]; then printf " Second  "; fi
+  if [[ -e "$SharedDrive" ]]; then printf " Shared  "; fi
 
   printf "\n\n  Connected Drive(s): "
-  if ps -ef | grep nbd1 | grep -q qcow; then printf " Main    " ; MainConnected=1 ; else MainConnected= ; fi
+  if ps -ef | grep nbd1 | grep -q qcow; then printf "  Main   " ; MainConnected=1 ; else MainConnected= ; fi
   if ps -ef | grep nbd2 | grep -q qcow; then printf " Second  " ; SecondConnected=1 ; else SecondConnected= ; fi
   if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  " ; SharedConnected=1 ; else SharedConnected= ; fi
 
   printf "\n\n  Mounted Drive(s):   "
-  if mount -fl | grep -q '/dev/nbd1'; then printf " Main    "; fi
+  if mount -fl | grep -q '/dev/nbd1'; then printf "  Main   "; fi
   if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; fi
   if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; fi
 
@@ -132,12 +126,12 @@ while true; do
     fi
   fi
 
-  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive "
+  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive  [A] All Drives  [a] all Non-Shared Drives "
 
   printColor "\n\n  Selected = %s " "$TargetName" 
-  printf " '%s'"  "$TargetDrive"
+  [[ $TargetName != All* ]] && printf " '%s'"  "$TargetDrive"
 
-  printColor "\n\n\n  [enter] to continue   or  [number] for different selection  "
+  printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
   printf "\n\n  [r] to refresh   [h] help   [q] to quit "
 
   printf "\n\n"
@@ -149,6 +143,8 @@ while true; do
     TargetDrive="$SecondDrive" ; TargetPathName="$SecondTargetPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2"
   elif [[ $qf_DriveSelect == "3" ]]; then 
     TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3"
+  elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
+  elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0"
   elif [[ $qf_DriveSelect == "r" ]]; then true
@@ -157,9 +153,8 @@ while true; do
     check_sudo_nbd_active
     if [[ ! -e "$TargetPathName" ]]; then 
       printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
-    else check_if_target_is_connected
     fi
-    printColor "\n\n  [enter] to continue  [c] connect  [d] disconnect   [r] to reselect or return"
+    printColor "\n\n  [c] connect  [d] disconnect  [enter] [r] to reselect or return"
     printf "\n\n"
     read -rp "  >  " qf_DriveSelect
       
@@ -167,12 +162,22 @@ while true; do
 
     if [[ $qf_DriveSelect != "r" ]]; then 
 
-      if [[ $qf_DriveSelect == "d" ]] && [[ $TargetConnected ]]; then 
-        printf "  qemu-nbd disconnecting ... \n\n  "  
+      if [[ $qf_DriveSelect == "d" ]]; then 
+        printf "  qemu-nbd disconnecting ... \n\n"
+        if [[ $TargetName == "All Drives" ]]; then  
+        sudo qemu-nbd -d "/dev/nbd1"
+        sudo qemu-nbd -d "/dev/nbd2"
+        sudo qemu-nbd -d "/dev/nbd3"
+        elif [[ $TargetName == "All Non-Shared" ]]; then  
+        sudo qemu-nbd -d "/dev/nbd1"
+        sudo qemu-nbd -d "/dev/nbd2"
+        else
         sudo qemu-nbd -d "$TargetDevice"
-      elif [[ $qf_DriveSelect == "c" ]] && [[ ! $TargetConnected ]]; then 
-        printf "  qemu-nbd connecting ... \n\n  " 
+        fi
+      elif [[ $qf_DriveSelect == "c" ]]; then 
+        printf "  qemu-nbd connecting ... \n\n" 
         nbd_disconnect_non_valid
+        # TODO  must be un mounted in order to connect
         sudo qemu-nbd -c "$TargetDevice"  -f qcow2  "$TargetPathName"
       fi
       sleep 2
