@@ -73,7 +73,7 @@ TargetDrive="$SharedDrive"
 TargetPathName="$SharedDrive"
 TargetName="Shared Drive"
 TargetDevice="/dev/nbd3"
-if [[ -e "$SharedPathName" ]]; then SharedAvailable=1 ; else SharedAvailable= ; fi
+if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
 
 # LOOP
 
@@ -123,8 +123,11 @@ while true; do
   printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive    [A] All Drives  [a] all Non-Shared Drives "
 
   printColor "\n\n  Selected = %s " "$TargetName" 
-  [[ $TargetName != All* ]] && printf " '%s'"  "$TargetDrive"
-  [[  -e "$MainPathName" ]] && [[ $LiveBoot ]] && printf "  EMPTY DRIVE (live boot)" 
+  if [[ $TargetName != All* ]]; then
+   if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE" 
+   fi
+  fi
+  [[ $TargetName == "Main Drive" ]] && [[ $LiveBoot ]] && [[  -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
 
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
