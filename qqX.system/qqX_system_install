@@ -812,8 +812,8 @@ if [[ ! $SkipMkLauncher ]]; then
       # needs quotes  - plus REVIEW  -e  deprecation in other terminals
       if [[ $CustomTerminalProfile ]]; then 
         echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path  XDG %f" '"'  
-      elif [[ "$SelectedTerminalProfile" == *'gnome-terminal'* ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -- " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+      elif [[ $UserTerm == "gnome-terminal" ]]; then 
+        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'"XDG %f"'"'  
       elif [[ $SelectedTerminalProfile ]]; then 
         echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
       else  

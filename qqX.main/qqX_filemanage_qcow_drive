@@ -89,7 +89,7 @@ while true; do
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
   printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  
-  printf "\n\n  Mounting of the connected drives is carried out as standard in the file-manager."  
+  printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager."  
   printf "\n"
 
   [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
@@ -198,7 +198,7 @@ while true; do
         fi
       fi
 
-      # Qcow2 mount is a complex procedure > use File Manager to do it as much easier
+      # Qcow2 mount is a more complex procedure > use File Manager to do it as much easier
       # But drive must be un-mounted in order to connect, which happily is relatively easy 
 
       if [[ $qf_DriveSelect == "d" ]]; then 

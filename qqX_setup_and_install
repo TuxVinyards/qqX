@@ -77,8 +77,11 @@ if [ -z "$UserTerm" ]; then TermGrep="$(pgrep -a term | grep qqX | tr -cd '[:pri
   fi
 fi
 
+DefWidth=150
+DefHeight=45
+
 if [ "$UserTerm" = "gnome-terminal" ]; then
-  "$UserTerm" --geometry 145x50 -- "./qqX.system/qqX_system_install"
+  "$UserTerm" --geometry ${DefWidth}x${DefHeight} --wait -- "./qqX.system/qqX_system_install"
 
 elif [ "$UserTerm" = "konsole" ]; then
   "$UserTerm" --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=145 -p TerminalRows=50  -e  "./qqX.system/qqX_system_install"
