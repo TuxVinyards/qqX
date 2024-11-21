@@ -26,7 +26,7 @@ source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
 if [[ ! $(type -p "$FileManager") ]] ; then 
-  printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager" ; sleep 100
+  printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 if [[ ! $(modinfo -n nbd) ]] ; then 
   printf "\n\n\n  Kernel module WARNING: 'nbd' NOT found. "
@@ -111,24 +111,33 @@ while true; do
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
     if [[ "$MainGreppedPathName" != "$MainPathName" ]]; then 
       printf "\n\n  NOTE: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
+      MainCrossConnected=1
+    else MainCrossConnected=
     fi
   fi
   if [[ $SecondConnected ]]; then     
     SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
     if [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then 
       printf "\n\n  NOTE: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
+      SecondCrossConnected=1
+    else SecondCrossConnected=
     fi
   fi
 
   printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive    [A] All Drives  [a] all Non-Shared Drives "
 
   printColor "\n\n  Selected = %s " "$TargetName" 
-  if [[ $TargetName != All* ]]; then
-   if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE" 
-   fi
-  fi
-  [[ $TargetName == "Main Drive" ]] && [[ $LiveBoot ]] && [[  -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
 
+  if [[ $TargetName != All* ]]; then
+   if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE on this VM" ; fi
+  fi
+  if [[ $TargetName == "Main Drive" ]]; then
+    [[ $LiveBoot ]] && [[ -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
+    [[ $MainCrossConnected ]] && printf "   [enter] for disconnection, if required"
+  fi
+  if [[ $TargetName == "Second Drive" ]]; then
+    [[ $SecondCrossConnected ]] && printf "   [enter] for disconnection, if required"
+  fi
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
   printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
@@ -150,10 +159,9 @@ while true; do
   elif [[ $qf_DriveSelect == "r" ]]; then true
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
+
     check_sudo_nbd_active
-    if [[ $TargetName != All* ]] && [[ ! -e "$TargetPathName" ]]; then 
-      printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
-    fi
+
     printColor "\n\n  [c] connect  [d] disconnect and unmount  [enter] [r] to reselect or return"
     printf "\n\n  Connected drives should be mounted as standard in the file-manager."  
 
@@ -208,7 +216,7 @@ while true; do
 
       fi
 
-      sleep 2
+      sleep 1.5
 
     fi
 
