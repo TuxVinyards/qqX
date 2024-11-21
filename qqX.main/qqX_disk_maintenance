@@ -689,6 +689,7 @@ function qcow2_filemanage {
     printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
     printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
     printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
+    printf "\n LiveBoot=\"%s\"" "$LiveBoot"
     printf "\n MainDrive=\"%s\"" "$MainDrive"
     printf "\n SecondDrive=\"%s\"" "$SecondDrive"
     printf "\n SharedDrive=\"%s\"" "$SharedDrive"

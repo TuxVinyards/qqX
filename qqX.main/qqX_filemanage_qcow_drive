@@ -59,28 +59,11 @@ check_sudo_nbd_active () {
   fi
 }
 
-
-nbd_disconnect_non_valid () {
-  # Disconnect any previously connected non-shared drives from any previous VM's
-  # NB qemu connection is not the same as host file system mounting
-  if ps -ef | grep nbd | grep -q qcow ; then
-    if [[ $MainGreppedPathName ]] && [[ "$MainGreppedPathName" != "$MainTargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd1
-    fi
-    if [[ $SecondGreppedPathName ]] && [[ "$SecondGreppedPathName" != "$SecondTargetPathName" ]]; then sudo qemu-nbd -d /dev/nbd2
-    fi
-    printf "\n\n"
-    # https://stackoverflow.com/questions/17921544/get-last-field-using-awk-substr#17921589
-    # https://unix.stackexchange.com/questions/145672/print-last-element-of-each-row
-    # https://stackoverflow.com/questions/2961635/using-awk-to-print-all-columns-from-the-nth-to-the-last#2961994
-    # ps -ef | grep nbd | grep nbd2 | grep qcow | awk '{print $NF}'
-    # ubuntu-22.04/storage.qcow2
-  fi
-}
-
 MainTargetPathName="$VM_Conf_Dir/$MainDrive"
 SecondTargetPathName="$VM_Conf_Dir/$SecondDrive"
 SharedTargetPathName="$SharedDrive"
 
+# defaults
 TargetDrive="$SharedDrive"
 TargetPathName="$SharedDrive"
 TargetName="Shared Drive"
@@ -93,7 +76,8 @@ while true; do
   printf "\033c"
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
   printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
-  printf "\n\n  The elevated permissions required to mount the drives will remain isolated."  
+  printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  
+  printf "\n\n  Mounting of the connected drives is carried out as standard in the file-manager."  
   printf "\n"
 
   [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
@@ -119,13 +103,13 @@ while true; do
   if [[ $MainConnected ]]; then     
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
     if [[ "$MainGreppedPathName" != "$MainTargetPathName" ]]; then 
-      printf "\n\n  WARNING: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
+      printf "\n\n  NOTE: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
     fi
   fi
   if [[ $SecondConnected ]]; then     
     SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
     if [[ "$SecondGreppedPathName" != "$SecondTargetPathName" ]]; then 
-      printf "\n\n  WARNING: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
+      printf "\n\n  NOTE: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
     fi
   fi
 
@@ -135,7 +119,7 @@ while true; do
   [[ $TargetName != All* ]] && printf " '%s'"  "$TargetDrive"
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
-  printf "\n\n  [r] to refresh   [h] help   [q] to quit "
+  printf "\n\n  [r] to refresh  [f] open file-manager  [h] help   [q] to quit "
 
   printf "\n\n"
   read -rp "  >  " qf_DriveSelect
@@ -149,7 +133,8 @@ while true; do
   elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
-  elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0"
+  elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0" &
+  elif [[ $qf_DriveSelect == "f" ]]; then nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" &
   elif [[ $qf_DriveSelect == "r" ]]; then true
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
@@ -157,7 +142,9 @@ while true; do
     if [[ $TargetName != All* ]] && [[ ! -e "$TargetPathName" ]]; then 
       printf "\n\n  ERROR: The Target Drive needs to be set up first. See the qqX Utils menu ..."
     fi
-    printColor "\n\n  [c] connect  [d] disconnect  [enter] [r] to reselect or return"
+    printColor "\n\n  [c] connect  [d] disconnect and unmount  [enter] [r] to reselect or return"
+    printf "\n\n  Connected drives should be mounted as standard in the file-manager."  
+
     printf "\n\n"
     read -rp "  >  " qf_DriveSelect
       
@@ -197,8 +184,6 @@ while true; do
       elif [[ $qf_DriveSelect == "c" ]]; then 
         printf "  qemu-nbd connecting ... \n\n" 
 
-        nbd_disconnect_non_valid      #  TEMP 
-
         if [[ "$TargetName" == All* ]]; then  
           sudo qemu-nbd -c "/dev/nbd1"  -f qcow2  "$MainTargetPathName"
           sudo qemu-nbd -c "/dev/nbd2"  -f qcow2  "$SecondTargetPathName"
@@ -215,12 +200,14 @@ while true; do
 
     fi
 
-    # nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName" 
-
-    # works without sudo >  umount "$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')"
-
   fi
 
 done
 
+# https://stackoverflow.com/questions/17921544/get-last-field-using-awk-substr#17921589
+# https://unix.stackexchange.com/questions/145672/print-last-element-of-each-row
+# https://stackoverflow.com/questions/2961635/using-awk-to-print-all-columns-from-the-nth-to-the-last#2961994
+
+# https://code.visualstudio.com/  (recommended)
+# vim:tabstop=2:shiftwidth=2:expandtab
 
