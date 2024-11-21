@@ -59,15 +59,21 @@ check_sudo_nbd_active () {
   fi
 }
 
-MainTargetPathName="$VM_Conf_Dir/$MainDrive"
-SecondTargetPathName="$VM_Conf_Dir/$SecondDrive"
-SharedTargetPathName="$SharedDrive"
+if [[ $MainDrive ]]; then  MainPathName="$VM_Conf_Dir/$MainDrive" ; fi
+if [[ -e "$MainPathName" ]] && [[ ! $LiveBoot ]]; then  MainAvailable=1 ; else MainAvailable= ; fi
+
+if [[ $SecondDrive ]]; then SecondPathName="$VM_Conf_Dir/$SecondDrive" ; fi
+if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1 ; else SecondAvailable= ; fi
+
+SharedPathName="$SharedDrive"
+if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1 ; else SharedAvailable= ; fi
 
 # defaults
 TargetDrive="$SharedDrive"
 TargetPathName="$SharedDrive"
 TargetName="Shared Drive"
 TargetDevice="/dev/nbd3"
+if [[ -e "$SharedPathName" ]]; then SharedAvailable=1 ; else SharedAvailable= ; fi
 
 # LOOP
 
@@ -83,12 +89,13 @@ while true; do
   [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
 
   qf_DriveSelect=
+
   printColor "\n\n  %s " "${VM_InstanceName^^}"
 
   printf "\n\n  Available Drive(s): "
-  if [[ -e "$MainDrive" ]] && [[ ! $LiveBoot ]]; then printf "  Main   "; fi
-  if [[ -e "$SecondDrive" ]]; then printf " Second  "; fi
-  if [[ -e "$SharedDrive" ]]; then printf " Shared  "; fi
+  if [[ "$MainAvailable" ]]; then printf "  Main   " ; fi
+  if [[ "$SecondPathName" ]]; then printf " Second  " ; fi
+  if [[ "$SharedPathName" ]]; then printf " Shared  " ; fi
 
   printf "\n\n  Connected Drive(s): "
   if ps -ef | grep nbd1 | grep -q qcow; then printf "  Main   " ; MainConnected=1 ; else MainConnected= ; fi
@@ -96,19 +103,19 @@ while true; do
   if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  " ; SharedConnected=1 ; else SharedConnected= ; fi
 
   printf "\n\n  Mounted Drive(s):   "
-  if mount -fl | grep -q '/dev/nbd1'; then printf "  Main   "; MainTargetMountPoint="$(mount -fl | grep '/dev/nbd1' | awk '{print $3}')" ; fi
-  if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; SecondTargetMountPoint="$(mount -fl | grep '/dev/nbd2' | awk '{print $3}')" ; fi
-  if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; SharedTargetMountPoint="$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')" ; fi
+  if mount -fl | grep -q '/dev/nbd1'; then printf "  Main   "; MainMountPoint="$(mount -fl | grep '/dev/nbd1' | awk '{print $3}')" ; fi
+  if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; SecondMountPoint="$(mount -fl | grep '/dev/nbd2' | awk '{print $3}')" ; fi
+  if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; SharedMountPoint="$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')" ; fi
 
   if [[ $MainConnected ]]; then     
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
-    if [[ "$MainGreppedPathName" != "$MainTargetPathName" ]]; then 
+    if [[ "$MainGreppedPathName" != "$MainPathName" ]]; then 
       printf "\n\n  NOTE: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
     fi
   fi
   if [[ $SecondConnected ]]; then     
     SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
-    if [[ "$SecondGreppedPathName" != "$SecondTargetPathName" ]]; then 
+    if [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then 
       printf "\n\n  NOTE: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
     fi
   fi
@@ -117,6 +124,8 @@ while true; do
 
   printColor "\n\n  Selected = %s " "$TargetName" 
   [[ $TargetName != All* ]] && printf " '%s'"  "$TargetDrive"
+  [[  -e "$MainPathName" ]] && [[ $LiveBoot ]] && printf "  EMPTY DRIVE (live boot)" 
+
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
   printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
@@ -125,11 +134,11 @@ while true; do
   read -rp "  >  " qf_DriveSelect
 
   if   [[ $qf_DriveSelect == "1" ]]; then 
-    TargetDrive="$MainDrive" ; TargetPathName="$MainTargetPathName" ; TargetName="Main Drive" ; TargetDevice="/dev/nbd1" ; TargetMountPoint="$MainTargetMountPoint"
+    TargetDrive="$MainDrive" ; TargetPathName="$MainPathName" ; TargetName="Main Drive" ; TargetDevice="/dev/nbd1" ; TargetAvailable="$MainAvailable"
   elif [[ $qf_DriveSelect == "2" ]]; then 
-    TargetDrive="$SecondDrive" ; TargetPathName="$SecondTargetPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2" ; TargetMountPoint="$SecondTargetMountPoint"
+    TargetDrive="$SecondDrive" ; TargetPathName="$SecondPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2" ; TargetAvailable="$SecondAvailable"
   elif [[ $qf_DriveSelect == "3" ]]; then 
-    TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3" ; TargetMountPoint="$SharedTargetMountPoint"
+    TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3" ; TargetAvailable="$SharedAvailable"
   elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
@@ -155,10 +164,10 @@ while true; do
       if [[ $qf_DriveSelect == "c" || $qf_DriveSelect == "d" ]]; then 
         printf "  checking mounts ... \n\n"
         if [[ "$TargetName" == All* ]]; then  
-          [[ $MainTargetMountPoint ]] && umount "$MainTargetMountPoint"
-          [[ $SecondTargetMountPoint ]] && umount "$SecondTargetMountPoint"
+          [[ $MainMountPoint ]] && umount "$MainMountPoint"
+          [[ $SecondMountPoint ]] && umount "$SecondMountPoint"
           if [[ $TargetName == "All Drives" ]]; then  
-            [[ $SharedTargetMountPoint ]] && umount "$SharedTargetMountPoint"
+            [[ $SharedMountPoint ]] && umount "$SharedMountPoint"
           fi
         else
           TargetMountPoint="$(mount -fl | grep "$TargetDevice" | awk '{print $3}')" 
@@ -185,13 +194,13 @@ while true; do
         printf "  qemu-nbd connecting ... \n\n" 
 
         if [[ "$TargetName" == All* ]]; then  
-          sudo qemu-nbd -c "/dev/nbd1"  -f qcow2  "$MainTargetPathName"
-          sudo qemu-nbd -c "/dev/nbd2"  -f qcow2  "$SecondTargetPathName"
+          [[ $MainAvailable ]] && sudo qemu-nbd -c "/dev/nbd1"  -f qcow2  "$MainPathName"
+          [[ $SecondAvailable ]] && sudo qemu-nbd -c "/dev/nbd2"  -f qcow2  "$SecondPathName"
           if [[ $TargetName == "All Drives" ]]; then  
-            sudo qemu-nbd -c "/dev/nbd3"  -f qcow2  "$SharedTargetPathName"
+            [[ $SharedAvailable ]] && sudo qemu-nbd -c "/dev/nbd3"  -f qcow2  "$SharedPathName"
           fi
         else
-          sudo qemu-nbd -c "$TargetDevice"  -f qcow2  "$TargetPathName"
+          [[ $TargetAvailable ]] && sudo qemu-nbd -c "$TargetDevice"  -f qcow2  "$TargetPathName"
         fi
 
       fi
