@@ -445,8 +445,9 @@ else
       printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
       printf   "\n  for the subfolders and files of qqX.main and from 1.8 onwards of qqX.builtins"
 
-      printColor "\n\n  sudo mkdir -p \"%s/qqX.main\" " "$qqX_Std_Share_Path"
-      printColor "\n\n  sudo mkdir -p \"%s/qqX.builtins\" " "$qqX_Std_Share_Path"
+      # Using -p  to make sure that "$qqX_Std_Share_Path/qqX.custom" doesn't get overwritten
+
+      printColor "\n\n  sudo mkdir -p \"%s/qqX.custom\" " "$qqX_Std_Share_Path"
       printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
@@ -466,13 +467,13 @@ else
       printColor "\n  Auto-Installing .... \n\n  "
       sudo cp "qqX" "$qqX_Std_File_Path"
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
-      [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.main"
+      [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.custom"
       sudo cp -r "./qqX.main"  "$qqX_Std_Share_Path"
       sudo cp -r "./qqX.builtins"  "$qqX_Std_Share_Path"
       sudo chmod a+rx -R  "$qqX_Std_Share_Path/"
 
     fi
-    
+  
     # Make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link.   
     # Means copying to qqx will copy to qqX, and vice versa. 
     # And check that the right version is there:

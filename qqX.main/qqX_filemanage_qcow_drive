@@ -119,7 +119,7 @@ while true; do
   [[ $TargetName != All* ]] && printf " '%s'"  "$TargetDrive"
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
-  printf "\n\n  [r] to refresh  [f] open file-manager  [h] help   [q] to quit "
+  printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
 
   printf "\n\n"
   read -rp "  >  " qf_DriveSelect
