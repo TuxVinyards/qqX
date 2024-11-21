@@ -63,10 +63,16 @@ if [[ $MainDrive ]]; then  MainPathName="$VM_Conf_Dir/$MainDrive" ; fi
 if [[ -e "$MainPathName" ]] && [[ ! $LiveBoot ]]; then  MainAvailable=1 ; else MainAvailable= ; fi
 
 if [[ $SecondDrive ]]; then SecondPathName="$VM_Conf_Dir/$SecondDrive" ; fi
-if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1 ; else SecondAvailable= ; fi
+if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1
+  if  [[ ! $(du -b -t 1000000 "$SecondPathName" 2>/dev/null) ]]; then Empty2nd=1 ; else Empty2nd= ; fi
+else SecondAvailable= 
+fi
 
 SharedPathName="$SharedDrive"
-if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1 ; else SharedAvailable= ; fi
+if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1
+  if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
+else SharedAvailable= 
+fi
 
 # defaults
 TargetDrive="$SharedDrive"
@@ -109,19 +115,21 @@ while true; do
 
   if [[ $MainConnected ]]; then     
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
-    if [[ "$MainGreppedPathName" != "$MainPathName" ]]; then 
+    if [[ $MainGreppedPathName ]] && [[ "$MainGreppedPathName" != "$MainPathName" ]]; then 
       printf "\n\n  NOTE: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
       MainCrossConnected=1
     else MainCrossConnected=
     fi
+  else MainCrossConnected=
   fi
   if [[ $SecondConnected ]]; then     
     SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
-    if [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then 
+    if [[ $SecondGreppedPathName ]] && [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then 
       printf "\n\n  NOTE: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
       SecondCrossConnected=1
     else SecondCrossConnected=
     fi
+  else SecondCrossConnected=
   fi
 
   printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive    [A] All Drives  [a] all Non-Shared Drives "
@@ -133,10 +141,14 @@ while true; do
   fi
   if [[ $TargetName == "Main Drive" ]]; then
     [[ $LiveBoot ]] && [[ -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
-    [[ $MainCrossConnected ]] && printf "   [enter] for disconnection, if required"
+    [[ $MainCrossConnected ]] && printf "\n\n  CAUTION: Cross Linkage potentials >  [enter] to disconnect ?"
   fi
   if [[ $TargetName == "Second Drive" ]]; then
-    [[ $SecondCrossConnected ]] && printf "   [enter] for disconnection, if required"
+    [[ $Empty2nd ]] && [[ -e "$SecondPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+    [[ $SecondCrossConnected ]] && printf "\n\n  CAUTION: Cross Linkage potentials >  [enter] to disconnect ?"
+  fi
+  if [[ $TargetName == "Shared Drive" ]]; then
+    [[ $EmptyShared ]] && [[ -e "$SharedPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
