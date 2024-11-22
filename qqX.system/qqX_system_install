@@ -571,6 +571,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
     source "$HOME/.qqX/qqX_term.conf" 
+    # $UserTerm and $CustomTerminalProfile, if present
   fi
 
   if [[ $UserTerm || $CustomTerminalProfile ]]; then
@@ -863,6 +864,7 @@ fi
 Start_qqX=
 GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
+if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then  Start_qqX="${Start_qqX/' -- '/' --wait -- '}" ; fi
 
 End_Install=
 printColor  "\n\n  Install process finished:  "

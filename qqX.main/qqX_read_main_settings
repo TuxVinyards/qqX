@@ -247,7 +247,6 @@ function sort_qqX_builtin_settings {
 
 sort_qqX_builtin_settings
 
-
 function find_quick_version_numbers {
 
   # To be run only after rerouting functions for quickemu & quickget are in place & code has been sourced.

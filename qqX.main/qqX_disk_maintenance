@@ -700,8 +700,11 @@ function qcow2_filemanage {
   # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
   GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
   if [[ $GrepExecLine ]]; then 
-    GrepExecLine="${GrepExecLine/'Exec='/}" 
-    Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+    GrepExecLine="${GrepExecLine/'Exec='/}"
+    if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
+      Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
+    else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+    fi
   fi
 
   # allow for custom mounting scripts
