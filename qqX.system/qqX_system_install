@@ -548,11 +548,15 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
 
   printColor "\n\n  A desktop launcher already exists >> " 
 
-  if grep -q -s 'x-cd-image' "$XDG_GUI_desktop_PathName" ; then
-    printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
-  else
+  ForceReconfigure=
+  if ! grep -qs 'x-cd-image' "$XDG_GUI_desktop_PathName" ; then ForceReconfigure=1
+  fi
+  if grep -s 'gnome-terminal' "$XDG_GUI_desktop_PathName" | grep -qs -e '-e ' ; then ForceReconfigure=1
+  fi
+  if [[ $ForceReconfigure ]]; then
     printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
-    ForceReconfigure=1 
+  else
+    printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
   fi
   printColor "\n\n  [enter] to skip   " 
   printf "[r] to reconfigure \n\n"

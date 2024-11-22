@@ -197,7 +197,7 @@ VM_SelectorStyle="A"
 # qqX still allows percent as a value in later code. Size, if present, takes priority over percent.
 # Windows determines its own sizes, as does earlier code for Macs.
 # For later code MacOS should now use Size as per release in the conf files. See qqX wiki notes for Mac.
-# Set Linux sizes as ="XxY" Eg 2560x1440 2560x1080 1600x900 1920x1080 1920x720 etc
+# Set Linux sizes as ="XxY" Eg 3200x1800 2560x1440 2560x1080 1600x900 1920x1080 1920x720 etc
   Default_SDL_ScreenSize=""
 
 # PHYSICAL MONITOR SIZE - quickemu 4.9.5 onwards
