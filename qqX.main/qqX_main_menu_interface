@@ -13,7 +13,7 @@
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009 
 
 
 ## Check for Custom Main Menu 
@@ -306,6 +306,10 @@ else
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
+    fi
+
+    if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then 
+      printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
     fi
 
     if  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 

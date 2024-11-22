@@ -164,15 +164,11 @@ function check_disk_is_okay {
   done
 
   if [[ $1 ]] && [[ ! $2 ]]; then
-
     DiskCheckFolderName="$(dirname "$1")"
     DiskCheck_Disk="$(basename "$1")"
-
   else
-
     if [[ $1 ]]; then DiskCheckFolderName="$1" ; else DiskCheckFolderName="$VM_InstanceName"; fi
     if [[ $2 ]]; then DiskCheck_Disk="$2" ; else DiskCheck_Disk="disk.qcow2"; fi
-
   fi
 
   DiskChkExitCode=
@@ -184,7 +180,6 @@ function check_disk_is_okay {
     # Qemu-img with '-q' only outputs if error & on outputs on stderr   The exit status remains separately recorded.
 
     if [[ $PrintErrors ]]; then  "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
-
     else "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"  2>/dev/null ; fi
 
     # Note "Okay"  is also used as a flag  > caution if changing   # REVIEW  could also be flagged using:
@@ -193,7 +188,7 @@ function check_disk_is_okay {
     case "$?" in 
 
       0) DiskChkStatus="Okay" ;;
-
+      
       1) DiskChkStatus="Check not completed because of internal errors" ;;
 
       2) DiskChkStatus="Check completed, image is corrupted" 
