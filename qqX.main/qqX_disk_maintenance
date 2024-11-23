@@ -719,7 +719,7 @@ function qcow2_filemanage {
 function check_vm_nbd_boot_connected {
 
   local qf_Launch=
-  while pgrep qemu-nbd | grep -qi "$VM_InstanceName" || pgrep -a qemu-nbd | grep -q '/dev/nbd3' ; do  
+  while pgrep -a qemu-nbd | grep -qi "$VM_InstanceName" || pgrep -a qemu-nbd | grep -q '/dev/nbd3' ; do  
     printf "\n  ERROR - The VM needs to be disconnected from its NBD mounts"
     if pgrep -a bash | grep -q 'qqX_filemanage' ; then printf "\n\n  Switch tabs to the qcow2 file manager"
     else printf "\n\n  [qf] Start the qcow2 file manager"

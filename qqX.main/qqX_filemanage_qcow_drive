@@ -175,7 +175,7 @@ while true; do
     check_sudo_nbd_active
 
     printColor "\n\n  [c] connect  [d] disconnect and unmount  [enter] [r] to reselect or return"
-    printf "\n\n  Connected drives should be mounted as standard in the file-manager."  
+    printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
 
     printf "\n\n"
     read -rp "  >  " qf_DriveSelect
