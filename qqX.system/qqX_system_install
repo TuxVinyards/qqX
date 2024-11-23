@@ -67,7 +67,10 @@
 
 # shellcheck disable=SC1090,SC1091,SC2317,SC2034
 
-# Posix compliant Bash check
+# Posix compliant Terminal output and Bash check
+
+if [ ! -t 1 ]; then exit ; fi
+
 if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 5 ]; then 
   echo; echo "  Sorry, you need Bash, probably 5.0 or newer to run this script."; echo
   echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
@@ -898,7 +901,7 @@ if [[ $End_Install == "q" ]]; then exit ; fi
 if [[ $Start_qqX ]]; then 
   printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
-    sleep 2
+    sleep 1.4
     eval "$Start_qqX" 
     read -rp "  >  "
     exit

@@ -38,6 +38,9 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154 
 
+# Posix compliant Terminal output check
+if [ ! -t 1 ]; then exit ; fi
+
 #  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale (Also see qqX_Initialize)
 if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
