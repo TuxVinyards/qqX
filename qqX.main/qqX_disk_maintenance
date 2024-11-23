@@ -724,9 +724,10 @@ function check_vm_nbd_boot_connected {
     if pgrep -a bash | grep -q 'qqX_filemanage' ; then printf "\n\n  Switch tabs to the qcow2 file manager"
     else printf "\n\n  [qf] Start the qcow2 file manager"
     fi
-    printColor "\n\n\n  [enter] to continue, when disconnected"
+    printColor "\n\n\n  [enter] to continue, when disconnected   [r] to return"
     printf "\n\n"
     read -rp "  >  "  qf_Launch
+    [[ $qf_Launch == "r" ]] && return 1
     [[ $qf_Launch ]] && qcow2_filemanage
   done
 
