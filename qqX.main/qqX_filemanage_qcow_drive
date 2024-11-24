@@ -186,6 +186,10 @@ while true; do
 
     check_sudo_nbd_active
 
+    # echo '  sudo chown $USER:$USER "mounted-drive-name"' 
+    # echo '  chmod 775 "mounted-drive-name"'
+    #  TODO  add perms routine
+
     printColor "\n\n  [c] connect  [d] disconnect and unmount  [enter] [r] to reselect or return"
     printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
 

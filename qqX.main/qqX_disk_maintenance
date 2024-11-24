@@ -475,6 +475,14 @@ function qqX_snapshot_delete {
 
 }
 
+drive_chown_notes () {
+  printf "\n\n  If your new drives only have root access and your file manager won't change them,"
+  printf   "\n  the following commands can help give general user permissions:"
+  printf "\n\n"
+  # shellcheck disable=SC2016
+  echo '  sudo chown $USER:$USER "mounted-drive-name"' 
+  echo '  chmod 775 "mounted-drive-name"'
+}
 
 function create_new_drives {
 
@@ -489,24 +497,28 @@ function create_new_drives {
     printColor "\n\n  ERROR:  A shared drive appears to already have been set up. Check VM conf and general settings."
     printf "\n\n  Shared drive is set as '%s'" "$SharedDrive"
     if [[ -e "$SharedDrive" ]]; then 
-      printf " and has been found." 
+      printf "  and has been found." 
       check_disk_is_okay "$SharedDrive" 
       printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
-    else printf " but cannot be found."
+    else printf "  but cannot be found."
     fi
-    printf "\n\n"
+    printf "\n"
+    drive_chown_notes
+    printf "\n"
 
   elif [[ $MainMenuChoice == "2" ]] && [[ "$SecondDrive" ]] ; then 
   
     printColor "\n\n  ERROR:  A second appears to already have been set up. Check VM conf and general settings."
-    printf "\n\n  Second drive is set as '%s' \n\n" "$SecondDrive"
+    printf "\n\n  Second drive is set as '%s'" "$SecondDrive"
     if [[ -e "$SecondDrive" ]]; then 
-      printf " and has been found." 
+      printf "  and has been found." 
       check_disk_is_okay "$SecondDrive" 
       printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
-    else printf " but cannot be found."
+    else printf "  but cannot be found."
     fi
-    printf "\n\n"
+    printf "\n"
+    drive_chown_notes
+    printf "\n"
 
   else
 
@@ -597,6 +609,7 @@ function create_new_drives {
             printColor "\n  The Created Drive should now be formatted from inside a VM:"
             printf "\n\n  Use Gparted or similar to set a device table and add partition(s)"
             printf "\n\n  Read notes in main settings if older MacOS or if Windows present."
+            drive_chown_notes
 
           else  printColor "\n\n  Something went wrong. Drive not created "
 
