@@ -681,20 +681,6 @@ function qcow2_filemanage {
     return
   fi
 
-  # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
-
-  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
-    printf "\n FileManager=\"%s\"" "$FileManager"
-    printf "\n TextEditor=\"%s\"" "$TextEditor"
-    printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
-    printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
-    printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
-    printf "\n LiveBoot=\"%s\"" "$LiveBoot"
-    printf "\n MainDrive=\"%s\"" "$MainDrive"
-    printf "\n SecondDrive=\"%s\"" "$SecondDrive"
-    printf "\n SharedDrive=\"%s\"" "$SharedDrive"
-  } > "/tmp/qqX_nbd_vars"
-
   Terminal_Start=
   # Read the .desktop file for Terminal_Start instruction
   # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
@@ -707,11 +693,28 @@ function qcow2_filemanage {
     fi
   fi
 
+  local UserTerm=
+  UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
+
+  # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
+  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+    printf "\n FileManager=\"%s\"" "$FileManager"
+    printf "\n TextEditor=\"%s\"" "$TextEditor"
+    printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
+    printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
+    printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
+    printf "\n LiveBoot=\"%s\"" "$LiveBoot"
+    printf "\n MainDrive=\"%s\"" "$MainDrive"
+    printf "\n SecondDrive=\"%s\"" "$SecondDrive"
+    printf "\n SharedDrive=\"%s\"" "$SharedDrive"
+    printf "\n UserTerm=\"%s\"" "$UserTerm"
+  } > "/tmp/qqX_nbd_vars"
+
   # allow for custom mounting scripts
   if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
-    eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" &
+    eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
   else
-    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" &
+    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
   fi
 
 }

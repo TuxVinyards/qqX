@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ##  qqX component to be located in folder 'qqX.main'
 
@@ -26,7 +26,7 @@ source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
 if [[ ! $(type -p "$FileManager") ]] ; then 
-  printf "\n\n\n  File Manager ERROR: '%s' NOT found.\n" "$FileManager" ; sleep 2
+  printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 if [[ ! $(modinfo -n nbd) ]] ; then 
   printf "\n\n\n  Kernel module WARNING: 'nbd' NOT found. "
@@ -34,11 +34,21 @@ if [[ ! $(modinfo -n nbd) ]] ; then
 fi
 # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
 # New PID always goes on end of list but 'grep -c' tests fail inside the while loop so use PID check.
-ThisPID="$(ps T | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
-while ps -ef | grep 'qqX_filemanage' | grep -q qcow ; do
-  ChkPID="$(ps -ef | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
-  if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" ; fi
-done
+# pgrep sub-shell creates another
+#ThisPID="$(ps T | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
+if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
+  ThisPID="$(pgrep -n "$UserTerm")"
+    while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
+    ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
+    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+  done
+else
+  ThisPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | tail -n 2 | head -n 1)"
+  while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
+    ChkPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | head -n 1)"
+    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+  done
+fi
 
 show_nbd_help () {
   printf "\n\n  One control window per VM. Auto-closes others if new one opened."
@@ -85,7 +95,7 @@ if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
 
 while true; do
 
-  printf "\033c"
+  #printf "\033c"
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
   printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  

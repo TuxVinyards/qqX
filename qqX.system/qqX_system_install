@@ -556,13 +556,15 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
   fi
   if grep -s 'gnome-terminal' "$XDG_GUI_desktop_PathName" | grep -qs -e '-e ' ; then ForceReconfigure=1
   fi
+
   if [[ $ForceReconfigure ]]; then
     printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
+    printColor "\n\n  [enter] to continue   " 
   else
-    printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..." 
+    printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..."
+    printColor "\n\n  [enter] to skip   " 
+    printf "[r] to reconfigure \n\n"
   fi
-  printColor "\n\n  [enter] to skip   " 
-  printf "[r] to reconfigure \n\n"
   read -rp "  >  "  SkipMkLauncher
 
   if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 
@@ -901,7 +903,7 @@ if [[ $End_Install == "q" ]]; then exit ; fi
 if [[ $Start_qqX ]]; then 
   printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
-    sleep 1.4
+    sleep 1
     eval "$Start_qqX" 
     read -rp "  >  "
     exit
