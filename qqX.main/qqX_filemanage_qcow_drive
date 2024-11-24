@@ -32,10 +32,12 @@ if [[ ! $(modinfo -n nbd) ]] ; then
   printf "\n\n\n  Kernel module WARNING: 'nbd' NOT found. "
   printf "\n\n  Please check your distro repositories for 'linux-modules' \n"  ; sleep 100
 fi
+
 # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
-# New PID always goes on end of list but 'grep -c' tests fail inside the while loop so use PID check.
-# pgrep sub-shell creates another
-#ThisPID="$(ps T | grep 'qqX_filemanage' | grep qcow | tr ' ' '\n' | grep -E '^[0-9]' | head -n 1)"
+# New PID always goes on end of list but pgrep sub-shell creates another.
+# kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
+# gnome based terminals open just one and with a 'bash' nomination.
+
 if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
   ThisPID="$(pgrep -n "$UserTerm")"
     while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
@@ -95,7 +97,7 @@ if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
 
 while true; do
 
-  #printf "\033c"
+  printf "\033c"
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
   printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  
