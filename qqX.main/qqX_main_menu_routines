@@ -56,6 +56,7 @@ vm_pid_kill_menu() {
     if [[ $SpicyPID ]]; then 
       SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
       printColor " [r] reload Spicy window (if closed)"
+      printf "  -  ctrl-shift-F12 for mouse"
     fi
     printf "\n\n"
     tput cnorm

@@ -883,10 +883,10 @@ printf "\n\n  Start qqX to edit the settings file, or before starting"
 printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
 if [[ $UserTerm == "qterminal" ]]; then
-  printColor "\n\n  LXQT 'qterminal' does not have size commands BUT it may be resized quite easily \n\n  and should remember its sizes between uses."
+  printColor "\n\n  LXQT 'qterminal' does not have size commands BUT it may be resized quite easily \n\n  and should remember its sizes between uses. \n\n"
 fi
 if [[ $UserTerm == "urxvt" ]]; then
-  printColor "\n\n  In tiling Window Managers the terminal sizes tend to be auto-regulated."
+  printColor "\n\n  In tiling Window Managers the terminal sizes tend to be auto-regulated. \n\n"
 fi
 
 [[ $Start_qqX ]] && printColor "  [enter] to close current window and start"
