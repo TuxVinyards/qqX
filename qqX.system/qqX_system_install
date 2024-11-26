@@ -655,6 +655,7 @@ if [[ ! $SkipMkLauncher ]]; then
     printf "\n\n  Select 'standard' if in doubt, or where terminals do not have a -geometry parameter."
 
     printf "\n\n  If your terminal uses PIXELS, for example 'qterminal', try 1500 x 1000 in the settings."
+    printf "\n\n  In other cases, such as with tiling WM envs eg 'i3' the size is auto-regulated. "
 
     printf "\n\n\n"
 
@@ -702,6 +703,8 @@ if [[ ! $SkipMkLauncher ]]; then
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Standard"
 
   fi
+
+  # Some listed terminals will be entered into the 'else' section at the end, eg qterminal & urxvt
 
   SelectedTerminalProfile=
 
@@ -881,6 +884,9 @@ printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
 
 if [[ $UserTerm == "qterminal" ]]; then
   printColor "\n\n  LXQT 'qterminal' does not have size commands BUT it may be resized quite easily \n\n  and should remember its sizes between uses."
+fi
+if [[ $UserTerm == "urxvt" ]]; then
+  printColor "\n\n  In tiling Window Managers the terminal sizes tend to be auto-regulated."
 fi
 
 [[ $Start_qqX ]] && printColor "  [enter] to close current window and start"

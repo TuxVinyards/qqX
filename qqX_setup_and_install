@@ -56,8 +56,10 @@ fi
 # At the other extreme, and with the advent of Wayland, other projects have been abandoned completely. 
 # Termite, for example, now encourages the use of Alacritty ... 
 
+# Users with Window Managers, not Desktop Envs will be familiar with terminals and settings at the cmd line
+# However add some well known interfaces where possible, eg. urxvt that comes with 'i3' as this helps with running of QF
 
-set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "qterminal" "lxterminal" "roxterm" "uxterm" "xterm" 
+set -- "gnome-terminal" "konsole" "mate-terminal" "xfce4-terminal" "qterminal" "lxterminal" "roxterm" "urxvt" "uxterm" "xterm" 
 set "$@" -- "alacritty" "kitty" "foot"
 
 while [ -n "$1" ] ; do 
@@ -123,6 +125,9 @@ elif [ "$UserTerm" = "alacritty" ]; then
 
 elif [ "$UserTerm" = "lxterminal" ] || [ "$UserTerm" = "roxterm" ]; then
   "$UserTerm" --geometry=145x50 -e "./qqX.system/qqX_system_install"
+
+elif [ "$UserTerm" = "urxvt" ]; then
+  "$UserTerm" -e "./qqX.system/qqX_system_install"
 
 elif [ "$UserTerm" = "uxterm" ] || [ "$UserTerm" = "xterm" ]; then
   "$UserTerm" -geometry 145x50 -fa truetype -fs 12 -fg white -bg black -e "./qqX.system/qqX_system_install"
