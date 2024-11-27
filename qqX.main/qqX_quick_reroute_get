@@ -1409,6 +1409,7 @@ function_quick_get_wrap ()  {
   clear_main_gt_start_vars
   SettingsFileAdjusted=1
   ByPass_VM_Array_Selector=1
+  GT_Exit=1
 
 }
 
