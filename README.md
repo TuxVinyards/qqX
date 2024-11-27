@@ -12,13 +12,13 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.10.02](#release-notes)
+## [Latest release 1.10.02](#release-notes) + 1.11.0.02 beta
 
 Large code update with lots of new features and Quickemu improvements.
 
 An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
 
-@ Nov 16th, one or two discrete features of the [development branch](https://github.com/TuxVinyards/qqX/tree/1.10.03-dev) are still in progress but it is [stable and downloadable](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.10.03-dev.zip) and has several improvements, fixes and updates ....
+@ Nov 27th, the beta is [stable and downloadable](https://github.com/TuxVinyards/qqX/releases/tag/1.11.0.02) and has several improvements, fixes and updates ....
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -130,7 +130,9 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
 
-@ Nov 16th, one or two discrete features of the [development branch](https://github.com/TuxVinyards/qqX/tree/1.10.03-dev) are still in progress but it is [stable and downloadable](https://github.com/TuxVinyards/qqX/archive/refs/heads/1.10.03-dev.zip) and has several improvements, fixes and updates ....
+@ Nov 27th
+
+- New feature _mounting of qcow2 drives in a file manager_ ....
 
 - adds several quickget distro updates
 
@@ -144,13 +146,15 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - further improves terminal handling on Qt based desktops
 
-Coming soon  
+- plus tweaks for i3 and gnome3
 
-- Should be formally released when new feature _mounting of qcow2 drives in a file manager_ is completed ....
+- adds a fix for Arch hosts EFI
 
-- But download now. All development work should now be only on this section.
+To follow soon
 
-- Also a couple more distro URL updates should make the window too. But only that.
+- a couple of tweaks still to do in a couple of places, but nothing serious
+
+- and a bit more testing in tiling WM's  before we go to full release ....
 
 ### Reliability
 
