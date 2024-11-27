@@ -2008,7 +2008,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.6.06"
+readonly VERSION="FS 4.9.6.07"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"

@@ -57,7 +57,7 @@ function os_info() {
         holoiso)          INFO="HoloISO|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
         kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
         kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
-        kolibrios)        INFO="KolibriOS|-|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
+        kolibrios)        INFO="KolibriOS|-|https://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
         kubuntu)          INFO="Kubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
         linuxlite)        INFO="Linux Lite|-|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.";;
         linuxmint)        INFO="Linux Mint|-|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
@@ -211,7 +211,13 @@ function handle_missing() {
     # Handle odd missing Fedora combinations
     case "${OS}" in
         fedora)
-            if [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
+            # First we need to handle the Beta naming kludge
+            if [[ "${RELEASE}" == *"_Beta" ]]; then
+                NRELEASE="${RELEASE/_Beta/}"
+                else
+                NRELEASE="${RELEASE}"
+            fi
+            if [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
                 echo "ERROR! Unsupported combination"
                 echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1
@@ -665,7 +671,7 @@ function releases_dragonflybsd() {
     # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
+    echo $(web_pipe "https://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
 }
 
 function releases_easyos() {
@@ -699,12 +705,16 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -r)
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
 }
 
 function editions_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(select(.arch=="x86_64" and .variant!="Labs" and .variant!="IoT" and .variant!="Container" and .variant!="Cloud" and .variant!="Everything"  and .subvariant!="Security" and .subvariant!="Server_KVM" and .subvariant!="SoaS")) | map(.subvariant) | unique | .[]')
+    if [[ -z ${RELEASE} ]]; then
+          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    else
+        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    fi
 }
 
 function releases_freebsd() {
@@ -824,7 +834,7 @@ function releases_manjaro() {
 
 function releases_mxlinux() {
     # needs header, so not web_pipe:
-    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i -m 1 'location' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
+    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
 }
 
 function editions_mxlinux() {
@@ -838,7 +848,7 @@ function releases_netboot() {
 function releases_netbsd() {
     # V8 is EOL so filter it out
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
+    echo $(web_pipe "https://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
 }
 
 function releases_nitrux() {
@@ -848,7 +858,7 @@ function releases_nitrux() {
 function releases_nixos() {
     # Lists unstable plus the two most recent releases
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -P '(?<=<Key>nixos-)[0-9]+.[0-9]+(?=</Key>)' | sort -nr | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
 }
 
 function editions_nixos() {
@@ -885,7 +895,7 @@ function releases_oraclelinux() {
 
 function releases_parrotsec() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n 1)
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" |  grep -o -E 'href="[[:digit:]]\.[[:digit:]]+' | sort -nr | head -n 3 | cut -d\" -f 2 )
 }
 
 function editions_parrotsec() {
@@ -977,17 +987,17 @@ function releases_slint() {
 
 function releases_slitaz() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
+    echo $(web_pipe "https://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
 }
 
 function releases_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'-' -f 2 | sort -ru)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/" | jq -r '.[].name[:-1]' | grep -E "^[0-9-]+$" | sort -u)
 }
 
 function editions_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'.' -f5 | cut -d'-' -f2- | sort -u)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -1153,6 +1163,11 @@ function check_hash() {
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
     curl --silent --location "${1}"
+}
+
+# Download a JSON file from the web and pipe it to stdout
+function web_pipe_json() {
+     curl --silent --location --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -1387,6 +1402,8 @@ EOF
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             batocera)
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+            bazzite)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
@@ -1696,7 +1713,7 @@ function get_deepin() {
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
     # Correct URL for 23-RC onwards which has architecture directories
-    if [[ "${RELEASE}" == *"23-RC"* ]] ; then
+    if [ "${RELEASE}" != "20.9" ]; then
         URL+="/amd64"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
@@ -1796,8 +1813,18 @@ function get_fedora() {
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
+    # but we need to convert it back to a space for the URL search in the JSON
     #shellcheck disable=SC2086
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and .sha256 != null)')
+    # if RELEASE contains an underscore, replace it with a space
+     if [[ "${RELEASE}" == *"_"* ]]; then
+        RELEASE="${RELEASE/_/ }"
+    fi
+
+
+
+    # shellcheck disable=SC2086
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -1814,7 +1841,7 @@ function get_freebsd() {
 function get_freedos() {
     local HASH=""
     local ISO=""
-    local URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    local URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
     case ${RELEASE} in
         1.2) ISO="FD12CD.iso"
              HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
@@ -2335,7 +2362,7 @@ function get_rockylinux() {
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
-    URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
+    URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
     HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2395,7 +2422,7 @@ function get_slitaz() {
 
 function get_solus() {
     local HASH=""
-    local ISO="Solus-${RELEASE}-${EDITION}.iso"
+    local ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -3364,7 +3391,7 @@ function create_vm() {
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"  
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
                 ISO="$(basename "${ISO}")"
@@ -3440,7 +3467,7 @@ function create_config() {
 
 # Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
-function resolve_quickemu() {   
+function resolve_quickemu() {
     command -v quickemu || \
     if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
@@ -3545,7 +3572,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.6.06"
+        echo "FS 4.9.6.07"
         exit 0;;
     --help|-help|--h|-h)
         help_message
