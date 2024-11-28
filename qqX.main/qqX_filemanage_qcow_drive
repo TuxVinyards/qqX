@@ -22,6 +22,15 @@
 #  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected 
 #  and run by function 'qcow2_filemanage' in the main qqX program in the disk maintenance script
 
+# Allow full standalone running of qcow2 file management utility
+if [[ $1 == "--qqf" ]]; then 
+  if [[ ! -e "/tmp/qqX_nbd_vars" ]]; then
+    printf "\n  Qcow2 File Manager Utility - Full Standalone Mode"
+    printf "\n\n  ERROR: Run Option 'qqf' from a qqX VM menu > qqF transfer file not found ....\n\n"  ; sleep 2 ; exit
+  fi
+  qqf_FullStandalone=1 ; shift
+fi
+
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
@@ -29,23 +38,25 @@ if [[ ! $(type -p "$FileManager") ]] ; then
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 
-# One control window per VM. Auto-closes others if new one opened. Avoids confusion.
-# New PID always goes on end of list but pgrep sub-shell creates another.
-# kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
-# gnome based terminals open just one and with a 'bash' nomination.
+if [[ ! $qqf_FullStandalone ]]; then
+  # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
+  # New PID always goes on end of list but pgrep sub-shell creates another.
+  # kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
+  # gnome based terminals open just one and with a 'bash' nomination.
 
-if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
-  ThisPID="$(pgrep -n "$UserTerm")"
+  if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
+    ThisPID="$(pgrep -n "$UserTerm")"
+      while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
+      ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
+      if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+    done
+  else
+    ThisPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | tail -n 2 | head -n 1)"
     while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
-    ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
-    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
-  done
-else
-  ThisPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | tail -n 2 | head -n 1)"
-  while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
-    ChkPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | head -n 1)"
-    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
-  done
+      ChkPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | head -n 1)"
+      if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+    done
+  fi
 fi
 
 show_nbd_help () {
@@ -106,6 +117,13 @@ while true; do
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  
   printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager."  
   printf "\n"
+
+  if [[ $qqf_FullStandalone ]]; then 
+    printColor "\n\n  qqf - Full Standalone > "
+    printf "Make sure to run option 'qqf' from the qqX VM menu"  
+    printf "\n\n  each time the VM is swapped and to run [r] to refresh"  
+    printf "\n"
+  fi
 
   [[ $ShowHelp ]] && show_nbd_help && ShowHelp=
 
@@ -185,7 +203,7 @@ while true; do
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0" &
   elif [[ $qf_DriveSelect == "f" ]]; then nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" &
-  elif [[ $qf_DriveSelect == "r" ]]; then true
+  elif [[ $qf_DriveSelect == "r" ]]; then source "/tmp/qqX_nbd_vars"
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
 

@@ -685,29 +685,41 @@ function_delete_SecondDrive () {
 
 }
 
+#  shellcheck disable=SC2120
+
 function qcow2_filemanage {
+
+  local qqf_FullStandalone=
+
+  if [[ $1 == "--qqf" ]]; then 
+  
+    qqf_FullStandalone=1 ; shift
+
+  else
  
-  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
-    printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
-    printf "\n\n  [enter] to return \n\n"
-    read -rp "  >  "
-    return
-  fi
-
-  Terminal_Start=
-  # Read the .desktop file for Terminal_Start instruction
-  # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
-  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
-  if [[ $GrepExecLine ]]; then 
-    GrepExecLine="${GrepExecLine/'Exec='/}"
-    if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
-      Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
-    else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+    if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
+      printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
+      printf "\n\n  [enter] to return \n\n"
+      read -rp "  >  "
+      return
     fi
-  fi
 
-  local UserTerm=
-  UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
+    Terminal_Start=
+    # Read the .desktop file for Terminal_Start instruction
+    # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
+    GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
+    if [[ $GrepExecLine ]]; then 
+      GrepExecLine="${GrepExecLine/'Exec='/}"
+      if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
+        Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
+      else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+      fi
+    fi
+
+    local UserTerm=
+    UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
+
+  fi
 
   # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
@@ -724,10 +736,13 @@ function qcow2_filemanage {
   } > "/tmp/qqX_nbd_vars"
 
   # allow for custom mounting scripts
-  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
-    eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
+  if [[ $qqf_FullStandalone ]]; then true
   else
-    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+      eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
+    else
+      eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
+    fi
   fi
 
 }
