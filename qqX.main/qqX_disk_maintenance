@@ -691,9 +691,7 @@ function qcow2_filemanage {
 
   local qqf_FullStandalone=
 
-  if [[ $1 == "--qqf" ]]; then 
-  
-    qqf_FullStandalone=1 ; shift
+  if [[ $1 == "--qqf" ]]; then  qqf_FullStandalone=1 ; shift
 
   else
  
@@ -736,7 +734,19 @@ function qcow2_filemanage {
   } > "/tmp/qqX_nbd_vars"
 
   # allow for custom mounting scripts
-  if [[ $qqf_FullStandalone ]]; then true
+  if [[ $qqf_FullStandalone ]]; then 
+    printColor "\n\n  qqf - Full Standalone > "
+    printf "Make sure to run option 'qqf' from the qqX VM menu"  
+    printf "\n\n  each time the VM is swapped and to run [r] to refresh"  
+    printf "\n"
+
+    printf "\n\n  Standard Option [qf] is normally sufficient "
+    printf "\n\n  but if the opening of a new terminal is being inhibited by the host" 
+    printf "\n\n  then a open a terminal manually and type 'qqX --qqf' at the prompt"
+    printf "\n\n  and for custom scripts, type 'qqX --qqf --custom' "
+    printf "\n\n  [enter] to return"
+    printf "\n\n"
+    read -rp "  >  "
   else
     if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
       eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &

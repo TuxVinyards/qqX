@@ -94,11 +94,15 @@ if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not fo
 if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
 if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
-# Allow full standalone running of qcow2 file management utility
-if [[ $1 == "--qqf" ]]; then "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit ; fi
+# Read secure folder for custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
+qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
 
-# secure folder keeping custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
-qqX_CustomFolder="$(dirname "$qqX_MainFolder")""qqX.custom"
+# Allow full standalone running of qcow2 file management utility
+if [[ $1 == "--qqf" ]]; then 
+  if [[ $2 == "--custom" ]]; then  "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 
+  else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit 
+  fi
+fi
 
 # NON-FHS installs should normally locate Main and Built-Ins in with this file, so ./ will locate things
 

@@ -85,27 +85,31 @@ check_sudo_nbd_active () {
   fi
 }
 
-if [[ $MainDrive ]]; then  MainPathName="$VM_Conf_Dir/$MainDrive" ; fi
-if [[ -e "$MainPathName" ]] && [[ ! $LiveBoot ]]; then  MainAvailable=1 ; else MainAvailable= ; fi
+load_qf_defaults () {
+  if [[ $MainDrive ]]; then  MainPathName="$VM_Conf_Dir/$MainDrive" ; fi
+  if [[ -e "$MainPathName" ]] && [[ ! $LiveBoot ]]; then  MainAvailable=1 ; else MainAvailable= ; fi
 
-if [[ $SecondDrive ]]; then SecondPathName="$VM_Conf_Dir/$SecondDrive" ; fi
-if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1
-  if  [[ ! $(du -b -t 1000000 "$SecondPathName" 2>/dev/null) ]]; then Empty2nd=1 ; else Empty2nd= ; fi
-else SecondAvailable= 
-fi
+  if [[ $SecondDrive ]]; then SecondPathName="$VM_Conf_Dir/$SecondDrive" ; fi
+  if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1
+    if  [[ ! $(du -b -t 1000000 "$SecondPathName" 2>/dev/null) ]]; then Empty2nd=1 ; else Empty2nd= ; fi
+  else SecondAvailable= 
+  fi
 
-SharedPathName="$SharedDrive"
-if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1
-  if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
-else SharedAvailable= 
-fi
+  SharedPathName="$SharedDrive"
+  if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1
+    if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
+  else SharedAvailable= 
+  fi
 
-# defaults
-TargetDrive="$SharedDrive"
-TargetPathName="$SharedDrive"
-TargetName="Shared Drive"
-TargetDevice="/dev/nbd3"
-if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
+  # defaults
+  TargetDrive="$SharedDrive"
+  TargetPathName="$SharedDrive"
+  TargetName="Shared Drive"
+  TargetDevice="/dev/nbd3"
+  if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
+}
+
+load_qf_defaults
 
 # LOOP
 
@@ -203,7 +207,7 @@ while true; do
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0" &
   elif [[ $qf_DriveSelect == "f" ]]; then nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" &
-  elif [[ $qf_DriveSelect == "r" ]]; then source "/tmp/qqX_nbd_vars"
+  elif [[ $qf_DriveSelect == "r" ]]; then source "/tmp/qqX_nbd_vars" ; load_qf_defaults
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
 
