@@ -454,7 +454,9 @@ else
       printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
-
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_File_Path" 
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_lc_Link_Path" 
+      
       printf "\n\n  NOTE command line installation only. Auto-install is needed for desktop launchers and shortcuts"
       printf "\n"
       print_manual_uninstall_notes
@@ -474,6 +476,8 @@ else
       sudo cp -r "./qqX.main"  "$qqX_Std_Share_Path"
       sudo cp -r "./qqX.builtins"  "$qqX_Std_Share_Path"
       sudo chmod a+rx -R  "$qqX_Std_Share_Path/"
+      sudo chmod a+rx "$qqX_Std_File_Path"
+      sudo chmod a+rx "$qqX_Std_lc_Link_Path"
 
     fi
   
@@ -532,6 +536,7 @@ else
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
       [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
+      [[ ! -x $(type -p qqx) ]] || [[ ! -x $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin need chmod +x"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
       [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
       printf "\n\n  [enter] to close & investigate \n\n"
