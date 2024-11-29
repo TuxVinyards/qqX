@@ -110,6 +110,8 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
 fi  
 
+
+
 if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised || $XDG_FileType_Recognised ]]; then
   refresh_sources_and_load_VM_arrays
   while true; do
