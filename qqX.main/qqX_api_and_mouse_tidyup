@@ -27,8 +27,10 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     VM_Conf_File="$QCOW_RightClick_VM_Dir_Name.conf"
     VM_InstanceName="$QCOW_RightClick_VM_Dir_Name"
     QCOW_RightClick_NON_qqX=
+    QCOW_RightClick_VM_qqX=1
     shift
-  else  QCOW_RightClick_NON_qqX=1 ; shift
+  else  
+    QCOW_RightClick_NON_qqX=1 ; QCOW_RightClick_VM_qqX= ; shift
   fi
 fi
 
@@ -85,7 +87,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     [[ $IsoQuit ]] && exit directly 
   fi
   
-  if [[ ! $QCOW_RightClick_NON_qqX ]]; then 
+  if [[ $QCOW_RightClick_VM_qqX ]]; then 
     QCOW_RightClick= 
     ByPass_VM_Array_Selector=1
     if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
@@ -264,7 +266,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 fi
 
 
-if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ ! $QCOW_RightClick_NON_qqX ]]; then
+if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $QCOW_RightClick_VM_qqX ]]; then
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
   [[ $VM_Conf_File ]] && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
