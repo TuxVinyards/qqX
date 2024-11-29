@@ -15,10 +15,12 @@
 
 #  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
-
 #  Sorts out any MOUSE CLICK or COMMAND LINE parameters and reads any flags set during 'qqX_initialize' 
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
+# This script is CALLED by 'qqX_Initialize' using the flag 'RunMouseApiTidy' 
+# in the qqX main script AFTER all the other scripts, files and functions have been sourced 
+# but BEFORE starting the qqX main loop.
 
 if [[ $XDG_MimeType_is_QCOW ]]; then 
   # should have changed to the right directory at this point (also see initialze script for .conf checks)
