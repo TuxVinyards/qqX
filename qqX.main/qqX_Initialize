@@ -123,10 +123,11 @@ if [[ $1 == "XDG" ]]; then
       XDG_ISO_Name="$2"
       XDG_FileType_Recognised=1
 
-    elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -q -s 'guest_os' "$2" ; then 
+    elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -qs 'guest_os' "$2" ; then 
       # then is a conf file open-with and appears to conform to standard quickemu .conf layout
       QCOW_RightClick=
       QCOW_RightClick_NON_qqX=
+      QCOW_RightClick_VM_qqX=1
       VM_Conf_Dir="$(dirname "$2")"
       [[ "$VM_Conf_Dir" == '.' ]] && VM_Conf_Dir="$(pwd)"
       VM_Conf_File="$(basename "$2")"
