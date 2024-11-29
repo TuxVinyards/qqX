@@ -2,6 +2,9 @@
 
 ##  qqX component to be located in folder 'qqX.main'
 
+# NB Avoid use of "#!/usr/bin/env bash" in this script 
+# as it will mask process names & inhibit process controls.
+
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
@@ -117,6 +120,7 @@ while true; do
 
   printf "\033c"
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
+  [[ "$(basename "$0")" == custom* ]] && printColor "  -  custom version"
   printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."  
   printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager."  

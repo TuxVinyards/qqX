@@ -721,6 +721,7 @@ function qcow2_filemanage {
 
   # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+    printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
     printf "\n FileManager=\"%s\"" "$FileManager"
     printf "\n TextEditor=\"%s\"" "$TextEditor"
     printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
@@ -740,10 +741,10 @@ function qcow2_filemanage {
     printf "\n\n  each time the VM is swapped and to run [r] to refresh"  
     printf "\n"
 
-    printf "\n\n  Standard Option [qf] is normally sufficient "
-    printf "\n\n  but if the opening of a new terminal is being inhibited by the host" 
-    printf "\n\n  then a open a terminal manually and type 'qqX --qqf' at the prompt"
-    printf "\n\n  and for custom scripts, type 'qqX --qqf --custom' "
+    printf "\n\n  Standard Option [qf] is normally sufficient, in most distros,"
+    printf "\n\n  but if qf is not opening a new terminal as it should do" 
+    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt,"
+    printf "\n\n  and for custom scripts type 'qqX --qqf --custom' "
     printf "\n\n  [enter] to return"
     printf "\n\n"
     read -rp "  >  "

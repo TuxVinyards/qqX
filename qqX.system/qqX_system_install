@@ -42,14 +42,18 @@
 
 ##  qqX - quickemu quickget X terminal project   
 
-#  STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
-#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
+# STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
+# From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
 # It is not a silver bullet & can also cause problems with bash exec clauses ...
-# Some users may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
+
+# SOME USERS may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
 # Only the main qqX script itself should need to be changed. This is easiest if done before running the installer but can also be done afterwards.
 # The commands "type -p bash" or "which bash" should help locate this.  
+
+# From version qqX 1.11 changes should also be made to 'qqX_filemanage_qcow_drive' in qqX.main
+
 # See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
 #  Differences may be present in non FHS distros & may need special installation 
