@@ -34,6 +34,10 @@ if [[ $1 == "--qqf" ]]; then
   qqf_FullStandalone=1 ; shift
 fi
 
+if [[ -e "$1" ]]; then 
+  qqf_RightClickDrivepath="$1" ; shift
+fi
+
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
@@ -89,6 +93,7 @@ check_sudo_nbd_active () {
 }
 
 load_qf_defaults () {
+
   if [[ $MainDrive ]]; then  MainPathName="$VM_Conf_Dir/$MainDrive" ; fi
   if [[ -e "$MainPathName" ]] && [[ ! $LiveBoot ]]; then  MainAvailable=1 ; else MainAvailable= ; fi
 
@@ -97,19 +102,30 @@ load_qf_defaults () {
     if  [[ ! $(du -b -t 1000000 "$SecondPathName" 2>/dev/null) ]]; then Empty2nd=1 ; else Empty2nd= ; fi
   else SecondAvailable= 
   fi
-
   SharedPathName="$SharedDrive"
   if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1
     if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
   else SharedAvailable= 
   fi
+  if [[ "$qqf_RightClickDrivepath" ]]; then  RightClickAvailable=1
+    if  [[ ! $(du -b -t 1000000 "$qqf_RightClickDrivepath" 2>/dev/null) ]]; then EmptyRightClick=1 ; else EmptyRightClick= ; fi
+  else RightClickAvailable= 
+  fi
 
-  # defaults
-  TargetDrive="$SharedDrive"
-  TargetPathName="$SharedDrive"
-  TargetName="Shared Drive"
-  TargetDevice="/dev/nbd3"
-  if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
+  if [[ $RightClickAvailable ]]; then
+    TargetDrive="$qqf_RightClickDrivepath"
+    TargetPathName="$qqf_RightClickDrivepath"
+    TargetName="Right Click Drive"
+    TargetDevice="/dev/nbd0"
+    TargetAvailable=1
+  else
+    # defaults
+    TargetDrive="$SharedDrive"
+    TargetPathName="$SharedDrive"
+    TargetName="Shared Drive"
+    TargetDevice="/dev/nbd3"
+    if [[ $SharedAvailable ]]; then TargetAvailable=1 ; else TargetAvailable= ; fi
+  fi
 }
 
 load_qf_defaults
@@ -143,16 +159,19 @@ while true; do
   if [[ "$MainAvailable" ]]; then printf "  Main   " ; fi
   if [[ "$SecondPathName" ]]; then printf " Second  " ; fi
   if [[ "$SharedPathName" ]]; then printf " Shared  " ; fi
+  if [[ "$qqf_RightClickDrivepath" ]]; then printf " RClick  " ; fi
 
   printf "\n\n  Connected Drive(s): "
   if ps -ef | grep nbd1 | grep -q qcow; then printf "  Main   " ; MainConnected=1 ; else MainConnected= ; fi
   if ps -ef | grep nbd2 | grep -q qcow; then printf " Second  " ; SecondConnected=1 ; else SecondConnected= ; fi
   if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  " ; SharedConnected=1 ; else SharedConnected= ; fi
+  if ps -ef | grep nbd0 | grep -q qcow; then printf " RClick  " ; RClickConnected=1 ; else RClickConnected= ; fi
 
   printf "\n\n  Mounted Drive(s):   "
   if mount -fl | grep -q '/dev/nbd1'; then printf "  Main   "; MainMountPoint="$(mount -fl | grep '/dev/nbd1' | awk '{print $3}')" ; fi
   if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; SecondMountPoint="$(mount -fl | grep '/dev/nbd2' | awk '{print $3}')" ; fi
   if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; SharedMountPoint="$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')" ; fi
+  if mount -fl | grep -q '/dev/nbd0'; then printf " RClick  "; RClickMountPoint="$(mount -fl | grep '/dev/nbd0' | awk '{print $3}')" ; fi
 
   if [[ $MainConnected ]]; then     
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
@@ -172,8 +191,11 @@ while true; do
     fi
   else SecondCrossConnected=
   fi
+  if [[ $qqf_RightClickDrivepath ]]; then
+    printf "\n\n  Right Click Drive: %s" "$qqf_RightClickDrivepath"
+  fi
 
-  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive    [A] All Drives  [a] all Non-Shared Drives "
+  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive  [r] right click drive   [A] All Drives  [a] all Non-Shared Drives "
 
   printf "\n\n  See main utilities for general disk tools and for disk creation"
 
@@ -193,6 +215,9 @@ while true; do
   if [[ $TargetName == "Shared Drive" ]]; then
     [[ $EmptyShared ]] && [[ -e "$SharedPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
+  if [[ $TargetName == "Right Click Drive" ]]; then
+    [[ $EmptyRightClick ]] && [[ -e "$qqf_RightClickDrivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+  fi
 
   printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
   printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
@@ -206,6 +231,9 @@ while true; do
     TargetDrive="$SecondDrive" ; TargetPathName="$SecondPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2" ; TargetAvailable="$SecondAvailable"
   elif [[ $qf_DriveSelect == "3" ]]; then 
     TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3" ; TargetAvailable="$SharedAvailable"
+  elif [[ $qf_DriveSelect == "r" ]]; then 
+    TargetDrive="$qqf_RightClickDrivepath" ; TargetPathName="$qqf_RightClickDrivepath" 
+    TargetName="Right Click Drive"; TargetDevice="/dev/nbd0" ; TargetAvailable="$RightClickAvailable"
   elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
@@ -233,6 +261,7 @@ while true; do
         if [[ "$TargetName" == All* ]]; then  
           [[ $MainMountPoint ]] && umount "$MainMountPoint"
           [[ $SecondMountPoint ]] && umount "$SecondMountPoint"
+          [[ $RClickMountPoint ]] && umount "$RClickMountPoint"
           if [[ $TargetName == "All Drives" ]]; then  
             [[ $SharedMountPoint ]] && umount "$SharedMountPoint"
           fi

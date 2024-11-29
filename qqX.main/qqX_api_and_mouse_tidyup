@@ -84,9 +84,9 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     RightClickReRouted=1
     right_click_re_route
   else  
-    printColor "\n\n  [enter] to continue    [c] to cancel and close \n\n"  
+    printColor "\n\n  [enter] to continue   [qqf] open qcow2 in file manager   [c] to cancel and close \n\n"  
     read -rp  "  >  "  IsoQuit
-    [[ $IsoQuit ]] && exit directly 
+    [[ $IsoQuit == "c" ]] && exit directly 
   fi
   
   if [[ $QCOW_RightClick_VM_qqX ]]; then 
@@ -108,8 +108,19 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
   else  exit directly 
   fi
 
-fi  
+  if [[ $IsoQuit == "qqf" ]]; then
+    qqf_RightClickDrivepath="$(realpath "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName")"
+    if [[ $QCOW_RightClick_VM_qqX ]]; then
+      qcow2_filemanage "$qqf_RightClickDrivepath"
+    else
+      if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
+        "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf "$qqf_RightClickDrivepath"
+      else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf "$qqf_RightClickDrivepath"
+      fi
+    fi
+  fi
 
+fi  
 
 
 if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised || $XDG_FileType_Recognised ]]; then

@@ -690,8 +690,13 @@ function_delete_SecondDrive () {
 function qcow2_filemanage {
 
   local qqf_FullStandalone=
+  local qqf_RightClickDrivepath=
 
-  if [[ $1 == "--qqf" ]]; then  qqf_FullStandalone=1 ; shift
+  if [[ $1 == "--qqf" ]]; then  
+    qqf_FullStandalone=1 ; shift
+
+  elif [[ -e "$1" ]]; then 
+    qqf_RightClickDrivepath="$1" ; shift
 
   else
  
@@ -722,6 +727,7 @@ function qcow2_filemanage {
   # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
     printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
+    printf "\n qqf_RightClickDrivepath=\"%s\"" "$qqf_RightClickDrivepath"
     printf "\n FileManager=\"%s\"" "$FileManager"
     printf "\n TextEditor=\"%s\"" "$TextEditor"
     printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
@@ -743,8 +749,7 @@ function qcow2_filemanage {
 
     printf "\n\n  Standard Option [qf] is normally sufficient, in most distros,"
     printf "\n\n  but if qf is not opening a new terminal as it should do" 
-    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt,"
-    printf "\n\n  and for custom scripts type 'qqX --qqf --custom' "
+    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt"
     printf "\n\n  [enter] to return"
     printf "\n\n"
     read -rp "  >  "
