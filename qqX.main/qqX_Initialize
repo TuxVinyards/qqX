@@ -125,6 +125,7 @@ if [[ $1 == "XDG" ]]; then
 
     elif [[ "$XDG_MimeType" == *'text/plain' ]] &&  grep -qs 'guest_os' "$2" ; then 
       # then is a conf file open-with and appears to conform to standard quickemu .conf layout
+      # (also see api mouse script for qcow checks)
       QCOW_RightClick=
       QCOW_RightClick_NON_qqX=
       QCOW_RightClick_VM_qqX=1

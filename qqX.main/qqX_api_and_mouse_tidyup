@@ -21,8 +21,8 @@
 
 
 if [[ $XDG_MimeType_is_QCOW ]]; then 
-  # should haved changed to the right directory at this point
-  if grep -q -s "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
+  # should have changed to the right directory at this point (also see initialze script for .conf checks)
+  if grep -qs "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
     VM_Conf_Dir="$(pwd)"
     VM_Conf_File="$QCOW_RightClick_VM_Dir_Name.conf"
     VM_InstanceName="$QCOW_RightClick_VM_Dir_Name"
