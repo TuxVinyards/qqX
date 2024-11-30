@@ -692,13 +692,11 @@ function qcow2_filemanage {
   local qqf_FullStandalone=
   local qqf_RightClickDrivepath=
 
-  if [[ $1 == "--qqf" ]]; then  
-    qqf_FullStandalone=1 ; shift
+  if [[ $1 == "--qqf" ]]; then qqf_FullStandalone=1 ; shift ; fi
 
-  elif [[ -e "$1" ]]; then 
-    qqf_RightClickDrivepath="$1" ; shift
+  if [[ -e "$1" ]]; then  qqf_RightClickDrivepath="$1" ; shift ; fi
 
-  else
+  if [[ ! $qqf_FullStandalone ]]; then
  
     if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
       printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
@@ -718,6 +716,13 @@ function qcow2_filemanage {
       else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
       fi
     fi
+
+    # resize qqf terminal a tad, if possible, to make it easier to see that there are two terms open
+    Terminal_Start="${Terminal_Start/150/170}"
+    Terminal_Start="${Terminal_Start/145/170}"
+    Terminal_Start="${Terminal_Start/x55/x40}"
+    Terminal_Start="${Terminal_Start/x50/x40}"
+    Terminal_Start="${Terminal_Start/x45/x40}"
 
     local UserTerm=
     UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"

@@ -98,6 +98,7 @@ if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files
 qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
 
 # Allow full standalone running of qcow2 file management utility
+# --qqf "$qqf_RightClickDrivepath" TO FINISH 
 if [[ $1 == "--qqf" ]]; then 
   if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
     "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 
