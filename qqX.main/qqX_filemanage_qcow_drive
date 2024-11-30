@@ -191,9 +191,19 @@ while true; do
     fi
   else SecondCrossConnected=
   fi
-  if [[ $qqf_RightClickDrivepath ]]; then
+  if [[ $qqf_RightClickDrivepath ]] && [[ $TargetName != "Right Click Drive" ]]; then
     printf "\n\n  Right Click Drive: %s" "$qqf_RightClickDrivepath"
   fi
+  if [[ $RClickConnected ]]; then     
+    RClickGreppedPathName="$(ps -ef | grep nbd0 | grep qcow | awk '{print $NF}')"
+    if [[ $RClickGreppedPathName ]] && [[ "$RClickGreppedPathName" != "$qqf_RightClickDrivepath" ]]; then 
+      printColor "\n\n  NOTE: The current connection for Right Click Drive is to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$RClickGreppedPathName")"
+      RClickCrossConnected=1
+    else RClickCrossConnected=
+    fi
+  else RClickCrossConnected=
+  fi
+
 
   printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive  [r] right click drive   [A] All Drives  [a] all Non-Shared Drives "
 
@@ -202,7 +212,7 @@ while true; do
   printColor "\n\n  Selected = %s " "$TargetName" 
 
   if [[ $TargetName != All* ]]; then
-   if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE on this VM" ; fi
+   if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE or NOT LINKED to this VM" ; fi
   fi
   if [[ $TargetName == "Main Drive" ]]; then
     [[ $LiveBoot ]] && [[ -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
@@ -219,7 +229,7 @@ while true; do
     [[ $EmptyRightClick ]] && [[ -e "$qqf_RightClickDrivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
 
-  printColor "\n\n\n  [enter] to continue   or  [option] for different selection  "
+  printColor "\n\n\n  [enter] to change the connections   or  [option] for different selection  "
   printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
 
   printf "\n\n"
@@ -248,7 +258,7 @@ while true; do
       printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
       printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
     fi
-    printColor "\n\n  [c] connect  [d] disconnect and unmount  [enter] [r] to reselect or return"
+    printColor "\n\n  [c] connect  [d] disconnect current and unmount  [enter] [r] to reselect or return"
     printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
     printf "\n\n"
     read -rp "  >  " qf_DriveSelect

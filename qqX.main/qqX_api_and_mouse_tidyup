@@ -13,7 +13,7 @@
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009  
 
 #  Sorts out any MOUSE CLICK or COMMAND LINE parameters and reads any flags set during 'qqX_initialize' 
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
@@ -64,9 +64,12 @@ if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised 
   right_click_re_route
 fi
 
-if [[ $XDG_MimeType_is_QCOW ]]; then  
-  check_disk_is_okay "$QCOW_RightClick_VM_Dir_Name"  "$QCOW_RightClick_DiskName"
-  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
+if [[ $XDG_MimeType_is_QCOW ]]; then
+  if ps -ef | grep -q nbd0 ; then  DiskChkStatus="Okay"
+  else
+    check_disk_is_okay "$QCOW_RightClick_VM_Dir_Name"  "$QCOW_RightClick_DiskName"
+  fi
+  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s \n"  "$DiskChkStatus" ; fi
   if [[ $QCOW_RightClick_NON_qqX ]]; then 
     if [[ $DiskChkStatus == "Okay" ]]; then printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
     else printColor  "\n\n QEMU qcow2 disk found \n\n BUT not configured as qqX/quickemu bootable \n\n AND has ERRORS .... \n\n"
@@ -80,9 +83,9 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
       printf  "> QEMU disk image utility notes\n\n"
     fi
   fi
-
-  "$QEMU_IMG" info "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName"
-      
+  #if ! ps -ef | grep -q nbd0 ; then  #  REVIEW  
+    "$QEMU_IMG" info "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName"
+  #fi   
   if [[ $QCOW_RightClick_NON_qqX ]]; then  
     printColor "\n\n See  https://qemu.readthedocs.io  "
     printf  "> QEMU disk image utility may be useful"
