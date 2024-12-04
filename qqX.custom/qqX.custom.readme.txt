@@ -1,0 +1,12 @@
+
+The folder 'qqX.custom' is designed to be installable at the default location, 
+or other, and to be qqX upgrade resistant. 
+
+Manual creation of the folder is required. 
+
+The qqX installer/upgrader will/should ignore all direct references to it. 
+
+Chmod a +rx will be given recursively to the whole of the /usr/share/qqX folder, 
+or other. Anything placed there will become executable ....
+
+

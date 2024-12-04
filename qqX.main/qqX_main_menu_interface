@@ -222,7 +222,7 @@ else
     elif [[ $FileManager ]]; then 
       if [[ $(type -p "$FileManager") ]]; then 
         printf "   [f] open VM folder"
-        printf "  [qf] open qcow2"
+        printf "  [qf] | [qqf] open qcow2"
         printf " in file manager"
       else  printColor "   [set]  ERROR file manager not found" 
       fi
