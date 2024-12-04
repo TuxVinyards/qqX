@@ -22,17 +22,19 @@
 # in the qqX main script AFTER all the other scripts, files and functions have been sourced 
 # but BEFORE starting the qqX main loop.
 
+if [[ $RClickShowVars ]]; then  echo; echo "1 $1" ; read -r ; fi
+
 if [[ $XDG_MimeType_is_QCOW ]]; then 
   # should have changed to the right directory at this point (also see initialze script for .conf checks)
   if grep -qs "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
-    VM_Conf_Dir="$(pwd)"
+    VM_Conf_Dir="$QCOW_RightClick_Conf_Dir"
     VM_Conf_File="$QCOW_RightClick_VM_Dir_Name.conf"
     VM_InstanceName="$QCOW_RightClick_VM_Dir_Name"
-    QCOW_RightClick_NON_qqX=
-    QCOW_RightClick_VM_qqX=1
+    XDG_RightClick_NON_qqX=
+    XDG_RightClick_VM_qqX=1
     shift
   else  
-    QCOW_RightClick_NON_qqX=1 ; QCOW_RightClick_VM_qqX= ; shift
+    XDG_RightClick_NON_qqX=1 ; XDG_RightClick_VM_qqX= ; shift
   fi
 fi
 
@@ -56,8 +58,8 @@ right_click_re_route () {
   fi
 }
 
-if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]] && [[ ! $XDG_FileType_Recognised ]]; then
-  if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1 "  "$XDG_MimeType"
+if [[ $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]] && [[ ! $XDG_FileType_Recognised ]]; then
+  if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1"  "$XDG_MimeType"
   else  show_CLI_usage 
   fi
   RightClickReRouted=1
@@ -65,12 +67,15 @@ if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised 
 fi
 
 if [[ $XDG_MimeType_is_QCOW ]]; then
+
   if ps -ef | grep -q nbd0 ; then  DiskChkStatus="Okay"
   else
-    check_disk_is_okay "$QCOW_RightClick_VM_Dir_Name"  "$QCOW_RightClick_DiskName"
+    check_disk_is_okay "$QCOW_RightClick_Conf_Dir"  "$QCOW_RightClick_DiskName"
   fi
-  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s \n"  "$DiskChkStatus" ; fi
-  if [[ $QCOW_RightClick_NON_qqX ]]; then 
+  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s \n"  "$DiskChkStatus" 
+  fi
+
+  if [[ $XDG_RightClick_NON_qqX ]]; then 
     if [[ $DiskChkStatus == "Okay" ]]; then printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
     else printColor  "\n\n QEMU qcow2 disk found \n\n BUT not configured as qqX/quickemu bootable \n\n AND has ERRORS .... \n\n"
     fi
@@ -83,12 +88,13 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
       printf  "> QEMU disk image utility notes\n\n"
     fi
   fi
-  #if ! ps -ef | grep -q nbd0 ; then  #  REVIEW  
-    "$QEMU_IMG" info "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName"
-  #fi   
-  if [[ $QCOW_RightClick_NON_qqX ]]; then  
+
+  # show disk info:
+  "$QEMU_IMG" info "$QCOW_RightClick_Conf_Dir/$QCOW_RightClick_DiskName"
+
+  if [[ $XDG_RightClick_NON_qqX ]]; then  
     printColor "\n\n See  https://qemu.readthedocs.io  "
-    printf  "> QEMU disk image utility may be useful"
+    printf  "> QEMU disk image utility or qqX's 'qf' may be useful"
     RightClickReRouted=1
     right_click_re_route
   else  
@@ -97,8 +103,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     [[ $IsoQuit == "c" ]] && exit directly 
   fi
   
-  if [[ $QCOW_RightClick_VM_qqX ]]; then 
-    QCOW_RightClick= 
+  if [[ $XDG_RightClick_VM_qqX ]]; then 
     ByPass_VM_Array_Selector=1
     if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
     else
@@ -117,7 +122,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
   fi
 
   if [[ $IsoQuit == "qf" ]]; then
-    qqf_RightClickDrivepath="$(realpath "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName")"
+    qqf_RightClickDrivepath="$(realpath "$QCOW_RightClick_Conf_Dir/$QCOW_RightClick_DiskName")"
     qcow2_filemanage "$qqf_RightClickDrivepath"
     sleep 3
     exit directly
@@ -284,7 +289,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 fi
 
 
-if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $QCOW_RightClick_VM_qqX ]]; then
+if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $XDG_RightClick_VM_qqX ]]; then
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
   [[ $VM_Conf_File ]] && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars

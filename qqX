@@ -57,6 +57,7 @@ if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then 
 ## DEV: for easier fault tracing use =0 to set. Set =int/float for pauses, eg =1 to pause 1 sec, "0.2" etc for less.
 NoClear=
 GeneralLoopCheck=
+RClickShowVars=
 # Dev Start if starting qqX directly from a source folder i.e "./"  Used as flag to show which source is being used.
 if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
 function dev_loop_check {
