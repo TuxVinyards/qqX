@@ -15,20 +15,14 @@
 
 #  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
-
 qqX_logo_plain() {
-  
   # early loader 
-
   echo "  _    _   \/   "
   echo " (_|  (_|  /\ "
   echo "   |.   |.    "
-
 }
 
-
 if  [[ $NoClear ]]; then 
-
 	printf () {
 		# shellcheck disable=SC2199
 		# checks for occurence of the clearing pattern within the parameter text, treating the text as a single string
@@ -47,9 +41,7 @@ if  [[ $NoClear ]]; then
       command printf "$@"
     fi
 	}
-
 else 
-
 	printf () {
 		# shellcheck disable=SC2199
 		if [[ "$@" ==  '\033c'* ]]; then
@@ -60,9 +52,7 @@ else
       command printf "$@"
     fi
 	}
-
 fi
-
 
 # Usage needs to be loaded early on, so it can be shown if initial help is required
 show_CLI_usage () {
@@ -89,6 +79,27 @@ show_CLI_usage () {
   printf    "\n\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
 
 }
+
+#  Pick up the SETTINGS file 
+#  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines and introduces a custom settings file
+
+if [[ ! -f "$HOME/.qqX/qqX_settings" ]]; then 
+  printf "\n\n  ERROR with settings file detection "
+  printf "\n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
+else
+  qqX_SettingsFile="$HOME/.qqX/qqX_settings"
+  source "$qqX_SettingsFile" 
+  [[ -f "$HOME/.qqX/custom_settings" ]] && source "$HOME/.qqX/custom_settings"
+fi
+
+if [[ $AllowMoreLocale ]]; then 
+  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
+  else export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; fi
+else
+  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then  export "LC_ALL=C.UTF-8" ;  else export "LC_ALL=C" ; fi
+fi
+
 
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
 #  Further processing is done in the 'qqX_api_and_mouse_tidyup' script, after other functions have been loaded
@@ -229,25 +240,7 @@ else  CurrentFolder="$(pwd)"
 fi
 
 
-#  Pick up the SETTINGS file 
-#  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines and introduces a custom settings file
 
-if [[ ! -f "$HOME/.qqX/qqX_settings" ]]; then 
-  printf "\n\n  ERROR with settings file detection "
-  printf "\n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
-else
-  qqX_SettingsFile="$HOME/.qqX/qqX_settings"
-  source "$qqX_SettingsFile" 
-  [[ -f "$HOME/.qqX/custom_settings" ]] && source "$HOME/.qqX/custom_settings"
-fi
-
-if [[ $AllowMoreLocale ]]; then 
-  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale
-  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
-  else export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; fi
-else
-  if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then  export "LC_ALL=C.UTF-8" ;  else export "LC_ALL=C" ; fi
-fi
 
 if [[ $XDG_MimeType_is_QCOW ]]; then
 
