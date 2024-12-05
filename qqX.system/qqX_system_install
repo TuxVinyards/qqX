@@ -292,27 +292,33 @@ CustomTerminalProfile=
 # MATE:
 MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
 MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
+MateTerminalProfile_HostSize=" --hide-menubar --title=qqX "
 
 # GNOME:
 GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
 GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
+GnomeTerminalProfile_HostSize=" --hide-menubar --title=qqX "
 
 # XFCE4:
 XfceTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 XfceTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
+XfceTerminalProfile_HostSize=" --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 
 # LxTerminal:
 LxTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --title=qqX "
 LxTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --title=qqX "
+LxTerminalProfile_HostSize=" --title=qqX "
 
 # XTERM:
 XtermTerminalProfile_Taller=" -geometry ${Term_Width}x${Term_Taller} -fa truetype -fs 12 -fg white -bg black"
 XtermTerminalProfile_Standard=" -geometry ${Term_Width}x${Term_Height} -fa truetype -fs 12 -fg white -bg black"
+XtermTerminalProfile_HostSize=" -fa truetype -fs 12 -fg white -bg black"
 
 # KONSOLE:
 KonsoleTitle="qqX"
 KonsoleTerminalProfile_Taller=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Taller} "
 KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Height}"
+KonsoleTerminalProfile_HostSize=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency"
 
 ##  Check we are in the right place
 if [[ ! -d "$(pwd)/qqX.system" ]]; then 
@@ -667,7 +673,7 @@ if [[ ! $SkipMkLauncher ]]; then
     printf "\n\n  Select 'standard' if in doubt, or where terminals do not have a -geometry parameter."
 
     printf "\n\n  If your terminal uses PIXELS, for example 'qterminal', try 1500 x 1000 in the settings."
-    printf "\n\n  In other cases, such as with tiling WM envs eg 'i3' the size is auto-regulated. "
+    printf "\n\n  In other cases, such as with tiling WM envs eg 'i3' the size may be auto-regulated. "
 
     printf "\n\n\n"
 
@@ -676,7 +682,7 @@ if [[ ! $SkipMkLauncher ]]; then
     printColor "  [enter] continue "
     if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
       printColor "at standard height "
-      printf "   [t] extra height   or "
+      printf "   [t] extra height  [a] as host (auto)  or "
     fi
 
   else  
@@ -703,6 +709,16 @@ if [[ ! $SkipMkLauncher ]]; then
     XtermTerminalProfile="$XtermTerminalProfile_Taller"
     LxTerminalProfile="$LxTerminalProfile_Taller"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
+
+  elif [[ $TerminalHeightChoice == "a" ]]; then
+
+    printf "\n  Height selected =  Auto/Host " 
+    MateTerminalProfile="$MateTerminalProfile_HostSize"
+    GnomeTerminalProfile="$GnomeTerminalProfile_HostSize"
+    XfceTerminalProfile="$XfceTerminalProfile_HostSize"
+    XtermTerminalProfile="$XtermTerminalProfile_HostSize"
+    LxTerminalProfile="$LxTerminalProfile_HostSize"
+    KonsoleTerminalProfile="$KonsoleTerminalProfile_HostSize"
 
   elif  [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
 
