@@ -565,6 +565,9 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
   fi
   if grep -s 'gnome-terminal' "$XDG_GUI_desktop_PathName" | grep -qs -e '-e ' ; then ForceReconfigure=1
   fi
+  #  ver 1.11 removes need for XDG trigger parameter
+  if grep -qs 'XDG' "$XDG_GUI_desktop_PathName" ; then ForceReconfigure=1
+  fi
 
   if [[ $ForceReconfigure ]]; then
     printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
@@ -833,13 +836,13 @@ if [[ ! $SkipMkLauncher ]]; then
 
       # needs quotes  - plus REVIEW  -e  deprecation in other terminals
       if [[ $CustomTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path %f" '"'  
       elif [[ $UserTerm == "gnome-terminal" ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'"XDG %f"'"'  
+        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'" %f"'"'  
       elif [[ $SelectedTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  %f" '"'  
       else  
-        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path %f" '"'  
       fi
 
       echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
@@ -877,7 +880,7 @@ if [[ ! $SkipMkLauncher ]]; then
 fi
 
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
-#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
+#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path" 
 Start_qqX=
 GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
