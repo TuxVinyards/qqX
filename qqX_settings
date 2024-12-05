@@ -1,17 +1,19 @@
 #!/usr/bin/env bash 
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
+#  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
+#  Licence:  GPL3   https://www.gnu.org/licenses 
 
-# 	licence:  GPL3   https://www.gnu.org/licenses 
+#  -------------------------------------------------------------------------------------------------------------------
 
-
-## Settings file for qqX - quickemu quickget X terminal project 
+# Settings file for qqX - quickemu quickget X terminal project 
 
 # qqX installer will create a hidden folder at $HOME & will place the settings there.
 # Settings may normally opened and edited via the qqX menu interface.
 # Alternatively, may be edited via the file manager, usually ctrl-h to unhide/hide files.
 
-# shellcheck disable=SC2034,SC2154   
+# shellcheck disable=SC2034,SC2154
+
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## SET THE DEFAULT VM FOLDER, where the Virtual Machines are normally found. 
 #  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate. 
@@ -29,6 +31,7 @@ Extra_VM_Folder+=("")
 
 Extra_VM_Folder+=("")
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ##  GENERAL COLOR & THEMING  
 #  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1   
@@ -37,6 +40,7 @@ X_Shade="3"
 
 ## Other SETTINGS SECTIONS AVAILABLE:
 
+  #   VM SELECTOR INTERFACE
   #  'QUICKEMU' & 'QUICKGET'  SOURCE
   #   qqX UPDATES
   #   EDITOR & BROWSER PROGRAMS
@@ -48,6 +52,7 @@ X_Shade="3"
   #   TIANO BIOS
   #   CUSTOM SETTINGS & DEVELOPMENT
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## VM SELECTOR: 
 
@@ -105,6 +110,7 @@ VM_SelectorStyle="A"
 # For custom main menu: see file "qqX_main_menu_interface"
 # Also see qqX wiki.
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## 'QUICKEMU' & 'QUICKGET'  SOURCE:
 
@@ -143,6 +149,7 @@ VM_SelectorStyle="A"
 
   QE_SourceVersion="FreeBird"    
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## qqX UPDATES:
 
@@ -156,6 +163,7 @@ VM_SelectorStyle="A"
 # Give full path eg "/media/xxx/Storage/qqX.files"  
   Specified_Updates_Location=
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## OTHER PROGRAMS:
 
@@ -181,6 +189,7 @@ VM_SelectorStyle="A"
 # Give quoted name or may be left blank, if not known.  Or may be set ="no" to hide menu options, if name cannot be resolved.
   WebBrowser=
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ##  BOOT DEFAULTS:
 
@@ -236,6 +245,7 @@ VM_SelectorStyle="A"
 # Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ... 
   P_Kill_WaitSecs="4"
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ##  SHARED or SECOND DRIVES:  
 
@@ -257,6 +267,7 @@ VM_SelectorStyle="A"
 
 # qqX adds SecondDrives to the .CONF FILE, eg as ="Windows-11/storage.qcow2" 
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## ERRORS:
 
@@ -279,6 +290,7 @@ VM_SelectorStyle="A"
   FixArgs_hpet=1
   FixArgs_smartcard=1
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## QEMU VERSION
 
@@ -331,6 +343,7 @@ VM_SelectorStyle="A"
 # Set blank for log file only. NB An main menu toggle is also available and a log file is always outputted to the VM's folder
   VerboseArgs= 
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 ## TIANO BIOS
 
@@ -366,6 +379,7 @@ VM_SelectorStyle="A"
 # Also use 'BootStyleMsg' for individual overides in the .conf if wished.
   BootStyleMsg="slow"
 
+#  -------------------------------------------------------------------------------------------------------------------
 
 # CUSTOM SETTINGS FILE
 # The qqX upgrader utility will tidy up and possibly remove any 'obsolete' code and comments from this file ...
