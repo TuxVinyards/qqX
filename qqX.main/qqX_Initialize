@@ -103,13 +103,10 @@ fi
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
 #  Further processing is done in the 'qqX_input_and_mouse_tidyup' script, after other functions have been loaded
 
-if [[ $RClickShowVars ]]; then echo "1: $*"  ; echo  ; read -r ; fi
+if [[ $Trace_InputVars ]]; then echo "1: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 if [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$qqX_Version" ; exit 
 elif [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit 
-fi
-
-if [[ $1 ]]; then RunMouseApiTidy=1 ; else RunMouseApiTidy=
 fi
 
 # @ Ver 1.11, the 'XDG' trigger parameter is now not needed and is deprecated
@@ -121,7 +118,7 @@ fi
 [[ $1 == '%f' ]] && shift 
 
 
-if [[ $RClickShowVars ]]; then echo "2: $*"  ; echo  ; read -r ; fi
+if [[ $Trace_InputVars ]]; then echo "2: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 # SORT OUT if '$1' is a readable file or drive, what MIME-TYPE it is, and what main folder to CD to.
 
@@ -135,7 +132,7 @@ if [[ -e "$1" ]]; then
   XDG_RealPathName="$(realpath "$1")"
   XDG_MimeType="$(mimetype "$XDG_RealPathName" 2>/dev/null)"
   CurrentFolder="$(dirname "$XDG_RealPathName")"
-  if [[ $RClickShowVars ]]; then echo "RP $XDG_RealPathName  MT $XDG_MimeType" ; echo "CF  $CurrentFolder"  ; echo  ; read -r ; fi
+  if [[ $Trace_InputVars ]]; then echo "RP $XDG_RealPathName  MT $XDG_MimeType" ; echo "CF  $CurrentFolder"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
   if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then 
     XDG_MimeType_is_QCOW=1
@@ -144,9 +141,9 @@ if [[ -e "$1" ]]; then
     QCOW_RightClick_DiskName="$(basename "$XDG_RealPathName")"  
     QCOW_RightClick_Conf_Dir="$(dirname "$QCOW_RightClick_Dir")"
     QCOW_RightClick_VM_Dir_Name="$(basename "$QCOW_RightClick_Dir")"
-    if [[ $RClickShowVars ]]; then 
+    if [[ $Trace_InputVars ]]; then 
       echo "D $QCOW_RightClick_Dir  CD $QCOW_RightClick_Conf_Dir"  
-      echo "VDN  $QCOW_RightClick_VM_Dir_Name  N  $QCOW_RightClick_DiskName " ; echo  ; read -r
+      echo "VDN  $QCOW_RightClick_VM_Dir_Name  N  $QCOW_RightClick_DiskName " ; echo  ; sleep "$Trace_InputVars"
     fi
     # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
     #  standard right-click open-with actions will use the current folder
@@ -171,11 +168,12 @@ if [[ -e "$1" ]]; then
       VM_Conf_Dir="$(dirname "$XDG_RealPathName")"
       VM_Conf_File="$(basename "$XDG_RealPathName")"
       VM_InstanceName="${VM_Conf_File/'.conf'/}"
-      #echo "2: $XDG_RealPathName"  ; echo 
-      #echo "R: $XDG_RealPathName"  ; echo 
-      #echo "D: $VM_Conf_Dir"  ; echo 
-      #echo "C: $VM_Conf_File"  ; echo 
-      #echo "N: $VM_InstanceName"  ; echo  ; read
+      if [[ $Trace_InputVars ]]; then 
+        echo "R: $XDG_RealPathName"  ; echo 
+        echo "D: $VM_Conf_Dir"  ; echo 
+        echo "C: $VM_Conf_File"  ; echo 
+        echo "N: $VM_InstanceName"  ; echo  ; sleep "$Trace_InputVars"
+      fi
       shift $#
       if [[ $VM_InstanceName ]]; then
         # set to VM folder and flag to run the VM selector
@@ -218,12 +216,14 @@ if [[ -e "$1" ]]; then
     
   fi
 
-  if [[ $RClickShowVars ]]; then echo "3: $*"  ; echo  ; read -r ; fi
+  if [[ $Trace_InputVars ]]; then echo "3: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 else  CurrentFolder="$(pwd)"
   
 fi
 
-if [[ $RClickShowVars ]]; then echo "4: $*"  ; echo  ; read -r ; fi
+if [[ $1 ]]; then Initial_Input="$1" ; shift ; else Initial_Input=
+fi
+
 
 # vim:tabstop=2:shiftwidth=2:expandtab

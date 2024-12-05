@@ -54,12 +54,12 @@ fi
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-## DEV: for easier fault tracing use =0 to set. Set =int/float for pauses, eg =1 to pause 1 sec, "0.2" etc for less.
-NoClear=
-GeneralLoopCheck=
-RClickShowVars=
-# Dev Start if starting qqX directly from a source folder i.e "./"  Used as flag to show which source is being used.
+# DEV Start is used as flag to show which source is being used, if starting qqX directly from a source folder i.e "./"  
 if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
+
+# For general FAULT TRACING set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less.
+NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=
+
 function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
@@ -194,7 +194,7 @@ fi
 #  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
-[[ $RunMouseApiTidy ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
+[[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
