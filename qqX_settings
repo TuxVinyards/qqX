@@ -149,8 +149,8 @@ VM_SelectorStyle="A"
 # Checks quietly for new GitHub releases (set =1 if not required)
   Disable_qqX_upd_Checks=
 
-# Un Hide beta releases  (when checking is enabled)  Default =1  hide
-  Hide_qqX_BetaUpdates=1
+# Hide beta releases  (when checking is enabled)  Default =  blank  (show)
+  Hide_qqX_BetaUpdates=
 
 # Option for a Specified folder, in which sub folder "qqX.releases" gets to be placed, other than the usual like ~/Downloads
 # Give full path eg "/media/xxx/Storage/qqX.files"  
