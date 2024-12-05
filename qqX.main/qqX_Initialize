@@ -101,7 +101,7 @@ fi
 
 
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
-#  Further processing is done in the 'qqX_api_and_mouse_tidyup' script, after other functions have been loaded
+#  Further processing is done in the 'qqX_input_and_mouse_tidyup' script, after other functions have been loaded
 
 if [[ $RClickShowVars ]]; then echo "1: $*"  ; echo  ; read -r ; fi
 
