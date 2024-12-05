@@ -153,7 +153,7 @@ while true; do
 
   qf_DriveSelect=
 
-  printColor "\n\n  %s " "${VM_InstanceName^^}"
+  [[ $VM_InstanceName ]] && printColor "\n\n  %s " "${VM_InstanceName^^}"
 
   printf "\n\n  Available Drive(s): "
   if [[ "$MainAvailable" ]]; then printf "  Main   " ; fi
