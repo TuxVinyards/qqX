@@ -140,15 +140,16 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
     MoveIso=
     printColor "\n\n  Set up this ISO as a qqX/quickemu VM? "
     printf "\n\n  %s\n" "$XDG_ISO_Name"
-    printColor "\n\n  Standard LINUX ISO's only."
-    printf "\n\n  Note: batocera | freedos | haiku | kolibrios | reactos | truenas | solaris "
-    printf "\n\n  dragonflybsd | freebsd | netbsd | openbsd  should work but the .conf file"
-    printf "\n\n  will need manually editing so guest_os= reads appropriately as one of the above,"
-    printf "\n\n  plus 'boot=\"legacy\"' may be required for one or two of these. \n"
+    printColor "\n\n  Standard LINUX ISO's only"
+    printf "\n\n  For: batocera | freedos | haiku | kolibrios | reactos | truenas "
+    printf "\n\n  solaris | dragonflybsd | freebsd | netbsd | openbsd "
+    printf "\n\n  Follow up edit the guest_os= .conf line  eg guest_os=\"batocera\""
+    printf "\n\n  Add ' boot=\"legacy\" ' if required. \n"
     if [[ $XDG_FileType_Recognised ]] && [[ ! $XDG_MimeType_Recognised ]]; then
       printf "\n\n  WARNING: The ISO formatting is a non-recognised mimetype so may not be bootable or valid. Try anyway? \n"
     fi     
-    printf "\n\n  [enter] continue   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
+    printColor "\n\n  [enter] continue with set up   "
+    printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
     read -rp "  >  "  Cancel_ISO
 
     if [[ $Cancel_ISO == "c" ]]; then exit directly
