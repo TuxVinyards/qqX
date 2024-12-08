@@ -23,7 +23,8 @@
 
 #  A CUSTOM VERSION for this file MAY BE CREATED, if wished, and placed next to this one
 #  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected 
-#  and run by function 'qcow2_filemanage' in the main qqX program in the disk maintenance script
+#  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
+
 
 # Allow full standalone running of qcow2 file management utility
 if [[ $1 == "--qqf" ]]; then 
@@ -36,12 +37,17 @@ else
   qqf_FullStandalone=
 fi
 
-if [[ -e "$1" ]]; then 
-  qqf_RightClickDrivepath="$1" ; shift
-fi
-
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
+
+if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
+if [[ -e "$1" ]]; then 
+  qqf_Input_Drivepath="$1" ; shift
+fi
+
+if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
 
 if [[ ! $(type -p "$FileManager") ]] ; then 
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
@@ -109,15 +115,15 @@ load_qf_defaults () {
     if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
   else SharedAvailable= 
   fi
-  if [[ "$qqf_RightClickDrivepath" ]]; then  RightClickAvailable=1
-    if  [[ ! $(du -b -t 1000000 "$qqf_RightClickDrivepath" 2>/dev/null) ]]; then EmptyRightClick=1 ; else EmptyRightClick= ; fi
-  else RightClickAvailable= 
+  if [[ "$qqf_Input_Drivepath" ]]; then  InputAvailable=1
+    if  [[ ! $(du -b -t 1000000 "$qqf_Input_Drivepath" 2>/dev/null) ]]; then EmptyInput=1 ; else EmptyInput= ; fi
+  else InputAvailable= 
   fi
 
-  if [[ $RightClickAvailable ]]; then
-    TargetDrive="$qqf_RightClickDrivepath"
-    TargetPathName="$qqf_RightClickDrivepath"
-    TargetName="Right Click Drive"
+  if [[ $InputAvailable ]]; then
+    TargetDrive="$qqf_Input_Drivepath"
+    TargetPathName="$qqf_Input_Drivepath"
+    TargetName="Input Drive"
     TargetDevice="/dev/nbd0"
     TargetAvailable=1
   else
@@ -161,19 +167,19 @@ while true; do
   if [[ "$MainAvailable" ]]; then printf "  Main   " ; fi
   if [[ "$SecondPathName" ]]; then printf " Second  " ; fi
   if [[ "$SharedPathName" ]]; then printf " Shared  " ; fi
-  if [[ "$qqf_RightClickDrivepath" ]]; then printf " RClick  " ; fi
+  if [[ "$qqf_Input_Drivepath" ]]; then printf " Input  " ; fi
 
   printf "\n\n  Connected Drive(s): "
   if ps -ef | grep nbd1 | grep -q qcow; then printf "  Main   " ; MainConnected=1 ; else MainConnected= ; fi
   if ps -ef | grep nbd2 | grep -q qcow; then printf " Second  " ; SecondConnected=1 ; else SecondConnected= ; fi
   if ps -ef | grep nbd3 | grep -q qcow; then printf " Shared  " ; SharedConnected=1 ; else SharedConnected= ; fi
-  if ps -ef | grep nbd0 | grep -q qcow; then printf " RClick  " ; RClickConnected=1 ; else RClickConnected= ; fi
+  if ps -ef | grep nbd0 | grep -q qcow; then printf " Input   " ; InputConnected=1 ; else InputConnected= ; fi
 
   printf "\n\n  Mounted Drive(s):   "
   if mount -fl | grep -q '/dev/nbd1'; then printf "  Main   "; MainMountPoint="$(mount -fl | grep '/dev/nbd1' | awk '{print $3}')" ; fi
   if mount -fl | grep -q '/dev/nbd2'; then printf " Second  "; SecondMountPoint="$(mount -fl | grep '/dev/nbd2' | awk '{print $3}')" ; fi
   if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; SharedMountPoint="$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')" ; fi
-  if mount -fl | grep -q '/dev/nbd0'; then printf " RClick  "; RClickMountPoint="$(mount -fl | grep '/dev/nbd0' | awk '{print $3}')" ; fi
+  if mount -fl | grep -q '/dev/nbd0'; then printf " Input   "; InputMountPoint="$(mount -fl | grep '/dev/nbd0' | awk '{print $3}')" ; fi
 
   if [[ $MainConnected ]]; then     
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
@@ -193,21 +199,21 @@ while true; do
     fi
   else SecondCrossConnected=
   fi
-  if [[ $qqf_RightClickDrivepath ]] && [[ $TargetName != "Right Click Drive" ]]; then
-    printf "\n\n  Right Click Drive: %s" "$qqf_RightClickDrivepath"
+  if [[ $qqf_Input_Drivepath ]] && [[ $TargetName != "Input Drive" ]]; then
+    printf "\n\n  Input Drive: %s" "$qqf_Input_Drivepath"
   fi
-  if [[ $RClickConnected ]]; then     
-    RClickGreppedPathName="$(ps -ef | grep nbd0 | grep qcow | awk '{print $NF}')"
-    if [[ $RClickGreppedPathName ]] && [[ "$RClickGreppedPathName" != "$qqf_RightClickDrivepath" ]]; then 
-      printColor "\n\n  NOTE: The current connection for Right Click Drive is to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$RClickGreppedPathName")"
-      RClickCrossConnected=1
-    else RClickCrossConnected=
+  if [[ $InputConnected ]]; then     
+    InputGreppedPathName="$(ps -ef | grep nbd0 | grep qcow | awk '{print $NF}')"
+    if [[ $InputGreppedPathName ]] && [[ "$InputGreppedPathName" != "$qqf_Input_Drivepath" ]]; then 
+      printColor "\n\n  NOTE: The current connection for Input Drive is to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$InputGreppedPathName")"
+      InputCrossConnected=1
+    else InputCrossConnected=
     fi
-  else RClickCrossConnected=
+  else InputCrossConnected=
   fi
 
 
-  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive  [r] right click drive   [A] All Drives  [a] all Non-Shared Drives "
+  printf "\n\n\n  [1] Main Drive   [2] Second Drive  [3] Shared Drive   [i] Input Drive  [A] All Drives  [a] all Non-Shared Drives "
 
   printf "\n\n  See main utilities for general disk tools and for disk creation"
 
@@ -227,8 +233,8 @@ while true; do
   if [[ $TargetName == "Shared Drive" ]]; then
     [[ $EmptyShared ]] && [[ -e "$SharedPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
-  if [[ $TargetName == "Right Click Drive" ]]; then
-    [[ $EmptyRightClick ]] && [[ -e "$qqf_RightClickDrivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+  if [[ $TargetName == "Input Drive" ]]; then
+    [[ $EmptyInput ]] && [[ -e "$qqf_Input_Drivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
 
   printColor "\n\n\n  [enter] to change the connections   or  [option] for different selection  "
@@ -243,9 +249,9 @@ while true; do
     TargetDrive="$SecondDrive" ; TargetPathName="$SecondPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2" ; TargetAvailable="$SecondAvailable"
   elif [[ $qf_DriveSelect == "3" ]]; then 
     TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3" ; TargetAvailable="$SharedAvailable"
-  elif [[ $qf_DriveSelect == "r" ]]; then 
-    TargetDrive="$qqf_RightClickDrivepath" ; TargetPathName="$qqf_RightClickDrivepath" 
-    TargetName="Right Click Drive"; TargetDevice="/dev/nbd0" ; TargetAvailable="$RightClickAvailable"
+  elif [[ $qf_DriveSelect == "i" ]]; then 
+    TargetDrive="$qqf_Input_Drivepath" ; TargetPathName="$qqf_Input_Drivepath" 
+    TargetName="Input Drive"; TargetDevice="/dev/nbd0" ; TargetAvailable="$InputAvailable"
   elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
@@ -273,7 +279,7 @@ while true; do
         if [[ "$TargetName" == All* ]]; then  
           [[ $MainMountPoint ]] && umount "$MainMountPoint"
           [[ $SecondMountPoint ]] && umount "$SecondMountPoint"
-          [[ $RClickMountPoint ]] && umount "$RClickMountPoint"
+          [[ $InputMountPoint ]] && umount "$InputMountPoint"
           if [[ $TargetName == "All Drives" ]]; then  
             [[ $SharedMountPoint ]] && umount "$SharedMountPoint"
           fi
@@ -289,6 +295,7 @@ while true; do
       if [[ $qf_DriveSelect == "d" ]]; then 
         printf "  qemu-nbd disconnecting ... \n\n"
         if [[ "$TargetName" == All* ]]; then  
+          sudo qemu-nbd -d "/dev/nbd0"
           sudo qemu-nbd -d "/dev/nbd1"
           sudo qemu-nbd -d "/dev/nbd2"
           if [[ $TargetName == "All Drives" ]]; then  
@@ -302,6 +309,7 @@ while true; do
         printf "  qemu-nbd connecting ... \n\n" 
 
         if [[ "$TargetName" == All* ]]; then  
+          [[ $InputAvailable ]] && sudo qemu-nbd -c "/dev/nbd0"  -f qcow2  "$qqf_Input_Drivepath"
           [[ $MainAvailable ]] && sudo qemu-nbd -c "/dev/nbd1"  -f qcow2  "$MainPathName"
           [[ $SecondAvailable ]] && sudo qemu-nbd -c "/dev/nbd2"  -f qcow2  "$SecondPathName"
           if [[ $TargetName == "All Drives" ]]; then  

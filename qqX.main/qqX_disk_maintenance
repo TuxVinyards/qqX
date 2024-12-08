@@ -687,64 +687,74 @@ function_delete_SecondDrive () {
 
 #  shellcheck disable=SC2120
 
-function qcow2_filemanage {
+qcow2_filemanagement_launcher () {
 
-  local qqf_FullStandalone=
   local qqf_StandaloneInfo=
-  local qqf_RightClickDrivepath=
+  local qqf_SetVars=
+  local qqf_Input=
+  local qqf_Input_Drivepath=
 
-  if [[ $1 == "--qqf" ]]; then qqf_FullStandalone=1 ; shift ; fi
-  if [[ $1 == "qqf-info" ]]; then qqf_StandaloneInfo=1 ; shift ; fi
-  if [[ -e "$1" ]]; then  qqf_RightClickDrivepath="$1" ; shift ; fi
+  if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
-  if [[ ! $qqf_FullStandalone ]]; then
- 
-    if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
-      printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
-      printf "\n\n  [enter] to return \n\n"
-      read -rp "  >  "
-      return
-    fi
-
-    Terminal_Start=
-    # Read the .desktop file for Terminal_Start instruction
-    # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
-    GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
-    if [[ $GrepExecLine ]]; then 
-      GrepExecLine="${GrepExecLine/'Exec='/}"
-      if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
-        Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
-      else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
-      fi
-    fi
-
-    # resize qqf terminal a tad, if possible, to make it easier to see that there are two terms open
-    Terminal_Start="${Terminal_Start/150/170}"
-    Terminal_Start="${Terminal_Start/145/170}"
-    Terminal_Start="${Terminal_Start/x55/x40}"
-    Terminal_Start="${Terminal_Start/x50/x40}"
-    Terminal_Start="${Terminal_Start/x45/x40}"
-
-    local UserTerm=
-    UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
-
+  if [[ $1 == "qqf-info" ]]; then qqf_StandaloneInfo=1 ; shift
   fi
+  if [[ $1 == "qqf-setvars" ]]; then qqf_SetVars=1 ; shift
+  fi
+  [[ $1 ]] && qqf_Input_Drivepath="$(realpath "$1")" && shift
+  [[ -e "$qqf_Input_Drivepath" ]] && qqf_Input_Drivepath=
+
+  if [[ $Trace_InputVars ]]; then echo "qqf_Input_Drivepath: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
+  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
+    printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
+    printf "\n\n  [enter] to return \n\n"
+    read -rp "  >  "
+    return
+  fi
+
+  Terminal_Start=
+  # Read the .desktop file for Terminal_Start instruction
+  # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
+  GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
+  if [[ $GrepExecLine ]]; then 
+    GrepExecLine="${GrepExecLine/'Exec='/}"
+    if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
+      Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
+    else Terminal_Start="$(cut -d '"' -f 1 <<< "$GrepExecLine")"
+    fi
+  fi
+
+  # resize qqf terminal a tad, if possible, to make it easier to see that there are two terms open
+  Terminal_Start="${Terminal_Start/150/170}"
+  Terminal_Start="${Terminal_Start/145/170}"
+  Terminal_Start="${Terminal_Start/x55/x40}"
+  Terminal_Start="${Terminal_Start/x50/x40}"
+  Terminal_Start="${Terminal_Start/x45/x40}"
+
+  local UserTerm=
+  UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
+
 
   # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
     printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
-    printf "\n qqf_RightClickDrivepath=\"%s\"" "$qqf_RightClickDrivepath"
     printf "\n FileManager=\"%s\"" "$FileManager"
     printf "\n TextEditor=\"%s\"" "$TextEditor"
     printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
     printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
     printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
     printf "\n LiveBoot=\"%s\"" "$LiveBoot"
+    printf "\n qqf_Input_Drivepath=\"%s\"" "$qqf_Input_Drivepath"
     printf "\n MainDrive=\"%s\"" "$MainDrive"
     printf "\n SecondDrive=\"%s\"" "$SecondDrive"
     printf "\n SharedDrive=\"%s\"" "$SharedDrive"
     printf "\n UserTerm=\"%s\"" "$UserTerm"
+    printf "\n NoClear=\"%s\"" "$NoClear"
+    printf "\n Trace_InputVars=\"%s\"" "$Trace_InputVars"
   } > "/tmp/qqX_nbd_vars"
+
+  if [[ $Trace_InputVars ]]; then echo; cat "/tmp/qqX_nbd_vars"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
 
   # allow for custom mounting scripts
   if [[ $qqf_StandaloneInfo ]]; then 
@@ -755,6 +765,14 @@ function qcow2_filemanage {
     printColor "\n\n  [enter] to return"
     printf "\n\n"
     read -rp "  >  "
+  elif [[ $qqf_SetVars ]]; then 
+    return
+  elif [[ $qqf_Input_Drivepath ]]; then 
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+      eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" "$qqf_Input_Drivepath"  >/dev/null 2>&1 &
+    else
+      eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" "$qqf_Input_Drivepath" >/dev/null 2>&1 &
+    fi
   else
     if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
       eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
@@ -777,7 +795,7 @@ function check_vm_nbd_boot_connected {
     printf "\n\n"
     read -rp "  >  "  qf_Launch
     [[ $qf_Launch == "r" ]] && return 1
-    [[ $qf_Launch ]] && qcow2_filemanage
+    [[ $qf_Launch ]] && qcow2_filemanagement_launcher
   done
 
 }

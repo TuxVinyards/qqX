@@ -99,7 +99,6 @@ if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files
 qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
 
 # Allows CLI launched standalone running of qcow2 file management utility (using main qqX to refresh the nbd vars)
-# --qqf "$qqf_RightClickDrivepath" TO FINISH 
 if [[ $1 == "--qqf" ]]; then 
   if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
     "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 

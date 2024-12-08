@@ -22,7 +22,7 @@
 #  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
 
 #  DUMMY CUSTOM VERSION that may be edited and placed at "$qqX_CustomFolder/custom_filemanage_qcow_drive"
-#  and which will be auto-detected and run by function 'qcow2_filemanage' 
+#  and which will be auto-detected and run by function 'qcow2_filemanagement_launcher' 
 
 #  Variance theoretically can exist in the functioning of NBD file mounting routines 
 #  so some distro desktop combinations may need some form of custom tweaking ??

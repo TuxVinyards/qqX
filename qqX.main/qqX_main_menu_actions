@@ -135,9 +135,9 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
-  elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanage qqf-info
+  elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
 
-  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanage  
+  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanagement_launcher  
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
