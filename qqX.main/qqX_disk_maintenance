@@ -690,10 +690,11 @@ function_delete_SecondDrive () {
 function qcow2_filemanage {
 
   local qqf_FullStandalone=
+  local qqf_StandaloneInfo=
   local qqf_RightClickDrivepath=
 
   if [[ $1 == "--qqf" ]]; then qqf_FullStandalone=1 ; shift ; fi
-
+  if [[ $1 == "qqf-info" ]]; then qqf_StandaloneInfo=1 ; shift ; fi
   if [[ -e "$1" ]]; then  qqf_RightClickDrivepath="$1" ; shift ; fi
 
   if [[ ! $qqf_FullStandalone ]]; then
@@ -746,16 +747,12 @@ function qcow2_filemanage {
   } > "/tmp/qqX_nbd_vars"
 
   # allow for custom mounting scripts
-  if [[ $qqf_FullStandalone ]]; then 
-    printColor "\n\n  qqf - Full Standalone > "
-    printf "Make sure to run option 'qqf' from the qqX VM menu"  
-    printf "\n\n  each time the VM is swapped and to run [r] to refresh"  
-    printf "\n"
-
+  if [[ $qqf_StandaloneInfo ]]; then 
     printf "\n\n  Standard Option [qf] is normally sufficient, in most distros,"
     printf "\n\n  but if qf is not opening a new terminal as it should do" 
     printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt"
-    printf "\n\n  [enter] to return"
+    printf "\n\n\n  The qqf VM variables have now been set/reset."
+    printColor "\n\n  [enter] to return"
     printf "\n\n"
     read -rp "  >  "
   else

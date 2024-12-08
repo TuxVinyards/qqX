@@ -63,6 +63,7 @@ show_CLI_usage () {
   printf     "\n\n  Or qqX \"[/path/to/vms-folder/]vm-name.conf\" to start a specific machine."
   printf     "\n\n  To set up an ISO: qqX \"iso_name.iso\" or \"/path/iso_name.iso\" "
   printf     "\n\n  Or analyse a Qcow2 disk: \"qqX disk_name.qcow2\" or \"/path/disk_name.qcow2\" "
+  printf     "\n\n  and qqX --qqf to load the generic Qcow2 FileManager mounting utility."
 
   printf     "\n\n\n  Mouse click - Right:"
   printf     "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."
@@ -73,7 +74,7 @@ show_CLI_usage () {
   printf     "\n\n  On a .conf file and 'run in terminal' will open directly to the distro's individual menu"
   printf     "\n\n  The first line of the .conf must have been edited to point to qqX instead of quickemu,"   
   printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/qqX --vm  or similar (VM name not needed)" 
-  printf     "\n\n  and the .conf file permissions must have been set to executable. See qqX [tune] utiility." 
+  printf     "\n\n  and the .conf file permissions must have been set to executable. See qqX [tune] utility." 
 
   printf    "\n\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
 

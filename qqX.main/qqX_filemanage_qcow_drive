@@ -32,6 +32,8 @@ if [[ $1 == "--qqf" ]]; then
     printf "\n\n  ERROR: Run Option 'qqf' from a qqX VM menu > qqF transfer file not found ....\n\n"  ; sleep 2 ; exit
   fi
   qqf_FullStandalone=1 ; shift
+else 
+  qqf_FullStandalone=
 fi
 
 if [[ -e "$1" ]]; then 
@@ -143,9 +145,9 @@ while true; do
   printf "\n"
 
   if [[ $qqf_FullStandalone ]]; then 
-    printColor "\n\n  qqf - Full Standalone > "
-    printf "Make sure to run option 'qqf' from the qqX VM menu"  
-    printf "\n\n  each time the VM is swapped and to run [r] to refresh"  
+    printColor "\n\n  qqf - Full Standalone >  "
+    printf "Running option 'qqf' from the qqX menu will set/reset targeted VM variables."  
+    printf "\n\n  Re-run to target a specific VM, or if the VM is swapped.  Use [r] to refresh"  
     printf "\n"
   fi
 
