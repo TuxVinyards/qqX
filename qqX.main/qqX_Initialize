@@ -57,25 +57,26 @@ fi
 # Usage needs to be loaded early on, so it can be shown if initial help is required
 show_CLI_usage () {
 
-  printf     "\n  Command line Usage"  
-  printf     "\n\n  qqX --version  &  qqX --help  as standard"
-  printf     "\n\n\n  Plain 'qqX' to start the distro/vm selector menu"    
-  printf     "\n\n  Or qqX \"[/path/to/vms-folder/]vm-name.conf\" to start a specific machine."
-  printf     "\n\n  To set up an ISO: qqX \"iso_name.iso\" or \"/path/iso_name.iso\" "
-  printf     "\n\n  Or analyse a Qcow2 disk: qqX \"disk_name.qcow2\" or \"/path/disk_name.qcow2\" "
-
-  printf     "\n\n\n  Mouse click - Right:"
-  printf     "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."
-  printf     "\n\n  On a .qcow2 disk will 'open-with' into the qqX disk analyser."
-  printf     "\n\n  Also the .conf and using 'open-with' may also be enabled. See the qqX wiki."
-
-  printf    "\n\n\n  Mouse click - Left:"
-  printf     "\n\n  On a .conf file and 'run in terminal' will open directly to the distro's individual menu"
-  printf     "\n\n  The first line of the .conf must have been edited to point to qqX instead of quickemu,"   
-  printf     "\n\n  eg. #!/usr/bin/quickemu --vm  becomes  #!/usr/bin/qqX --vm  or similar (VM name not needed)" 
-  printf     "\n\n  and the .conf file permissions must have been set to executable. See qqX [tune] utility." 
-
-  printf    "\n\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
+  printf     "\n  Command line Usage:"  
+  printf   "\n\n 'qqX' to start the distro/vm selector menu,"
+  printf   "\n\n  qqX \"vm-name.conf\" or \"path/vm-name.conf\" to start a specific machine,"
+  printf   "\n\n  qqX --version & qqX --help  as standard"
+  printf   "\n"
+  printf   "\n\n  To set up an ISO: qqX \"iso_name.iso\" or \"/path/iso_name.iso\" "
+  printf   "\n\n  Or to analyse a Qcow2 disk: qqX \"disk_name.qcow2\" or \"/path/disk_name.qcow2\" "
+  printf   "\n\n  To non-specifically open the Qcow2 mounter use \'qqX --qqf\'"
+  printf   "\n"
+  printf   "\n\n  Mouse click - Right:"
+  printf   "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."
+  printf   "\n\n  On a .qcow2 disk will open-with to the qqX disk analyser & mounter."
+  printf   "\n\n  On a .conf file will open-with to the VM control menu."
+  printf   "\n"
+  printf   "\n\n  Mouse click - Left:"
+  printf   "\n\n  Double click .conf files or select 'run in terminal' "
+  printf   "\n\n  Adjust behaviour using qqX [tune]"
+  printf   "\n"
+  printf   "\n\n  More Help:"
+  printf   "\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
 
 }
 

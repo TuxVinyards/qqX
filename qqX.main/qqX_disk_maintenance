@@ -758,10 +758,9 @@ qcow2_filemanagement_launcher () {
 
   # allow for custom mounting scripts
   if [[ $qqf_StandaloneInfo ]]; then 
-    printf "\n\n  Standard Option [qf] is normally sufficient, in most distros,"
-    printf "\n\n  but if qf is not opening a new terminal as it should do" 
-    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt"
-    printf "\n\n\n  The qqf VM variables have now been set/reset."
+    printf "\n\n  This option will set/reset the necessary VM variables for the QF standalone."
+    printf "\n\n  If the Standard Option [qf] is not opening a new terminal, as it should do," 
+    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt."
     printColor "\n\n  [enter] to return"
     printf "\n\n"
     read -rp "  >  "
