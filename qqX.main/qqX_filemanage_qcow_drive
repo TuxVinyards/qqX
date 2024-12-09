@@ -26,15 +26,9 @@
 #  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
 
 
-# Allow full standalone running of qcow2 file management utility
-if [[ $1 == "--qqf" ]]; then 
-  if [[ ! -e "/tmp/qqX_nbd_vars" ]]; then
-    printf "\n  Qcow2 File Manager Utility - Full Standalone Mode"
-    printf "\n\n  ERROR: Run Option 'qqf' from a qqX VM menu > qqF transfer file not found ....\n\n"  ; sleep 2 ; exit
-  fi
-  qqf_FullStandalone=1 ; shift
-else 
-  qqf_FullStandalone=
+# Allow generic standalone running of qcow2 file management utility (early qqX shard)
+if [[ $1 == "--qqf" ]]; then qqf_FullStandalone=1 ; shift
+else  qqf_FullStandalone=
 fi
 
 source "/tmp/qqX_nbd_vars"
@@ -152,8 +146,9 @@ while true; do
 
   if [[ $qqf_FullStandalone ]]; then 
     printColor "\n\n  qqf - Full Standalone >  "
-    printf "Running option 'qqf' from the qqX menu will set/reset targeted VM variables."  
-    printf "\n\n  Re-run to target a specific VM, or if the VM is swapped.  Use [r] to refresh"  
+    printf "\n\n  Use option 'qqf' from the qqX menu to populate the VM drives."  
+    printf "\n\n  For spot input, use mouse right click or CLI. See qqX --help for details."  
+    printf "\n\n  Re-run option 'qqf' if the VM is swapped.  Follow with [r] to refresh"
     printf "\n"
   fi
 

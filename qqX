@@ -98,8 +98,13 @@ if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files
 # Read secure folder for custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
 qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
 
-# Allows CLI launched standalone running of qcow2 file management utility (using main qqX to refresh the nbd vars)
+# qqF standalone  > CL launched running of qcow2 file management utility (using main qqX to refresh the nbd vars)
+# early launch following the location of 'qqX_MainFolder' (and guessed filemanager)
 if [[ $1 == "--qqf" ]]; then 
+  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+    printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
+    printf "\n FileManager=\"%s\"" "xdg-open"
+  } > "/tmp/qqX_nbd_vars"  
   if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
     "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 
   else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit 
