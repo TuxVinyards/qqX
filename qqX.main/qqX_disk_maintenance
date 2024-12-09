@@ -734,36 +734,41 @@ qcow2_filemanagement_launcher () {
   local UserTerm=
   UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
 
+  if [[ $qqf_StandaloneInfo ]]; then 
+  printf "\n\n  This option will set/reset the necessary VM variables for the QF standalone."
+  printf "\n\n  If the Standard Option [qf] is not opening a new terminal, as it should do," 
+  printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt."
+  printColor "\n\n  [enter] to return  [k] to skip"
+  printf "\n\n"
+  read -rp "  >  "  qqf_Skip_SetVars
+  fi
 
-  # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
-  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
-    printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
-    printf "\n FileManager=\"%s\"" "$FileManager"
-    printf "\n TextEditor=\"%s\"" "$TextEditor"
-    printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
-    printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
-    printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
-    printf "\n LiveBoot=\"%s\"" "$LiveBoot"
-    printf "\n qqf_Input_Drivepath=\"%s\"" "$qqf_Input_Drivepath"
-    printf "\n MainDrive=\"%s\"" "$MainDrive"
-    printf "\n SecondDrive=\"%s\"" "$SecondDrive"
-    printf "\n SharedDrive=\"%s\"" "$SharedDrive"
-    printf "\n UserTerm=\"%s\"" "$UserTerm"
-    printf "\n NoClear=\"%s\"" "$NoClear"
-    printf "\n Trace_InputVars=\"%s\"" "$Trace_InputVars"
-  } > "/tmp/qqX_nbd_vars"
-
+  if [[ $qqf_Skip_SetVars ]]; then qqf_Skip_SetVars=
+  else
+    # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
+    { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+      printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
+      printf "\n FileManager=\"%s\"" "$FileManager"
+      printf "\n TextEditor=\"%s\"" "$TextEditor"
+      printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
+      printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
+      printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
+      printf "\n LiveBoot=\"%s\"" "$LiveBoot"
+      printf "\n qqf_Input_Drivepath=\"%s\"" "$qqf_Input_Drivepath"
+      printf "\n MainDrive=\"%s\"" "$MainDrive"
+      printf "\n SecondDrive=\"%s\"" "$SecondDrive"
+      printf "\n SharedDrive=\"%s\"" "$SharedDrive"
+      printf "\n UserTerm=\"%s\"" "$UserTerm"
+      printf "\n NoClear=\"%s\"" "$NoClear"
+      printf "\n Trace_InputVars=\"%s\"" "$Trace_InputVars"
+      printf "\n"
+    } > "/tmp/qqX_nbd_vars"
+  fi
+  
   if [[ $Trace_InputVars ]]; then echo; cat "/tmp/qqX_nbd_vars"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
-
-  # allow for custom mounting scripts
   if [[ $qqf_StandaloneInfo ]]; then 
-    printf "\n\n  This option will set/reset the necessary VM variables for the QF standalone."
-    printf "\n\n  If the Standard Option [qf] is not opening a new terminal, as it should do," 
-    printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt."
-    printColor "\n\n  [enter] to return"
-    printf "\n\n"
-    read -rp "  >  "
+    return
   elif [[ $qqf_SetVars ]]; then 
     return
   elif [[ $qqf_Input_Drivepath ]]; then 

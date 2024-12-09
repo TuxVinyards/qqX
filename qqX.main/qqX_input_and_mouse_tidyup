@@ -124,7 +124,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
     qqf_Input_Drivepath="$(realpath "$QCOW_Input_Conf_Dir/$QCOW_Input_DiskName")"
     if [[ $Trace_InputVars ]]; then echo "Tidy requested Path: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
     qcow2_filemanagement_launcher "$qqf_Input_Drivepath"
-    sleep 3
+    sleep 2
     exit directly
   fi
 

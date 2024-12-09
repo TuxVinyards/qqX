@@ -145,14 +145,14 @@ while true; do
   printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager." 
   printf "\n"
 
-  if [[ $qqf_FullStandalone ]]; then 
+  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_FullStandalone ]]; then 
     printColor "\n\n  qqf - Full Standalone >  "
     printf "\n\n  Use option 'qqf' from the qqX menu to populate the VM drives."  
     printf "\n\n  For spot input, use mouse right click or CLI. See qqX --help for details."  
     printf "\n"
   fi
 
-  if [[ $InputAvailable ]] && [[ ! $qqf_FullStandalone ]]; then 
+  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_FullStandalone ]]; then 
     printColor "\n\n  qqf - Spot Input  >  "
     printf "  Use option 'qqf' from the qqX menu to populate the VM drives."  
     printf "\n"
@@ -239,7 +239,7 @@ while true; do
   fi
 
   printColor "\n\n\n  [enter] to change the connections   or  [option] for different selection  "
-  printf "\n\n  [r] to refresh  [f] open in file-manager   [h] help   [q] to quit "
+  printf "\n\n  [r] to refresh vars  [f] open drive in file-manager  [h] help   [q] to quit "
 
   printf "\n\n"
   read -rp "  >  " qf_DriveSelect
@@ -258,7 +258,11 @@ while true; do
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then nohup &> /dev/null  "$TextEditor"  "$0" &
   elif [[ $qf_DriveSelect == "f" ]]; then nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" &
-  elif [[ $qf_DriveSelect == "r" ]]; then source "/tmp/qqX_nbd_vars" ; load_qf_defaults
+  elif [[ $qf_DriveSelect == "r" ]]; then
+    if [[ $qqf_Input_Drivepath ]]; then 
+      printf "\n qqf_Input_Drivepath=\"%s\" \n" "$qqf_Input_Drivepath" >> "/tmp/qqX_nbd_vars"
+    fi
+    source "/tmp/qqX_nbd_vars" ; load_qf_defaults ; HideRefreshMsgs=1
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
 
