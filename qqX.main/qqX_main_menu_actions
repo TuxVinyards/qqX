@@ -164,7 +164,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "gt" ]] ; then  
   
     # also see "vm" option
-
+    source "$ConfClearanceLog"
     # no need to reload the arrays
     ByPass_VM_Array_Loader=1
     # but run the selector
@@ -385,7 +385,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
     # also see "gt" option
-
+    source "$ConfClearanceLog"
     # no need to reload the arrays
     ByPass_VM_Array_Loader=1
     # but run the selector
