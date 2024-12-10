@@ -66,13 +66,13 @@ check_for_qqX_updates() {
 
   # Quietly do a check for new releases 
   curl -sLf -m 10 -o "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest" 
-  qqX_LatestRelease="$(floatversion -M "$(grep -i 'tag_name' "/tmp/latest-qqX")")"
+  [[ -e "/tmp/latest-qqX" ]] && qqX_LatestRelease="$(floatversion -M "$(grep -si 'tag_name' "/tmp/latest-qqX")" 2>/dev/null)"
 
   if [[ $qqX_LatestRelease ]]; then
 
     # find tarball > eg. "https://github.com/TuxVinyards/qqX/releases/download/$qqX_LatestRelease/qqX-$qqX_LatestRelease.tar.gz"
-    if [[ "$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -c download)" == "2" ]] ; then
-      qqX_Latest_Secure_TarBall="$(tr '"' '\n' < "/tmp/latest-qqX" | grep http | grep -m 1 download)"
+    if [[ "$(tr '"' '\n' < "/tmp/latest-qqX" | grep -s http | grep -sc download)" == "2" ]] ; then
+      qqX_Latest_Secure_TarBall="$(tr '"' '\n' < "/tmp/latest-qqX" | grep -s http | grep -s -m 1 download)"
       qqX_Latest_Secure_TarSha="${qqX_Latest_Secure_TarBall}.sha256"
     fi
 
@@ -102,7 +102,7 @@ check_for_qqX_updates() {
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
 
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
-      if  floatversion --gt "$qqX_LatestRelease  $qqX_Version" ; then
+      if  floatversion --gt "$qqX_LatestRelease  $qqX_Version" 2>/dev/null ; then
         { printf "\n\n qqX_UpdateAvail=\"1\""   
           printf "\n\n qqX_LatestRelease=\"%s\""  "$qqX_LatestRelease" 
           printf "\n\n qqX_Latest_Secure_TarBall=\"%s\""  "$qqX_Latest_Secure_TarBall" 
@@ -127,7 +127,7 @@ function download_new_release {
     if [[ ! $qqX_Latest_Secure_TarBall ]] ; then printColor "\n\n  ERROR  No latest release found.  Reload & retry ..."
     else 
       printf "\n\n  %s \n"  "$qqX_Latest_Secure_TarBall"
-      AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -A 12 'body')"
+      AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -sA 12 'body')"
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
       AboutRelease="${AboutRelease//\"/}"

@@ -228,7 +228,7 @@ function show_qqX_general_help {
 function multi_instance_checks {
 
   local MultiInstanceCount="0"
-  # count exact match, and ignore side routines (and 'A' ancestors as in sub-shell)
+  # count exact match, and ignore side routines (with 'A' not-ancestors as in sub-shell)
   MultiInstanceCount="$(pgrep -aAx 'qqX' | grep -civ '.qcow2')"
   MultiQuit=
   KillQQ=
