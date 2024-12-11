@@ -236,10 +236,10 @@ function multi_instance_checks {
   if [[ $MultiInstanceCount -gt 1 ]]; then 
 
     tput sc
-    qqX_logo_printf_title  "WARNING: more than one instance of qqX appears to be running "
-    printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed. "
-    printf "\n\n\n  For *simple* usage, it can be safe to continue ..."
-    printf "\n\n  BUT as long as the other instance's code base has not been hot-swapped."
+    qqX_logo_printf_title  "CAUTION: more than one instance of qqX appears to be running "
+    printf "\n"
+    printf "\n\n  QEMU will lock protect key files and will prevent VM's being run simultaneously ..."
+    printf "\n\n  Simple usage can be possible but be aware that minor cross-linking problems could occur"
 
     CurrentQQ="$(ps | awk '/qqX/{print $1}')"
     OtherQQ="$(pgrep -ax qqX | grep -v "$CurrentQQ")"
