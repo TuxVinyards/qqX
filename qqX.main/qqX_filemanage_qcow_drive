@@ -26,9 +26,9 @@
 #  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
 
 
-# Allow generic standalone running of qcow2 file management utility (early qqX shard)
-if [[ $1 == "--qqf" ]]; then qqf_FullStandalone=1 ; shift
-else  qqf_FullStandalone=
+# Sharded generic standalone running of qcow2 file management utility
+if [[ $1 == "--qqf" ]]; then qqf_Standalone=1 ; shift
+else  qqf_Standalone=
 fi
 
 source "/tmp/qqX_nbd_vars"
@@ -47,12 +47,11 @@ if [[ ! $(type -p "$FileManager") ]] ; then
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 
-if [[ ! $qqf_FullStandalone ]]; then
+if [[ ! $qqf_Standalone ]]; then
   # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
   # New PID always goes on end of list but pgrep sub-shell creates another.
   # kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
   # gnome based terminals open just one and with a 'bash' nomination.
-
   if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
     ThisPID="$(pgrep -n "$UserTerm")"
       while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
@@ -145,14 +144,13 @@ while true; do
   printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager." 
   printf "\n"
 
-  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_FullStandalone ]]; then 
-    printColor "\n\n  qqf - Full Standalone >  "
+  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_Standalone ]]; then 
+    printColor "\n\n  qqf - standalone >  "
     printf "\n\n  Use option 'qqf' from the qqX menu to populate the VM drives."  
     printf "\n\n  For spot input, use mouse right click or CLI. See qqX --help for details."  
     printf "\n"
   fi
-
-  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_FullStandalone ]]; then 
+  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_Standalone ]]; then 
     printColor "\n\n  qqf - Spot Input  >  "
     printf "  Use option 'qqf' from the qqX menu to populate the VM drives."  
     printf "\n"

@@ -58,7 +58,7 @@ if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then 
 if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
 
 # For general FAULT TRACING set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less.
-NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=
+NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars= ; ShowProcesses=
 
 function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
@@ -199,6 +199,8 @@ fi
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
 [[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
+
+[[ $QF_exit_to_Main ]] && printf "\033c" &&  multi_instance_checks
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
