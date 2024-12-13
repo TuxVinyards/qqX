@@ -47,24 +47,22 @@ if [[ ! $(type -p "$FileManager") ]] ; then
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 
-if [[ ! $qqf_Standalone ]]; then
-  # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
-  # New PID always goes on end of list but pgrep sub-shell creates another.
-  # kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
-  # gnome based terminals open just one and with a 'bash' nomination.
-  if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
-    ThisPID="$(pgrep -n "$UserTerm")"
-      while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
-      ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
-      if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
-    done
-  else
-    ThisPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | tail -n 2 | head -n 1)"
+# One control window per VM. Auto-closes others if new one opened. Avoids confusion.
+# New PID always goes on end of list but pgrep sub-shell creates another.
+# kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
+# gnome based terminals open just one and with a 'bash' nomination.
+if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
+  ThisPID="$(pgrep -n "$UserTerm")"
     while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
-      ChkPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | head -n 1)"
-      if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
-    done
-  fi
+    ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
+    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+  done
+else
+  ThisPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | tail -n 2 | head -n 1)"
+  while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
+    ChkPID="$(pgrep -af qqX_filemanage | cut -d' ' -f1 | head -n 1)"
+    if [[ $ChkPID == "$ThisPID" ]] ; then break ; else kill "$ChkPID" 2>/dev/null ; fi
+  done
 fi
 
 show_nbd_help () {
