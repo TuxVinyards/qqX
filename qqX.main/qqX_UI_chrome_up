@@ -246,15 +246,15 @@ function multi_instance_checks {
   CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ")"
 
   # All qqX, exactly, so exclude 'qqX_copy_over'  
-  # pgrep -aAx qqX doesn't count itself ..... (grep -sv not needed) REVIEW 
-  #AnotherQQ="$(pgrep -af qqX | grep -sv "$CurrentQQ")"
-  #AnotherQQ="$(pgrep -af qqX | grep -sv 'qqX_copy_over')"
-  AnotherQQ="$(pgrep -aA qqX 2>/dev/null)"
-  [[ $ShowProcesses ]] && OtherQQ="$(pgrep -aAx qqX 2>/dev/null)"
+  # pgrep -aAxi qqX doesn't count itself ..... (grep -sv not needed) REVIEW 
+  #AnotherQQ="$(pgrep -afi qqX | grep -sv "$CurrentQQ")"
+  #AnotherQQ="$(pgrep -afi qqX | grep -sv 'qqX_copy_over')"
+  AnotherQQ="$(pgrep -aAi qqX 2>/dev/null)"
+  [[ $ShowProcesses ]] && OtherQQ="$(pgrep -aAxi qqX 2>/dev/null)"
 
   # Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
-  # Running CL instances will show up with 'pgrep -aAx qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
-  # With pgrep -af qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
+  # Running CL instances will show up with 'pgrep -aAxi qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
+  # With pgrep -afi qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
 
   if [[ $ShowProcesses ]]; then 
     echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"  

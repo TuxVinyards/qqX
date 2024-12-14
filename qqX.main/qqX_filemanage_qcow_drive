@@ -25,6 +25,8 @@
 #  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected 
 #  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
 
+tput civis
+
 # Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
 sleep 0.4
 
