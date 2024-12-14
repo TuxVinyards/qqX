@@ -27,8 +27,8 @@
 
 
 # Sharded generic standalone running of qcow2 file management utility
-if [[ $1 == "--qqf" ]]; then qqf_Standalone=1 ; shift
-else  qqf_Standalone=
+if [[ $1 == "--qqf" ]]; then qqf_CmdLineStart=1 ; shift
+else  qqf_CmdLineStart=
 fi
 
 source "/tmp/qqX_nbd_vars"
@@ -136,21 +136,24 @@ while true; do
   printf "\033c"
   qqX_logo_printf_title "File Manager Utility for mounting/unmounting and for connecting QCOW2 drives"
   [[ "$(basename "$0")" == custom* ]] && printColor "  -  custom version"
-  printf "\n\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
+  printf "\n"
+  printf "\n\n  This terminal window is PROCESS SEPARATED from qqX and may be LEFT OPEN, repositioned or minimized"
   printf "\n\n  The elevated permissions required to prepare the drives will remain isolated."
+  printf "\n\n  Any opening of new qqF windows will terminate other qqF instances that are running."
+  printf "\n"
   printf "\n\n  Run option 'qqf' from the qqX menu if the VM is swapped.  Follow with [r] to refresh"
   printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager." 
   printf "\n"
 
-  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_Standalone ]]; then 
-    printColor "\n\n  qqf - standalone >  "
-    printf "\n\n  Use option 'qqf' from the qqX menu to populate the VM drives."  
-    printf "\n\n  For spot input, use mouse right click or CLI. See qqX --help for details."  
+  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_CmdLineStart ]]; then 
+    printColor "\n\n  qqF - Cmd Line Start  >  "
+    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
+    printf "\n\n  Or for spot input, use mouse right click or CLI. See qqX --help for details."  
     printf "\n"
   fi
-  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_Standalone ]]; then 
-    printColor "\n\n  qqf - Spot Input  >  "
-    printf "  Use option 'qqf' from the qqX menu to populate the VM drives."  
+  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_CmdLineStart ]]; then 
+    printColor "\n\n  qqF - Spot Input  >  "
+    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
     printf "\n"
   fi
 

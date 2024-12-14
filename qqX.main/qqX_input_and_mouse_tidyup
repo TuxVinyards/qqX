@@ -38,6 +38,9 @@ fi
 if [[ $Trace_InputVars ]]; then  echo; echo "qqX VM = $XDG_Input_VM_qqX  I $VM_InstanceName" ; echo "Cf $VM_Conf_File" ; sleep "$Trace_InputVars" ; fi
 
 input_re_route () {
+  if [[ $XDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
+    printColor "\n\n Note that opening of new qqF windows will terminate other qqF instances that are running"
+  fi
   printf "\n\n  [enter] to run qqX   "
   [[ $XDG_MimeType_is_QCOW ]] && printf "[qf] open qcow2 in file manager   "
   printf "[c] to close \n\n"
@@ -93,7 +96,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
   if [[ $XDG_Input_NON_qqX ]]; then  
     printColor "\n\n See  https://qemu.readthedocs.io  "
-    printf  "> QEMU disk image utility or qqX's 'qf' may be useful"
+    printf  "> QEMU's disk image utility or the qf/qqF drive mounter may be useful"
     InputReRouted=1
     input_re_route
   else  
