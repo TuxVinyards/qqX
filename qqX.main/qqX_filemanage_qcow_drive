@@ -25,6 +25,8 @@
 #  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected 
 #  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
 
+# Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
+sleep 0.4
 
 # Sharded generic standalone running of qcow2 file management utility
 if [[ $1 == "--qqf" ]]; then qqf_CmdLineStart=1 ; shift
@@ -49,8 +51,11 @@ fi
 
 # One control window per VM. Auto-closes others if new one opened. Avoids confusion.
 # New PID always goes on end of list but pgrep sub-shell creates another.
-# kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
-# gnome based terminals open just one and with a 'bash' nomination.
+
+# Note: kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
+# and gnome based terminals open just one and with a 'bash' nomination. 
+# Also see function 'multi_instance_checks' in 'UI_chrome_up' ...
+
 if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
   ThisPID="$(pgrep -n "$UserTerm")"
     while [[ "$(pgrep -af qqX_filemanage)" ]] ; do

@@ -727,9 +727,8 @@ qcow2_filemanagement_launcher () {
   # resize qqf terminal a tad, if possible, to make it easier to see that there are two terms open
   Terminal_Start="${Terminal_Start/150/170}"
   Terminal_Start="${Terminal_Start/145/170}"
-  Terminal_Start="${Terminal_Start/x55/x40}"
-  Terminal_Start="${Terminal_Start/x50/x40}"
-  Terminal_Start="${Terminal_Start/x45/x40}"
+  Terminal_Start="${Terminal_Start/x55/x45}"
+  Terminal_Start="${Terminal_Start/x50/x45}"
 
   local UserTerm=
   UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"

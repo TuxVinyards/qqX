@@ -233,19 +233,28 @@ function multi_instance_checks {
   CurrentQQ_LastField=
   OtherQQ=
 
+  # Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
+  sleep 0.6
+
   if [[ $ShowProcesses ]]; then 
     pgrep -an
     read -rp " >  "
   fi
 
-  CurrentQQ="$(pgrep -an)"
+  CurrentQQ="$(pgrep -an 2>/dev/null)"
   CurrentQQ_LastField="$(awk '{print $NF}' <<< "$CurrentQQ")"
   CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ")"
 
   # All qqX, exactly, so exclude 'qqX_copy_over'  
   # pgrep -aAx qqX doesn't count itself ..... (grep -sv not needed) REVIEW 
-  AnotherQQ="$(pgrep -aAx qqX | grep -sv "$CurrentQQ")"
-  OtherQQ="$(pgrep -aAx qqX)"
+  #AnotherQQ="$(pgrep -af qqX | grep -sv "$CurrentQQ")"
+  #AnotherQQ="$(pgrep -af qqX | grep -sv 'qqX_copy_over')"
+  AnotherQQ="$(pgrep -aA qqX 2>/dev/null)"
+  OtherQQ="$(pgrep -aAx qqX 2>/dev/null)"
+
+  # Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
+  # Running CL instances will show up with 'pgrep -aAx qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
+  # With pgrep -af qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
 
   if [[ $ShowProcesses ]]; then 
     echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"  
@@ -255,8 +264,11 @@ function multi_instance_checks {
     read -rp " >  "
   fi
 
-  if [[ "$CurrentQQ_LastField" == *'.qcow2'* ]] && [[ ! $QF_exit_to_Main ]]; then CurrentQQ="qcow"
-  else CurrentQQ="main"
+  CurrentQQ_mode="main"
+  if [[ ! $QF_exit_to_Main ]]; then
+    case "$CurrentQQ_LastField" in
+      *'.qcow2'*|*'--qqf'*|*'qqX_filemanage '*) CurrentQQ_mode="qcow" ;;
+    esac
   fi
 
   if [[ $OtherQQ ]]; then 
@@ -279,7 +291,31 @@ function multi_instance_checks {
     fi
   fi
 
-  if [[ $OtherQQ ]] && [[ $CurrentQQ == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
+  if [[ $AnotherQQ ]]; then 
+    OtherQQ_MainArr=()
+    OtherQQ_F_Arr=()
+    mapfile -t AnotherQQ_Arr <<< "$AnotherQQ"
+    for QQ in "${AnotherQQ_Arr[@]}"; do
+      if [[ "$QQ" != *"$CurrentQQ"* ]]; then
+        if [[ "$QQ" == *'.qcow2'* ]] || [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage '* ]]; then 
+          OtherQQ_F_Arr+=("$(awk '{print $1}' <<< "$QQ")")
+          # starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. REVIEW 
+          [[ $QF_exit_to_Main ]] && OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        fi
+      fi
+    done
+    if [[ $ShowProcesses ]]; then 
+      echo; declare -p AnotherQQ_Arr; echo
+      echo; declare -p OtherQQ_MainArr; echo
+      echo; declare -p OtherQQ_F_Arr; echo
+      read -rp " >  "
+    fi
+  fi
+
+  #if [[ $OtherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
+
+  if [[ $AnotherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
 
     tput sc
     qqX_logo_printf_title  "CAUTION: more than one instance of qqX appears to be running "
@@ -313,7 +349,7 @@ function multi_instance_checks {
     
   fi
 
-  if [[ "$(pgrep quickgui)" ]] ; then
+  if [[ "$(pgrep quickgui 2>/dev/null)" ]] ; then
 
     printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running " 
     printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"

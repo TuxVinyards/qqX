@@ -38,7 +38,7 @@ fi
 if [[ $Trace_InputVars ]]; then  echo; echo "qqX VM = $XDG_Input_VM_qqX  I $VM_InstanceName" ; echo "Cf $VM_Conf_File" ; sleep "$Trace_InputVars" ; fi
 
 input_re_route () {
-  if [[ $XDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
+  if [[ $xxXDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
     printColor "\n\n Note that opening of new qqF windows will terminate other qqF instances that are running"
   fi
   printf "\n\n  [enter] to run qqX   "
@@ -93,6 +93,10 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 
   # show disk info:
   "$QEMU_IMG" info "$QCOW_Input_Dir/$QCOW_Input_DiskName"
+
+  if [[ $XDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
+    printColor "\n\n Note that opening of new qqF windows will terminate other qqF instances that are running"
+  fi
 
   if [[ $XDG_Input_NON_qqX ]]; then  
     printColor "\n\n See  https://qemu.readthedocs.io  "

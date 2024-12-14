@@ -41,6 +41,8 @@
 # Posix compliant Terminal output check
 if [ ! -t 1 ]; then exit ; fi
 
+tput civis
+
 #  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale (Also see qqX_Initialize)
 if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
@@ -50,6 +52,9 @@ fi
 # Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
 # Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
   qqX_Version="1.11.0.04"
+
+# Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
+sleep 0.4
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
@@ -200,7 +205,7 @@ fi
 
 [[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
 
-[[ $QF_exit_to_Main ]] && printf "\033c" &&  multi_instance_checks
+[[ $QF_exit_to_Main ]] && printf "\033c"  && sleep 0.6  &&  multi_instance_checks
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
