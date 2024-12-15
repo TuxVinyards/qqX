@@ -229,26 +229,39 @@ function multi_instance_checks {
 
   MultiQuit=
   KillQQ=
+  CurrentQQ_FullLine=
   CurrentQQ=
   CurrentQQ_LastField=
   OtherQQ=
 
-  # Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
-  sleep 0.6
+  # Make sure that all current processes have been statted properly before moving on.
+  # pgrep -an is not reliable and pgrep sub-shell creates another pid too. 
+  # BUT new PID always goes on end of list so check for this until no 'kworker' grep errors
+  sleep 0.2
+  i=0
+  while true; do
+    CurrentQQ_FullLine="$(pgrep -afi qqX | tail -n 1  2>/dev/null)"
+    [[ $ShowProcesses ]] && printf "\n %s %s" "$i" "$CurrentQQ_FullLine"
+    if [[ "$CurrentQQ_FullLine" == *kworker* ]]; then sleep 0.2 ; ((i+=1))
+    else
+      CurrentQQ_LastField="$(awk '{print $NF}' <<< "$CurrentQQ_FullLine")"
+      CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ_FullLine")"
+      break
+    fi
+    if [[ $i -gt 25 ]]; then 
+      printColor "\n\n ERROR statting current PID > restart required"
+      printf "\n\n\n  [enter] to close \n\n" 
+      read -rp "  >  "
+    fi
+  done
 
-  if [[ $ShowProcesses ]]; then 
-    pgrep -an
-    read -rp " >  "
-  fi
+  # All qqX, exactly, will exclude 'qqX_copy_over' but doesn't make reading the parameters and variants too easy
+  # Also needs -i ignore case, so that CLI starts using 'qqx' (lower) get counted
 
-  CurrentQQ="$(pgrep -an 2>/dev/null)"
-  CurrentQQ_LastField="$(awk '{print $NF}' <<< "$CurrentQQ")"
-  CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ")"
-
-  # All qqX, exactly, so exclude 'qqX_copy_over'  
-  # pgrep -aAxi qqX doesn't count itself ..... (grep -sv not needed) REVIEW 
+  # pgrep -aAxi qqX doesn't count itself ..... (grep -sv not needed)  but -afi does .... REVIEW 
   #AnotherQQ="$(pgrep -afi qqX | grep -sv "$CurrentQQ")"
   #AnotherQQ="$(pgrep -afi qqX | grep -sv 'qqX_copy_over')"
+
   AnotherQQ="$(pgrep -aAi qqX 2>/dev/null)"
   [[ $ShowProcesses ]] && OtherQQ="$(pgrep -aAxi qqX 2>/dev/null)"
 
@@ -332,13 +345,18 @@ function multi_instance_checks {
 
     if [[ $MultiQuit == "k" ]]; then 
       if [[ $(pgrep kvm 2>/dev/null) ]]; then printColor "\n\n  CAUTION: Check for distros that may be running. Force closing can corrupt VM file systems ...."
-      else printColor "\n\n  Killing other qqX instances ... "
+      else
+        printf "\n\n  Killing desktop started instances will close the terminal windows."
+        printf "\n\n  CLI instances will terminate but the windows will remain open ..."
+        printColor "\n\n\n  Killing other qqX instances ... "
       fi
       printf "\n\n  [k] yes, kill  [enter] to continue with all  [q] to quit \n\n"
       read -rp "  >  "  KillQQ
       if [[ $KillQQ == "k" ]]; then
         for QQ in "${OtherQQ_MainArr[@]}"; do
-          kill "$(tr -cd '[:digit:]' <<< "$QQ")" 2>/dev/null
+          KillTarget="$(awk '{print $1}' <<< "$QQ" | tr -cd '[:digit:]' 2>/dev/null)"
+          [[ $ShowProcesses ]] && printf "\n QQ = %  > killing: %s" "$QQ" "$KillTarget"
+          kill "$KillTarget" 2>/dev/null
         done
         printColor "\n\n  Closed  \n\n" ; sleep 0.7
       elif [[ $KillQQ == "q" ]]; then exit directly

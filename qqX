@@ -53,7 +53,7 @@ fi
 # Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
   qqX_Version="1.11.0.04"
 
-# Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
+# Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
 sleep 0.4
 
 # Check name is okay. qqX but also lc qqx symlink.
@@ -205,7 +205,7 @@ fi
 
 [[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
 
-[[ $QF_exit_to_Main ]] && printf "\033c"  && sleep 0.6  &&  multi_instance_checks
+[[ $QF_exit_to_Main ]] && printf "\033c"  &&  multi_instance_checks
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
