@@ -232,7 +232,7 @@ function multi_instance_checks {
   CurrentQQ_FullLine=
   CurrentQQ=
   CurrentQQ_LastField=
-  OtherQQ=
+  AnotherQQ=
 
   # Make sure that all current processes have been statted properly before moving on.
   # pgrep -an is not reliable and pgrep sub-shell creates another pid too. 
@@ -241,7 +241,7 @@ function multi_instance_checks {
   i=0
   while true; do
     CurrentQQ_FullLine="$(pgrep -afi qqX | tail -n 1  2>/dev/null)"
-    [[ $ShowProcesses ]] && printf "\n %s %s" "$i" "$CurrentQQ_FullLine"
+    [[ $ShowProcesses ]] && printf "\n(i%s) %s " "$i" "$CurrentQQ_FullLine"
     if [[ "$CurrentQQ_FullLine" == *kworker* ]]; then sleep 0.2 ; ((i+=1))
     else
       CurrentQQ_LastField="$(awk '{print $NF}' <<< "$CurrentQQ_FullLine")"
@@ -256,22 +256,18 @@ function multi_instance_checks {
   done
 
   # All qqX, exactly, will exclude 'qqX_copy_over' but doesn't make reading the parameters and variants too easy
-  # Also needs -i ignore case, so that CLI starts using 'qqx' (lower) get counted
-
-  # pgrep -aAxi qqX doesn't count itself ..... (grep -sv not needed)  but -afi does .... REVIEW 
-  #AnotherQQ="$(pgrep -afi qqX | grep -sv "$CurrentQQ")"
-  #AnotherQQ="$(pgrep -afi qqX | grep -sv 'qqX_copy_over')"
+  # Also pgrep -aAxi qqX, with x, doesn't count itself ..... but -afi does .... REVIEW 
+  # Note: needs -i ignore case, so that CLI starts using 'qqx' (lower) get counted
 
   AnotherQQ="$(pgrep -aAi qqX 2>/dev/null)"
-  [[ $ShowProcesses ]] && OtherQQ="$(pgrep -aAxi qqX 2>/dev/null)"
 
-  # Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
+  # Also Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
   # Running CL instances will show up with 'pgrep -aAxi qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
   # With pgrep -afi qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
 
-  if [[ $ShowProcesses ]]; then 
+  if [[ $ShowProcesses ]]; then
+    echo 
     echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"  
-    echo; echo "OtherQQ:"; echo; echo "$OtherQQ"; echo
     echo; echo "AnotherQQ:"; echo; echo "$AnotherQQ"; echo
     echo; echo "QF_exit_to_Main = $QF_exit_to_Main"; echo
     read -rp " >  "
@@ -284,40 +280,24 @@ function multi_instance_checks {
     esac
   fi
 
-  if [[ $OtherQQ ]]; then 
-    OtherQQ_MainArr=()
-    OtherQQ_F_Arr=()
-    mapfile -t OtherQQ_Arr <<< "$OtherQQ"
-    for QQ in "${OtherQQ_Arr[@]}"; do
-      if [[ "$QQ" == *'.qcow2'* ]]; then 
-        OtherQQ_F_Arr+=("$(awk '{print $1}' <<< "$QQ")")
-        # starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. REVIEW 
-        [[ "${#OtherQQ_F_Arr[@]}" -ge 1 ]] && OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
-      else OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
-      fi
-    done
-    if [[ $ShowProcesses ]]; then 
-      echo; declare -p OtherQQ_Arr; echo
-      echo; declare -p OtherQQ_MainArr; echo
-      echo; declare -p OtherQQ_F_Arr; echo
-      read -rp " >  "
-    fi
-  fi
-
   if [[ $AnotherQQ ]]; then 
     OtherQQ_MainArr=()
     OtherQQ_F_Arr=()
     mapfile -t AnotherQQ_Arr <<< "$AnotherQQ"
     for QQ in "${AnotherQQ_Arr[@]}"; do
       if [[ "$QQ" != *"$CurrentQQ"* ]]; then
-        if [[ "$QQ" == *'.qcow2'* ]] || [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage '* ]]; then 
+        if [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage'* ]]; then 
           OtherQQ_F_Arr+=("$(awk '{print $1}' <<< "$QQ")")
-          # starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. REVIEW 
-          [[ $QF_exit_to_Main ]] && OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
-        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then 
+          OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        elif [[ $QF_exit_to_Main ]] && [[ "$QQ" != *'qqX_copy_over'* ]]; then  
+          OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
         fi
       fi
     done
+    # Starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. 
+    # .qcow2 remains when 'exit to main' but changes to 'filemanage' when switching to QF
+    # while elif [[ "$QQ" == *'.qcow2'* ]]; gets included in [[ "$QQ" != *'qqX_copy_over'* ]]
     if [[ $ShowProcesses ]]; then 
       echo; declare -p AnotherQQ_Arr; echo
       echo; declare -p OtherQQ_MainArr; echo
@@ -325,8 +305,6 @@ function multi_instance_checks {
       read -rp " >  "
     fi
   fi
-
-  #if [[ $OtherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
 
   if [[ $AnotherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
 

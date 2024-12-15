@@ -65,6 +65,7 @@ if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
 # For general FAULT TRACING set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less.
 NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars= ; ShowProcesses=
 
+
 function dev_loop_check {
     if [[ $GeneralLoopCheck ]]; then
     echo
