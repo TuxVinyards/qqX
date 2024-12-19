@@ -546,7 +546,7 @@ else
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
       [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
-      [[ ! -x $(type -p qqx) ]] || [[ ! -x $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin need chmod +x"
+      [[ ! -x $(type -p qqx) ]] || [[ ! -x $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin need chmod a+rx"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
       [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
       printf "\n\n  [enter] to close & investigate \n\n"
@@ -876,7 +876,7 @@ if [[ ! $SkipMkLauncher ]]; then
     
     make_desktop_content | sudo tee "$XDG_GUI_desktop_PathName"  1>/dev/null
 
-    sudo chmod +x  "$XDG_GUI_desktop_PathName"
+    sudo chmod a+rx  "$XDG_GUI_desktop_PathName"
 
     # Useful:  
     # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
