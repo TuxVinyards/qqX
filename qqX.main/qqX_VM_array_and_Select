@@ -295,6 +295,8 @@ VM_loader_selector_and_menu () {
           VM_Selection=
         }
 
+        path_diagnostics
+
         printf "\n\n"
         read -rp  "   >  "  VM_Selection
 

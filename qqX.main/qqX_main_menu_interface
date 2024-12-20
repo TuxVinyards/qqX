@@ -330,6 +330,8 @@ else
     printf  "  [enter] refresh   "
     [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
     printf " [h] show help & info  [q] quit \n\n"
+
+    path_diagnostics
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }
