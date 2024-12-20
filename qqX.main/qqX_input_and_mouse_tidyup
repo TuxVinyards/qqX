@@ -280,7 +280,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
           printf '#!' ; printf "/usr/bin/qqX --vm"
           printf "\n\nguest_os=\"linux\""
           printf "\ndisk_img=\"%s/disk.qcow2\"" "$QWG_NewVM_Name"
-          printf "\ndisk_size=\"64G\""
+          printf "\ndisk_size=\"128G\""
           printf "\niso=\"%s\"" "$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
 
         } > "$QWG_Conf_Dir/$QWG_NewVM_Name.conf"
