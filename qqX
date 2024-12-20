@@ -59,8 +59,9 @@ sleep 0.4
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-# DEV Start is used as flag to show which source is being used, if starting qqX directly from a source folder i.e "./"  
-if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
+# DEV Start is used as flag to show which source is being used. Check if starting qqX directly from a source folder
+# i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present
+if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
 # For general FAULT TRACING set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less.
 NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars= ; ShowProcesses=
