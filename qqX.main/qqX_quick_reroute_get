@@ -199,13 +199,12 @@ function_test_iso_url () {
 
 
 function show_current_group_folder_list {
-
   i=0
   CurrentFolder_Recognised=
-  [[ ! $CurrentFolder ]] && CurrentFolder="$(pwd)"
-
+  if [[ $QWG_Conf_Dir ]]; then CurrentFolder="$QWG_Conf_Dir"
+  elif [[ ! $CurrentFolder ]]; then  CurrentFolder="$(pwd)"
+  fi
   while [[ ${VM_Folder_List[i]} ]]; do
-
     if [[ $CurrentFolder == "$Default_VM_Folder" ]]; then
       if [[ $i -eq 0 ]]; then printColor "\n  [0]  %s (current/default)"  "${VM_Folder_List[i]}"
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
@@ -216,10 +215,8 @@ function show_current_group_folder_list {
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
     fi
-
     [[ ${VM_Folder_List[i]} == "$CurrentFolder" ]] && CurrentFolder_Recognised=1
     ((i +=1))
-
   done
 }
 
@@ -233,8 +230,7 @@ function check_new_vm_folder_name {
 
     if [[ $(ls -h "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null) ]]; then
       [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
-    else
-      rm -d "$QWG_Conf_Dir/$QWG_NewVM_Name" 
+    else rm -d "$QWG_Conf_Dir/$QWG_NewVM_Name" 
     fi
     
   else

@@ -185,17 +185,19 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
     # If name then start 
     if [[ $ISO_NewVM_Name == "b" ]]; then 
       ISO_NewVM_Name=
+
     elif [[ $ISO_NewVM_Name ]]; then
+
       QWG_Conf_Dir="$CurrentFolder"
       QGW_OverWriteAllow=
       QGW_OverWriteAlert=
-      printColor "\n\n  New VM Name =  %s" "$ISO_NewVM_Name"
-      printf "\n\n  Preset Group Folders: \n"
-      show_current_group_folder_list
-      printf "\n\n"
-
+      
       # Selector GROUP Folder
       while true ; do
+        printColor "\n\n  New VM Name =  %s" "$ISO_NewVM_Name"
+        printf "\n\n  Preset Group Folders: \n"
+        show_current_group_folder_list
+        printf "\n\n"
         printColor "  Installation target folder:  %s "   "$QWG_Conf_Dir"  
         QWG_NewVM_Name="$ISO_NewVM_Name"
         QGW_OS_Arr_NameSelected="$ISO_NewVM_Name"
