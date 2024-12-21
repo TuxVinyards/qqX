@@ -141,9 +141,22 @@ function_config_tune_up ()  {
       printf "\n\n  Setting up a qqX 'shared drive' can also help with sharing between distros"
       printf "\n  See the notes in the general settings file for installation"
     fi
-    printColor "\n\n  In case of errored download, delete folder and .conf file, or use the [del] utility ..."
+    printColor "\n\n  In case of errored download > [d] delete folder and .conf file using file manager"
     printf "\n\n  [enter] to continue to the menus \n\n"
-    read -rp "  > "
+    ErroredDL=
+    read -rp "  > " ErroredDL
+    if [[ $ErroredDL ]]; then
+      printColor "\n\n  %s / %s"  "$(dirname "$TuneUpTargetFile")" "$TuneUp_InstanceName"
+      [[ ! -e "$TuneUpTargetFile" ]] && printf "  .conf file:  not present" 
+      printf "\n\n  [enter] to continue \n\n"
+      read -rp "  >  "
+      VM_InstanceName=
+      if [[ $FileManager ]]; then nohup &> /dev/null  "$FileManager"  "$TuneUp_Conf_Dir" &
+      else printf "\n\n  ERROR: File Manager has not been found or set, so a manual start is required"
+      fi
+      printColor "\n\n  [enter] to return \n\n"
+      read -rp "  >  "
+    fi
     return 
   fi
 
