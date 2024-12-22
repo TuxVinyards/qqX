@@ -253,7 +253,7 @@ VM_loader_selector_and_menu () {
 
         else
 
-          printf "\n\n  [number] to select a VM"        
+          printf "\n\n  [number] to select a VM         "        
           printf "   [set] view or edit settings file"
           printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
 
@@ -272,8 +272,8 @@ VM_loader_selector_and_menu () {
 
           if [[ $qqX_UpdateAvail ]]; then printf "\n\n  [Enter]  " ; else printColor "\n\n  [Enter]  " ; fi
 
-          printf "%s  "  "${VM_Array_NameZero^^}"
-          printf "    [gt] quickget a new distro    [h] Help   [f] FreeBird   [r] refresh   [q] quit"
+          printf "%-25s"  "${VM_Array_NameZero^^}"
+          printf " [gt] quickget a new distro  [qf] qcow2 file manager  [h] Help  [f] FreeBird  [r] refresh  [q] quit"
 
           [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
@@ -294,6 +294,8 @@ VM_loader_selector_and_menu () {
           VM_InstanceName=
           VM_Selection=
         }
+
+        path_diagnostics
 
         printf "\n\n"
         read -rp  "   >  "  VM_Selection
@@ -343,6 +345,8 @@ VM_loader_selector_and_menu () {
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
 
       elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
+
+      elif [[ $VM_Selection == "qf" ]]; then  qcow2_filemanagement_launcher "qqf-setvars" ; qcow2_filemanagement_launcher  ; return
 
       elif [[ $VM_Selection == "set" ]];then
 

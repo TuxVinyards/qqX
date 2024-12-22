@@ -13,37 +13,42 @@
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009  
 
+# Sorts out any MOUSE CLICK or COMMAND LINE parameters that have been initially read by 'qqX_initialize' 
+# This script is then CALLED using the flag 'Initial_Input' when input is present by the qqX main script 
+# AFTER all the other scripts, files and functions have been sourced but BEFORE starting the qqX main loop.
 
-#  Sorts out any MOUSE CLICK or COMMAND LINE parameters and reads any flags set during 'qqX_initialize' 
-#  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
-
+if [[ $Trace_InputVars ]]; then  echo; echo "pwd $(pwd)"; echo ; echo "1 $Initial_Input" ; sleep "$Trace_InputVars" ; fi
 
 if [[ $XDG_MimeType_is_QCOW ]]; then 
-
-  # should haved changed to the right directory at this point
-  if grep -q -s "disk_img="'"'"$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName" "$QCOW_RightClick_VM_Dir_Name.conf" ; then
-
-    VM_Conf_Dir="$(pwd)"
-    VM_Conf_File="$QCOW_RightClick_VM_Dir_Name.conf"
-    VM_InstanceName="$QCOW_RightClick_VM_Dir_Name"
-    QCOW_RightClick_NON_qqX=
+  # should have changed to the right directory at this point (also see initialze script for .conf checks)
+  if grep -qs "disk_img="'"'"$QCOW_Input_VM_Dir_Name/$QCOW_Input_DiskName" "$QCOW_Input_Dir.conf" ; then
+    VM_Conf_Dir="$QCOW_Input_Conf_Dir"
+    VM_Conf_File="$QCOW_Input_VM_Dir_Name.conf"
+    VM_InstanceName="$QCOW_Input_VM_Dir_Name"
+    XDG_Input_NON_qqX=
+    XDG_Input_VM_qqX=1
     shift
-
-  else  QCOW_RightClick_NON_qqX=1 ; shift
-
+  else  
+    XDG_Input_NON_qqX=1 ; XDG_Input_VM_qqX= ; shift
   fi
-
 fi
 
-right_click_re_route () {
+if [[ $Trace_InputVars ]]; then  echo; echo "qqX VM = $XDG_Input_VM_qqX  I $VM_InstanceName" ; echo "Cf $VM_Conf_File" ; sleep "$Trace_InputVars" ; fi
 
-  printf "\n\n  [enter] to run qqX   [c] to close \n\n"
+input_re_route () {
+  if [[ $xxXDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
+    printColor "\n\n Note that opening of new qqF windows will terminate other qqF instances that are running"
+  fi
+  printf "\n\n  [enter] to run qqX   "
+  [[ $XDG_MimeType_is_QCOW ]] && printf "[qf] open qcow2 in file manager   "
+  printf "[c] to close \n\n"
   read -rp "  >  "  XDG_StartVariant
-
-  if [[ $XDG_StartVariant != "c" ]]; then 
- 
+  if [[ $XDG_StartVariant == "qf" ]]; then 
+    InputTidy="qf"
+    XDG_StartVariant=
+  elif [[ $XDG_StartVariant != "c" ]]; then 
     VM_InstanceName=
     VM_Conf_Dir=
     VM_Conf_File=
@@ -51,39 +56,32 @@ right_click_re_route () {
     IsoImg=
     XDG_MimeType_is_QCOW=
     refresh_sources_and_load_VM_arrays
-
   else  exit directly
-
   fi
 }
 
-if [[ $QCOW_RightClick || $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]] && [[ ! $XDG_FileType_Recognised ]]; then
-
-  if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$1 "  "$XDG_MimeType"
+if [[ $XDG_StartVariant ]] && [[ ! $XDG_MimeType_Recognised ]] && [[ ! $XDG_FileType_Recognised ]]; then
+  if [[ $XDG_StartVariant ]]; then printColor "\n\n  %s  not understood \n\n  Or non valid file type %s "  "$Initial_Input"  "$XDG_MimeType"
   else  show_CLI_usage 
   fi
-
-  RightClickReRouted=1
-  right_click_re_route
-
+  InputReRouted=1
+  input_re_route
 fi
 
-#
+if [[ $XDG_MimeType_is_QCOW ]]; then
 
-if [[ $XDG_MimeType_is_QCOW ]]; then  
+  if ps -ef | grep -q nbd0 ; then  DiskChkStatus="Okay"  # as has already been checked, and where nbd0 is reserved for spot input drives
+  else
+    check_disk_is_okay "$QCOW_Input_Dir"  "$QCOW_Input_DiskName"
+  fi
+  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s \n"  "$DiskChkStatus" 
+  fi
 
-  check_disk_is_okay "$QCOW_RightClick_VM_Dir_Name"  "$QCOW_RightClick_DiskName"
-
-  if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n DISK.QCOW2 ERROR  %s "  "$DiskChkStatus" ; fi
-
-  if [[ $QCOW_RightClick_NON_qqX ]]; then 
-
+  if [[ $XDG_Input_NON_qqX ]]; then 
     if [[ $DiskChkStatus == "Okay" ]]; then printColor  "\n\n QEMU qcow2 disk found BUT not configured as qqX/quickemu bootable: \n\n"
     else printColor  "\n\n QEMU qcow2 disk found \n\n BUT not configured as qqX/quickemu bootable \n\n AND has ERRORS .... \n\n"
     fi
-
   else
-
     show_qqX_title_bar
     printColor  "\n\n  qqX/quickemu bootable: \n\n"
     if [[ $DiskChkStatus != "Okay" ]]; then  
@@ -91,112 +89,101 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
       printf "\n\n Also see  https://qemu.readthedocs.io  "
       printf  "> QEMU disk image utility notes\n\n"
     fi
-
   fi
 
-  "$QEMU_IMG" info "$QCOW_RightClick_VM_Dir_Name/$QCOW_RightClick_DiskName"
-      
-  if [[ $QCOW_RightClick_NON_qqX ]]; then  
+  # show disk info:
+  "$QEMU_IMG" info "$QCOW_Input_Dir/$QCOW_Input_DiskName"
 
+  if [[ $XDG_MimeType_is_QCOW ]] && [[ "$(pgrep -af qqX_filemanage 2>/dev/null)" ]]; then
+    printColor "\n\n Note that opening of new qqF windows will terminate other qqF instances that are running"
+  fi
+
+  if [[ $XDG_Input_NON_qqX ]]; then  
     printColor "\n\n See  https://qemu.readthedocs.io  "
-    printf  "> QEMU disk image utility may be useful"
-    RightClickReRouted=1
-    right_click_re_route
-    
+    printf  "> QEMU's disk image utility or the qf/qqF drive mounter may be useful"
+    InputReRouted=1
+    input_re_route
   else  
-    printColor "\n\n  [enter] to continue    [c] to cancel and close \n\n"  
-    read -rp  "  >  "  IsoQuit
-    [[ $IsoQuit ]] && exit directly 
+    printColor "\n\n  [enter] to continue   [qf] open qcow2 in file manager   [c] to cancel and close \n\n"  
+    read -rp  "  >  "  InputTidy
+    [[ $InputTidy == "c" ]] && exit directly 
   fi
   
-  if [[ ! $QCOW_RightClick_NON_qqX ]]; then 
-  
-    QCOW_RightClick= 
+  if [[ $XDG_Input_VM_qqX ]]; then 
     ByPass_VM_Array_Selector=1
-    
     if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
-
     else
-
       if [[ ! -d  "$VM_Conf_Dir"  ]]; then 
         printColor "\n\n  Directory:  %s  not found "  "$VM_Conf_Dir "
         function_conf_error  " COMMAND LINE Path Instruction,"
-      else  
-        cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
+      else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
       fi
-
     fi
-
     if [[ ! -f "$VM_Conf_Dir/$VM_Conf_File" ]]; then 
       printColor "\n\n  Conf:  %s  not found "  "$VM_Conf_File"
       function_conf_error  " COMMAND LINE .Conf Instruction,"
     fi
-
-  elif [[ $RightClickReRouted ]]; then true
-
+  elif [[ $InputReRouted ]]; then true
   else  exit directly 
+  fi
 
+  if [[ $InputTidy == "qf" ]]; then
+    qqf_Input_Drivepath="$(realpath "$QCOW_Input_Conf_Dir/$QCOW_Input_DiskName")"
+    if [[ $Trace_InputVars ]]; then echo "Tidy requested Path: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+    qcow2_filemanagement_launcher "$qqf_Input_Drivepath"
+    sleep 2
+    exit directly
+  else
+    # not qf, and not close, so re-check but with qqX_Main flag
+    QF_exit_to_Main=1
   fi
 
 fi  
 
+
 if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised || $XDG_FileType_Recognised ]]; then
-
   refresh_sources_and_load_VM_arrays
-
   while true; do
-
     New_ISO_Start=
     Cancel_ISO=
     ISO_NewVM_Name=
     ISO_OvWr=
     ISO_NewFolder=
     MoveIso=
-
     printColor "\n\n  Set up this ISO as a qqX/quickemu VM? "
     printf "\n\n  %s\n" "$XDG_ISO_Name"
-    printColor "\n\n  Standard LINUX ISO's only."
-    printf "\n\n  Note: batocera | freedos | haiku | kolibrios | reactos | truenas | solaris "
-    printf "\n\n  dragonflybsd | freebsd | netbsd | openbsd  should work but the .conf file"
-    printf "\n\n  will need manually editing so guest_os= reads appropriately as one of the above,"
-    printf "\n\n  plus 'boot=\"legacy\"' may be required for one or two of these. \n"
-
+    printColor "\n\n  Standard LINUX ISO's only"
+    printf "\n\n  For: batocera | freedos | haiku | kolibrios | reactos | truenas "
+    printf "\n\n  solaris | dragonflybsd | freebsd | netbsd | openbsd "
+    printf "\n\n  Follow up edit the guest_os= .conf line  eg guest_os=\"batocera\""
+    printf "\n\n  Add ' boot=\"legacy\" ' if required. \n"
     if [[ $XDG_FileType_Recognised ]] && [[ ! $XDG_MimeType_Recognised ]]; then
       printf "\n\n  WARNING: The ISO formatting is a non-recognised mimetype so may not be bootable or valid. Try anyway? \n"
     fi     
-
-    printf "\n\n  [enter] continue   "; printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
+    printColor "\n\n  [enter] continue with set up   "
+    printf "[vm] switch to qqX VM selector menu  [c] cancel & close \n\n"
     read -rp "  >  "  Cancel_ISO
 
     if [[ $Cancel_ISO == "c" ]]; then exit directly
-  
     elif [[ $Cancel_ISO == "vm" ]]; then 
-  
       VM_InstanceName=
       VM_Conf_Dir=
       VM_Conf_File=
       XDG_MimeType_is_QCOW=
       break
-
     else  
-
       printColor "\n\n  Please give a short VM name for the folder."
       printColor "\n\n  eg. tux-33-alpha  emu-44-mate  (usually recommended)"
       printf "\n\n  [enter] to use ISO name: %s" "$(basename "$XDG_ISO_Name" .iso)"
       printf "\n\n  [vm] switch to qqX VM selector menu   [c] cancel & close \n\n"
       read -rp "  >  "  ISO_NewVM_Name
-
       [[ ! $ISO_NewVM_Name ]] && ISO_NewVM_Name="$(basename "$XDG_ISO_Name" .iso)"
-
       [[ $ISO_NewVM_Name == "vm" ]] && break
       [[ $ISO_NewVM_Name == "c" ]] && exit directly
-
     fi
 
     # If name then start 
-
     if [[ $ISO_NewVM_Name == "b" ]]; then 
-  
       ISO_NewVM_Name=
 
     elif [[ $ISO_NewVM_Name ]]; then
@@ -204,53 +191,40 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
       QWG_Conf_Dir="$CurrentFolder"
       QGW_OverWriteAllow=
       QGW_OverWriteAlert=
-
-      printColor "\n\n  New VM Name =  %s" "$ISO_NewVM_Name"
-      printf "\n\n  Preset Group Folders: \n"
-      show_current_group_folder_list
-      printf "\n\n"
-
+      
       # Selector GROUP Folder
-    
       while true ; do
-
+        printColor "\n\n  New VM Name =  %s" "$ISO_NewVM_Name"
+        printf "\n\n  Preset Group Folders: \n"
+        show_current_group_folder_list
+        printf "\n\n"
         printColor "  Installation target folder:  %s "   "$QWG_Conf_Dir"  
-
         QWG_NewVM_Name="$ISO_NewVM_Name"
         QGW_OS_Arr_NameSelected="$ISO_NewVM_Name"
         check_new_vm_folder_name
-
         if [[ $QGW_OverWriteAlert ]];then  
-
           printColor  "\n\n\n  Installation target folder:  %s"  "$QWG_Conf_Dir"
           printf  "\n\n  [enter] Start the Setup  "
           printColor "?? BACKUP ??  " 
-        
         else  printColor  "\n\n  [enter] Start the Setup  " 
-        
         fi
-          
         if [[ $QGW_OverWriteAllow ]]; then printf "[number] select a DIFFERENT FOLDER  "
         else printf "[number] select a different (preset or current) folder  "
         fi
-        
         printf " [h] help  [b] go back \n\n"
         read -rp "  >  " New_ISO_Start
         printf "\n"
 
         case "$New_ISO_Start" in
-
           b)
             New_ISO_Start= ; ISO_NewVM_Name=
             break
           ;;
-
           [0-9]|[0-9][0-9]) 
             QWG_Conf_Dir="${VM_Folder_List[New_ISO_Start]}" 
             QGW_OverWriteAlert=
             CurrentFolder_Recognised=1
           ;;
-
           h)  
             printf     "  Once the initial setup up has finished, "
             printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running." 
@@ -258,7 +232,6 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
             show_current_group_folder_list
             printf "\n\n"
           ;;
-
           *)
             if [[ $QGW_OverWriteAlert ]]; then 
               printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
@@ -269,7 +242,6 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
             else New_ISO_Start="start" ; break
             fi
           ;;
-
         esac
 
         if [[ ! $QWG_Conf_Dir ]]; then
@@ -289,14 +261,11 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
           printf "\n\n"
           if [[ $ISO_NewFolder ]]; then true ; else continue ; fi
         fi
-     
         printf "  Folder Creation: %s" "$QWG_Conf_Dir/$QWG_NewVM_Name"
-
         printf "\n\n  Copy the ISO to the new folder, or move it?  [enter] copy   [m] move \n\n"
         read -rp "  >  "  MoveIso
 
         mkdir -p  "$QWG_Conf_Dir/$QWG_NewVM_Name"
-
         cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
         if [[ $MoveIso == "m" ]]; then 
@@ -311,19 +280,16 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
           printf '#!' ; printf "/usr/bin/qqX --vm"
           printf "\n\nguest_os=\"linux\""
           printf "\ndisk_img=\"%s/disk.qcow2\"" "$QWG_NewVM_Name"
-          printf "\ndisk_size=\"64G\""
+          printf "\ndisk_size=\"128G\""
           printf "\niso=\"%s\"" "$QWG_NewVM_Name/$(basename "$XDG_ISO_Name")"
 
         } > "$QWG_Conf_Dir/$QWG_NewVM_Name.conf"
 
         chmod +x "$QWG_Conf_Dir/$QWG_NewVM_Name.conf"
-
         VM_Conf_Dir="$QWG_Conf_Dir"
         VM_Conf_File="$QWG_NewVM_Name.conf"
         VM_InstanceName="$QWG_NewVM_Name"
-
         cd "$QWG_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
-
         refresh_sources_and_load_VM_arrays
         break
       
@@ -336,16 +302,12 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 fi
 
 
-if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ ! $QCOW_RightClick_NON_qqX ]]; then
-
+if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $XDG_Input_VM_qqX ]]; then
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
   [[ $VM_Conf_File ]] && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
-
-else
-
+else 
   refresh_sources_and_load_VM_arrays
-
 fi
 
 [[ $GeneralLoopCheck ]] && printf "\n\n End of Api & Mouse:" &&  dev_loop_check

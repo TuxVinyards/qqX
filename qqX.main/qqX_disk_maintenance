@@ -685,8 +685,26 @@ function_delete_SecondDrive () {
 
 }
 
-function qcow2_filemanage {
- 
+#  shellcheck disable=SC2120
+
+qcow2_filemanagement_launcher () {
+
+  local qqf_StandaloneInfo=
+  local qqf_SetVars=
+  local qqf_Input=
+  local qqf_Input_Drivepath=
+
+  if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
+  if [[ $1 == "qqf-info" ]]; then qqf_StandaloneInfo=1 ; shift
+  fi
+  if [[ $1 == "qqf-setvars" ]]; then qqf_SetVars=1 ; shift
+  fi
+  [[ $1 ]] && qqf_Input_Drivepath="$(realpath "$1")" && shift
+  [[ -e "$qqf_Input_Drivepath" ]] && qqf_Input_Drivepath=
+
+  if [[ $Trace_InputVars ]]; then echo "qqf_Input_Drivepath: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
   if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
     printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
     printf "\n\n  [enter] to return \n\n"
@@ -706,28 +724,64 @@ function qcow2_filemanage {
     fi
   fi
 
+  # resize qqf terminal a tad, if possible, to make it easier to see that there are two terms open
+  Terminal_Start="${Terminal_Start/150/170}"
+  Terminal_Start="${Terminal_Start/145/170}"
+  Terminal_Start="${Terminal_Start/x55/x45}"
+  Terminal_Start="${Terminal_Start/x50/x45}"
+
   local UserTerm=
   UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
 
-  # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
-  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
-    printf "\n FileManager=\"%s\"" "$FileManager"
-    printf "\n TextEditor=\"%s\"" "$TextEditor"
-    printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
-    printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
-    printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
-    printf "\n LiveBoot=\"%s\"" "$LiveBoot"
-    printf "\n MainDrive=\"%s\"" "$MainDrive"
-    printf "\n SecondDrive=\"%s\"" "$SecondDrive"
-    printf "\n SharedDrive=\"%s\"" "$SharedDrive"
-    printf "\n UserTerm=\"%s\"" "$UserTerm"
-  } > "/tmp/qqX_nbd_vars"
+  if [[ $qqf_StandaloneInfo ]]; then 
+  printf "\n\n  This option will set/reset the necessary VM variables for the QF standalone."
+  printf "\n\n  If the Standard Option [qf] is not opening a new terminal, as it should do," 
+  printf "\n\n  then open a terminal manually and type 'qqX --qqf' at the prompt."
+  printColor "\n\n  [enter] to return  [k] to skip"
+  printf "\n\n"
+  read -rp "  >  "  qqf_Skip_SetVars
+  fi
 
-  # allow for custom mounting scripts
-  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
-    eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
+  if [[ $qqf_Skip_SetVars ]]; then qqf_Skip_SetVars=
   else
-    eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
+    # Needs to run script in a separate terminal to ensure qqX main does NOT get elevated permissions
+    { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+      printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
+      printf "\n FileManager=\"%s\"" "$FileManager"
+      printf "\n TextEditor=\"%s\"" "$TextEditor"
+      printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
+      printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
+      printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"
+      printf "\n LiveBoot=\"%s\"" "$LiveBoot"
+      printf "\n qqf_Input_Drivepath=\"%s\"" "$qqf_Input_Drivepath"
+      printf "\n MainDrive=\"%s\"" "$MainDrive"
+      printf "\n SecondDrive=\"%s\"" "$SecondDrive"
+      printf "\n SharedDrive=\"%s\"" "$SharedDrive"
+      printf "\n UserTerm=\"%s\"" "$UserTerm"
+      printf "\n NoClear=\"%s\"" "$NoClear"
+      printf "\n Trace_InputVars=\"%s\"" "$Trace_InputVars"
+      printf "\n"
+    } > "/tmp/qqX_nbd_vars"
+  fi
+  
+  if [[ $Trace_InputVars ]]; then echo; cat "/tmp/qqX_nbd_vars"  ; echo  ; sleep "$Trace_InputVars" ; fi
+
+  if [[ $qqf_StandaloneInfo ]]; then 
+    return
+  elif [[ $qqf_SetVars ]]; then 
+    return
+  elif [[ $qqf_Input_Drivepath ]]; then 
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+      eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" "$qqf_Input_Drivepath"  >/dev/null 2>&1 &
+    else
+      eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" "$qqf_Input_Drivepath" >/dev/null 2>&1 &
+    fi
+  else
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+      eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
+    else
+      eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
+    fi
   fi
 
 }
@@ -744,7 +798,7 @@ function check_vm_nbd_boot_connected {
     printf "\n\n"
     read -rp "  >  "  qf_Launch
     [[ $qf_Launch == "r" ]] && return 1
-    [[ $qf_Launch ]] && qcow2_filemanage
+    [[ $qf_Launch ]] && qcow2_filemanagement_launcher
   done
 
 }

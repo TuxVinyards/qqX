@@ -227,21 +227,93 @@ function show_qqX_general_help {
 
 function multi_instance_checks {
 
-  MultiInstanceCount="$(pgrep -cx "qqX")"   # count exact match, ignores sub routines
   MultiQuit=
   KillQQ=
+  CurrentQQ_FullLine=
+  CurrentQQ=
+  CurrentQQ_LastField=
+  AnotherQQ=
 
-  if [[ $MultiInstanceCount -gt 1 ]]; then 
+  # Make sure that all current processes have been statted properly before moving on.
+  # pgrep -an is not reliable and pgrep sub-shell creates another pid too. 
+  # BUT new PID always goes on end of list so check for this until no 'kworker' grep errors
+  sleep 0.2
+  i=0
+  while true; do
+    CurrentQQ_FullLine="$(pgrep -afi qqX | tail -n 1  2>/dev/null)"
+    [[ $ShowProcesses ]] && printf "\n(i%s) %s " "$i" "$CurrentQQ_FullLine"
+    if [[ "$CurrentQQ_FullLine" == *kworker* ]]; then sleep 0.2 ; ((i+=1))
+    else
+      CurrentQQ_LastField="$(awk '{print $NF}' <<< "$CurrentQQ_FullLine")"
+      CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ_FullLine")"
+      break
+    fi
+    if [[ $i -gt 25 ]]; then 
+      printColor "\n\n ERROR statting current PID > restart required"
+      printf "\n\n\n  [enter] to close \n\n" 
+      read -rp "  >  "
+    fi
+  done
+
+  # All qqX, exactly, will exclude 'qqX_copy_over' but doesn't make reading the parameters and variants too easy
+  # Also pgrep -aAxi qqX, with x, doesn't count itself ..... but -afi does .... REVIEW 
+  # Note: needs -i ignore case, so that CLI starts using 'qqx' (lower) get counted
+
+  AnotherQQ="$(pgrep -aAi qqX 2>/dev/null)"
+
+  # Also Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
+  # Running CL instances will show up with 'pgrep -aAxi qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
+  # With pgrep -afi qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
+
+  if [[ $ShowProcesses ]]; then
+    echo 
+    echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"  
+    echo; echo "AnotherQQ:"; echo; echo "$AnotherQQ"; echo
+    echo; echo "QF_exit_to_Main = $QF_exit_to_Main"; echo
+    read -rp " >  "
+  fi
+
+  CurrentQQ_mode="main"
+  if [[ ! $QF_exit_to_Main ]]; then
+    case "$CurrentQQ_LastField" in
+      *'.qcow2'*|*'--qqf'*|*'qqX_filemanage '*) CurrentQQ_mode="qcow" ;;
+    esac
+  fi
+
+  if [[ $AnotherQQ ]]; then 
+    OtherQQ_MainArr=()
+    OtherQQ_F_Arr=()
+    mapfile -t AnotherQQ_Arr <<< "$AnotherQQ"
+    for QQ in "${AnotherQQ_Arr[@]}"; do
+      if [[ "$QQ" != *"$CurrentQQ"* ]]; then
+        if [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage'* ]]; then 
+          OtherQQ_F_Arr+=("$(awk '{print $1}' <<< "$QQ")")
+        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then 
+          OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        elif [[ $QF_exit_to_Main ]] && [[ "$QQ" != *'qqX_copy_over'* ]]; then  
+          OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
+        fi
+      fi
+    done
+    # Starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. 
+    # .qcow2 remains when 'exit to main' but changes to 'filemanage' when switching to QF
+    # while elif [[ "$QQ" == *'.qcow2'* ]]; gets included in [[ "$QQ" != *'qqX_copy_over'* ]]
+    if [[ $ShowProcesses ]]; then 
+      echo; declare -p AnotherQQ_Arr; echo
+      echo; declare -p OtherQQ_MainArr; echo
+      echo; declare -p OtherQQ_F_Arr; echo
+      read -rp " >  "
+    fi
+  fi
+
+  if [[ $AnotherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
 
     tput sc
-    qqX_logo_printf_title  "WARNING: more than one instance of qqX appears to be running "
-    printf "\n\n  To prevent cross-linking, this instance or the other instance(s) should be closed. "
-    printf "\n\n\n  For *simple* usage, it can be safe to continue ..."
-    printf "\n\n  BUT as long as the other instance's code base has not been hot-swapped."
+    qqX_logo_printf_title  "CAUTION: more than one instance of qqX appears to be running "
 
-    CurrentQQ="$(ps | awk '/qqX/{print $1}')"
-    OtherQQ="$(pgrep -ax qqX | grep -v "$CurrentQQ")"
-    mapfile -t OtherQQ_Arr <<< "$OtherQQ"
+    printf "\n"
+    printf "\n\n  QEMU will lock protect key files and will prevent VM's being run simultaneously ..."
+    printf "\n\n  Simple usage can be possible but be aware that minor cross-linking problems could occur"
 
     printf "\n\n\n  [enter] to continue with all   [k] kill other instances and continue with just this one "
     printColor "\n\n  [q] to quit \n\n"
@@ -251,13 +323,18 @@ function multi_instance_checks {
 
     if [[ $MultiQuit == "k" ]]; then 
       if [[ $(pgrep kvm 2>/dev/null) ]]; then printColor "\n\n  CAUTION: Check for distros that may be running. Force closing can corrupt VM file systems ...."
-      else printColor "\n\n  Continue with killing idle qqX instances? "
+      else
+        printf "\n\n  Killing desktop started instances will close the terminal windows."
+        printf "\n\n  CLI instances will terminate but the windows will remain open ..."
+        printColor "\n\n\n  Killing other qqX instances ... "
       fi
-      printf "\n\n  [k] to kill  [enter] to continue with all  [q] to quit \n\n"
+      printf "\n\n  [k] yes, kill  [enter] to continue with all  [q] to quit \n\n"
       read -rp "  >  "  KillQQ
       if [[ $KillQQ == "k" ]]; then
-        for QQ in "${OtherQQ_Arr[@]}"; do
-          kill "$(tr -cd '[:digit:]' <<< "$QQ")" 2>/dev/null
+        for QQ in "${OtherQQ_MainArr[@]}"; do
+          KillTarget="$(awk '{print $1}' <<< "$QQ" | tr -cd '[:digit:]' 2>/dev/null)"
+          [[ $ShowProcesses ]] && printf "\n QQ = %  > killing: %s" "$QQ" "$KillTarget"
+          kill "$KillTarget" 2>/dev/null
         done
         printColor "\n\n  Closed  \n\n" ; sleep 0.7
       elif [[ $KillQQ == "q" ]]; then exit directly
@@ -268,7 +345,7 @@ function multi_instance_checks {
     
   fi
 
-  if [[ "$(pgrep quickgui)" ]] ; then
+  if [[ "$(pgrep quickgui 2>/dev/null)" ]] ; then
 
     printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running " 
     printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"

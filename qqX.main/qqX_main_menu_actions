@@ -135,7 +135,9 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
 
-  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanage  
+  elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
+
+  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanagement_launcher  
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
@@ -162,7 +164,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "gt" ]] ; then  
   
     # also see "vm" option
-
+    source "$ConfClearanceLog"
     # no need to reload the arrays
     ByPass_VM_Array_Loader=1
     # but run the selector
@@ -383,7 +385,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
     # also see "gt" option
-
+    source "$ConfClearanceLog"
     # no need to reload the arrays
     ByPass_VM_Array_Loader=1
     # but run the selector

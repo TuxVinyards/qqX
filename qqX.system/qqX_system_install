@@ -42,14 +42,18 @@
 
 ##  qqX - quickemu quickget X terminal project   
 
-#  STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
-#  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
+# STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
+# From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
 # It is not a silver bullet & can also cause problems with bash exec clauses ...
-# Some users may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
+
+# SOME USERS may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
 # Only the main qqX script itself should need to be changed. This is easiest if done before running the installer but can also be done afterwards.
 # The commands "type -p bash" or "which bash" should help locate this.  
+
+# From version qqX 1.11 changes should also be made to 'qqX_filemanage_qcow_drive' in qqX.main
+
 # See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
 #  Differences may be present in non FHS distros & may need special installation 
@@ -147,27 +151,31 @@ if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
   [[ $FHS_Alert ]] &&  exit 
 fi
 
-##  Check for 'curl' as not in all distros (where $1 test is true if command line is being used) 
+##  Check for items sometimes missing 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
-##  Check for 'jq' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
-##  Check for 'bc' as not in all distros (where $1 test is true if command line is being used) 
 if [[ ! $(type -p bc) ]]; then
   printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
-##  Check for 'wget' as not in all distros (where $1 test is true if command line is being used) 
+if [[ ! $(type -p xrandr) ]]; then
+  printf "\n\n  An 'xrandr' installation should normally be present and is required by qqX ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+fi
 if [[ ! $(type -p wget) ]]; then
   printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
 fi
-
+if [[ ! $(type -p 7z) ]]; then
+  printf "\n\n  A '7zip' installation should be present and is needed in few places ...\n\n"
+  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+fi
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
   if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
@@ -288,27 +296,33 @@ CustomTerminalProfile=
 # MATE:
 MateTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
 MateTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
+MateTerminalProfile_HostSize=" --hide-menubar --title=qqX "
 
 # GNOME:
 GnomeTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --title=qqX "
 GnomeTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --title=qqX "
+GnomeTerminalProfile_HostSize=" --hide-menubar --title=qqX "
 
 # XFCE4:
 XfceTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 XfceTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
+XfceTerminalProfile_HostSize=" --hide-menubar --hide-toolbar --title=qqX --icon=$HOME/.qqX/icons/qqX.std.logo.96.png"
 
 # LxTerminal:
 LxTerminalProfile_Taller=" --geometry=${Term_Width}x${Term_Taller} --title=qqX "
 LxTerminalProfile_Standard=" --geometry=${Term_Width}x${Term_Height} --title=qqX "
+LxTerminalProfile_HostSize=" --title=qqX "
 
 # XTERM:
 XtermTerminalProfile_Taller=" -geometry ${Term_Width}x${Term_Taller} -fa truetype -fs 12 -fg white -bg black"
 XtermTerminalProfile_Standard=" -geometry ${Term_Width}x${Term_Height} -fa truetype -fs 12 -fg white -bg black"
+XtermTerminalProfile_HostSize=" -fa truetype -fs 12 -fg white -bg black"
 
 # KONSOLE:
 KonsoleTitle="qqX"
 KonsoleTerminalProfile_Taller=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Taller} "
 KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency -p TerminalColumns=${Term_Width} -p TerminalRows=${Term_Height}"
+KonsoleTerminalProfile_HostSize=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency"
 
 ##  Check we are in the right place
 if [[ ! -d "$(pwd)/qqX.system" ]]; then 
@@ -454,7 +468,9 @@ else
       printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
-
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_File_Path" 
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_lc_Link_Path" 
+      
       printf "\n\n  NOTE command line installation only. Auto-install is needed for desktop launchers and shortcuts"
       printf "\n"
       print_manual_uninstall_notes
@@ -474,6 +490,8 @@ else
       sudo cp -r "./qqX.main"  "$qqX_Std_Share_Path"
       sudo cp -r "./qqX.builtins"  "$qqX_Std_Share_Path"
       sudo chmod a+rx -R  "$qqX_Std_Share_Path/"
+      sudo chmod a+rx "$qqX_Std_File_Path"
+      sudo chmod a+rx "$qqX_Std_lc_Link_Path"
 
     fi
   
@@ -532,6 +550,7 @@ else
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
       [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin"
+      [[ ! -x $(type -p qqx) ]] || [[ ! -x $(type -p qqX) ]] && printf "\n\n The main qqX files in /usr/bin need chmod a+rx"
       [[ ! -e "$HOME/.qqX/qqX_settings" ]] && printf "\n\n The hidden files .qqX/qqX_settings in the Home directory"
       [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]] && printf "\n\n The hidden icon files .qqX/icons/.. in the Home directory"
       printf "\n\n  [enter] to close & investigate \n\n"
@@ -555,6 +574,9 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
   if ! grep -qs 'x-cd-image' "$XDG_GUI_desktop_PathName" ; then ForceReconfigure=1
   fi
   if grep -s 'gnome-terminal' "$XDG_GUI_desktop_PathName" | grep -qs -e '-e ' ; then ForceReconfigure=1
+  fi
+  #  ver 1.11 removes need for XDG trigger parameter
+  if grep -qs 'XDG' "$XDG_GUI_desktop_PathName" ; then ForceReconfigure=1
   fi
 
   if [[ $ForceReconfigure ]]; then
@@ -655,7 +677,7 @@ if [[ ! $SkipMkLauncher ]]; then
     printf "\n\n  Select 'standard' if in doubt, or where terminals do not have a -geometry parameter."
 
     printf "\n\n  If your terminal uses PIXELS, for example 'qterminal', try 1500 x 1000 in the settings."
-    printf "\n\n  In other cases, such as with tiling WM envs eg 'i3' the size is auto-regulated. "
+    printf "\n\n  In other cases, such as with tiling WM envs eg 'i3' the size may be auto-regulated. "
 
     printf "\n\n\n"
 
@@ -664,7 +686,7 @@ if [[ ! $SkipMkLauncher ]]; then
     printColor "  [enter] continue "
     if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
       printColor "at standard height "
-      printf "   [t] extra height   or "
+      printf "   [t] extra height  [a] as host (auto)  or "
     fi
 
   else  
@@ -691,6 +713,16 @@ if [[ ! $SkipMkLauncher ]]; then
     XtermTerminalProfile="$XtermTerminalProfile_Taller"
     LxTerminalProfile="$LxTerminalProfile_Taller"
     KonsoleTerminalProfile="$KonsoleTerminalProfile_Taller"
+
+  elif [[ $TerminalHeightChoice == "a" ]]; then
+
+    printf "\n  Height selected =  Auto/Host " 
+    MateTerminalProfile="$MateTerminalProfile_HostSize"
+    GnomeTerminalProfile="$GnomeTerminalProfile_HostSize"
+    XfceTerminalProfile="$XfceTerminalProfile_HostSize"
+    XtermTerminalProfile="$XtermTerminalProfile_HostSize"
+    LxTerminalProfile="$LxTerminalProfile_HostSize"
+    KonsoleTerminalProfile="$KonsoleTerminalProfile_HostSize"
 
   elif  [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
 
@@ -824,13 +856,13 @@ if [[ ! $SkipMkLauncher ]]; then
 
       # needs quotes  - plus REVIEW  -e  deprecation in other terminals
       if [[ $CustomTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path %f" '"'  
       elif [[ $UserTerm == "gnome-terminal" ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'"XDG %f"'"'  
+        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'" %f"'"'  
       elif [[ $SelectedTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  %f" '"'  
       else  
-        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path  XDG %f" '"'  
+        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path %f" '"'  
       fi
 
       echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
@@ -848,7 +880,7 @@ if [[ ! $SkipMkLauncher ]]; then
     
     make_desktop_content | sudo tee "$XDG_GUI_desktop_PathName"  1>/dev/null
 
-    sudo chmod +x  "$XDG_GUI_desktop_PathName"
+    sudo chmod a+rx  "$XDG_GUI_desktop_PathName"
 
     # Useful:  
     # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
@@ -868,7 +900,7 @@ if [[ ! $SkipMkLauncher ]]; then
 fi
 
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
-#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path  XDG " 
+#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path" 
 Start_qqX=
 GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
@@ -908,6 +940,8 @@ if [[ $End_Install == "q" ]]; then exit ; fi
 
 if [[ $Start_qqX ]]; then 
   printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
+  # for normal installations switch to $HOME as we are not doing devstarts ...
+  cd "$HOME" || printf "\n\n  ERROR switching to home folder %s ?? \n\n" "$HOME" 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 1
     eval "$Start_qqX" 

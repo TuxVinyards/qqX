@@ -57,30 +57,33 @@ else
       printColor  "    [u]   hide utils & technical"
       printColor "\n\n  ---------------------------------------------------------------------------- \n"
       printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
-      printf "\n\n  [2c] create [2d] delete a second virtual hard-drive   [3c] create [3m] "
-      if [[ $SharedDriveArgs ]]; then printf "unmount"; else printf "mount" ; fi
-      printf " shared drive "
+      printf "\n\n  [2c]  create [2d] delete a second virtual hard-drive   [3c] create [3m] "
+      if [[ $SharedDriveArgs ]]; then printf "unmount"; else printf "mount"
+      fi
+      printf " shared drive (guest boot)"
+      if [[ $Mounted_ISO ]]; then
+        printf "\n\n  [iso] unmount iso from guest, boot from main drive"
+      else
+        printf "\n\n  [iso] mount iso to guest, allow boot or read from iso"
+      fi
+      if [[ ! $LiveBoot ]]; then
+        if [[ $BootStyle == "fast" ]]; then printf "   [bm] show guest efi/bios boot menu"
+        else printf "   [fb] hide bios boot menu "
+        fi
+      fi
 
       printf "\n\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] "
-      printf "\n\n  [hdw]  add current config to this VM's Virtual Hardware Record    [m] msrs help"
+      printf "\n\n  [hdw] add current config to this VM's Virtual Hardware Record    [m] msrs help"
 
       [[ -e "$HOME/.qqX/qqX_term.conf" ]] && printf "    [tmc] terminal config"
-
-      printf "\n"
-      if [[ $VerboseArgs ]]; then printf  "\n\n  [v]   hide verbose qemu args"	
-      else  printf  "\n\n  [v]   show verbose qemu args & check before booting"	
-      fi
-      printf  "   [xa]  view or edit extra qemu args  "
 
       if [[ -e "$QemuArgsCustomFile" ]]; then printf "\n\n  [cd]  delete the custom boot file "
       else printf "\n\n  [cc]  create a custom boot file "
       fi
-      printf "  [iso] mount iso / boot from iso"
-      if [[ ! $LiveBoot ]]; then
-        if [[ $BootStyle == "fast" ]]; then printf "   [bm] show bios boot menu"
-        else printf "   [fb] hide bios boot menu "
-        fi
+      if [[ $VerboseArgs ]]; then printf  "  [v] hide verbose boot"	
+      else  printf  "  [v] show verbose boot"	
       fi
+      printf  "   [xa]  view or edit extra qemu args  "
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
       printColor "\n\n  ---------------------------------------------------------------------------- "
@@ -222,7 +225,7 @@ else
     elif [[ $FileManager ]]; then 
       if [[ $(type -p "$FileManager") ]]; then 
         printf "   [f] open VM folder"
-        printf "  [qf] open qcow2"
+        printf "   [qf] | [qqf] open qcow2"
         printf " in file manager"
       else  printColor "   [set]  ERROR file manager not found" 
       fi
@@ -327,6 +330,8 @@ else
     printf  "  [enter] refresh   "
     [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
     printf " [h] show help & info  [q] quit \n\n"
+
+    path_diagnostics
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }

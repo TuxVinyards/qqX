@@ -41,6 +41,8 @@
 # Posix compliant Terminal output check
 if [ ! -t 1 ]; then exit ; fi
 
+tput civis
+
 #  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale (Also see qqX_Initialize)
 if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
@@ -49,20 +51,25 @@ fi
 # Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
 # Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
 # Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
-  qqX_Version="1.11.0.02"
+  qqX_Version="1.11.0.04"
+
+# Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
+sleep 0.4
 
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
   
-## DEV: for easier fault tracing use =0 to set. Set =int/float for pauses, eg =1 to pause 1 sec, "0.2" etc for less.
-NoClear=
-GeneralLoopCheck=
-# Dev Start if starting qqX directly from a source folder i.e "./"  Used as flag to show which source is being used.
-if [[ -d ".git" ]]; then DevStart=1 ; else DevStart= ; fi
+# DEV Start is used as flag to show which source is being used. Check if starting qqX directly from a source folder
+# i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present
+if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
+
+# DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less, 
+# where timed pauses are given. Some diagnostics require enter key to continue ...
+NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars= ; ShowProcesses= ; PathDiagnostics=
+
 function dev_loop_check {
-    if [[ $GeneralLoopCheck ]]; then
-    echo
-    echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+  if [[ $GeneralLoopCheck ]]; then
+    echo; echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
     echo "BootStyle = $BootStyle   BootStyleMsg = $BootStyleMsg    BootStyle_Default = $BootStyle_Default   BootStyleMsg_Default = $BootStyleMsg_Default"
     echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
@@ -72,6 +79,25 @@ function dev_loop_check {
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  "
     echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
     sleep "$GeneralLoopCheck"
+  fi
+}
+
+function path_diagnostics {
+  if [[ $PathDiagnostics ]]; then
+    echo; echo; echo "DevStart = $DevStart  - pwd: $(pwd) - System_qqX_Path: $System_qqX_Path"
+    echo; echo "OriginalPATH = $OriginalPATH"
+    echo; echo "Export PATH = $PATH"
+    echo; echo "qqX_MainFolder: $qqX_MainFolder"
+    echo "qqX_BuiltinsFolder: $qqX_BuiltinsFolder"
+    echo "qqX_CustomFolder: $qqX_CustomFolder"
+    echo "XDG_GUI_desktop_Folder: $XDG_GUI_desktop_Folder"
+    echo; echo "FreePath = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
+    echo "QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script  CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
+    echo "QE_SourceVersion: $QE_SourceVersion"
+    echo "QE_SourcePath: $QE_SourcePath  QE_VerNumber: $QE_VerNumber"
+    echo "QG_SourcePath: $QG_SourcePath  QG_VerNumber: $QG_VerNumber"
+    echo
+    [[ $1 == "pause" ]] && read -rp "[enter] to continue " && echo
   fi
 }
 
@@ -94,8 +120,21 @@ if [[ ! -d "$qqX_MainFolder" ]]; then echo; echo "  ERROR: qqX main files not fo
 if [[ -d "./qqX.builtins" ]]; then qqX_BuiltinsFolder="$(realpath "./qqX.builtins")" ; else qqX_BuiltinsFolder="/usr/share/qqX/qqX.builtins"; fi
 if [[ ! -d "$qqX_BuiltinsFolder" ]]; then echo; echo "  ERROR: qqX builtin files not found.  Please re-check your installation."; echo; sleep 10; exit 1 ; fi
 
-# secure folder keeping custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
-qqX_CustomFolder="$(dirname "$qqX_MainFolder")""qqX.custom"
+# Read secure folder for custom user scripts, which should be admin safe eg. "/usr/share/qqX/qqX.custom"
+qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
+
+# qqF standalone  > CL launched running of qcow2 file management utility (using main qqX to refresh the nbd vars)
+# early launch following the location of 'qqX_MainFolder' (and guessed filemanager)
+if [[ $1 == "--qqf" ]]; then 
+  { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
+    printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
+    printf "\n FileManager=\"%s\"" "xdg-open"
+  } > "/tmp/qqX_nbd_vars"  
+  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
+    "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 
+  else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit 
+  fi
+fi
 
 # NON-FHS installs should normally locate Main and Built-Ins in with this file, so ./ will locate things
 
@@ -147,13 +186,10 @@ source "$qqX_MainFolder/qqX_main_menu_actions"
 [[ $GeneralLoopCheck ]] && printf "\n\n Source files done:" &&  dev_loop_check
 
 function main_menu {
-
   while true ; do
-
     MainMenuChoice=
     SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
-
     if [[ $KillPID_Menu_Exited ]] ; then
       KillPID_Menu_Exited=  ;  UseCustomBootArgs=  
       if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
@@ -161,11 +197,9 @@ function main_menu {
       else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
       fi
     fi
-
     main_menu_interface
     main_menu_actions
     [[ $VM_Renamed ]] || [[ ! $VM_InstanceName ]] && return
-
   done
 } 
 
@@ -184,44 +218,41 @@ fi
 #  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
-[[ $RunMouseApiTidy ]] && source "$qqX_MainFolder/qqX_api_and_mouse_tidyup"
+[[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
+
+[[ $QF_exit_to_Main ]] && printf "\033c"  &&  multi_instance_checks
 
 # If selection has now been made via api or mouse:
 [[ $VM_InstanceName ]] && ByPass_VM_Array_Selector=1
 
+path_diagnostics pause
 
-## MAIN LOOP
+## MAIN LOOP ###########################
 
 tput civis
-
 while true ; do
-
   [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop:" &&  dev_loop_check
 
   # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
   # The array must still be loaded as may be needed for reselecting later ...
 
-  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then   VM_loader_selector_and_menu 
-  
+  if [[ ! $VM_InstanceName || $ByPass_VM_Array_Selector ]]; then   
+    VM_loader_selector_and_menu 
   else  
-
     # PWD should now be the conf directory but make sure we are actually there.  
     # Could happen if tune up follows a download that was started in a different folder to the target new one.
     # Otherwise, go to the VM Selector.
-
     if [[ -d "$VM_Conf_Dir" ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then 
       cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder " 
       main_menu
     else
       VM_InstanceName=
     fi
-    
   fi   
-
 done
-
 tput  cnorm
 
+##########################################
 
 ## CODING STYLE 
 
