@@ -278,10 +278,12 @@ function show_QWG_header {
 
 function show_hot_swap_line {
     printColor "               Using %s:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]" "$QE_SourceVersion"
-    printf "  (versions may have different lists)\n"
+    printf "  [H] help on different versions\n"
   if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
     printf "\n               Code Source: %s " "$QE_SourcePath" 
-    [[ $CodingHotSwap ]] && CodingHotSwapShow= 
+    [[ $CodingHotSwap ]] && CodingHotSwapShow=
+  elif [[ $QE_SourceVersion != "FreeSpirit" ]]; then
+    printf "\n               FreeSpirit usually has the latest fixes and additions ...." 
   fi
   printf "\n\n"
 }
@@ -381,7 +383,7 @@ function_quick_get_wrap ()  {
 
     while true ; do
 
-      printColor "\n\n  Give [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH  [E] exit quickget "
+      printColor "\n\n  [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH  [E] exit quickget "
       printf "\n\n" 
 
       [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
