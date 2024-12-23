@@ -12,11 +12,13 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.11.01
+## Latest release 1.11.01
 
-Large code update with lots of new features and Quickemu improvements.
+Another large code update with lots of new features and Quickemu improvements.
 
-An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
+Extended testing has now included tiling WM's into the mix.
+
+As well as the added extra handling routines for KDE 6, XFCE, LXQT and Gnome3
 
 - new feature allows  _mounting of qcow2 drives in a file manager_
 
@@ -152,7 +154,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - adds a fix for Arch hosts EFI
 
-@ Dec 23  Release 1.11.01 
+@ Dec 23  Release 1.11.01
 
 - Extensive testing has now been completed, including in a wide range of tiling window managers
 
