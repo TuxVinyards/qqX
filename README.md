@@ -12,19 +12,15 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.10.02](#release-notes) + 1.11.0.02 beta
+## [Latest release 1.11.01
 
 Large code update with lots of new features and Quickemu improvements.
 
 An extended testing program has now added extra handling routines for KDE 6, XFCE and LXQT
 
-@ Nov 27th, the beta is [stable and downloadable](https://github.com/TuxVinyards/qqX/releases/tag/1.11.0.02) and has several improvements, fixes and updates ....
+- new feature allows  _mounting of qcow2 drives in a file manager_
 
-@ Dec 21st the [branch 1.11.0.04](https://github.com/TuxVinyards/qqX/tree/1.11.0.04) is _good to go_ but a fix for Windows downloads has just been pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98) and will take a little while to merge due to language fixes that are in place in qqX.
-
-The [language issue](https://github.com/quickemu-project/quickemu/issues/1113) was raised at Quickemu but shut down and not fixed ...
-
-New release hopefully in a day or two .... but clone the beta branch in the meantime.
+- adds fixes for Arch hosts EFI and for Windows downloads
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -156,11 +152,13 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - adds a fix for Arch hosts EFI
 
-To follow soon
+@ Dec 23  Release 1.11.01 
 
-- a couple of tweaks still to do in a couple of places, but nothing serious
+- Extensive testing has now been completed, including in a wide range of tiling window managers
 
-- and a bit more testing in tiling WM's  before we go to full release ....
+- The fix for Windows downloads pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98) and has now been merged, complete with the language fixes that are in place in qqX. The [language issue](https://github.com/quickemu-project/quickemu/issues/1113) was raised at Quickemu but shut down and not fixed ...
+
+Enjoy the end of year festivities :christmas_tree:
 
 ### Reliability
 
