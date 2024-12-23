@@ -12,7 +12,7 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## Latest release 1.11.01
+## [Latest release 1.11.01](https://github.com/TuxVinyards/qqX/releases/latest)
 
 Another large code update with lots of new features and Quickemu improvements.
 
@@ -154,7 +154,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - adds a fix for Arch hosts EFI
 
-@ Dec 23  Release 1.11.01
+@ Dec 23  Release [1.11.01](https://github.com/TuxVinyards/qqX/releases/latest)
 
 - Extensive testing has now been completed, including in a wide range of tiling window managers
 
