@@ -1202,7 +1202,7 @@ function_quick_get_wrap ()  {
     #  WAIT for background things to start happening
     sleep 3   
     while true ; do 
-      mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 1; [[ ${Jobs_Arr[*]} ]] && break
+      mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 0.5 ; [[ ${Jobs_Arr[*]} ]] && break
     done
 
     # THEN wait for an enter key press
