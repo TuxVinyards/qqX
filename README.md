@@ -160,7 +160,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - The fix for Windows downloads pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98) and has now been merged, complete with the language fixes that are in place in qqX. The [language issue](https://github.com/quickemu-project/quickemu/issues/1113) was raised at Quickemu but shut down and not fixed ...
 
-- Note, after downloading you may need to navigate to the download folder using your file manager and run the installer from there. This slight glitch only showed up after uploading the release files. The installer should be fine though and is generally improved.
+- The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
 
 Enjoy the end of year festivities :christmas_tree:
 
