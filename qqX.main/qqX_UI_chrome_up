@@ -200,15 +200,15 @@ function show_qqX_general_help {
       read -rp  "   >  " HelpSelect
 
     elif [[ $HelpSelect == "f" ]]; then   
-      printf "\n  Selectable for Hot-Swap from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
-      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 'Custom'| tr '#' ' ' 
+      printf "\n  Hot-Swappable from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
+      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 '# FreeBird or FreeSpirit are recommended'| tr '#' ' ' 
       if [[ -e "$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" ]]; then
         printf "\n\n  Custom =   Default_VM_Folder > qqX.custom  > %s " "$("$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" --version)"
       fi
       if [[ -e "$QE_DevPath/quickemu" ]]; then
         printf "\n\n  Dev =   %s  > %s " "$QE_DevPath"  "$("$QE_DevPath/quickemu" --version)"
       fi
-      printf "\n\n"
+      printf "\n\n  [enter] to return \n\n"
       read -rp  "  >  " HelpSelect
 
     elif [[ $HelpSelect == "w" ]]; then
