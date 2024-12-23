@@ -109,10 +109,10 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "FS"   ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays 
   elif [[ $MainMenuChoice == "FB"   ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
   elif [[ $MainMenuChoice == "HB"   ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Ech" || $MainMenuChoice == "ech" ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Sys" || $MainMenuChoice == "sys" ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Cust" || $MainMenuChoice == "cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
-  elif [[ $MainMenuChoice == "Dev" || $MainMenuChoice == "dev" ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Ech" || $MainMenuChoice == "ECH" || $MainMenuChoice == "ech" ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Sys" || $MainMenuChoice == "SYS" || $MainMenuChoice == "sys" ]] ; then  CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Cust" || $MainMenuChoice == "CUST" || $MainMenuChoice == "cust" ]] ; then  CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
+  elif [[ $MainMenuChoice == "Dev" || $MainMenuChoice == "DEV" || $MainMenuChoice == "dev" ]] ; then  CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
 
   elif [[ $MainMenuChoice == "ql" ]] ; then
 
