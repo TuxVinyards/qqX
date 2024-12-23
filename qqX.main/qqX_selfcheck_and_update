@@ -209,7 +209,7 @@ function download_new_release {
       if [[ $qqX_UpdateExit != "r" ]]; then 
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
-        cd "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}" || printColor "\n\n  ERROR  changing to qqX.releases folder"
+        cd "$qqX_LatestTarBall_Folder" || { printColor "\n\n  ERROR  changing to qqX.releases folder" ; sleep 1000 ;}
         # move current execution away from this script and to the installer
         exec  bash -c "./qqX_setup_and_install  Upgrade" 
       fi
