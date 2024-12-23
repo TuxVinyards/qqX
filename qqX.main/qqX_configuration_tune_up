@@ -148,11 +148,14 @@ function_config_tune_up ()  {
     if [[ $ErroredDL ]]; then
       printColor "\n\n  %s / %s"  "$(dirname "$TuneUpTargetFile")" "$TuneUp_InstanceName"
       [[ ! -e "$TuneUpTargetFile" ]] && printf "  .conf file:  not present" 
-      printf "\n\n  [enter] to continue \n\n"
-      read -rp "  >  "
+      ErrOpenFM=
+      printf "\n\n  [enter] to open the file manager  [c] to cancel \n\n"
+      read -rp "  >  " ErrOpenFM
       VM_InstanceName=
-      if [[ $FileManager ]]; then nohup &> /dev/null  "$FileManager"  "$TuneUp_Conf_Dir" &
-      else printf "\n\n  ERROR: File Manager has not been found or set, so a manual start is required"
+      if [[ ! $ErrOpenFM ]]; then 
+        if [[ $FileManager ]]; then nohup &> /dev/null  "$FileManager"  "$TuneUp_Conf_Dir" &
+        else printf "\n\n  ERROR: File Manager has not been found or set, so a manual start is required"
+        fi
       fi
       printColor "\n\n  [enter] to return \n\n"
       read -rp "  >  "

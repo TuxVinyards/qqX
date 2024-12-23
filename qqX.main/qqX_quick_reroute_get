@@ -259,7 +259,7 @@ function check_new_vm_folder_name {
     if [[ ${SimilarVM_Arr[*]} ]]; then  
       for DailyCheckVM in "${SimilarVM_Arr[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
       [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
-      printColor "\n\n  %s  >>  similar name match(es) found: \n\n"  "$QWG_NewVM_Name"
+      printColor "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n\n"
       print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
       printf "\n"
     fi
@@ -1227,7 +1227,7 @@ function_quick_get_wrap ()  {
       tput cnorm 
 
       for Jobs_PID in "${Jobs_Arr[@]}" ; do 
-        [[ $Jobs_PID ]] && QGW_DownloadStopped=1
+        #[[ $Jobs_PID ]] && QGW_DownloadStopped=1
         kill "$Jobs_PID" 2> /dev/null 
       done
 
@@ -1383,9 +1383,9 @@ function_quick_get_wrap ()  {
 
   elif [[ ! -d "$New_VM_InstanceName" ]]; then
   
-    printf "  NO Folder/Download:  %s "  "$New_VM_InstanceName"
+    printf "  NO Folder/Download found ... %s "  "$New_VM_InstanceName"
     if [[ -e "$New_VM_Conf_File" ]]; then printf "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
-    else printf "\n .conf file NOT created:  %s "  "$(basename "$New_VM_Conf_File")"
+    else printf "\n .conf file NOT created or found %s "  "$(basename "$New_VM_Conf_File")"
     fi
     if [[ $QGW_DownloadStopped ]]; then
       printf "\n\n  Download Stopped > there may have been an ERROR "
