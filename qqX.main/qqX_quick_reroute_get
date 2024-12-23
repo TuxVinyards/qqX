@@ -1184,7 +1184,12 @@ function_quick_get_wrap ()  {
     #  quickget will also run a python3 command for macrecovery for MacOS 
     #  eg 26102 pts/1    S+     0:11 python3 /usr/bin/macrecovery --board-id Mac-00BE6ED71E35EB86 --mlb 00000000000000000 --os-type default --basename Recover
    
-    # QUICKGET RUNS FIRST, in the background, THEN it starts a separate downloader  eg wget or aria2
+    # QUICKGET RUNS FIRST, in the background, THEN quickget starts a separate downloader  eg curl, 
+    # so processes can be difficult to track at this point. 
+
+    # qqX ver 1.11 adds an output file into the freespirit code to see if an output folder has been produced
+    # as the Quickget final name output can vary from expected. 
+    printf "" > "/tmp/qe_new_vm_name.txt"
 
     quickget "$QGW_DownloadSelection" &  
   
@@ -1222,6 +1227,7 @@ function_quick_get_wrap ()  {
       tput cnorm 
 
       for Jobs_PID in "${Jobs_Arr[@]}" ; do 
+        [[ $Jobs_PID ]] && QGW_DownloadStopped=1
         kill "$Jobs_PID" 2> /dev/null 
       done
 
@@ -1284,7 +1290,7 @@ function_quick_get_wrap ()  {
   # do pre-process if standard download
 
   if [[ ! $ZsyncDownload ]]; then
-    # folder check
+    # folder check the theoretical name ... 
     if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
     elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
@@ -1302,7 +1308,17 @@ function_quick_get_wrap ()  {
     fi
   fi
 
-  # determine output cases:
+  if [[ ! -d "$New_VM_InstanceName" ]]; then
+    # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
+    if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
+      source "/tmp/qe_new_vm_name.txt"
+      New_VM_Conf_File="${New_VM_InstanceName}.conf"
+    else
+      QGW_DownloadStopped=1
+    fi
+  fi
+
+  # Determine output cases:
   if  [[ $ZsyncDownload ]]; then
 
     if [[ $QGW_DownloadStopped ]]; then 
@@ -1336,7 +1352,7 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_DownloadStopped ]]; then
         printf "\n\n  Download Stopped > Residual files are present"
-        printf "\n\n  Part downloads can usually be re-started if the folder is retained."
+        printf "\n\n  Linux part downloads can usually be re-started if the folder is retained."
       fi
       [[ ! $New_VM_Conf_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >" 
 
@@ -1358,7 +1374,24 @@ function_quick_get_wrap ()  {
       else  
         printf  "\n\n Folder/file retained \n\n"
       fi
-      sleep 2
+      sleep 1.4
+      cd "$Default_VM_Folder" || DefaultFolderError=1
+      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      refresh_sources_and_load_VM_arrays
+      return
+    fi
+
+  elif [[ ! -d "$New_VM_InstanceName" ]]; then
+  
+    printf "  NO Folder/Download:  %s "  "$New_VM_InstanceName"
+    if [[ -e "$New_VM_Conf_File" ]]; then printf "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
+    else printf "\n .conf file NOT created:  %s "  "$(basename "$New_VM_Conf_File")"
+    fi
+    if [[ $QGW_DownloadStopped ]]; then
+      printf "\n\n  Download Stopped > there may have been an ERROR "
+      printColor "\n\n  [enter] to cancel & return \n\n"
+      read -rp "  >  "  
+      sleep 0.5
       cd "$Default_VM_Folder" || DefaultFolderError=1
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
@@ -1396,6 +1429,7 @@ function_quick_get_wrap ()  {
   else  
   
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
+
     printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
     printf "\n\n"
     return
