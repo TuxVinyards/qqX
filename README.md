@@ -12,17 +12,19 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
+- Easy [installation](#how-to-install)
+
 ## [Latest release 1.11.02](https://github.com/TuxVinyards/qqX/releases/latest)
 
 Another large code update with lots of new features and Quickemu improvements.
 
-Extended testing has now included tiling WM's into the mix.
-
-As well as the added extra handling routines for KDE 6, XFCE, LXQT and Gnome3
-
 - new feature allows  _mounting of qcow2 drives in a file manager_
 
 - adds fixes for Arch hosts EFI and for Windows downloads
+
+- extended testing includes tiling WM's and all major desktops
+
+- adds new handling routines for KDE6, XFCE, LXQT and Gnome3
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -34,19 +36,23 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
 
-- Or at the terminal `qqX XDG /path/distro.iso`
+- Or at the terminal, simply `qqX /path/distro.iso`
 
-### Simple and Straightforward
+### Search the distro lists with _alphabetical zooming_
 
 - Simple list browse, download, and organise countless distros
+
+- Includes distro homepage browser, link checker and download size reportage
+
+![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
+
+### Simple and Straightforward
 
 - Multiple display modes, utilities, optimizers and tools
 
 - Choice of Custom Menus or 5 built-in _menu styles_
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
-
-- Easy [installation](#how-to-install)
 
 - Always up-to-date text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
 
@@ -60,15 +66,11 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
-### Start specific VM's straight from the filemanager
+- For tiling VM's simply type `qqX` at the terminal
+
+### Or start specific VM's straight from the filemanager
 
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
-
-### Search the distro lists with _alphabetical zooming_
-
-- Includes distro homepage browser, link checker and download size reportage
-
-![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
 ### Range of utilities and functions
 
@@ -94,13 +96,13 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 For standard Linux, most users will only need to install `qemu` `spice-gtk` and `qqX`
 
-- Some distro versions may need `curl` `jq` and `bc`
+- Some distro versions may need `curl` `7z` `jq` `bc` and possibly `xrandr`
 
 - The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest)
 
- No further software, support structures or dependencies should be required.
+That's it.
 
-- The qqX installer includes an easy un-installer, if you don't like it .....
+- Un-installer included .....
 
 Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
@@ -110,31 +112,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 ## Release notes
 
-@ Sept 16 - Version 1.10.02  
-
-- General collection of fixes and tweaks. Plus more improvements for KDE6 / Qt6 / Wayland / XFCE etc
-
- @ Sept 1 - Version 1.10.01  
-
-- Adds Windows languages and sorts the Quickemu problems too. You can now download French, not just 'French Canadian' for example.
-  
-- There's an improved distro editions selection mechanism which allows you to scroll up and down between releases and editions, depending on what you find and how you decide.
-
-- Other features also include being able scroll through the distro info pages, and from any given start point.
-  
-- And finally some control over boot management and being able to select whether we boot from the virtual hard drive or from the ISO. Very useful for partition management and disk maintenance.
-
-- You can now organize folders by various categories. The _same_ machine can now be listed in two or three folders at once. All by the magic of 'symbolic links'.  Expect a wiki page shortly to explain in full detail.
-
-- The ability to download any given Linux ISO and install it, has had a make over as well.
-
-- This release has had extra extensive testing, ranging from the slickness of 'Garuda Dr460nized' to the lightness of LXQT
-
-- FreeBird is default and based on quickemu @ Aug 4.  FreeSpirit has had initial testing and looks good. This is based on Aug 29.
-
-- Users still on version 1.8.04 and previous should download the latest release directly. For others, there was a fix in place a while back for the github changes behind the wget 302 / SHA error. So, use the installer/updater ....
-
-@ Nov 27th
+@ Nov 27th Beta 1.11.0.2
 
 - New feature _mounting of qcow2 drives in a file manager_ ....
 
@@ -158,7 +136,8 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Extensive testing has now been completed, including in a wide range of tiling window managers
 
-- The fix for Windows downloads pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98) and has now been merged, complete with the language fixes that are in place in qqX. The [language issue](https://github.com/quickemu-project/quickemu/issues/1113) was raised at Quickemu but shut down and not fixed ...
+- The fix for Windows downloads, recently pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98)
+has now been merged
 
 - The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
 
@@ -172,13 +151,17 @@ Enjoy the end of year festivities :christmas_tree:
 
 - qqX always makes backups, as is _standard good practice_ with _any_ software.
 
-### Improvements
+### Fixes for Quickemu
 
-- Tests show that _official_ Quickemu 4.9.5/6 can cause Intel processors to run MacOS very slowly. This doesn't affect FreeBird or FreeSpirit.
+- Available via qqX's FreeBird or FreeSpirit or in the qqX code itself
 
-- Also the Quickemu problem, where telescoped/nested VM grind to a halt, doesn't happen when using the qqX builtins either.
+- Fixes problems causing Intel processors to run MacOS very slowly.
 
-- As qqX will offer a config autotune after a download, the Quickemu issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top) with Windows will not be present.
+- Fixes the problem where telescoped/nested VM grind to a halt.
+
+- Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
+
+- And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
 
@@ -228,17 +211,19 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 I live in a wine growing region of Italy, in a castled village dating from the 1300's
 
-For me, qqX is something to do when it's too hot or it's raining and I can't be outside. So, Linux development amongst the Vinyards, with the Olde English spelling of " Vine Yards " which doesn't have with an 'e', to match the context.
+For me, qqX is something to do when it's too hot or it's raining and I can't be outside.
+So, Linux development amongst the Vinyards, with the Olde English spelling of " Vine Yards " to match
 
-1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia
-...therefore they who are more religiously and holily instructed, neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation...
+1533 (1651 pub.), Henry Cornelius Agrippa, De Occulta Philosophia:
+> therefore they who are more religiously and holily instructed,
+neither set a tree nor plant their _**vinyard**_, nor undertake any mean work without divine invocation
 
 ## why 'X' ?
 
-Traditionally Linux has used the X window system from X.org, so 'X term' often gets used as shorthand for the terminal.
+Traditionally Linux has used the X window system from X.org and classically the 'Xterm' command line interface.
 
-More technically speaking qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X' ...
+- <https://en.wikipedia.org/wiki/X_Window_System>
 
-<https://en.wikipedia.org/wiki/X_Window_System>
+- <https://en.wikipedia.org/wiki/Wayland_(protocol)>
 
-<https://en.wikipedia.org/wiki/Wayland_(protocol)>
+Technically speaking, qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X'
