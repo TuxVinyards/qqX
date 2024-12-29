@@ -593,8 +593,25 @@ function_quick_get_wrap ()  {
     QGW_Editions_FullListString=
     QGW_Editions_FullListTotal="0"
 
-    QGW_ReleasesEditions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | grep -A 10 Releases | grep -B 10 ERROR | grep -v ERROR )"
-    # TODO  while loop
+    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep -s quickget &); }
+
+    printf "" > "/tmp/quickget-rels-data.txt"
+    quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
+    sleep 0.5
+    DataCount="0"
+    QGW_ChkLoop=
+    while true; do
+      if grep -qs 'ERROR! You must specify' "/tmp/quickget-rels-data.txt"; then
+        QGW_ReleasesEditions_ListRaw="$(grep -A 10 Releases "/tmp/quickget-rels-data.txt" | grep -B 10 ERROR | grep -v ERROR )"
+        break
+      fi
+      read -rt 0.5  QGW_ChkLoop
+      ((DataCount+=1))
+      [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
+      [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+      [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+      [[ $QGW_ChkLoop ]] && break
+    done
 
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
