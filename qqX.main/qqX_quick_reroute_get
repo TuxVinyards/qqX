@@ -583,28 +583,44 @@ function_quick_get_wrap ()  {
 
     printf "\n\n  Checking releases ... \n\n\n"
 
-    declare -ga QGW_Releases_Array=() # TODO  while loop
+    declare -ga QGW_Releases_Array=()
+    declare -ga QGW_Editions_Array=()
+    declare -ga QGW_FullEditions_Array=()
+    QGW_ReleasesEditions_ListRaw=
+    QGW_Releases_ListRaw=
+    QGW_Editions_FullList=
+    QGW_Editions_FullListRaw=
+    QGW_Editions_FullListString=
+    QGW_Editions_FullListTotal="0"
 
     QGW_ReleasesEditions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | grep -A 10 Releases | grep -B 10 ERROR | grep -v ERROR )"
+    # TODO  while loop
+
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
     if [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
       QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
       # also get editions full list for later > some releases have different editions available
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
-      QGW_Editions_FullListString="$(cut -f2- <<< "$QGW_Editions_FullListRaw")"
-      # create test/flag for checking that the string is not just empty space (can happen)
-      QGW_Editions_FullList_Populated="$(tr -d '[:space:]' <<< "$QGW_Editions_FullListString" )"
+      QGW_Editions_FullList="$(cut -f2- <<< "$QGW_Editions_FullListRaw"| tr ' ' '\n')"
+      # make sure the list is not just empty space 
+      QGW_Editions_FullList="$(grep ^ <<< "$QGW_Editions_FullList" )"
+      mapfile -t QGW_FullEditions_Array <<< "$QGW_Editions_FullList"
+      QGW_Editions_FullListString="${QGW_FullEditions_Array[*]}"
+      QGW_Editions_FullListTotal="${#QGW_FullEditions_Array[@]}"
+      [[ $ShowQGetLists ]] && { echo "List E Full "; echo "$QGW_Editions_FullListString"; echo; }
+      [[ $ShowQGetLists ]] && { echo; declare -p QGW_FullEditions_Array; echo; }
     else
-      QGW_Releases_ListRaw="$(grep -B 10  ERROR  <<< "$QGW_Releases_ListRaw" | grep -v ERROR)"
+      QGW_Releases_ListRaw="$QGW_ReleasesEditions_ListRaw"
     fi
     
     [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
     [[ $ShowQGetLists ]] && { echo "Raw E "; echo "$QGW_Editions_FullListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "List E "; echo "$QGW_Editions_FullList"; echo; }
 
     # quickget outputs with a tab separator which is cut -d default
     QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
-    [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_ListRaw"; echo; }
 
     mapfile -t QGW_Releases_Array <<< "$QGW_Releases_ListRaw"
     [[ $ShowQGetLists ]] && { echo; declare -p QGW_Releases_Array; echo; }
@@ -747,27 +763,24 @@ function_quick_get_wrap ()  {
         printColor  "  OS / Release   =   %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
         printf "\n\n  Checking editions .... \n\n\n"
 
-        QGW_Editions_ListTest=
         QGW_List_NumSelected=
         QGW_Edition_Arr_NumSelected=
         QGW_Edition_Arr_NameSelected=
-        declare -ga QGW_Editions_Array=()
-        QGW_Editions_ListTest=
-        QGW_Editions_ListString=
-        QGW_Editions_FullList_Populated=
-        QGW_Editions_FullListString=
+        QGW_Editions_List=
+        QGW_Editions_ListRaw=
+        QGW_Editions_Array=()
 
         if grep -q -s "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
           # quickget will auto-start if editions function not present
           QGW_EditionsFunction=1
           # Release specific list
-          QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" | grep -A 10 Editions | grep -B 10 ERROR | grep -v ERROR | cut -f2- | tr ' ' '\n' )"
-
-          # make sure that the string is not just empty space
-          #QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
-          QGW_Editions_List="$(grep ^ <<< "$QGW_Editions_ListRaw" )"
-
-          [[ $ShowQGetLists ]] && { echo "E"; echo "$QGW_Editions_List"; echo; }
+          QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" | grep -A 10 Editions | grep -B 10 ERROR | grep -v ERROR | cut -f2- )"
+          [[ $ShowQGetLists ]] && { echo "Raw E"; echo "$QGW_Editions_ListRaw"; echo; }
+          
+          QGW_Editions_List="$(tr ' ' '\n' <<< "$QGW_Editions_ListRaw" )"
+          # make sure that the list is not just empty space
+          QGW_Editions_List="$(grep ^ <<< "$QGW_Editions_List" )"
+          [[ $ShowQGetLists ]] && { echo "List E"; echo "$QGW_Editions_List"; echo; }
 
         else QGW_EditionsFunction=
 
@@ -778,15 +791,15 @@ function_quick_get_wrap ()  {
         fi
 
         if [[ ! ${QGW_Editions_Array[*]} ]]; then
-          if [[ $QGW_EditionsFunction && $QGW_Editions_FullList_Populated && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          if [[ $QGW_EditionsFunction && "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
             printf "  Further selection not available in this release"
-            printf "\n\n  Full list, all Releases: \n\n  %s " "$QGW_Editions_FullListString"
+            printf "\n\n  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
-          elif [[ ! $QGW_Editions_FullList_Populated && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
             printf "  No editions to select in any of the releases ..."
             printColor "\n\n  [enter] to continue   "
             printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n" 
-          elif [[ ! $QGW_Editions_FullList_Populated && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
             printf "  This distro is single release option only .... "
             printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
           fi
@@ -795,8 +808,8 @@ function_quick_get_wrap ()  {
         elif [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
           printf "  One edition found: %s \n\n" "${QGW_Editions_Array[0]}"
           QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-          if [[ $QGW_Editions_FullList_Populated && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printf "  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+          if [[ "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
           else
             printColor "  [enter] to continue   [b] to go back \n\n" 
@@ -806,7 +819,7 @@ function_quick_get_wrap ()  {
         else
           print_quickget_and_folder_choices  "QGW_Editions_Array"
           if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printf "\n\n  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
           else  
             printColor "\n\n  Give LIST number of Edition   [r] return to releases menu to view web page    [b] back to main menu \n\n" 
