@@ -586,8 +586,7 @@ function_quick_get_wrap ()  {
     declare -ga QGW_Releases_Array=() # TODO  while loop
 
     QGW_ReleasesEditions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | grep -A 10 Releases | grep -B 10 ERROR | grep -v ERROR )"
-
-    echo "Raw $QGW_ReleasesEditions_ListRaw"; echo
+    [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
     if [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
       QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
@@ -599,14 +598,17 @@ function_quick_get_wrap ()  {
     else
       QGW_Releases_ListRaw="$(grep -B 10  ERROR  <<< "$QGW_Releases_ListRaw" | grep -v ERROR)"
     fi
-    echo "Raw R $QGW_Releases_ListRaw"; echo
-    echo "Raw E $QGW_Editions_FullListRaw"; echo
+    
+    [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "Raw E "; echo "$QGW_Editions_FullListRaw"; echo; }
 
+    # quickget outputs with a tab separator which is cut -d default
     QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
-
-    echo "Raw $QGW_Releases_ListRaw"; echo
+    [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
 
     mapfile -t QGW_Releases_Array <<< "$QGW_Releases_ListRaw"
+    [[ $ShowQGetLists ]] && { echo; declare -p QGW_Releases_Array; echo; }
+
   fi
 
   function choose_QGW_release {
@@ -760,31 +762,19 @@ function_quick_get_wrap ()  {
           QGW_EditionsFunction=1
           # Release specific list
           QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" | grep -A 10 Editions | grep -B 10 ERROR | grep -v ERROR | cut -f2- | tr ' ' '\n' )"
-          #QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
-          #QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
 
           # make sure that the string is not just empty space
           #QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
           QGW_Editions_List="$(grep ^ <<< "$QGW_Editions_ListRaw" )"
 
-          echo "$QGW_Editions_List"; echo
-
-          # Full list, all Releases
-          #QGW_Editions_FullListRaw="$(quickget "$QGW_OS_Arr_NameSelected"  |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-          #QGW_Editions_FullListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_FullListRaw")"
-          #QGW_Editions_FullListString="${QGW_Editions_FullListRaw/'- Editions: '/}"
-          #QGW_Editions_FullList_Populated="$(tr -d '[:space:]' <<< "$QGW_Editions_FullListString" )"
+          [[ $ShowQGetLists ]] && { echo "E"; echo "$QGW_Editions_List"; echo; }
 
         else QGW_EditionsFunction=
 
         fi
 
         if [[ $QGW_Editions_List ]]; then
-            #read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
             mapfile -t QGW_Editions_Array <<< "$QGW_Editions_List"
-            #QGW_Editions_FullListString="${QGW_Editions_Array[*]}"
-            # make sure that the string is not just empty space
-            #QGW_Editions_FullList_Populated="$(tr -d '[:space:]' <<< "$QGW_Editions_FullListString" )"
         fi
 
         if [[ ! ${QGW_Editions_Array[*]} ]]; then
