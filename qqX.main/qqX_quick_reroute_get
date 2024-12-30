@@ -159,8 +159,9 @@ function_test_iso_url () {
     DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
     [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
     while true; do
-      [[ $(cat "/tmp/qmod-dl-url" ) ]] && break
-      [[ "$SECONDS" -ge 10 && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      [[ $(cat "/tmp/qmod-dl-url") ]] && break
+      [[ "$SECONDS" -ge 12 && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      sleep 1
     done
 
     DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
