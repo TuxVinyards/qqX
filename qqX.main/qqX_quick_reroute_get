@@ -13,7 +13,7 @@
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009 
 
 # Find the right version for the standard 'quickget' call 
 # which is only used in simple API wrapping mode, for now ...
@@ -140,31 +140,43 @@ function_test_iso_url () {
 
   else
 
-    printColor "\n\n  Checking download link .... \n\n"
+    printf "\n\n  Checking download link .... \n\n"
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
     DL_PotentialOkay=
     DL_PotentialHtml=
 
+    SECONDS=0
     # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
-    if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
-    elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
+    if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
+    elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
     else echo > "/tmp/qmod-dl-url"
     fi
+    sleep 1
+    [[ $ShowQGetLists ]] && { echo "Check URL"; (ps -ef | grep bash | grep quickget); echo; }
+    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+    while true; do
+      [[ $(cat "/tmp/qmod-dl-url" ) ]] && break
+      [[ "$SECONDS" -ge 10 && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+    done
+
     DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
+    [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; }
     printf "" > "/tmp/qmod-dl-size"
 
     if [[ ! $DL_Url ]]; then  
-      printColor "\n\n  Quickget cannot provide a link ?? "; QGW_Download_BadLink=1
-      printf "\n\n"
+      printColor "\n\n  QuickGet has been timed-out with providing a link ..."; QGW_Download_BadLink=1
       iso_get_message
     else  
-      DL_FileName="${DL_Url##*/}"
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      DL_FileName="$(basename "$DL_Url")"
+      [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 4 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
-        printColor "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15 --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        printf "  twice ........ \n\n"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 6 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -330,9 +342,9 @@ function_quick_get_wrap ()  {
     tput sc
     printf  "               Checking connections ... \n\n" 
 
-    if   curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "1.1.1.1"  2> /dev/null ; then InternetUp=1
-    elif curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "cloudflare.com"  2> /dev/null ; then InternetUp=1
-    elif curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "google.com"  2> /dev/null ; then InternetUp=1
+    if   curl -L -I -s -o /dev/null --max-time 4 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
+    elif curl -L -I -s -o /dev/null --max-time 4 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
+    elif curl -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
 
     elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
     elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
@@ -489,7 +501,8 @@ function_quick_get_wrap ()  {
           iso_get_message () {
             if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
               printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
-              printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
+              printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  Right click on the downloaded ISO, then open-with > "
+              printf "  HomePage = %s"  "$QGW_OS_HomePage"
             fi
           }
 
@@ -540,11 +553,11 @@ function_quick_get_wrap ()  {
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 4 --max-time 10 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 8 --max-time 20 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              if curl --location --silent --head --output /dev/null --max-time 4 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl --location --silent --head --output /dev/null --max-time 8 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
-                printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
+                printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
               fi
             } >> "/tmp/qmod-dl-homepage-report.txt"
           fi
@@ -593,12 +606,12 @@ function_quick_get_wrap ()  {
     QGW_Editions_FullListString=
     QGW_Editions_FullListTotal="0"
 
-    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
-
     printf "" > "/tmp/quickget-rels-data.txt"
     quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
     sleep 0.5
-    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1)"
+    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
     DataCount="0"
     QGW_ChkLoop=
     while true; do
@@ -606,14 +619,16 @@ function_quick_get_wrap ()  {
         QGW_ReleasesEditions_ListRaw="$(grep -A 10 Releases "/tmp/quickget-rels-data.txt" | grep -B 10 ERROR | grep -v ERROR )"
         break
       fi
+      [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
       read -rt 0.5  QGW_ChkLoop
       ((DataCount+=1))
       [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
       [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
       [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
       [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
-      [[ $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
-      [[ $QGW_ChkLoop ]] && break
+      # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+      [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      [[ -n $QGW_ChkLoop ]] && break
     done
 
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
