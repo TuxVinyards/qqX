@@ -593,11 +593,12 @@ function_quick_get_wrap ()  {
     QGW_Editions_FullListString=
     QGW_Editions_FullListTotal="0"
 
-    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep -s quickget &); }
+    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
 
     printf "" > "/tmp/quickget-rels-data.txt"
     quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
     sleep 0.5
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1)"
     DataCount="0"
     QGW_ChkLoop=
     while true; do
@@ -610,6 +611,8 @@ function_quick_get_wrap ()  {
       [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
       [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
       [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+      [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      [[ $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
       [[ $QGW_ChkLoop ]] && break
     done
 
@@ -621,7 +624,7 @@ function_quick_get_wrap ()  {
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
       QGW_Editions_FullList="$(cut -f2- <<< "$QGW_Editions_FullListRaw"| tr ' ' '\n')"
       # make sure the list is not just empty space 
-      QGW_Editions_FullList="$(grep ^ <<< "$QGW_Editions_FullList" )"
+      QGW_Editions_FullList="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_FullList" )"
       mapfile -t QGW_FullEditions_Array <<< "$QGW_Editions_FullList"
       QGW_Editions_FullListString="${QGW_FullEditions_Array[*]}"
       QGW_Editions_FullListTotal="${#QGW_FullEditions_Array[@]}"
@@ -653,7 +656,7 @@ function_quick_get_wrap ()  {
 
       if [[ ! ${QGW_Releases_Array[*]} ]] ; then
 
-        printColor "  Quickemu or internet ERROR, no releases found "
+        printColor "  QuickGet or internet ERROR, no releases found "
         printf "\n\n  Linux ISO's: Try downloading directly from the distro's Web Pages .... \n"
     
       elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
@@ -796,7 +799,7 @@ function_quick_get_wrap ()  {
           
           QGW_Editions_List="$(tr ' ' '\n' <<< "$QGW_Editions_ListRaw" )"
           # make sure that the list is not just empty space
-          QGW_Editions_List="$(grep ^ <<< "$QGW_Editions_List" )"
+          QGW_Editions_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_List" )"
           [[ $ShowQGetLists ]] && { echo "List E"; echo "$QGW_Editions_List"; echo; }
 
         else QGW_EditionsFunction=
