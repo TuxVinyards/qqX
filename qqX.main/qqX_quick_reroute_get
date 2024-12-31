@@ -157,6 +157,7 @@ function_test_iso_url () {
     [[ $ShowQGetLists ]] && { echo "Check URL"; (ps -ef | grep bash | grep quickget); echo; }
     DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
     if [[ $DataPID ]]; then
+      # only if quickget has url checking ...
       [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
       while true; do
         [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
@@ -170,7 +171,7 @@ function_test_iso_url () {
     printf "" > "/tmp/qmod-dl-size"
 
     if [[ ! $DL_Url ]]; then  
-      printColor "\n\n  QuickGet has been timed-out with providing a link ..."; QGW_Download_BadLink=1
+      printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
       iso_get_message
     else  
       DL_FileName="$(basename "$DL_Url")"
@@ -609,6 +610,7 @@ function_quick_get_wrap ()  {
     QGW_Editions_FullListString=
     QGW_Editions_FullListTotal="0"
 
+    # running checks in the background (&) means that we can stop the process if it hangs
     printf "" > "/tmp/quickget-rels-data.txt"
     quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
     sleep 0.5
@@ -641,7 +643,7 @@ function_quick_get_wrap ()  {
       # also get editions full list for later > some releases have different editions available
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
       QGW_Editions_FullList="$(cut -f2- <<< "$QGW_Editions_FullListRaw"| tr ' ' '\n')"
-      # make sure the list is not just empty space 
+      # try to make sure the list is not just empty space 
       QGW_Editions_FullList="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_FullList" )"
       mapfile -t QGW_FullEditions_Array <<< "$QGW_Editions_FullList"
       QGW_Editions_FullListString="${QGW_FullEditions_Array[*]}"
@@ -808,15 +810,39 @@ function_quick_get_wrap ()  {
         QGW_Editions_ListRaw=
         QGW_Editions_Array=()
 
-        if grep -q -s "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
-          # quickget will auto-start if editions function not present
+        if grep -qs "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
+          # if NO editions function is present in the code for that distro, then no editions are available
+          # quickget will auto-start as no editions are available, so only check for data if a named function is present
           QGW_EditionsFunction=1
-          # Release specific list
-          QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" | grep -A 10 Editions | grep -B 10 ERROR | grep -v ERROR | cut -f2- )"
+          # Check the editions list specific to the selected release     
+          # running checks in the background (&) means that we can stop the process if it hangs (as with releases check)
+          printf "" > "/tmp/quickget-editions-data.txt"
+          quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" > "/tmp/quickget-editions-data.txt" &
+          sleep 0.5
+          [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
+          DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+          [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+          DataCount="0"
+          QGW_ChkLoop=
+          while true; do
+            if grep -qs 'ERROR! You must specify' "/tmp/quickget-editions-data.txt"; then
+              QGW_Editions_ListRaw="$(grep -A 10 Editions "/tmp/quickget-editions-data.txt" | grep -B 10 ERROR | grep -v ERROR | cut -f2- )"
+              break
+            fi
+            [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
+            read -rt 0.5  QGW_ChkLoop
+            ((DataCount+=1))
+            [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
+            [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+            [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+            [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+            # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+            [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+            [[ -n $QGW_ChkLoop ]] && break
+          done
           [[ $ShowQGetLists ]] && { echo "Raw E"; echo "$QGW_Editions_ListRaw"; echo; }
-          
           QGW_Editions_List="$(tr ' ' '\n' <<< "$QGW_Editions_ListRaw" )"
-          # make sure that the list is not just empty space
+          # try to make sure that the list is not just empty space
           QGW_Editions_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_List" )"
           [[ $ShowQGetLists ]] && { echo "List E"; echo "$QGW_Editions_List"; echo; }
 
