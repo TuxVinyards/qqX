@@ -13,7 +13,7 @@
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009 
 
 # Find the right version for the standard 'quickget' call 
 # which is only used in simple API wrapping mode, for now ...
@@ -140,31 +140,47 @@ function_test_iso_url () {
 
   else
 
-    printColor "\n\n  Checking download link .... \n\n"
+    printf "\n\n  Checking download link .... \n\n"
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
     DL_PotentialOkay=
     DL_PotentialHtml=
-
+    SECONDS=0
+    printf "" > "/tmp/qmod-dl-url"
     # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
-    if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
-    elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
-    else echo > "/tmp/qmod-dl-url"
+    # running checks in the background (&) means that we can stop the process if it hangs
+    if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
+    elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
     fi
+    sleep 1
+    [[ $ShowQGetLists ]] && { echo "Check URL"; (ps -ef | grep bash | grep quickget); echo; }
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+    if [[ $DataPID ]]; then
+      # only if quickget has url checking ...
+      [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+      while true; do
+        [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
+        [[ "$SECONDS" -ge 12 ]] && { kill "$DataPID" &>/dev/null ; break; }
+        sleep 1
+      done
+    fi
+
     DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
+    [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; }
     printf "" > "/tmp/qmod-dl-size"
 
     if [[ ! $DL_Url ]]; then  
-      printColor "\n\n  Quickget cannot provide a link ?? "; QGW_Download_BadLink=1
-      printf "\n\n"
+      printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
       iso_get_message
     else  
-      DL_FileName="${DL_Url##*/}"
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 6 --max-time 15 --retry 2 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      DL_FileName="$(basename "$DL_Url")"
+      printf "  Checking download size .... \n\n"
+      [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 4 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
-        printColor "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --connect-timeout 15 --max-time 40 --retry 3 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        printf "  twice ........ \n\n"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 6 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -330,9 +346,9 @@ function_quick_get_wrap ()  {
     tput sc
     printf  "               Checking connections ... \n\n" 
 
-    if   curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "1.1.1.1"  2> /dev/null ; then InternetUp=1
-    elif curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "cloudflare.com"  2> /dev/null ; then InternetUp=1
-    elif curl -L -I -s -o /dev/null --retry 2 --connect-timeout 2  "google.com"  2> /dev/null ; then InternetUp=1
+    if   curl -L -I -s -o /dev/null --max-time 4 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
+    elif curl -L -I -s -o /dev/null --max-time 4 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
+    elif curl -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
 
     elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
     elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
@@ -489,7 +505,8 @@ function_quick_get_wrap ()  {
           iso_get_message () {
             if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
               printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
-              printf "\n\n  Note that not all distro sites can be scanned for the 'latest' releases. \n\n  Right click on the downloaded ISO, then open-with."
+              printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  Right click on the downloaded ISO, then open-with > "
+              printf "  HomePage = %s"  "$QGW_OS_HomePage"
             fi
           }
 
@@ -540,11 +557,11 @@ function_quick_get_wrap ()  {
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 4 --max-time 10 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --location --silent --head --output /dev/null --retry 2 --connect-timeout 8 --max-time 20 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              if curl --location --silent --head --output /dev/null --max-time 4 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl --location --silent --head --output /dev/null --max-time 8 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
-                printf "\n\n  Downloads might work.  HOME PAGE link appears broken or site is down ... " 
+                printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
               fi
             } >> "/tmp/qmod-dl-homepage-report.txt"
           fi
@@ -584,10 +601,69 @@ function_quick_get_wrap ()  {
     printf "\n\n  Checking releases ... \n\n\n"
 
     declare -ga QGW_Releases_Array=()
-    QGW_Releases_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" | awk /'Releases:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-    QGW_Releases_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Releases_ListRaw")"
-    QGW_Releases_ListString="${QGW_Releases_ListRaw/'- Releases: '/}"
-    read -ra QGW_Releases_Array <<< "$QGW_Releases_ListString"
+    declare -ga QGW_Editions_Array=()
+    declare -ga QGW_FullEditions_Array=()
+    QGW_ReleasesEditions_ListRaw=
+    QGW_Releases_ListRaw=
+    QGW_Editions_FullList=
+    QGW_Editions_FullListRaw=
+    QGW_Editions_FullListString=
+    QGW_Editions_FullListTotal="0"
+
+    # running checks in the background (&) means that we can stop the process if it hangs
+    printf "" > "/tmp/quickget-rels-data.txt"
+    quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
+    sleep 0.5
+    [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+    DataCount="0"
+    QGW_ChkLoop=
+    while true; do
+      if grep -qs 'ERROR! You must specify' "/tmp/quickget-rels-data.txt"; then
+        QGW_ReleasesEditions_ListRaw="$(grep -A 10 Releases "/tmp/quickget-rels-data.txt" | grep -B 10 ERROR | grep -v ERROR )"
+        break
+      fi
+      [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
+      read -rt 0.5  QGW_ChkLoop
+      ((DataCount+=1))
+      [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
+      [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+      [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+      [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+      [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      [[ -n $QGW_ChkLoop ]] && break
+    done
+
+    [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
+
+    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
+      QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
+      # also get editions full list for later > some releases have different editions available
+      QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
+      QGW_Editions_FullList="$(cut -f2- <<< "$QGW_Editions_FullListRaw"| tr ' ' '\n')"
+      # try to make sure the list is not just empty space 
+      QGW_Editions_FullList="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_FullList" )"
+      mapfile -t QGW_FullEditions_Array <<< "$QGW_Editions_FullList"
+      QGW_Editions_FullListString="${QGW_FullEditions_Array[*]}"
+      QGW_Editions_FullListTotal="${#QGW_FullEditions_Array[@]}"
+      [[ $ShowQGetLists ]] && { echo "List E Full "; echo "$QGW_Editions_FullListString"; echo; }
+      [[ $ShowQGetLists ]] && { echo; declare -p QGW_FullEditions_Array; echo; }
+    else
+      QGW_Releases_ListRaw="$QGW_ReleasesEditions_ListRaw"
+    fi
+    
+    [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "Raw E "; echo "$QGW_Editions_FullListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "List E "; echo "$QGW_Editions_FullList"; echo; }
+
+    # quickget outputs with a tab separator which is cut -d default
+    QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
+    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_ListRaw"; echo; }
+
+    mapfile -t QGW_Releases_Array <<< "$QGW_Releases_ListRaw"
+    [[ $ShowQGetLists ]] && { echo; declare -p QGW_Releases_Array; echo; }
 
   fi
 
@@ -600,7 +676,7 @@ function_quick_get_wrap ()  {
 
       if [[ ! ${QGW_Releases_Array[*]} ]] ; then
 
-        printColor "  Quickemu or internet ERROR, no releases found "
+        printColor "  QuickGet or internet ERROR, no releases found "
         printf "\n\n  Linux ISO's: Try downloading directly from the distro's Web Pages .... \n"
     
       elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
@@ -727,50 +803,67 @@ function_quick_get_wrap ()  {
         printColor  "  OS / Release   =   %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
         printf "\n\n  Checking editions .... \n\n\n"
 
-        QGW_Editions_ListTest=
         QGW_List_NumSelected=
         QGW_Edition_Arr_NumSelected=
         QGW_Edition_Arr_NameSelected=
-        declare -ga QGW_Editions_Array=()
-        QGW_Editions_ListTest=
-        QGW_Editions_ListString=
-        QGW_Editions_FullListTest=
-        QGW_Editions_FullListString=
+        QGW_Editions_List=
+        QGW_Editions_ListRaw=
+        QGW_Editions_Array=()
 
-        if grep -q -s "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
-          # quickget will auto-start if editions function not present
+        if grep -qs "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
+          # if NO editions function is present in the code for that distro, then no editions are available
+          # quickget will auto-start as no editions are available, so only check for data if a named function is present
           QGW_EditionsFunction=1
-          # Release specific list
-          QGW_Editions_ListRaw="$(quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-          QGW_Editions_ListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_ListRaw")"
-          QGW_Editions_ListString="${QGW_Editions_ListRaw/'- Editions: '/}"
-          # make sure that the string is not just empty space
-          QGW_Editions_ListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_ListString" )"
-
-          # Full list, all Releases
-          QGW_Editions_FullListRaw="$(quickget "$QGW_OS_Arr_NameSelected"  |  awk /'Editions:'/'{print  $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $15, $16, $17, $18, $19, $20}')"
-          QGW_Editions_FullListRaw="$(tr -cd "[:print:]" <<< "$QGW_Editions_FullListRaw")"
-          QGW_Editions_FullListString="${QGW_Editions_FullListRaw/'- Editions: '/}"
-          QGW_Editions_FullListTest="$(tr -d '[:space:]' <<< "$QGW_Editions_FullListString" )"
+          # Check the editions list specific to the selected release     
+          # running checks in the background (&) means that we can stop the process if it hangs (as with releases check)
+          printf "" > "/tmp/quickget-editions-data.txt"
+          quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" > "/tmp/quickget-editions-data.txt" &
+          sleep 0.5
+          [[ $ShowQGetLists ]] && { echo "Check 1"; (pgrep -af bash | grep quickget &); echo; }
+          DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+          [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+          DataCount="0"
+          QGW_ChkLoop=
+          while true; do
+            if grep -qs 'ERROR! You must specify' "/tmp/quickget-editions-data.txt"; then
+              QGW_Editions_ListRaw="$(grep -A 10 Editions "/tmp/quickget-editions-data.txt" | grep -B 10 ERROR | grep -v ERROR | cut -f2- )"
+              break
+            fi
+            [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
+            read -rt 0.5  QGW_ChkLoop
+            ((DataCount+=1))
+            [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
+            [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+            [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+            [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+            # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+            [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+            [[ -n $QGW_ChkLoop ]] && break
+          done
+          [[ $ShowQGetLists ]] && { echo "Raw E"; echo "$QGW_Editions_ListRaw"; echo; }
+          QGW_Editions_List="$(tr ' ' '\n' <<< "$QGW_Editions_ListRaw" )"
+          # try to make sure that the list is not just empty space
+          QGW_Editions_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_List" )"
+          [[ $ShowQGetLists ]] && { echo "List E"; echo "$QGW_Editions_List"; echo; }
 
         else QGW_EditionsFunction=
 
         fi
 
-        if [[ $QGW_Editions_ListTest ]]; then
-            read -ra QGW_Editions_Array <<< "$QGW_Editions_ListString"
+        if [[ $QGW_Editions_List ]]; then
+            mapfile -t QGW_Editions_Array <<< "$QGW_Editions_List"
         fi
 
         if [[ ! ${QGW_Editions_Array[*]} ]]; then
-          if [[ $QGW_EditionsFunction && $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          if [[ $QGW_EditionsFunction && "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
             printf "  Further selection not available in this release"
-            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printf "\n\n  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
-          elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
             printf "  No editions to select in any of the releases ..."
             printColor "\n\n  [enter] to continue   "
             printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n" 
-          elif [[ ! $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
             printf "  This distro is single release option only .... "
             printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
           fi
@@ -779,8 +872,8 @@ function_quick_get_wrap ()  {
         elif [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
           printf "  One edition found: %s \n\n" "${QGW_Editions_Array[0]}"
           QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-          if [[ $QGW_Editions_FullListTest && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printf "  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+          if [[ "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+            printf "  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
           else
             printColor "  [enter] to continue   [b] to go back \n\n" 
@@ -790,7 +883,7 @@ function_quick_get_wrap ()  {
         else
           print_quickget_and_folder_choices  "QGW_Editions_Array"
           if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printf "\n\n  Full list, all Releases: %s " "$QGW_Editions_FullListString"
+            printf "\n\n  Full list (%s), all Releases: \n  %s" "$QGW_Editions_FullListTotal" "$QGW_Editions_FullListString"
             printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
           else  
             printColor "\n\n  Give LIST number of Edition   [r] return to releases menu to view web page    [b] back to main menu \n\n" 

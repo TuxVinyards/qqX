@@ -63,9 +63,9 @@ if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then 
 # i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present
 if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
-# DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less, 
+# DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,        
 # where timed pauses are given. Some diagnostics require enter key to continue ...
-NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars= ; ShowProcesses= ; PathDiagnostics=
+NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=         ### DEV ###
 
 function dev_loop_check {
   if [[ $GeneralLoopCheck ]]; then
