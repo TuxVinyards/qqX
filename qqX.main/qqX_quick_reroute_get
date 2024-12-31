@@ -146,23 +146,24 @@ function_test_iso_url () {
     DL_PotentialSize=
     DL_PotentialOkay=
     DL_PotentialHtml=
-
     SECONDS=0
+    printf "" > "/tmp/qmod-dl-url"
     # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
+    # running checks in the background (&) means that we can stop the process if it hangs
     if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
     elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
-    else echo > "/tmp/qmod-dl-url"
     fi
     sleep 1
     [[ $ShowQGetLists ]] && { echo "Check URL"; (ps -ef | grep bash | grep quickget); echo; }
-    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
     DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
-    [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
-    while true; do
-      [[ $(cat "/tmp/qmod-dl-url") ]] && break
-      [[ "$SECONDS" -ge 12 && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
-      sleep 1
-    done
+    if [[ $DataPID ]]; then
+      [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
+      while true; do
+        [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
+        [[ "$SECONDS" -ge 12 ]] && { kill "$DataPID" &>/dev/null ; break; }
+        sleep 1
+      done
+    fi
 
     DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
     [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; }
@@ -173,6 +174,7 @@ function_test_iso_url () {
       iso_get_message
     else  
       DL_FileName="$(basename "$DL_Url")"
+      printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
       curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 4 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
