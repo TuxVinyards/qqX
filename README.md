@@ -14,7 +14,7 @@
 
 - Easy [installation](#how-to-install)
 
-## [Latest release 1.11.02](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.11.03](https://github.com/TuxVinyards/qqX/releases/latest)
 
 Another large code update with lots of new features and Quickemu improvements.
 
@@ -132,7 +132,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - adds a fix for Arch hosts EFI
 
-@ Dec 23  Release [1.11.02](https://github.com/TuxVinyards/qqX/releases/latest)
+@ Dec 23  Release 1.11.02
 
 - Extensive testing has now been completed, including in a wide range of tiling window managers
 
@@ -141,9 +141,13 @@ has now been merged
 
 - The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
 
-@ Dec 31  - fix added to main (1.11.03 1st part) for Quickget hanging on URL checks when server or internet is slow
+@ Dec 31  Release [1.11.03](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- fix for Quickget hanging on URL checks when server or internet is slow
 
 - also fixes issue where quickget occasionally outputs multiline release and edition data
+
+- updates FreeSpirit to latest Quickemu 4.9.7/8  > adds proxmox and a couple of other items not in 1.11.02
 
 Enjoy the end of year festivities :christmas_tree:
 

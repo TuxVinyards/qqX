@@ -51,7 +51,7 @@ fi
 # Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
 # Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
 # Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
-  qqX_Version="1.11.02"
+  qqX_Version="1.11.03"
 
 # Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
 sleep 0.4
