@@ -149,7 +149,7 @@ has now been merged
 
 - updates FreeSpirit to latest Quickemu 4.9.7/8  > adds proxmox and a couple of other items not in 1.11.02
 
-Enjoy the end of year festivities :christmas_tree:
+Enjoy the end of year festivities :rocket:
 
 ### Reliability
 
