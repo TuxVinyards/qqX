@@ -8,7 +8,7 @@
 
 - Offers a complete menu system within a unique hybrid interface
 
-- More up-to-date and easier to mod than Gnome Boxes
+- More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
@@ -141,6 +141,10 @@ has now been merged
 
 - The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
 
+@ Dec 31  - fix added to main (1.11.03 1st part) for Quickget hanging on URL checks when server or internet is slow
+
+- also fixes issue where quickget occasionally outputs multiline release and edition data
+
 Enjoy the end of year festivities :christmas_tree:
 
 ### Reliability
@@ -163,7 +167,7 @@ Enjoy the end of year festivities :christmas_tree:
 
 - And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
 
-See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins, or [change log](https://github.com/TuxVinyards/qqX/wiki/Change-Log) for a history synopsis
+See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
 ### FAQs and Help
 
