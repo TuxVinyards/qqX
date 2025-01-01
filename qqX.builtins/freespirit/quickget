@@ -598,7 +598,8 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    echo 7.0.0
+    #echo 7.0.0
+    floatversion -M "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
 }
 
 function editions_bodhi() {
