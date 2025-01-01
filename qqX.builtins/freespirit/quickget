@@ -2490,8 +2490,9 @@ function get_sparkylinux() {
 
 function get_spirallinux() {
     local HASH=""
-    local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
-    local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
+    local LATEST="$(floatversion -M "$(curl -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')" 2>/dev/null)"
+    local ISO="SpiralLinux_${EDITION}_${LATEST}_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
     echo "${URL}/${ISO}" "${HASH}"
 }
