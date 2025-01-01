@@ -154,31 +154,31 @@ fi
 ##  Check for items sometimes missing 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p bc) ]]; then
   printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p xrandr) ]]; then
   printf "\n\n  An 'xrandr' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p wget) ]]; then
   printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p 7z) ]]; then
-  printf "\n\n  A '7zip' installation should be present and is needed in few places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  printf "\n\n  A command line '7zip' installation is needed for some distro downloads...\n\n"
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 
 

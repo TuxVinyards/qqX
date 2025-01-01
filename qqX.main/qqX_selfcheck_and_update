@@ -182,7 +182,7 @@ function download_new_release {
       # record where to come back to, when done
       ReturnFolder="$(pwd)"
 
-      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
+      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder ??"
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         eval curl -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"  "$qqX_Latest_Secure_TarBall"
@@ -201,7 +201,7 @@ function download_new_release {
         printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
       fi
 
-      printColor "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
+      printf "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
       printf "\n\n  All option settings, locations and preferences will be kept."
       printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
       read -rp "  >  "  qqX_UpdateExit
@@ -209,9 +209,9 @@ function download_new_release {
       if [[ $qqX_UpdateExit != "r" ]]; then 
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
-        cd "$qqX_LatestTarBall_Folder" || { printColor "\n\n  ERROR  changing to qqX.releases folder" ; sleep 1000 ;}
-        # move current execution away from this script and to the installer
-        exec  bash -c "./qqX_setup_and_install  Upgrade" 
+        sleep 0.5
+        # start the SYSTEM installer (use the posix installer for initial or manual installs)
+        exec  bash -c "$qqX_LatestTarBall_Folder/qqX.system/qqX_system_install  Upgrade" 
       fi
 
       sleep 0.6
