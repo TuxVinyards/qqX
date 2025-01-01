@@ -213,6 +213,7 @@ printf "\n  Running initial checks .... \n"
 if [[ ! $Disable_qqX_upd_Checks ]]; then
   check_for_qqX_updates &   
   qqX_UpdaterPID="$!"
+  find_latest_qemu_version &
 fi
 
 #  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
