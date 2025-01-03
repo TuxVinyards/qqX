@@ -605,6 +605,7 @@ function_quick_get_wrap ()  {
     declare -ga QGW_FullEditions_Array=()
     QGW_ReleasesEditions_ListRaw=
     QGW_Releases_ListRaw=
+    QGW_Releases_List=
     QGW_Editions_FullList=
     QGW_Editions_FullListRaw=
     QGW_Editions_FullListString=
@@ -660,9 +661,13 @@ function_quick_get_wrap ()  {
 
     # quickget outputs with a tab separator which is cut -d default
     QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
-    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_ListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "List R raw"; echo "$QGW_Releases_ListRaw"; echo; }
 
-    mapfile -t QGW_Releases_Array <<< "$QGW_Releases_ListRaw"
+    # try to make sure the list is not just empty space 
+    QGW_Releases_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Releases_ListRaw" )"
+    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_List"; echo; }
+
+    mapfile -t QGW_Releases_Array <<< "$QGW_Releases_List"
     [[ $ShowQGetLists ]] && { echo; declare -p QGW_Releases_Array; echo; }
 
   fi
