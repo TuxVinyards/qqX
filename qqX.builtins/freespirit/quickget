@@ -598,7 +598,7 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    floatversion -M 3 "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
+    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
 }
 
 function editions_bodhi() {
@@ -798,7 +798,7 @@ function editions_kolibrios() {
 }
 
 function releases_linuxlite() {
-    floatversion -M 3 "$(curl -sLf "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
+    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
 }
 
 function releases_linuxmint() {
