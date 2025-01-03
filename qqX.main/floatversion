@@ -18,7 +18,7 @@
 
 # For this script: x.xx.xx-suffix > major.minor.point and with optionals as -beta.01 etc
 # Non-major numbers are padded to 2dp to make easier reading in file managers
-# Current Version 1.02.01  > set locally in function case statements
+# Current Version 1.02.02  > set locally in function case statements
 
 # POSIX and Mac/HomeBrew compliant initial Bash test:
 if [ ! "$(command -v bash)" ] || ! bash --version | grep bash | grep -qEo '[ ]+[5-9]+[.]' ; then
@@ -75,7 +75,8 @@ float_version_from_string ()  {
 
   -h | --help         show help 
   -V | --version      show version
-  -c | --col          show list as column instead of string (unless -M)
+  -c | --col          show list as column instead of string
+  -s | --space        use single spaced string (for alternative machine reading)
   -r | --rev          show list in reverse order  
   -a | --all          show all extracted values, not just unique 
   -n | --num          sort by standard numbering, not versioning
@@ -108,6 +109,7 @@ float_version_from_string ()  {
 
   local ShowAsCol=
   local ShowAsStr=
+  local SingleSpace=
   local ShowMax=
   local TopMax=
   local RevMax=
@@ -141,7 +143,7 @@ float_version_from_string ()  {
       -h|--help)  
         show_help ; return 0 ;;
       -V|--version)
-        CurrentVersion="1.02.01"
+        CurrentVersion="1.02.02"
         printf "\n CurrentVersion: %s" "$CurrentVersion"
         printf "\n\n Checking for updates....   "
         LatestVersion="$(floatversion -M "$(curl -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
@@ -156,6 +158,8 @@ float_version_from_string ()  {
         return 0 ;;
       -c|--col)
         ShowAsCol=1 ; shift ;;
+      -s|--space )
+        SingleSpace=1 ; shift ;;
       -r|--rev)
         ShowRev=1 ; shift ;;
       -a|--all)
@@ -386,7 +390,9 @@ float_version_from_string ()  {
     else [[ $Verbose ]] && { echo "false"; echo ;} ; return 1
     fi
   elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then
-    printf "%s  " "${fvOutputArr[@]}"
+    if [[ $SingleSpace ]]; then printf "%s " "${fvOutputArr[@]}"
+    else printf "%s  " "${fvOutputArr[@]}"
+    fi
     printf "\n"
   elif [[ $ShowAsCol ]]; then
     printf "%s\n" "${fvOutputArr[@]}"
@@ -410,7 +416,7 @@ float_version_from_string ()  {
 
 floatversion ()  {
   # floatversion --options  "quoted-input-string-or-text-file" 
-  # (c) Alex Genovese - version 1.02.01 (compact) - Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
+  # (c) Alex Genovese - version 1.02.02 (compact) - Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
   local ShowAsStr= ; local ShowAsCol= ; local ShowMax= ; local ShowRev= ; local ShowAll= ; local SortNum= ; local GrepFull= 
   local InputText= ; local Nums= ; local NumsCount= ; local FilterString= ; local StartString= ; local DeleteString= ; local GTcompare=
   local UseSortV= ; local NoSortVfallback= ; declare -a NumArrTemp ; declare -a NumArrSorted ; declare -a SelectArrTemp 
@@ -418,6 +424,7 @@ floatversion ()  {
   while [[ "$1" ]] ; do
     case "$1" in 
       -c|--col)     ShowAsCol=1 ; shift ;;
+      -s|--space )  SingleSpace=1 ; shift ;;
       -r|--rev)     ShowRev=1 ; shift ;;
       -a|--all)     ShowAll=1 ; shift ;;
       -n|--num)     SortNum=1 ; shift ;;
@@ -501,7 +508,8 @@ floatversion ()  {
   fi
   if [[ $GTcompare ]]; then 
     if [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]]; then return 0 ; else return 1 ; fi
-  elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then printf "%s  " "${fvOutputArr[@]}" ; printf "\n"
+  elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then 
+    if [[ $SingleSpace ]]; then printf "%s " "${fvOutputArr[@]}"; else printf "%s  " "${fvOutputArr[@]}"; fi
   elif [[ $ShowAsCol ]]; then printf "%s\n" "${fvOutputArr[@]}"
   elif [[ $RevMax ]]; then  echo "${fvOutputArr[0]}"  
   else  echo "${fvOutputArr[-1]}"
