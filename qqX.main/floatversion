@@ -18,7 +18,7 @@
 
 # For this script: x.xx.xx-suffix > major.minor.point and with optionals as -beta.01 etc
 # Non-major numbers are padded to 2dp to make easier reading in file managers
-# Current Version 1.0.0  > set locally in function case statements
+# Current Version 1.02.01  > set locally in function case statements
 
 # POSIX and Mac/HomeBrew compliant initial Bash test:
 if [ ! "$(command -v bash)" ] || ! bash --version | grep bash | grep -qEo '[ ]+[5-9]+[.]' ; then
@@ -83,8 +83,13 @@ float_version_from_string ()  {
   -F | --filter       contains given items -F  \"string  string  string\" 
   -S | --starts       starting with -S  \"string  string  string\" 
   -D | --delete       doesn't contain: -D  \"string  string  string\" 
-  -M | --max          outputs the highest/latest value in list, only, with '-r' shows lowest/earliest
-  -g | --gt           A > B, returns true/false -g \"A B\" (.nums or sem ver)
+  -M | --max          Outputs the single highest/latest value in the list and with '-r' the lowest/earliest,
+                      with integer shows top or bottom of total list eg. -M 3 is top 3 and -M 3 -r the bottom.
+  -RM [int]           Outputs the single lowest/earliest value in the list. With integer, as -M but 
+                      reverses only the M filter set, not the list, eg. -M 3  > 3 2 1  -RM 3 > 1 2 3
+                      also accepts '-r' to reverse a lowest set filter ...
+  -g | --gt           A > B, returns true/false eg. if fv -g \"A B\"; then .. (.nums or sem ver)  
+                      Normally quiet and to be tested.  Use -v for screen output or piping.
   -v | --verbose      for problem output, show algorithm sequences (full version only) 
        --sort-v       use sort -V (if present) in preference to the default jq methods
        --no-svb       no falling back to 'jq' if 'sort -V' is unavailable, show error instead
@@ -104,6 +109,9 @@ float_version_from_string ()  {
   local ShowAsCol=
   local ShowAsStr=
   local ShowMax=
+  local TopMax=
+  local RevMax=
+  local TopShow=
   local ShowAll=
   local ShowRev=
   local SortNum=
@@ -133,7 +141,7 @@ float_version_from_string ()  {
       -h|--help)  
         show_help ; return 0 ;;
       -V|--version)
-        CurrentVersion="1.1.0"
+        CurrentVersion="1.02.01"
         printf "\n CurrentVersion: %s" "$CurrentVersion"
         printf "\n\n Checking for updates....   "
         LatestVersion="$(floatversion -M "$(curl -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
@@ -166,7 +174,11 @@ float_version_from_string ()  {
         [[ ! $2 ]] && show_help && return 1
         DeleteString="$2" ; shift 2 ;;
       -M|--max)
-        ShowMax=1 ; shift ;;
+        ShowMax=1 ; shift 
+        [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
+      -RM)
+        ShowMax=1 ; RevMax=1 ; shift 
+        [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
       -g|--gt)
         GTcompare=1; shift ;;
       -v|--verbose)
@@ -339,12 +351,31 @@ float_version_from_string ()  {
         ((n++))
       done
     fi
-    if [[ $ShowRev ]]; then 
-      NumArrTemp=(); i="${#fvOutputArr[@]}"; ((i-=1))
-      while [[ $i -ge 0  ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
-      [[ $Verbose ]] && { declare -p NumArrTemp ; echo ;}
+    if [[ $ShowRev ]]; then
+      NumArrTemp=(); i="${#fvOutputArr[@]}"
+      ((i-=1)) # to make sure that "${fvOutputArr[0]}" gets read
+      while [[ $i -ge 0 ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
       mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
-      [[ $Verbose ]] && { declare -p fvOutputArr ; echo; }
+      [[ $Verbose ]] && { echo "Rev:"; declare -p fvOutputArr ; echo; }
+    fi
+    if [[ $TopMax ]]; then  
+      # similar to ShowRev but separate in case TopMax needs reversing first
+      # TopShow is there to invert TopMax as the filter counts backwards from the end
+      NumArrTemp=(); i="${#fvOutputArr[@]}"
+        [[ $Verbose ]] && { echo "TopMax pre-process(1): i = $i  TopMax = $TopMax  TopShow = $TopShow"; echo; }
+      if [[ $i -gt "$TopMax" ]]; then TopShow="$((i-TopMax))"; else TopShow="$i"; fi ; ((i-=1))
+      [[ $TopShow -gt "$i" ]] && TopShow="0"
+        [[ $Verbose ]] && { echo "TopMax pre-process(2): i = $i  TopMax = $TopMax  TopShow = $TopShow"; echo; }
+      while true; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); [[ $i -lt "$TopShow" ]] && break; done
+        [[ $Verbose ]] && { echo "TopMax post-process(1):"; echo "TopMax = $TopMax TopShow = $TopShow"; declare -p NumArrTemp ; echo ;}
+      mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
+        [[ $Verbose ]] && { echo "TopMax post-process(2):"; declare -p fvOutputArr ; echo; }
+      if [[ $RevMax ]]; then
+        NumArrTemp=(); i="${#fvOutputArr[@]}"; ((i-=1))
+        while [[ $i -ge 0 ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
+        mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
+        [[ $Verbose ]] && { echo "RevMax:"; declare -p fvOutputArr ; echo; }
+      fi
     fi
   fi
 
@@ -359,7 +390,10 @@ float_version_from_string ()  {
     printf "\n"
   elif [[ $ShowAsCol ]]; then
     printf "%s\n" "${fvOutputArr[@]}"
+  elif [[ $RevMax ]]; then
+    echo "${fvOutputArr[0]}"
   else
+    # then default to = ShowMax (-1 ie the last one in the array)
     echo "${fvOutputArr[-1]}"
   fi
 
@@ -376,7 +410,7 @@ float_version_from_string ()  {
 
 floatversion ()  {
   # floatversion --options  "quoted-input-string-or-text-file" 
-  # (c) Alex Genovese - version 1.1.0 (compact) - Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
+  # (c) Alex Genovese - version 1.02.01 (compact) - Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
   local ShowAsStr= ; local ShowAsCol= ; local ShowMax= ; local ShowRev= ; local ShowAll= ; local SortNum= ; local GrepFull= 
   local InputText= ; local Nums= ; local NumsCount= ; local FilterString= ; local StartString= ; local DeleteString= ; local GTcompare=
   local UseSortV= ; local NoSortVfallback= ; declare -a NumArrTemp ; declare -a NumArrSorted ; declare -a SelectArrTemp 
@@ -391,7 +425,8 @@ floatversion ()  {
       -F|--filter)  [[ ! $2 ]] && return 1 ; FilterString="$2" ; shift 2 ;;
       -S|--start)   [[ ! $2 ]] && return 1 ; StartString="$2" ; shift 2 ;;
       -D|--delete)  [[ ! $2 ]] && return 1 ; DeleteString="$2" ; shift 2 ;;
-      -M|--max)     ShowMax=1 ; shift ;;
+      -M|--max)     ShowMax=1 ; shift ; [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
+      -RM)          ShowMax=1 ; RevMax=1 ; shift ; [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
       -g|--gt)      GTcompare=1 ; shift ;;
       --sort-v)     UseSortV=1 ; shift ;;
       --no-svb)     NoSortVfallback=1 ; shift ;;
@@ -454,11 +489,21 @@ floatversion ()  {
       while [[ $i -ge 0  ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
       mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
     fi
+    if [[ $TopMax ]]; then  NumArrTemp=(); i="${#fvOutputArr[@]}"
+      if [[ $i -gt "$TopMax" ]]; then TopShow="$((i-TopMax))"; else TopShow="$i"; fi ; ((i-=1)) ; [[ $TopShow -gt "$i" ]] && TopShow="0"
+      while true; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); [[ $i -lt "$TopShow" ]] && break; done
+      mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
+      if [[ $RevMax ]]; then NumArrTemp=(); i="${#fvOutputArr[@]}"; ((i-=1))
+        while [[ $i -ge 0 ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
+        mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
+      fi
+    fi
   fi
   if [[ $GTcompare ]]; then 
     if [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]]; then return 0 ; else return 1 ; fi
   elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then printf "%s  " "${fvOutputArr[@]}" ; printf "\n"
   elif [[ $ShowAsCol ]]; then printf "%s\n" "${fvOutputArr[@]}"
+  elif [[ $RevMax ]]; then  echo "${fvOutputArr[0]}"  
   else  echo "${fvOutputArr[-1]}"
   fi
 }
