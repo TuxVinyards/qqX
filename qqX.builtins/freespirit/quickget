@@ -695,7 +695,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    floatversion -s -r "$(curl -sLf "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
+    floatversion -s -M 4 "$(curl -sLf "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
 }
 
 function releases_endless() {
