@@ -467,7 +467,10 @@ move_rename_Selected_VM () {
 
   if [[ $Move_VM_Option == "r" ]]; then  
   
-    printf "\n  Currently Containing:   "  
+    CurrentFolder="$(pwd)"
+    show_current_group_folder_list
+
+    printf "\n\n  Currently Containing:   "  
     list_current_folder_instance_names
 
     while true; do
