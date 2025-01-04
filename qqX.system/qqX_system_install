@@ -500,7 +500,7 @@ else
     # And check that the right version is there:
 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
-      printColor "\n  ...... All good " 
+      printColor "\n  Files installed: "; printf " All good" 
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
     fi
 
@@ -513,12 +513,12 @@ else
 
     if [[ -d  "$HOME/VMQs" ]] ; then
 
-      printColor "\n\n  Standard default VM directory has been found >> "  
+      printColor "\n\n\n  The default VM directory has been found >> "  
       printf "\n\n  %s " "$HOME/VMQs" 
 
     elif [[ -d "$Default_VM_Folder" ]]; then
 
-      printColor "\n\n  Custom default VM directory has been found >> "  
+      printColor "\n\n\n  A Custom default VM directory has been found >> "  
       printf "\n\n  %s " "$Default_VM_Folder"
       
     else
@@ -545,7 +545,7 @@ else
     fi
 
     cp -r "qqX.system/icons"  "$HOME/.qqX" 
-    printColor "\n\n  Installing settings file and desktop icons \n\n"
+    printColor "\n\n  Running settings file and desktop icons routines ..."
 
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
@@ -599,6 +599,14 @@ if [[ ! $SkipMkLauncher ]]; then
   if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
     source "$HOME/.qqX/qqX_term.conf" 
     # $UserTerm and $CustomTerminalProfile, if present
+    if grep -sq 'UserTerm' "$HOME/.qqX/qqX_term.conf"; then 
+      printColor "\n\n  Terminal Emulator '%s' has been found in the qqX config files ..." "$UserTerm"
+    fi
+  fi
+
+  if grep -qs Exec "$XDG_GUI_desktop_Folder/qqX.desktop"; then 
+    CurrentTerm="$(grep Exec "$XDG_GUI_desktop_Folder/qqX.desktop" | cut -d' ' -f1 | cut -d= -f2  2>/dev/null)"
+    [[ $CurrentTerm ]] && printf "\n\n  The current qqX launcher is using '%s'" "$CurrentTerm"
   fi
 
   if [[ $UserTerm || $CustomTerminalProfile ]]; then
