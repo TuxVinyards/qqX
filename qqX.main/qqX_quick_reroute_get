@@ -47,7 +47,7 @@ print_quickget_and_folder_choices () {
   # and for use for listing target folder selections for installing or moving VM's
 
   declare -n  QGW_List_ArrName="$1"
-  [[ $ShowQGetLists ]] && { printf "\n %s" "${QGW_List_ArrName[@]}"; printf "\n\n"; }
+  [[ $ShowQGetLists ]] && { printf "\n print choices transfer arr: "; printf "\n %s" "${QGW_List_ArrName[@]}"; printf "\n\n"; }
   QGW_List_Arr_ItemLength=15
 
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
@@ -765,12 +765,12 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      if [[ $QGW_OS_Arr_NameSelected  == "windows" ]]; then
+      if [[ $QGW_OS_Arr_NameSelected  == 'windows' ]]; then
         QGW_WinLangs_Array=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
         "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
         "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
         "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
-      else
+      elif [[ $QGW_OS_Arr_NameSelected  == 'windows-server' ]]; then
         # windows-server
         QGW_WinLangs_Array=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
       fi
@@ -780,10 +780,10 @@ function_quick_get_wrap ()  {
       printf "\n\n"
       if [[ $QGW_Release_Arr_NameSelected == "8"  ||  $QGW_Release_Arr_NameSelected == "10-ltsc" ]]; then
         printf "\n\n  WARNING:  Outdated code. This release can no longer be downloaded"
-        printColor "\n\n  [b] to go back \n\n"  
+        printColor "\n\n  [b] back to main menu \n\n"  
       else
         print_quickget_and_folder_choices  "QGW_WinLangs_Array"
-        printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
+        printColor "\n\n  Give LIST number of Language   [b] back to main menu \n\n"  
       fi
       read -rp "  >  "  QGW_List_NumSelected 
 
@@ -791,9 +791,9 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_List_NumSelected == "b" ]]; then  
         QGW_List_NumSelected=
-        QGW_OS_Arr_NameSelected=
-        QGW_Release_Arr_NameSelected=
+        QGW_List_NumSelected_Next=
         QGW_Edition_Arr_NameSelected=
+        QGW_Edition_Arr_NumSelected=
         function_quick_get_wrap
         return
       else
