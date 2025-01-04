@@ -70,6 +70,7 @@ NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDi
 function dev_loop_check {
   if [[ $GeneralLoopCheck ]]; then
     echo; echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
+    echo "pwd: $(pwd)   CurrentFolder = $CurrentFolder"  
     echo "BootStyle = $BootStyle   BootStyleMsg = $BootStyleMsg    BootStyle_Default = $BootStyle_Default   BootStyleMsg_Default = $BootStyleMsg_Default"
     echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
@@ -77,7 +78,7 @@ function dev_loop_check {
     echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
     echo "SharedDrive = $SharedDrive SharedDrive_Conf = $SharedDrive_Conf SharedDrive_Mount = $SharedDrive_Mount"
     echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  "
-    echo "pwd: $(pwd)   QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
+    echo "QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
     sleep "$GeneralLoopCheck"
   fi
 }
