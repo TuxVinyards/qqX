@@ -32,12 +32,9 @@ function quickget {
 QGW_OS_Array=()
 
 load_QGW_OS_Array () {
-  QGW_OS_ListRaw="$(quickget "qq-grep" | tail -n +3 )"
-  QGW_OS_ListString="$(tr '\n' ' ' <<< "$QGW_OS_ListRaw")"
-  QGW_OS_ListString="$(tr -cd "[:print:]" <<< "$QGW_OS_ListString")"
-  read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
+  mapfile -t QGW_OS_Array <<< "$(quickget "qq-grep" | grep -v ERROR | tr ' ' '\n' | grep '[[:graph:]]')"
+  [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; }
 }
-
 
 print_quickget_and_folder_choices () {
 
