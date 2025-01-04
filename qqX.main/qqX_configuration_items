@@ -323,20 +323,20 @@ function_conf_error () {
     printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
     printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
     printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings " 
-    printf "\n\n  [q] to quit \n\n"   
+    printf "\n\n  [c] ignore and continue   [q] to quit \n\n"   
 
   elif [[ $1 == "qqX_SettingsFile" ]] ; then 
 
     printf "\n  INTERNAL ERROR: "
     printColor "\n\n\n  Settings file not found: %s"  "$qqX_SettingsFile"
-    printf "\n\n  [q] to quit \n\n"   
+    printf "\n\n  [c] ignore and continue   [q] to quit \n\n"   
     
   else   
 
     # includes "$1" = "config"
     printColor "\n\n  [Enter] to edit qqX general settings"  
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
-    printf "  [c] ignore, re-check and continue "
+    printf "  [c] ignore and continue "
     printf "  [q] to quit \n\n"  
 
   fi   
