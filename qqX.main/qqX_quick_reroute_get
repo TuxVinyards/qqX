@@ -161,7 +161,7 @@ function_test_iso_url () {
       [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
       while true; do
         [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
-        [[ "$SECONDS" -ge 12 ]] && { kill "$DataPID" &>/dev/null ; break; }
+        [[ "$SECONDS" -ge 20 ]] && { kill "$DataPID" &>/dev/null ; break; }
         sleep 1
       done
     fi
@@ -177,10 +177,10 @@ function_test_iso_url () {
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 4 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 8 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         printf "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 6 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 16 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -553,12 +553,12 @@ function_quick_get_wrap ()  {
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
-            printf "\n  Checking Distro Home Page ....\n\n"
+            printf "\n  Checking Distro Home Page ...."
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
-              printf "  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --max-time 4 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --location --silent --head --output /dev/null --max-time 8 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+              if curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
                 printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
@@ -954,10 +954,10 @@ function_quick_get_wrap ()  {
     # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
-      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... \n\n"
+      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
       show_distro_homepage_check_results
     elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then 
-      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... \n\n"
+      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... "
       show_distro_homepage_check_results
     else
       function_test_iso_url
