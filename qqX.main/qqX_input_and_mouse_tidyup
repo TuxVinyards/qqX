@@ -111,7 +111,7 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
   
   if [[ $XDG_Input_VM_qqX ]]; then 
     ByPass_VM_Array_Selector=1
-    if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$CurrentFolder"
+    if [[ ! $VM_Conf_Dir ]]; then  VM_Conf_Dir="$Current_VM_Folder"
     else
       if [[ ! -d  "$VM_Conf_Dir"  ]]; then 
         printColor "\n\n  Directory:  %s  not found "  "$VM_Conf_Dir "
@@ -188,7 +188,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 
     elif [[ $ISO_NewVM_Name ]]; then
 
-      QWG_Conf_Dir="$CurrentFolder"
+      QWG_Conf_Dir="$Current_VM_Folder"
       QGW_OverWriteAllow=
       QGW_OverWriteAlert=
       
@@ -223,7 +223,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
           [0-9]|[0-9][0-9]) 
             QWG_Conf_Dir="${VM_Folder_List[New_ISO_Start]}" 
             QGW_OverWriteAlert=
-            CurrentFolder_Recognised=1
+            Current_VM_Folder_Recognised=1
           ;;
           h)  
             printf     "  Once the initial setup up has finished, "
@@ -253,7 +253,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
 
       if [[ $New_ISO_Start == "start" ]]; then 
 
-        if [[ ! "$CurrentFolder_Recognised" ]]; then  
+        if [[ ! "$Current_VM_Folder_Recognised" ]]; then  
           printColor "\n\n  Confirm installation in non-recognised folder."
           printf "\n\n  Folder may be added to presets afterwards, via settings edit ... "
           printf "\n\n  [enter] to go back" ; printColor "   [yes] to confirm \n\n"

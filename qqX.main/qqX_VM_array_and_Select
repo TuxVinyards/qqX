@@ -236,7 +236,7 @@ VM_loader_selector_and_menu () {
 
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
-        if [[ $New_VM_Conf_File ]] && [[ ! $CurrentFolder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
+        if [[ $New_VM_Conf_File ]] && [[ ! $Current_VM_Folder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
           printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
         fi
       
@@ -520,7 +520,7 @@ refresh_sources_and_load_VM_arrays() {
   find_file_manager_browser
   find_texteditor
 
-  CurrentFolder="$Default_VM_Folder"
+  Current_VM_Folder="$Default_VM_Folder"
   function_create_VM_folderList  
   scan_folders_list_and_add_VMs 
 

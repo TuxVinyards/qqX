@@ -15,8 +15,9 @@
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-## SET THE DEFAULT VM FOLDER, where the Virtual Machines are normally found. 
-#  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate. 
+## SET THE DEFAULT GENERAL VM FOLDER, where the Virtual Machines are normally stored. 
+#  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate.
+#  Contains the .conf files and the 'InstanceName' containers.
 
 Default_VM_Folder="$HOME/VMQs"
 

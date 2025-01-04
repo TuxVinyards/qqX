@@ -29,12 +29,12 @@ function_create_VM_folderList() {
   ExtraFolderError=
 
   # Make sure that 'Default_VM_Folder' has a value and it exists
-  [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$CurrentFolder"
+  [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$Current_VM_Folder"
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings:  Default Folder NOT found \n\n" ; sleep 1 ; DefaultFolderError=1 ; fi
   
   # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
-  if [[ "$CurrentFolder" != "$Default_VM_Folder" ]] && [[ "$(ls "$CurrentFolder/"*.conf 2> /dev/null)" ]] ; then   
-    declare -ga VM_Folder_List=( "$CurrentFolder" "$Default_VM_Folder" )
+  if [[ "$Current_VM_Folder" != "$Default_VM_Folder" ]] && [[ "$(ls "$Current_VM_Folder/"*.conf 2> /dev/null)" ]] ; then   
+    declare -ga VM_Folder_List=( "$Current_VM_Folder" "$Default_VM_Folder" )
   else  declare -ga VM_Folder_List=("$Default_VM_Folder")
   fi
   for xF in "${Extra_VM_Folder[@]}"; do

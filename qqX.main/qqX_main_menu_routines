@@ -357,16 +357,16 @@ function_rename_conf_dirnames () {
 
 list_current_folder_instance_names () {
 
-  CurrentFolderNames=()
-  CurrentFolderNameError=
-  mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
-  for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
+  Current_VM_FolderNames=()
+  Current_VM_FolderNameError=
+  mapfile -t Current_VM_FolderContent <<< "$(ls 2>/dev/null)"
+  for Name in "${Current_VM_FolderContent[@]}"; do [[ -d "$Name" ]] && Current_VM_FolderNames+=("$Name"); done
 
   # printf "\n  Containing:   "  # set each title case by case
-  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor "  NONE FOUND \n\n" 
+  if [[ ! ${Current_VM_FolderNames[*]} ]]; then printColor "  NONE FOUND \n\n" 
   else 
     printf "\n\n" 
-    print_quickget_and_folder_choices  "CurrentFolderNames"  6 
+    print_quickget_and_folder_choices  "Current_VM_FolderNames"  6 
   fi
 }
 
@@ -470,7 +470,7 @@ move_rename_Selected_VM () {
     while true; do
 
       Mv_NewName=
-      CurrentFolderNameError=
+      Current_VM_FolderNameError=
       printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
       printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change  [ln] make link"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
@@ -478,10 +478,10 @@ move_rename_Selected_VM () {
 
       [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName" 
       
-      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1
+      for Name in "${Current_VM_FolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && Current_VM_FolderNameError=1
       done
 
-      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
+      if [[ $Current_VM_FolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
       fi
 
     done

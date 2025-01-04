@@ -216,22 +216,22 @@ function_test_iso_url () {
 
 function show_current_group_folder_list {
   i=0
-  CurrentFolder_Recognised=
-  if [[ $QWG_Conf_Dir ]]; then CurrentFolder="$QWG_Conf_Dir"
-  elif [[ ! $CurrentFolder ]]; then  CurrentFolder="$(pwd)"
+  Current_VM_Folder_Recognised=
+  if [[ $QWG_Conf_Dir ]]; then Current_VM_Folder="$QWG_Conf_Dir"
+  elif [[ ! $Current_VM_Folder ]]; then  Current_VM_Folder="$(pwd)"
   fi
   while [[ ${VM_Folder_List[i]} ]]; do
-    if [[ $CurrentFolder == "$Default_VM_Folder" ]]; then
+    if [[ $Current_VM_Folder == "$Default_VM_Folder" ]]; then
       if [[ $i -eq 0 ]]; then printColor "\n  [0]  %s (current/default)"  "${VM_Folder_List[i]}"
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
     else
       if [[ $i -eq 0 ]]; then printf "\n  [0]  %s (default)"  "${VM_Folder_List[i]}"
-      elif [[ $CurrentFolder ==  "${VM_Folder_List[i]}" ]]; then  printColor "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+      elif [[ $Current_VM_Folder ==  "${VM_Folder_List[i]}" ]]; then  printColor "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
     fi
-    [[ ${VM_Folder_List[i]} == "$CurrentFolder" ]] && CurrentFolder_Recognised=1
+    [[ ${VM_Folder_List[i]} == "$Current_VM_Folder" ]] && Current_VM_Folder_Recognised=1
     ((i +=1))
   done
 }

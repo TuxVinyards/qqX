@@ -166,13 +166,13 @@ show_qqX_title_bar() {
     [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
   done
 
-  if [[ ! $CurrentFolder ]]; then 
-    CurrentFolder="$Default_VM_Folder"
+  if [[ ! $Current_VM_Folder ]]; then 
+    Current_VM_Folder="$Default_VM_Folder"
     cd "$Default_VM_Folder" || printf "\n\n  ChromeUp ERROR sorting Current Folder"
   fi
 
   if [[ ! $HideFolderTitleBar ]]; then  
-    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$CurrentFolder"
+    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$Current_VM_Folder"
   else  
     printf "\n"
   fi
