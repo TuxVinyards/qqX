@@ -363,6 +363,7 @@ function_conf_error () {
       VM_Selection=
       VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       cd "$Default_VM_Folder" || DefaultFolderError=1
+      Current_VM_Folder="$Default_VM_Folder" 
       function_quick_get_wrap 
       return
 

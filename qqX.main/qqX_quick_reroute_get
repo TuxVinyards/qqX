@@ -329,6 +329,9 @@ function clear_main_gt_start_vars {
   QGW_DownloadStart=
   QGW_DownloadSelection=
   QGW_Download_BadLink=
+  QWG_Conf_Dir="$Default_VM_Folder" 
+  cd "$QWG_Conf_Dir" || { printColor "  ERROR changing to the General VM Location"; sleep 3; }
+  Current_VM_Folder="$QWG_Conf_Dir" 
 }
 
 function_quick_get_wrap ()  {
@@ -374,9 +377,6 @@ function_quick_get_wrap ()  {
     show_QWG_header
 
   done
-
-  QWG_Conf_Dir="$Default_VM_Folder" 
-  cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location" 
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
 
@@ -1196,7 +1196,8 @@ function_quick_get_wrap ()  {
         QWG_Conf_Dir="$Default_VM_Folder" 
       fi
       
-      cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location" 
+      cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location"
+      Current_VM_Folder="$QWG_Conf_Dir" 
 
     done
 
@@ -1474,6 +1475,7 @@ function_quick_get_wrap ()  {
       fi
       sleep 1.4
       cd "$Default_VM_Folder" || DefaultFolderError=1
+      Current_VM_Folder="$Default_VM_Folder" 
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
       return
@@ -1491,6 +1493,7 @@ function_quick_get_wrap ()  {
       read -rp "  >  "  
       sleep 0.5
       cd "$Default_VM_Folder" || DefaultFolderError=1
+      Current_VM_Folder="$Default_VM_Folder" 
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
       return
@@ -1535,6 +1538,7 @@ function_quick_get_wrap ()  {
   fi
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ," ; fi
+  Current_VM_Folder="$VM_Conf_Dir" 
 
   clear_main_gt_start_vars
   SettingsFileAdjusted=1

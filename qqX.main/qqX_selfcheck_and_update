@@ -155,7 +155,8 @@ function download_new_release {
 
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
         printColor "\n\n  [enter] Current/Default folder  %s "  "$Default_VM_Folder" 
-      else  
+      else
+        # not to confuse with '$Current_VM_Folder' 
         printf "\n\n  [c] Current folder    %s "  "$(pwd)"  
         printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
       fi 
@@ -185,7 +186,7 @@ function download_new_release {
       qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
       mkdir -p "$qqX_LatestTarBall_Folder"
 
-      # record where to come back to, when done
+      # record where to come back to, when done and not to confuse with '$Current_VM_Folder' 
       ReturnFolder="$(pwd)"
 
       cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder ??"

@@ -65,7 +65,7 @@ if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
 # DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,        
 # where timed pauses are given. Some diagnostics require enter key to continue ...
-NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=         ### DEV ###
+NoClear=0  ;  GeneralLoopCheck=0 ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=         ### DEV ###
 
 function dev_loop_check {
   if [[ $GeneralLoopCheck ]]; then
@@ -245,7 +245,8 @@ while true ; do
     # Could happen if tune up follows a download that was started in a different folder to the target new one.
     # Otherwise, go to the VM Selector.
     if [[ -d "$VM_Conf_Dir" ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then 
-      cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder " 
+      cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder "
+      Current_VM_Folder="$VM_Conf_Dir"
       main_menu
     else
       VM_InstanceName=

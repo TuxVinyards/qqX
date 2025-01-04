@@ -332,6 +332,7 @@ function_delete_Selected_VM () {
   NewFileTuneUp=
   NewFileTuneUp_JustDone=
   cd "$Default_VM_Folder" || DefaultFolderError=1
+  Current_VM_Folder="$Default_VM_Folder" 
   refresh_sources_and_load_VM_arrays
 
 }
@@ -456,7 +457,9 @@ move_rename_Selected_VM () {
     # set mv to use 'r' as multi-purpose 
     Move_VM_Option="r"
 
-    if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
+    if cd "$Mv_NewConf_Dir"; then 
+      printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
+      Current_VM_Folder="$Mv_NewConf_Dir" 
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
 

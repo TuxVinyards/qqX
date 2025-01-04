@@ -116,7 +116,9 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
       if [[ ! -d  "$VM_Conf_Dir"  ]]; then 
         printColor "\n\n  Directory:  %s  not found "  "$VM_Conf_Dir "
         function_conf_error  " COMMAND LINE Path Instruction,"
-      else  cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
+      else  
+        cd "$VM_Conf_Dir"  || function_conf_error  " COMMAND LINE Path Instruction,"
+        Current_VM_Folder="$VM_Conf_Dir" 
       fi
     fi
     if [[ ! -f "$VM_Conf_Dir/$VM_Conf_File" ]]; then 
@@ -290,6 +292,7 @@ if [[ $XDG_MimeType_is_ISO || $XDG_ISO_Name ]] && [[ $XDG_MimeType_Recognised ||
         VM_Conf_File="$QWG_NewVM_Name.conf"
         VM_InstanceName="$QWG_NewVM_Name"
         cd "$QWG_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
+        Current_VM_Folder="$Default_VM_Folder" 
         refresh_sources_and_load_VM_arrays
         break
       
@@ -304,6 +307,7 @@ fi
 
 if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $XDG_Input_VM_qqX ]]; then
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
+  Current_VM_Folder="$Default_VM_Folder" 
   [[ $VM_Conf_File ]] && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
 else 
