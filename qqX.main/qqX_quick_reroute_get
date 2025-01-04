@@ -639,7 +639,10 @@ function_quick_get_wrap ()  {
 
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
-    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
+    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Languages'* ]]; then 
+      # is Windows (has its own internal array)
+      QGW_Releases_ListRaw="$(grep -B 10  Languages  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Languages)"
+    elif [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
       QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
       # also get editions full list for later > some releases have different editions available
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
