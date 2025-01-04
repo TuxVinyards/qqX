@@ -32,8 +32,12 @@ function quickget {
 QGW_OS_Array=()
 
 load_QGW_OS_Array () {
-  mapfile -t QGW_OS_Array <<< "$(quickget "qq-grep" | grep -v ERROR | tr ' ' '\n' | grep '[[:graph:]]')"
+  mapfile -t QGW_OS_Array <<< "$(quickget "qq-grep" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
   [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; }
+  if [[ ! ${QGW_OS_Array[0]} ]]; then
+    printColor "\n\n  INTERNAL ERROR: load_QGW_OS_Array"
+    printf "\n\n  Quickget OS distro list output not be read or found. \n\n"
+  fi
 }
 
 print_quickget_and_folder_choices () {
@@ -43,9 +47,7 @@ print_quickget_and_folder_choices () {
   # and for use for listing target folder selections for installing or moving VM's
 
   declare -n  QGW_List_ArrName="$1"
-
-  #printf "\n * %s" "${QGW_List_ArrName[@]}" 
-
+  [[ $ShowQGetLists ]] && { printf "\n %s" "${QGW_List_ArrName[@]}"; printf "\n\n"; }
   QGW_List_Arr_ItemLength=15
 
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi

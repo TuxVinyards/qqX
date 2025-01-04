@@ -65,7 +65,7 @@ if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
 # DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,        
 # where timed pauses are given. Some diagnostics require enter key to continue ...
-NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=0         ### DEV ###
+NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=        ### DEV ###
 
 function dev_loop_check {
   if [[ $GeneralLoopCheck ]]; then
