@@ -177,7 +177,7 @@ if [[ -e "$1" ]]; then
       fi
       shift $#
       if [[ $VM_InstanceName ]]; then
-        # set to VM folder and flag to run the VM selector
+        # set to General VM folder, where the .conf files are ... and flag to run the VM selector
         cd "$VM_Conf_Dir"  || printf "\n\n XDG .desktop starter  >  VM Folder not found " 
         Current_VM_Folder="$VM_Conf_Dir"
       fi
