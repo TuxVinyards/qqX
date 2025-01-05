@@ -244,7 +244,9 @@ function show_qqX_general_help {
 
     elif [[ $HelpSelect == "w" ]]; then
       HelpSelect=
+      printf "\n  Opening Browser ... \n"
       (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & ) || web_browser_not_found_message
+      sleep 1
     else  
       HelpSelect=
       break

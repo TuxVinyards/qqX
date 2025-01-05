@@ -29,7 +29,9 @@ function  main_menu_actions {
     printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
     read -rp "  >  "  TxSetCode
     if [[ ! $TxSetCode ]]; then
+      printf "\n  Opening Browser ... \n\n"
       (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/blob/main/qqX_settings"  & ) || web_browser_not_found_message
+      sleep 1
     else
       TxSetCode= ; return
     fi
@@ -40,7 +42,9 @@ function  main_menu_actions {
     printColor "\n\n  [enter] to load in browser  [b] to go back \n\n"
     read -rp "  >  "  LoadHomePage
     if [[ ! $LoadHomePage ]]; then
+      printf "\n  Opening Browser ... \n\n"
       (nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & ) || web_browser_not_found_message 
+      sleep 1
     else
       LoadHomePage= ; return
     fi
@@ -157,8 +161,11 @@ function  main_menu_actions {
     elif [[ $BootStyle == "slow" ]]; then  BootStyle="fast" ; BootStyleMsg="fast"
     fi
 
-  elif [[ $MainMenuChoice == "qd" ]] ; then (nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & ) || web_browser_not_found_message
-
+  elif [[ $MainMenuChoice == "qd" ]] ; then 
+    printf "\n  Opening Browser ... \n\n"
+    (nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & ) || web_browser_not_found_message
+    sleep 1
+    
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" 
 
   elif [[ $MainMenuChoice == "gt" ]] ; then  

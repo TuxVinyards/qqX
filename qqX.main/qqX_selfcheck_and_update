@@ -170,8 +170,10 @@ function download_new_release {
       if [[ $qqX_LatestTarBall_Folder == "s" ]]; then  qqX_LatestTarBall_Folder="$Specified_Updates_Location" ; break
       elif [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
-      elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
+      elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then
+        printf "  Opening Browser ... \n\n"
         (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX" & ) || web_browser_not_found_message
+        sleep 1
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
       else qqX_LatestTarBall_Folder="$Default_VM_Folder" ; break
       fi

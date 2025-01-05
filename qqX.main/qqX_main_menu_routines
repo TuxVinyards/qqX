@@ -768,8 +768,9 @@ custom_boot_file () {
     if [[ $CreateCustom == "b" ]]; then return
 
     elif [[ $CreateCustom == "w" ]]; then
-
+      printf "\n  Opening Browser ... \n\n"
       (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
+      sleep 1
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_List.txt" ]]; then
 
@@ -795,8 +796,9 @@ custom_boot_file () {
     if [[ $DeleteCustom == "b" ]]; then return
 
     elif [[ $DeleteCustom == "w" ]]; then
-
+      printf "\n  Opening Browser ... \n\n"
       (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
+      sleep 1
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" ]]; then
      
