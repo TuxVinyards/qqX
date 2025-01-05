@@ -792,6 +792,9 @@ function_quick_get_wrap ()  {
       if [[ $QGW_List_NumSelected == "b" ]]; then  
         QGW_List_NumSelected=
         QGW_List_NumSelected_Next=
+        QGW_OS_Arr_NameSelected=
+        QGW_Release_Arr_NumSelected=
+        QGW_Release_Arr_NameSelected=
         QGW_Edition_Arr_NameSelected=
         QGW_Edition_Arr_NumSelected=
         function_quick_get_wrap
