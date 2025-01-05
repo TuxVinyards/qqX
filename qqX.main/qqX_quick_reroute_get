@@ -32,12 +32,13 @@ function quickget {
 QGW_OS_Array=()
 
 load_QGW_OS_Array () {
-  QGW_OS_ListRaw="$(quickget "qq-grep" | tail -n +3 )"
-  QGW_OS_ListString="$(tr '\n' ' ' <<< "$QGW_OS_ListRaw")"
-  QGW_OS_ListString="$(tr -cd "[:print:]" <<< "$QGW_OS_ListString")"
-  read -ra QGW_OS_Array <<< "$QGW_OS_ListString"
+  mapfile -t QGW_OS_Array <<< "$(quickget "qq-grep" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
+  [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; }
+  if [[ ! ${QGW_OS_Array[0]} ]]; then
+    printColor "\n\n  INTERNAL ERROR: load_QGW_OS_Array"
+    printf "\n\n  Quickget OS distro list output not be read or found. \n\n"
+  fi
 }
-
 
 print_quickget_and_folder_choices () {
 
@@ -46,9 +47,7 @@ print_quickget_and_folder_choices () {
   # and for use for listing target folder selections for installing or moving VM's
 
   declare -n  QGW_List_ArrName="$1"
-
-  #printf "\n * %s" "${QGW_List_ArrName[@]}" 
-
+  [[ $ShowQGetLists ]] && { printf "\n print choices transfer arr: "; printf "\n %s" "${QGW_List_ArrName[@]}"; printf "\n\n"; }
   QGW_List_Arr_ItemLength=15
 
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
@@ -161,7 +160,7 @@ function_test_iso_url () {
       [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
       while true; do
         [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
-        [[ "$SECONDS" -ge 12 ]] && { kill "$DataPID" &>/dev/null ; break; }
+        [[ "$SECONDS" -ge 20 ]] && { kill "$DataPID" &>/dev/null ; break; }
         sleep 1
       done
     fi
@@ -177,10 +176,10 @@ function_test_iso_url () {
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 4 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 8 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         printf "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 6 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 16 "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -216,22 +215,22 @@ function_test_iso_url () {
 
 function show_current_group_folder_list {
   i=0
-  CurrentFolder_Recognised=
-  if [[ $QWG_Conf_Dir ]]; then CurrentFolder="$QWG_Conf_Dir"
-  elif [[ ! $CurrentFolder ]]; then  CurrentFolder="$(pwd)"
+  Current_VM_Folder_Recognised=
+  if [[ $QWG_Conf_Dir ]]; then Current_VM_Folder="$QWG_Conf_Dir"
+  elif [[ ! $Current_VM_Folder ]]; then  Current_VM_Folder="$(pwd)"
   fi
   while [[ ${VM_Folder_List[i]} ]]; do
-    if [[ $CurrentFolder == "$Default_VM_Folder" ]]; then
+    if [[ $Current_VM_Folder == "$Default_VM_Folder" ]]; then
       if [[ $i -eq 0 ]]; then printColor "\n  [0]  %s (current/default)"  "${VM_Folder_List[i]}"
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
     else
       if [[ $i -eq 0 ]]; then printf "\n  [0]  %s (default)"  "${VM_Folder_List[i]}"
-      elif [[ $CurrentFolder ==  "${VM_Folder_List[i]}" ]]; then  printColor "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
+      elif [[ $Current_VM_Folder ==  "${VM_Folder_List[i]}" ]]; then  printColor "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       else printf "\n\n  [%s]  %s "  "$i" "${VM_Folder_List[i]}"
       fi
     fi
-    [[ ${VM_Folder_List[i]} == "$CurrentFolder" ]] && CurrentFolder_Recognised=1
+    [[ ${VM_Folder_List[i]} == "$Current_VM_Folder" ]] && Current_VM_Folder_Recognised=1
     ((i +=1))
   done
 }
@@ -329,6 +328,9 @@ function clear_main_gt_start_vars {
   QGW_DownloadStart=
   QGW_DownloadSelection=
   QGW_Download_BadLink=
+  QWG_Conf_Dir="$Default_VM_Folder" 
+  cd "$QWG_Conf_Dir" || { printColor "  ERROR changing to the General VM Location"; sleep 3; }
+  Current_VM_Folder="$QWG_Conf_Dir" 
 }
 
 function_quick_get_wrap ()  {
@@ -374,9 +376,6 @@ function_quick_get_wrap ()  {
     show_QWG_header
 
   done
-
-  QWG_Conf_Dir="$Default_VM_Folder" 
-  cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location" 
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
 
@@ -553,12 +552,12 @@ function_quick_get_wrap ()  {
           fi
 
           if [[ $QGW_OS_HomePage ]]; then 
-            printf "\n  Checking Distro Home Page ....\n\n"
+            printf "\n  Checking Distro Home Page ...."
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
-              printf "  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --max-time 4 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --location --silent --head --output /dev/null --max-time 8 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
+              if curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
                 printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
@@ -605,6 +604,7 @@ function_quick_get_wrap ()  {
     declare -ga QGW_FullEditions_Array=()
     QGW_ReleasesEditions_ListRaw=
     QGW_Releases_ListRaw=
+    QGW_Releases_List=
     QGW_Editions_FullList=
     QGW_Editions_FullListRaw=
     QGW_Editions_FullListString=
@@ -638,7 +638,10 @@ function_quick_get_wrap ()  {
 
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
-    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
+    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Languages'* ]]; then 
+      # is Windows (has its own internal array)
+      QGW_Releases_ListRaw="$(grep -B 10  Languages  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Languages)"
+    elif [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
       QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
       # also get editions full list for later > some releases have different editions available
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
@@ -660,9 +663,13 @@ function_quick_get_wrap ()  {
 
     # quickget outputs with a tab separator which is cut -d default
     QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
-    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_ListRaw"; echo; }
+    [[ $ShowQGetLists ]] && { echo "List R raw"; echo "$QGW_Releases_ListRaw"; echo; }
 
-    mapfile -t QGW_Releases_Array <<< "$QGW_Releases_ListRaw"
+    # try to make sure the list is not just empty space 
+    QGW_Releases_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Releases_ListRaw" )"
+    [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_List"; echo; }
+
+    mapfile -t QGW_Releases_Array <<< "$QGW_Releases_List"
     [[ $ShowQGetLists ]] && { echo; declare -p QGW_Releases_Array; echo; }
 
   fi
@@ -725,12 +732,13 @@ function_quick_get_wrap ()  {
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
-        nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+        printf "  Opening Browser ... \n\n" 
+        (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message 
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
-
+        sleep 1
 
       elif [[ $QGW_List_NumSelected ]]; then 
 
@@ -758,12 +766,12 @@ function_quick_get_wrap ()  {
 
       printColor  "\n\n  Selected = %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
 
-      if [[ $QGW_OS_Arr_NameSelected  == "windows" ]]; then
+      if [[ $QGW_OS_Arr_NameSelected  == 'windows' ]]; then
         QGW_WinLangs_Array=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
         "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
         "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
         "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
-      else
+      elif [[ $QGW_OS_Arr_NameSelected  == 'windows-server' ]]; then
         # windows-server
         QGW_WinLangs_Array=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
       fi
@@ -773,10 +781,10 @@ function_quick_get_wrap ()  {
       printf "\n\n"
       if [[ $QGW_Release_Arr_NameSelected == "8"  ||  $QGW_Release_Arr_NameSelected == "10-ltsc" ]]; then
         printf "\n\n  WARNING:  Outdated code. This release can no longer be downloaded"
-        printColor "\n\n  [b] to go back \n\n"  
+        printColor "\n\n  [b] back to main menu \n\n"  
       else
         print_quickget_and_folder_choices  "QGW_WinLangs_Array"
-        printColor "\n\n  Give LIST number of Language   [b] to go back \n\n"  
+        printColor "\n\n  Give LIST number of Language   [b] back to main menu \n\n"  
       fi
       read -rp "  >  "  QGW_List_NumSelected 
 
@@ -784,9 +792,12 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_List_NumSelected == "b" ]]; then  
         QGW_List_NumSelected=
+        QGW_List_NumSelected_Next=
         QGW_OS_Arr_NameSelected=
+        QGW_Release_Arr_NumSelected=
         QGW_Release_Arr_NameSelected=
         QGW_Edition_Arr_NameSelected=
+        QGW_Edition_Arr_NumSelected=
         function_quick_get_wrap
         return
       else
@@ -949,10 +960,10 @@ function_quick_get_wrap ()  {
     # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
-      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... \n\n"
+      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
       show_distro_homepage_check_results
     elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then 
-      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... \n\n"
+      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... "
       show_distro_homepage_check_results
     else
       function_test_iso_url
@@ -1162,8 +1173,10 @@ function_quick_get_wrap ()  {
           printf "\n\n"
         ;;
 
-        w)  
-          nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+        w) 
+          printf "  Opening Browser ... \n\n"
+          (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
+          sleep 1
         ;;
 
         *)
@@ -1191,7 +1204,8 @@ function_quick_get_wrap ()  {
         QWG_Conf_Dir="$Default_VM_Folder" 
       fi
       
-      cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location" 
+      cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location"
+      Current_VM_Folder="$QWG_Conf_Dir" 
 
     done
 
@@ -1469,6 +1483,7 @@ function_quick_get_wrap ()  {
       fi
       sleep 1.4
       cd "$Default_VM_Folder" || DefaultFolderError=1
+      Current_VM_Folder="$Default_VM_Folder" 
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
       return
@@ -1486,6 +1501,7 @@ function_quick_get_wrap ()  {
       read -rp "  >  "  
       sleep 0.5
       cd "$Default_VM_Folder" || DefaultFolderError=1
+      Current_VM_Folder="$Default_VM_Folder" 
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
       refresh_sources_and_load_VM_arrays
       return
@@ -1530,6 +1546,7 @@ function_quick_get_wrap ()  {
   fi
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ," ; fi
+  Current_VM_Folder="$VM_Conf_Dir" 
 
   clear_main_gt_start_vars
   SettingsFileAdjusted=1

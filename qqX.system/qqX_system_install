@@ -154,31 +154,31 @@ fi
 ##  Check for items sometimes missing 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p bc) ]]; then
   printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p xrandr) ]]; then
   printf "\n\n  An 'xrandr' installation should normally be present and is required by qqX ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p wget) ]]; then
   printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p 7z) ]]; then
-  printf "\n\n  A '7zip' installation should be present and is needed in few places ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  printf "\n\n  A command line '7zip' installation is needed for some distro downloads...\n\n"
+  read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
-  if [[ $1 ]]; then exit 1 ; else read -rp "  [enter] to ignore or continue > " ; fi
+  read -rp "  [enter] to ignore or continue > "
 fi
 
 
@@ -500,7 +500,7 @@ else
     # And check that the right version is there:
 
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
-      printColor "\n  ...... All good " 
+      printColor "\n  Files installed: "; printf " All good" 
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
     fi
 
@@ -513,12 +513,12 @@ else
 
     if [[ -d  "$HOME/VMQs" ]] ; then
 
-      printColor "\n\n  Standard default VM directory has been found >> "  
+      printColor "\n\n\n  The default VM directory has been found >> "  
       printf "\n\n  %s " "$HOME/VMQs" 
 
     elif [[ -d "$Default_VM_Folder" ]]; then
 
-      printColor "\n\n  Custom default VM directory has been found >> "  
+      printColor "\n\n\n  A Custom default VM directory has been found >> "  
       printf "\n\n  %s " "$Default_VM_Folder"
       
     else
@@ -545,7 +545,7 @@ else
     fi
 
     cp -r "qqX.system/icons"  "$HOME/.qqX" 
-    printColor "\n\n  Installing settings file and desktop icons \n\n"
+    printColor "\n\n  Running settings file and desktop icons routines ..."
 
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
       printColor "\n\n  ERROR  qqX files not installed correctly \n\n"
@@ -599,6 +599,14 @@ if [[ ! $SkipMkLauncher ]]; then
   if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
     source "$HOME/.qqX/qqX_term.conf" 
     # $UserTerm and $CustomTerminalProfile, if present
+    if grep -sq 'UserTerm' "$HOME/.qqX/qqX_term.conf"; then 
+      printColor "\n\n  Terminal Emulator '%s' has been found in the qqX config files ..." "$UserTerm"
+    fi
+  fi
+
+  if grep -qs Exec "$XDG_GUI_desktop_Folder/qqX.desktop"; then 
+    CurrentTerm="$(grep Exec "$XDG_GUI_desktop_Folder/qqX.desktop" | cut -d' ' -f1 | cut -d= -f2  2>/dev/null)"
+    [[ $CurrentTerm ]] && printf "\n\n  The current qqX launcher is using '%s'" "$CurrentTerm"
   fi
 
   if [[ $UserTerm || $CustomTerminalProfile ]]; then

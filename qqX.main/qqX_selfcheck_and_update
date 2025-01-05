@@ -117,6 +117,12 @@ check_for_qqX_updates() {
 
 }
 
+# Runs in the background. qqX will run this once. 
+function find_latest_qemu_version {
+  printf "" > "/tmp/latest-qemu.txt"
+  { floatversion -M "$(curl -sLf --max-time 5 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
+}
+
 
 function download_new_release {
 
@@ -149,7 +155,8 @@ function download_new_release {
 
       if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
         printColor "\n\n  [enter] Current/Default folder  %s "  "$Default_VM_Folder" 
-      else  
+      else
+        # not to confuse with '$Current_VM_Folder' 
         printf "\n\n  [c] Current folder    %s "  "$(pwd)"  
         printColor "\n\n  [enter] Default VM folder  %s"  "$Default_VM_Folder"
       fi 
@@ -163,8 +170,10 @@ function download_new_release {
       if [[ $qqX_LatestTarBall_Folder == "s" ]]; then  qqX_LatestTarBall_Folder="$Specified_Updates_Location" ; break
       elif [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
-      elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
-        nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
+      elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then
+        printf "  Opening Browser ... \n\n"
+        (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX" & ) || web_browser_not_found_message
+        sleep 1
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
       else qqX_LatestTarBall_Folder="$Default_VM_Folder" ; break
       fi
@@ -179,10 +188,10 @@ function download_new_release {
       qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
       mkdir -p "$qqX_LatestTarBall_Folder"
 
-      # record where to come back to, when done
+      # record where to come back to, when done and not to confuse with '$Current_VM_Folder' 
       ReturnFolder="$(pwd)"
 
-      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder"
+      cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder ??"
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
         eval curl -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz"  "$qqX_Latest_Secure_TarBall"
@@ -201,7 +210,7 @@ function download_new_release {
         printf "\n\n  Beta Notifications can be turned off in the general settings file \n"
       fi
 
-      printColor "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
+      printf "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
       printf "\n\n  All option settings, locations and preferences will be kept."
       printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
       read -rp "  >  "  qqX_UpdateExit
@@ -209,9 +218,9 @@ function download_new_release {
       if [[ $qqX_UpdateExit != "r" ]]; then 
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
         tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
-        cd "$qqX_LatestTarBall_Folder" || { printColor "\n\n  ERROR  changing to qqX.releases folder" ; sleep 1000 ;}
-        # move current execution away from this script and to the installer
-        exec  bash -c "./qqX_setup_and_install  Upgrade" 
+        sleep 0.5
+        # start the SYSTEM installer (use the posix installer for initial or manual installs)
+        exec  bash -c "$qqX_LatestTarBall_Folder/qqX.system/qqX_system_install  Upgrade" 
       fi
 
       sleep 0.6

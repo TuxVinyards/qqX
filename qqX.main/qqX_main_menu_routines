@@ -332,6 +332,7 @@ function_delete_Selected_VM () {
   NewFileTuneUp=
   NewFileTuneUp_JustDone=
   cd "$Default_VM_Folder" || DefaultFolderError=1
+  Current_VM_Folder="$Default_VM_Folder" 
   refresh_sources_and_load_VM_arrays
 
 }
@@ -357,16 +358,16 @@ function_rename_conf_dirnames () {
 
 list_current_folder_instance_names () {
 
-  CurrentFolderNames=()
-  CurrentFolderNameError=
-  mapfile -t CurrentFolderContent <<< "$(ls 2>/dev/null)"
-  for Name in "${CurrentFolderContent[@]}"; do [[ -d "$Name" ]] && CurrentFolderNames+=("$Name"); done
+  Current_VM_Folder_Names=()
+  Current_VM_Folder_NameError=
+  mapfile -t Current_VM_FolderContent <<< "$(ls 2>/dev/null)"
+  for Name in "${Current_VM_FolderContent[@]}"; do [[ -d "$Name" ]] && Current_VM_Folder_Names+=("$Name"); done
 
   # printf "\n  Containing:   "  # set each title case by case
-  if [[ ! ${CurrentFolderNames[*]} ]]; then printColor "  NONE FOUND \n\n" 
+  if [[ ! ${Current_VM_Folder_Names[*]} ]]; then printColor "  NONE FOUND \n\n" 
   else 
     printf "\n\n" 
-    print_quickget_and_folder_choices  "CurrentFolderNames"  6 
+    print_quickget_and_folder_choices  "Current_VM_Folder_Names"  6 
   fi
 }
 
@@ -456,7 +457,9 @@ move_rename_Selected_VM () {
     # set mv to use 'r' as multi-purpose 
     Move_VM_Option="r"
 
-    if cd "$Mv_NewConf_Dir"; then printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
+    if cd "$Mv_NewConf_Dir"; then 
+      printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
+      Current_VM_Folder="$Mv_NewConf_Dir" 
     else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
     fi
 
@@ -464,13 +467,16 @@ move_rename_Selected_VM () {
 
   if [[ $Move_VM_Option == "r" ]]; then  
   
-    printf "\n  Currently Containing:   "  
+    CurrentFolder="$(pwd)"
+    show_current_group_folder_list
+
+    printf "\n\n  Currently Containing:   "  
     list_current_folder_instance_names
 
     while true; do
 
       Mv_NewName=
-      CurrentFolderNameError=
+      Current_VM_Folder_NameError=
       printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
       printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change  [ln] make link"
       printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
@@ -478,10 +484,10 @@ move_rename_Selected_VM () {
 
       [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName" 
       
-      for Name in "${CurrentFolderNames[@]}"; do [[ $Mv_NewName == "$Name" ]] && CurrentFolderNameError=1
+      for Name in "${Current_VM_Folder_Names[@]}"; do [[ $Mv_NewName == "$Name" ]] && Current_VM_Folder_NameError=1
       done
 
-      if [[ $CurrentFolderNameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
+      if [[ $Current_VM_Folder_NameError ]]; then printf "\n\n  ERROR  Name already exists" ; else break
       fi
 
     done
@@ -762,15 +768,16 @@ custom_boot_file () {
     if [[ $CreateCustom == "b" ]]; then return
 
     elif [[ $CreateCustom == "w" ]]; then
-
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  &  
+      printf "\n  Opening Browser ... \n\n"
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
+      sleep 1
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_List.txt" ]]; then
-     
-        printf "\n\n  Creating Custom Boot file \n\n"
-        cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" 
-        sleep 1.5
-        
+
+      printf "\n\n  Creating Custom Boot file \n\n"
+      cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" 
+      sleep 1.5
+
     fi     
 
   elif [[ $1 == "delete" ]]; then 
@@ -789,14 +796,15 @@ custom_boot_file () {
     if [[ $DeleteCustom == "b" ]]; then return
 
     elif [[ $DeleteCustom == "w" ]]; then
-
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  &  
+      printf "\n  Opening Browser ... \n\n"
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
+      sleep 1
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" ]]; then
      
-        printf "\n\n  Deleting Custom Boot file, renaming as .old ...\n\n"
-        mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt" 
-        sleep 1.5
+      printf "\n\n  Deleting Custom Boot file, renaming as .old ...\n\n"
+      mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt" 
+      sleep 1.5
         
     fi     
 

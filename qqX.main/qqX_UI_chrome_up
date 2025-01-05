@@ -142,11 +142,42 @@ function exit {
   NoExit=
 }
 
+# Tests for these programs will have been made just previously in the read_main_settings script
+# but placing the message functions here allows these functions to run elsewhere
+# See function qcow2_filemanagement_launcher
+
+texteditor_not_found_message () {
+  printColor "\n\n  Unable to open settings or show some help sections without an editor."
+  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
+  printf "\n\n  Give settings file the command name of a preferred editor."
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
+  read -rp "  >  "
+}
+
+web_browser_not_found_message () {
+  printColor "\n\n  Add Web Browser to GENERAL SETTINGS:"
+  printf "\n\n  None of the usual or default Web Browsers can be found ..."
+  printf "\n\n  Give settings file the command name of a preferred browser."
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
+  read -rp "  >  "
+}
+
+file_manager_not_found_message () {
+  printColor "\n\n  Add File Manager to GENERAL SETTINGS:"
+  printf "\n\n  None of the usual or default File Managers can be found ..."
+  printf "\n\n  Give settings file the command name of a preferred manager."
+  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
+  read -rp "  >  "
+}
 
 show_qqX_title_bar() {
 
+  if [[ ! $LatestQEMU ]] && grep -qsE ^'[0-9]' "/tmp/latest-qemu.txt"; then  LatestQEMU="$(cat "/tmp/latest-qemu.txt")"; fi
+
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
-  printf "\n\n  Currently wrapping:  QEMU %s   quickemu %s  &  quickget %s  '%s'" "$QEMU_VER_LONG" "$QE_VerNumber" "$QG_VerNumber" "$QE_SourceVersion"
+  printf "\n\n  Currently wrapping:  QEMU %s" "$QEMU_VER_LONG"
+  if [[ $LatestQEMU ]]; then printf "  (latest: %s)   " "$LatestQEMU"; else printf "   "; fi
+  printf "quickemu %s  &  quickget %s  '%s'"  "$QE_VerNumber" "$QG_VerNumber" "$QE_SourceVersion"
 
   [[ $VerboseArgs ]] && printf  "  (Verbose Args)"
 
@@ -162,13 +193,13 @@ show_qqX_title_bar() {
     [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
   done
 
-  if [[ ! $CurrentFolder ]]; then 
-    CurrentFolder="$Default_VM_Folder"
+  if [[ ! $Current_VM_Folder ]]; then 
+    Current_VM_Folder="$Default_VM_Folder"
     cd "$Default_VM_Folder" || printf "\n\n  ChromeUp ERROR sorting Current Folder"
   fi
 
   if [[ ! $HideFolderTitleBar ]]; then  
-    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$CurrentFolder"
+    printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$Current_VM_Folder"
   else  
     printf "\n"
   fi
@@ -213,8 +244,9 @@ function show_qqX_general_help {
 
     elif [[ $HelpSelect == "w" ]]; then
       HelpSelect=
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & 
-
+      printf "\n  Opening Browser ... \n"
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & ) || web_browser_not_found_message
+      sleep 1
     else  
       HelpSelect=
       break

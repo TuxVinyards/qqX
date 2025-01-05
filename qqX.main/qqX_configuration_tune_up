@@ -153,9 +153,7 @@ function_config_tune_up ()  {
       read -rp "  >  " ErrOpenFM
       VM_InstanceName=
       if [[ ! $ErrOpenFM ]]; then 
-        if [[ $FileManager ]]; then nohup &> /dev/null  "$FileManager"  "$TuneUp_Conf_Dir" &
-        else printf "\n\n  ERROR: File Manager has not been found or set, so a manual start is required"
-        fi
+        (nohup &> /dev/null  "$FileManager"  "$TuneUp_Conf_Dir" & ) || file_manager_not_found_message
       fi
       printColor "\n\n  [enter] to return \n\n"
       read -rp "  >  "
