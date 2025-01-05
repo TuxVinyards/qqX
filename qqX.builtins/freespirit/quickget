@@ -598,7 +598,7 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    echo 7.0.0
+    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
 }
 
 function editions_bodhi() {
@@ -684,9 +684,9 @@ function releases_easyos() {
     # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
     TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
     for YEAR in ${TWO_YEARS} ; do
-        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / | sort -nr)"
+        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / | sort -nr)"
     done
-    echo ${ALL_RELEASES}
+    echo "${ALL_RELEASES}"
 }
 
 
@@ -695,9 +695,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    local ENDEAVOUR_RELEASES=""
-    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | grep -o '<a href="[^"]*.iso">' | sed 's/^<a href="//;s/.iso">.*//' | grep -v 'x86_64' | LC_ALL="en_US.UTF-8" sort -Mr | cut -c 13- | head -n 5 | tr '\n' ' ')"
-    echo "${ENDEAVOUR_RELEASES,,}"
+    floatversion -s -M 4 "$(curl -sLf "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
 }
 
 function releases_endless() {
@@ -798,11 +796,11 @@ function editions_kolibrios() {
 }
 
 function releases_linuxlite() {
-    echo 6.6 6.4 6.2 6.0
+    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
 }
 
 function releases_linuxmint() {
-    echo 22 21.3 21.2 21.1 21 20.3 20.2
+    curl -slf "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
 }
 
 function editions_linuxmint() {
@@ -2495,8 +2493,10 @@ function get_sparkylinux() {
 
 function get_spirallinux() {
     local HASH=""
-    local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
-    local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
+    local LATEST=""
+    LATEST="$(floatversion -M "$(curl -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')" 2>/dev/null)"
+    local ISO="SpiralLinux_${EDITION}_${LATEST}_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
     echo "${URL}/${ISO}" "${HASH}"
 }
