@@ -101,14 +101,6 @@ function find_file_manager_browser()  {
   fi
 }
 
-texteditor_not_found_message () {
-  printColor "\n\n  Unable to open settings or show some help sections without an editor."
-  printf "\n\n  Default or basic text editors will be tried or have been tried ..."
-  printf "\n\n  Give settings file the command name of a preferred editor."
-  printf "\n\n  Settings location:  %s  \n\n  [enter] to return \n\n"  "$qqX_SettingsFile"
-  read -rp "  >  "
-}
-
 find_texteditor () {
 
   [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=

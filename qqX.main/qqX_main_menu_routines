@@ -769,14 +769,14 @@ custom_boot_file () {
 
     elif [[ $CreateCustom == "w" ]]; then
 
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  &  
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_List.txt" ]]; then
-     
-        printf "\n\n  Creating Custom Boot file \n\n"
-        cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" 
-        sleep 1.5
-        
+
+      printf "\n\n  Creating Custom Boot file \n\n"
+      cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" 
+      sleep 1.5
+
     fi     
 
   elif [[ $1 == "delete" ]]; then 
@@ -796,13 +796,13 @@ custom_boot_file () {
 
     elif [[ $DeleteCustom == "w" ]]; then
 
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  &  
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"  & ) || web_browser_not_found_message
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" ]]; then
      
-        printf "\n\n  Deleting Custom Boot file, renaming as .old ...\n\n"
-        mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt" 
-        sleep 1.5
+      printf "\n\n  Deleting Custom Boot file, renaming as .old ...\n\n"
+      mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt" 
+      sleep 1.5
         
     fi     
 

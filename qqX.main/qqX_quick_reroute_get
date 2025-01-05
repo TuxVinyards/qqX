@@ -732,7 +732,7 @@ function_quick_get_wrap ()  {
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
-        nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+        (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message 
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
@@ -1173,7 +1173,7 @@ function_quick_get_wrap ()  {
         ;;
 
         w)  
-          nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & 
+          (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
         ;;
 
         *)

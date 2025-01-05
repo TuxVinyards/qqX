@@ -749,6 +749,7 @@ qcow2_filemanagement_launcher () {
       printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
       printf "\n FileManager=\"%s\"" "$FileManager"
       printf "\n TextEditor=\"%s\"" "$TextEditor"
+      printf "\n WebBrowser=\"%s\"" "$WebBrowser"
       printf "\n Default_VM_Folder=\"%s\"" "$Default_VM_Folder"
       printf "\n VM_Conf_Dir=\"%s\"" "$VM_Conf_Dir"
       printf "\n VM_InstanceName=\"%s\"" "$VM_InstanceName"

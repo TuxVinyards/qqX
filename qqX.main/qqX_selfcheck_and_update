@@ -171,7 +171,7 @@ function download_new_release {
       elif [[ $qqX_LatestTarBall_Folder == "d" ]]; then  qqX_LatestTarBall_Folder="$HOME/Downloads" ; break
       elif [[ $qqX_LatestTarBall_Folder == "c" ]]; then  qqX_LatestTarBall_Folder="$(pwd)" ; break
       elif [[ $qqX_LatestTarBall_Folder == "w" ]]; then  
-        nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX"  & 
+        (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX" & ) || web_browser_not_found_message
       elif [[ $qqX_LatestTarBall_Folder == "b" ]]; then  qqX_LatestTarBall_Folder= ; qqX_NoReleaseDL=1 ; break
       else qqX_LatestTarBall_Folder="$Default_VM_Folder" ; break
       fi

@@ -29,7 +29,7 @@ function  main_menu_actions {
     printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
     read -rp "  >  "  TxSetCode
     if [[ ! $TxSetCode ]]; then
-      nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/blob/main/qqX_settings"  & 
+      (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/blob/main/qqX_settings"  & ) || web_browser_not_found_message
     else
       TxSetCode= ; return
     fi
@@ -40,7 +40,7 @@ function  main_menu_actions {
     printColor "\n\n  [enter] to load in browser  [b] to go back \n\n"
     read -rp "  >  "  LoadHomePage
     if [[ ! $LoadHomePage ]]; then
-      nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & 
+      (nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & ) || web_browser_not_found_message 
     else
       LoadHomePage= ; return
     fi
@@ -133,7 +133,7 @@ function  main_menu_actions {
     [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:" "usb_desc_get_descriptor") && QemuErrorAlert=
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
-  elif [[ $MainMenuChoice == "f" ]] ; then  nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  &
+  elif [[ $MainMenuChoice == "f" ]] ; then  (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  & ) || file_manager_not_found_message
 
   elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
 
@@ -157,7 +157,7 @@ function  main_menu_actions {
     elif [[ $BootStyle == "slow" ]]; then  BootStyle="fast" ; BootStyleMsg="fast"
     fi
 
-  elif [[ $MainMenuChoice == "qd" ]] ; then nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & 
+  elif [[ $MainMenuChoice == "qd" ]] ; then (nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & ) || web_browser_not_found_message
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" 
 
