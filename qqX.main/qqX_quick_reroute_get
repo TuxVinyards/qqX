@@ -732,12 +732,13 @@ function_quick_get_wrap ()  {
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
+        printf "  Opening Browser ... \n\n" 
         (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message 
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
-
+        sleep 1
 
       elif [[ $QGW_List_NumSelected ]]; then 
 
@@ -1172,8 +1173,10 @@ function_quick_get_wrap ()  {
           printf "\n\n"
         ;;
 
-        w)  
+        w) 
+          printf "  Opening Browser ... \n\n"
           (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
+          sleep 1
         ;;
 
         *)
