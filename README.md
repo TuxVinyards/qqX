@@ -14,9 +14,9 @@
 
 - Easy [installation](#how-to-install)
 
-## [Latest release 1.11.03](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
-Another large code update with lots of new features and Quickemu improvements.
+1.11.0 is a large code update with lots of new features and Quickemu improvements.
 
 - new feature allows  _mounting of qcow2 drives in a file manager_
 
@@ -25,6 +25,8 @@ Another large code update with lots of new features and Quickemu improvements.
 - extended testing includes tiling WM's and all major desktops
 
 - adds new handling routines for KDE6, XFCE, LXQT and Gnome3
+
+- 1.11.04 fixes multiple distro downloads and adds several UX adjustments
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -112,6 +114,8 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 ## Release notes
 
+1.11 has been a large code update with lots of new features and Quickemu improvements
+
 @ Nov 27th Beta 1.11.0.2
 
 - New feature _mounting of qcow2 drives in a file manager_ ....
@@ -141,7 +145,7 @@ has now been merged
 
 - The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
 
-@ Dec 31  Release [1.11.03](https://github.com/TuxVinyards/qqX/releases/latest)
+@ Dec 31  Release 1.11.03
 
 - fix for Quickget hanging on URL checks when server or internet is slow
 
@@ -149,7 +153,11 @@ has now been merged
 
 - updates FreeSpirit to latest Quickemu 4.9.7/8  > adds proxmox and a couple of other items not in 1.11.02
 
-Enjoy the end of year festivities :rocket:
+@ Jan 6 Release [1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- adds several UX adjustments and general polish
+
+- a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
 
 ### Reliability
 
@@ -170,6 +178,8 @@ Enjoy the end of year festivities :rocket:
 - Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
 
 - And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
+
+- The use of 'floatversion' allows qqX _exclusive fixes_ for multiple distro downloads not available in Quickemu
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
