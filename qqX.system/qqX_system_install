@@ -13,6 +13,10 @@
 #   in the folder > right click > open in terminal >  type "./qqX_system_install"  (note prefix ./)
 
 ##  CUSTOM TERMINAL SIZES & PROFILE  may be set further down, just after the initial system checks
+#   qqX should test and setup most standard desktop associated terminals without problem.
+#   From version 1.10.02 onwards, a 'CustomTerminalProfile' will also be stored in the qqX settings folder. 
+#   The (hidden) file '$HOME/.qqX/qqX_term.conf' will be checked and auto-read when carrying out updates 
+#   and may also be edited following initial setup, which is possibly easier ...
 
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
