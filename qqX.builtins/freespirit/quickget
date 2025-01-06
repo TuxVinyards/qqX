@@ -1154,6 +1154,7 @@ function check_hash() {
         iso="${VM_PATH}/${1}"
     fi
     hash="${2}"
+    hash="$(tr -cd '[:graph:]' <<< "$hash")"
     # Guess the hash algorithm by the hash length
     case ${#hash} in
         32) hash_algo=md5sum;;
