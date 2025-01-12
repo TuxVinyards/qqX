@@ -179,7 +179,7 @@ has now been merged
 
 - And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
 
-- The use of 'floatversion' allows qqX _exclusive fixes_ for multiple distro downloads not available in Quickemu
+- The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
