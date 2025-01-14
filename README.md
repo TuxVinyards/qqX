@@ -167,7 +167,7 @@ has now been merged
 
 - qqX always makes backups, as is _standard good practice_ with _any_ software.
 
-### Fixes for Quickemu
+## Fixes for Quickemu
 
 - Available via qqX's FreeBird or FreeSpirit or in the qqX code itself
 
@@ -183,7 +183,17 @@ has now been merged
 
 See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
-### FAQs and Help
+### Creative Differences and Relationship with Quickemu
+
+- Users should be offered a choice and be allowed to decide.
+
+There was [a listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages but my attempts to help became too often misconstrued ...
+
+The wiki listing should be reinstated on the basis that Wimpy and I keep our distance and that we stay away from each others issue pages and such.
+
+I fully walked away back in June 2024 but 6 months later, in 2025, I do feel that some better co-operation and better relations are needed ...
+
+## FAQs and Help
 
 - Lots of _Quickemu Help_ available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help) too, not just qqX
 
