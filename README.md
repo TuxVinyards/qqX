@@ -16,6 +16,20 @@
 
 - And has an easy [installation](#how-to-install)
 
+## Creative Differences and Relationship with Quickemu
+
+For various reasons, I fully walked away from the Quickemu project in June 2024 ...
+
+The Quickemu philosophy of software that makes decisions and simply does "the right thing" isn't a full answer.
+
+- More controls are needed. Especially when Quickemu does the wrong thing.
+
+We seem to be at a point where qqX is becoming an increasingly separate project.
+
+- An increasing number of fixes for Quickemu are having to be added downstream
+
+- Lots of fixes are using separate qqX licensed code
+
 ## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
 1.11.0 is a large code update with lots of new features and Quickemu improvements.
@@ -183,17 +197,11 @@ has now been merged
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
 
-See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
+At the beginning of 2025, I would like to see an improvement in relationships, such that so many of these fixes didn't have to get added. Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages could be a good move.
 
-### Creative Differences and Relationship with Quickemu
+Unfortunately, more than this will be needed to halt the increasing drift apart. An analogy could be Ubuntu promoting derivatives like Linux Mint. And Debian promoting Ubuntu. It could happen but it doesn't. So it probably won't happen here.
 
-- Users should be offered a choice and be allowed to decide.
-
-There was [a listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages but my attempts to help became too often misconstrued ...
-
-The wiki listing should be reinstated on the basis that Wimpy and I keep our distance and that we stay away from each others issue pages and such.
-
-I fully walked away back in June 2024 but 6 months later, in 2025, I do feel that some better co-operation and better relations are needed ...
+- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
 ## FAQs and Help
 
