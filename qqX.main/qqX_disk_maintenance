@@ -210,7 +210,7 @@ function manage_and_repair_disks {
     else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" 
     fi
 
-    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -n 1)"
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
 
     printf "\n\n  Checking for backup disk space on host drive ..."
@@ -247,7 +247,7 @@ function manage_and_repair_disks {
   
   # REVIEW   qemu's differential 'bitmap' tracking  https://lwn.net/Articles/837053/
 
-  if [[ $DiskManage != "b" ]]; then 
+  if [[ $DiskManage ]] && [[ $DiskManage != "b" ]]; then 
 
     if [[ $DiskManage == "rz" ]]; then
 

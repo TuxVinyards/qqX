@@ -328,7 +328,7 @@ function_config_tune_up ()  {
 
   else 
 
-    Shared_RAM_Allocated="$(free --mega -h | tr ' ' '\n' | grep -m 4 [0-9] | tail -1  2>/dev/null)"
+    Shared_RAM_Allocated="$(free --mega -h | tr ' ' '\n' | grep -m 4 [0-9] | tail -n 1  2>/dev/null)"
 
     if [[ "$Shared_RAM_Allocated" == *M* ]]; then 
       Shared_RAM_Allocated="$(cut -d'M' -f1 <<< "$Shared_RAM_Allocated")"
