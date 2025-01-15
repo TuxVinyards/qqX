@@ -1,18 +1,20 @@
 # qqX  - quickemu quickget X terminal project
 
+- Create an easy to build collection of distros and desktops for testing, using and evaluating
+
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
 - Adds fixes, tools and general improvements to the [Quickemu](https://github.com/quickemu-project/quickemu) system
 
-- for the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
+- Allows the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
 
 - Offers a complete menu system within a unique hybrid interface
 
-- More up-to-date and easier to mod than Gnome Boxes or VirtualBox
+- Is more up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-- Easy [installation](#how-to-install)
+- And has an easy [installation](#how-to-install)
 
 ## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
