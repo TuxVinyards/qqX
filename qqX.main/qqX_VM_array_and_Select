@@ -87,27 +87,19 @@ scan_folders_list_and_add_VMs () {
         VM_PairsCount=0
 
         while [[ ${VM_Array[$i,0]} ]]; do
-
           ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-
           if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
-
             [[ $VM_PairsCount -eq  "$VM_ElementCount" ]] &&  break
-
             # else carry on interating the array 
             ((i+=1))  
             ((VM_PairsCount+=2))  
-            
           else  
-
             VM_SettingsError=1
             printf "\n\n  Array Element(s) Not Found "
             printf "\n\n  Folder:  %s " "${VM_Array[$i,0]}"
             printf "\n\n  .conf :  %s " "${VM_Array[$i,1]}"
             break
-            
           fi
-          
         done
 
       fi
@@ -117,30 +109,22 @@ scan_folders_list_and_add_VMs () {
       # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
 
       if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then  
-      
         VM_SettingsError=1
         printf "\n\n  Empty Array Element(s) Found "
-
       fi
 
       # All Checks Error dialog
 
       if [[ $VM_SettingsError ]]; then
-
         printColor "\n\n  ERROR in VM array general settings"
-
         printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
         printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
         printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
-
         read -rp  "  >  "  VM_SettingsError
-
         printf "\n\n"
-
-        if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings ; fi
-
+        if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings
+        fi
       else  break
-
       fi
 
     done
@@ -148,9 +132,7 @@ scan_folders_list_and_add_VMs () {
   fi
 
   # Scan rest of list & ADD new found .conf files / distros to the VM array, if they are not yet listed:
-
   i=0
-
   while [[ ${VM_Folder_List[i]} ]]; do
 
     FolderPathName="${VM_Folder_List[i]}"
