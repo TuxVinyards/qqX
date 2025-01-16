@@ -216,13 +216,29 @@ else
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
     fi
 
-    InstanceQcow2_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep qcow2 | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l 2>/dev/null)"
-    InstanceISO_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l 2>/dev/null)"
+    InstanceQcow2_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep qcow2 | awk '{print $1}' | cut -d 'G' -f1 2>/dev/null)"
 
-    [[ ! $InstanceQcow2_Sizes ]] && InstanceQcow2_Sizes="0"
-    [[ ! $InstanceISO_Sizes ]] && InstanceISO_Sizes="0"
+    if [[ $InstanceQcow2_Sizes ]]; then  
+      InstanceQcow2_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceQcow2_Sizes" 2>/dev/null)"
+      InstanceQcow2_Sizes="$(paste -sd+  <<< "$InstanceQcow2_Sizes" | bc -l  2>/dev/null)"
+    else
+      InstanceQcow2_Sizes="0"
+      InstanceQcow2_SizesCount="0"
+    fi
+    
+    InstanceISO_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' | cut -d 'G' -f1 2>/dev/null)"
 
-    printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   Disks: %s   ISO's: %s"  "${InstanceQcow2_Sizes}G" "${InstanceISO_Sizes}G"
+    if [[ $InstanceISO_Sizes ]]; then  
+      InstanceISO_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceISO_Sizes" 2>/dev/null)"
+      InstanceISO_Sizes="$(paste -sd+  <<< "$InstanceISO_Sizes" | bc -l  2>/dev/null)"
+    else
+      InstanceISO_Sizes="0"
+      InstanceISO_SizesCount="0"
+    fi
+
+    printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   "
+    printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount" 
+    printf "ISO's: %s (%s)  "  "${InstanceISO_Sizes}G" "$InstanceISO_SizesCount"
 
     printf  "\n\n"
     filter_and_flag_qemu_errors
