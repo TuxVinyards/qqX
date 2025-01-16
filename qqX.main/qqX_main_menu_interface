@@ -216,18 +216,25 @@ else
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
     fi
 
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
+    InstanceQcow2_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep qcow2 | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l 2>/dev/null)"
+    InstanceISO_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l 2>/dev/null)"
 
+    [[ ! $InstanceQcow2_Sizes ]] && InstanceQcow2_Sizes="0"
+    [[ ! $InstanceISO_Sizes ]] && InstanceISO_Sizes="0"
+
+    printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   Disks: %s   ISO's: %s"  "${InstanceQcow2_Sizes}G" "${InstanceISO_Sizes}G"
+
+    printf  "\n\n"
     filter_and_flag_qemu_errors
 
     if [[ $QemuErrorAlert ]]; then 
       printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then 
       if [[ $(type -p "$FileManager") ]]; then 
-        printf "   [f] open VM folder"
+        printf "  [f] open VM folder"
         printf "   [qf] | [qqf] open qcow2"
         printf " in file manager"
-      else  printColor "   [set]  ERROR file manager not found" 
+      else  printColor "  [set]  ERROR file manager not found" 
       fi
     fi
 
