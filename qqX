@@ -49,8 +49,8 @@ else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
 fi
 
 # Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
-# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
-# Non-major non-zero numbers remain padded to 2dp to make easier reading in file managers
+# Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# but minor numbers remain padded to 2dp
   qqX_Version="1.11.04"
 
 # Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
