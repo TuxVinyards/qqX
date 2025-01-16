@@ -16,19 +16,11 @@
 
 - And has an easy [installation](#how-to-install)
 
-## Creative Differences and Relationship with Quickemu
+## Creative Differences
 
-For various reasons, I fully walked away from the Quickemu project in June 2024 ...
+The Quickemu philosophy is that software should generally make the decisions and simply "do the right thing".
 
-The Quickemu philosophy of software that makes decisions and simply does "the right thing" isn't a full answer.
-
-- More controls are needed. Especially when Quickemu does the wrong thing.
-
-We seem to be at a point where qqX is becoming an increasingly separate project.
-
-- An increasing number of fixes for Quickemu are having to be added downstream
-
-- Lots of fixes are using separate qqX licensed code
+- The qqX view is that more controls are needed. Especially when Quickemu does the wrong thing.
 
 ## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
@@ -197,9 +189,21 @@ has now been merged
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
 
+## Relationship with Quickemu
+
+qqX should be seen as complementary to Quickemu and as something to improve user experience.
+
+However, we seem to be at a point where qqX is becoming an increasingly separate project.
+
+- An increasing number of fixes for Quickemu are having to be added downstream
+
+- Lots of fixes are using separate qqX licensed code
+
+Creative differences lead to a rift with the Quickemu project in June 2024 ...
+
 At the beginning of 2025, I would like to see an improvement in relationships, such that so many of these fixes didn't have to get added. Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages could be a good move.
 
-Unfortunately, more than this will be needed to halt the increasing drift apart. An analogy could be Ubuntu promoting derivatives like Linux Mint. And Debian promoting Ubuntu. It could happen but it doesn't. So it probably won't happen here.
+An analogy could be Ubuntu not promoting derivatives like Linux Mint. And Debian not promoting Ubuntu. But this doesn't mean that we  have to do the same.
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
