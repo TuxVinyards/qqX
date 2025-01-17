@@ -84,21 +84,25 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ### Range of utilities and functions
 
-- Backups and snapshot management
-
-- Controls for Secondary storage
-  
-- Configuration tune-up wizard
-
 - Qcow2 repair, resize and diagnostics
 
 - Boot manager and ISO boot selector
 
-- Custom boot parameters and the ability to run [Arm64, Risc-V +](https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types)
+- Backups and snapshot management
 
-- .conf updater for rename and move
+- Controls for Secondary storage
+  
+- A configuration tune-up wizard
 
-- Controls for screen size and days count on 'daily-live' ISO's
+- Custom Qemu boot parameters tools
+
+- Tools to run [Arm64, Risc-V +](https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types)
+
+- Distro rename and move utility
+
+- Extended controls for screen size
+
+- Days count on 'daily-live' ISO's
 
 ![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
@@ -122,7 +126,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 ## Release notes
 
-1.11 has been a large code update with lots of new features and Quickemu improvements
+1.11 was a large code update with lots of new features and Quickemu improvements
 
 @ Nov 27th Beta 1.11.0.2
 
@@ -146,7 +150,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 @ Dec 23  Release 1.11.02
 
-- Extensive testing has now been completed, including in a wide range of tiling window managers
+- Extensive testing was completed, including in a wide range of tiling window managers
 
 - The fix for Windows downloads, recently pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98)
 has now been merged
@@ -167,7 +171,7 @@ has now been merged
 
 - a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
 
-### Reliability
+## Reliability
 
 - Testing is always carried out on a variety of mainstream distros before release. (more so on 1.10)
 
@@ -177,7 +181,7 @@ has now been merged
 
 ## Fixes for Quickemu
 
-- Available via qqX's FreeBird or FreeSpirit or in the qqX code itself
+- Available via qqX's [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) or FreeSpirit or in the qqX code itself
 
 - Fixes problems causing Intel processors to run MacOS very slowly.
 
@@ -188,24 +192,6 @@ has now been merged
 - And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
-
-## Relationship with Quickemu
-
-qqX should be seen as complementary to Quickemu and as something to improve user experience.
-
-However, we seem to be at a point where qqX is becoming an increasingly separate project.
-
-- An increasing number of fixes for Quickemu are having to be added downstream
-
-- Lots of fixes are using separate qqX licensed code
-
-Creative differences lead to a rift with the Quickemu project in June 2024 ...
-
-At the beginning of 2025, I would like to see an improvement in relationships, such that so many of these fixes didn't have to get added. Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages could be a good move.
-
-An analogy could be Ubuntu not promoting derivatives like Linux Mint. And Debian not promoting Ubuntu. But this doesn't mean that we  have to do the same.
-
-- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
 ## FAQs and Help
 
@@ -244,6 +230,24 @@ There are none of the complexities that LibVirt creates by using only machine re
 And none of steep learning curves that come with languages such as Rust, C or Vala.
 
 - Even seemingly simple LibVirt front-ends like Gnome Boxes can contain whole learning curves for the most basic of things, like moving the default VM folder for example.  Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads)
+
+## Relationship with Quickemu
+
+qqX should be seen as complementary to Quickemu and as something to improve the Quickemu user experience.
+
+That said, we do seem to be at a point where qqX is becoming an increasingly separate project.
+
+- An increasing number of fixes for Quickemu are having to be added downstream
+
+- Lots of fixes are using separate qqX licensed code
+
+Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June I added to the growing count of developers who had decided to walk away.
+
+I would like to see an improvement in relationships, such that more people could benefit from the work being done here. At the beginning of 2025, reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
+
+While an analogy could be Ubuntu not promoting derivatives like Linux Mint and Debian not promoting Ubuntu, this doesn't mean that we  have to do the same.
+
+- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
 ## Development and Roadmap
 
