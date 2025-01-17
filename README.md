@@ -16,12 +16,6 @@
 
 - And has an easy [installation](#how-to-install)
 
-## Creative Differences
-
-The Quickemu philosophy is that software should generally make the decisions and simply "do the right thing".
-
-- The qqX view is that more controls are needed. Especially when Quickemu does the wrong thing.
-
 ## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
 1.11.0 is a large code update with lots of new features and Quickemu improvements.
@@ -237,13 +231,15 @@ qqX should be seen as complementary to Quickemu and as something to improve the 
 
 That said, we do seem to be at a point where qqX is becoming an increasingly separate project.
 
+Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June I added to the growing count of developers who had decided to walk away.
+
 - An increasing number of fixes for Quickemu are having to be added downstream
 
 - Lots of fixes are using separate qqX licensed code
 
-Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June I added to the growing count of developers who had decided to walk away.
+I would like to see an improvement in relationships, so that more people could benefit from the work being done here.
 
-I would like to see an improvement in relationships, such that more people could benefit from the work being done here. At the beginning of 2025, reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
+At the beginning of 2025, reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
 
 While an analogy could be Ubuntu not promoting derivatives like Linux Mint and Debian not promoting Ubuntu, this doesn't mean that we  have to do the same.
 
