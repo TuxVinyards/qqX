@@ -169,6 +169,17 @@ scan_folders_list_and_add_VMs () {
 
 }
 
+vm_menu_interface_refresh () {
+  ByPass_VM_Array_Loader=
+  ByPass_VM_Array_Selector=
+  ListTitleFolderOld=
+  InvertStyleColors=
+  MenuStylePreviewed=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  VM_InstanceName=
+  VM_Selection=
+}
 
 VM_loader_selector_and_menu () {  
 
@@ -265,18 +276,6 @@ VM_loader_selector_and_menu () {
           fi
 
         fi
-
-        vm_menu_interface_refresh () {
-          ByPass_VM_Array_Loader=
-          ByPass_VM_Array_Selector=
-          ListTitleFolderOld=
-          InvertStyleColors=
-          MenuStylePreviewed=
-          VM_Conf_Dir=
-          VM_Conf_File=
-          VM_InstanceName=
-          VM_Selection=
-        }
 
         path_diagnostics
 
