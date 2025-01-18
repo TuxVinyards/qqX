@@ -169,6 +169,21 @@ scan_folders_list_and_add_VMs () {
 
 }
 
+
+scan_VM_Array_for_sizes () {
+
+  printf "" > "/tmp/qqX.Sizes.qcow.txt"  
+  printf "" > "/tmp/qqX.Sizes.iso.txt"  
+  local i=0
+  while [[ ${VM_Array[$i,0]} ]]; do
+    ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+    ArrFolder="${ArrFolderFile/'.conf'/}"
+    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt"
+    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt"
+    ((i+=1))
+  done
+}
+
 VM_selector_menu_refresh () {
   ByPass_VM_Array_Loader=
   ByPass_VM_Array_Selector=
@@ -180,7 +195,6 @@ VM_selector_menu_refresh () {
   VM_InstanceName=
   VM_Selection=
 }
-
 
 VM_loader_selector_and_menu () {  
 
@@ -229,7 +243,10 @@ VM_loader_selector_and_menu () {
           if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
         done
 
+
+
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
+
 
         if [[ $New_VM_Conf_File ]] && [[ ! $Current_VM_Folder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
           printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
@@ -510,7 +527,8 @@ refresh_sources_and_load_VM_arrays() {
 
   Current_VM_Folder="$Default_VM_Folder"
   function_create_VM_folderList  
-  scan_folders_list_and_add_VMs 
+  scan_folders_list_and_add_VMs
+  scan_VM_Array_for_sizes
 
   cd "$RefreshCallFolder" || printColor "\n\n  ERROR returning to Original Location following the Array refresh" 
   Current_VM_Folder="$RefreshCall_VM_Folder"
