@@ -23,7 +23,7 @@ add_unlisted_vm_to_vm_array () {
   #  where $1 is 'VM_Path' and  $2 is 'VM_Conf_File' to be tested against the existing list (non-sparse)
 
   if [[ $1 ]]; then
-  
+
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
     TestFolderFile="$1/$2"
     [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
@@ -171,10 +171,27 @@ scan_VM_Array_for_sizes () {
   while [[ ${VM_Array[$i,0]} ]]; do
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt"
-    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt"
+    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
+    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
     ((i+=1))
   done
+
+  if [[ $(cat "/tmp/qqX.Sizes.qcow.txt" ) ]]; then  
+    TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null)"
+    TotalQcow2_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.qcow.txt" | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l  2>/dev/null)"
+  else
+    TotalQcow2_Sizes="0"
+    TotalQcow2_SizesCount="0"
+  fi
+
+  if [[ $(cat "/tmp/qqX.Sizes.iso.txt" ) ]]; then  
+    Total_ISO_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.iso.txt" 2>/dev/null)"
+    Total_ISO_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.iso.txt" | awk '{print $1}' | cut -d 'G' -f1 | paste -sd+ | bc -l  2>/dev/null)"
+  else
+    Total_ISO_Sizes="0"
+    Total_ISO_SizesCount="0"
+  fi
+  
 }
 
 VM_selector_menu_refresh () {
@@ -236,10 +253,9 @@ VM_loader_selector_and_menu () {
           if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
         done
 
-
-
+        printf "\n  Total Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+        printf "   [SZ] show size details \n"
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
-
 
         if [[ $New_VM_Conf_File ]] && [[ ! $Current_VM_Folder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
           printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
