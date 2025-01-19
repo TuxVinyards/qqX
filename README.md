@@ -249,6 +249,12 @@ While an analogy could be Ubuntu not promoting derivatives like Linux Mint and D
 
 See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for _more details_ and for _what's happening_ in future releases
 
+## Contributions
+
+At mid Jan 2025, as [here,](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) there are still quite a few places in Quickget where snippets of static code could do with the addition of [floatversion](https://github.com/TuxVinyards/floatversion) tweaks.
+
+If anyone wants to pick those up and add them to the [quickget-distro-fixes](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) branch while I am focussing on the `dev-next` branch, that would be useful.
+
 ## Why the Vinyards?
 
 I live in a wine growing region of Italy, in a castled village dating from the 1300's
