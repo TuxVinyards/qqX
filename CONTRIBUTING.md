@@ -1,6 +1,8 @@
 # Ideas and Creativity are most important
 
-- If you can, try to follow the Coding Style and Guidance outlined at the end of the qqX main script
+- Try to follow the Coding Style and Guidance outlined at the end of the qqX main script
+
+- But don't worry if you only know POSIX Shell and Coding Style is getting in the way
 
 - Things can always get sorted out in a separate branch if need be, later
 
@@ -18,6 +20,6 @@
 
 - Complex code should ideally be tested with different distro's and different desktops and managers
 
-## Add Screenshots
+## Screenshots can help
 
-- Pictures can tell a thousand words ...
+- Sometimes a picture can tell a thousand words ...
