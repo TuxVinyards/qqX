@@ -194,6 +194,23 @@ scan_VM_Array_for_sizes () {
   
 }
 
+show_VM_Array_sizes_text () {
+
+  printf "\n" > "/tmp/qqX.SizesTotals.txt"
+
+  { cat "/tmp/qqX.Sizes.qcow.txt"
+    printf "\n\n" 
+    cat "/tmp/qqX.Sizes.iso.txt"
+    printf "\n\nTotal Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+    printf "\n" 
+  }>> "/tmp/qqX.SizesTotals.txt" 
+
+  sleep 0.5
+
+  (nohup &> /dev/null  "$TextEditor" "/tmp/qqX.SizesTotals.txt" & ) || texteditor_not_found_message
+
+}
+
 VM_selector_menu_refresh () {
   ByPass_VM_Array_Loader=
   ByPass_VM_Array_Selector=
@@ -254,7 +271,8 @@ VM_loader_selector_and_menu () {
         done
 
         printf "\n  Total Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-        printf "   [SZ] show size details \n"
+        printf "   [sz] show size details \n"
+
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
         if [[ $New_VM_Conf_File ]] && [[ ! $Current_VM_Folder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
@@ -361,6 +379,12 @@ VM_loader_selector_and_menu () {
 
         VM_Selection=
         qqX_edit_settings 
+        return
+
+      elif [[ $VM_Selection == "sz" ]];then
+
+        VM_Selection=
+        show_VM_Array_sizes_text 
         return
 
       elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
