@@ -23,18 +23,14 @@ add_unlisted_vm_to_vm_array () {
   #  where $1 is 'VM_Path' and  $2 is 'VM_Conf_File' to be tested against the existing list (non-sparse)
 
   if [[ $1 ]]; then
-
+  
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
     TestFolderFile="$1/$2"
-
     [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
 
     if [[ ! ${VM_Array[0,0]} ]]; then 
-    
       New_VM_ElementCount=0  
-
     else 
-    
       New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
       local i=0
       while [[ ${VM_Array[$i,0]} ]]; do
@@ -43,13 +39,11 @@ add_unlisted_vm_to_vm_array () {
         else  ((i+=1))  # carry on interating the array
         fi
       done
-
     fi
 
-      # if it's the first entry, or at the end there is no match found in the array, then add it
-      VM_Array["$New_VM_ElementCount",0]="$1" 
-      VM_Array["$New_VM_ElementCount",1]="$2" 
-
+    # if it's the first entry, or at the end there is no match found in the array, then add it
+    VM_Array["$New_VM_ElementCount",0]="$1" 
+    VM_Array["$New_VM_ElementCount",1]="$2" 
   fi
   
 }
@@ -85,7 +79,6 @@ scan_folders_list_and_add_VMs () {
 
         i=0
         VM_PairsCount=0
-
         while [[ ${VM_Array[$i,0]} ]]; do
           ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
           if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
