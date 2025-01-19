@@ -1,7 +1,5 @@
 # Ideas and Creativity are most important
 
-Don't let the Coding Style stand in the way of getting yours ideas out there
-
 - If you can, try to follow the Coding Style and Guidance outlined at the end of the qqX main script
 
 - Things can always get sorted out in a separate branch if need be, later
