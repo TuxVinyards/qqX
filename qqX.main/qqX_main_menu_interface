@@ -219,7 +219,7 @@ else
 
     # use du with -L on instance menus as are individual totals only and some instances can be symbolically linked
     
-    InstanceQcow2_Sizes="$(du -a -L -t 100M "$VM_InstanceName" | grep qcow2 | awk '{print $1}' 2>/dev/null)"
+    InstanceQcow2_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep qcow2 | awk '{print $1}' 2>/dev/null)"
 
     if [[ $InstanceQcow2_Sizes ]]; then  
       InstanceQcow2_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceQcow2_Sizes" 2>/dev/null)"
@@ -230,12 +230,12 @@ else
       InstanceQcow2_SizesCount="0"
     fi
 
-    InstanceISO_Sizes="$(du -a -L -t 100M "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' 2>/dev/null)"
+    InstanceISO_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' 2>/dev/null)"
 
     if [[ $InstanceISO_Sizes ]]; then  
       InstanceISO_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceISO_Sizes" 2>/dev/null)"
       InstanceISO_Sizes="$(paste -sd+  <<< "$InstanceISO_Sizes" | bc -l  2>/dev/null)"
-      InstanceISO_Sizes="$(bc <<< "scale=1; $InstanceISO_Sizes/1000000")"
+      InstanceISO_Sizes="$(bc <<< "scale=2; $InstanceISO_Sizes/1000000")"
     else
       InstanceISO_Sizes="0"
       InstanceISO_SizesCount="0"
