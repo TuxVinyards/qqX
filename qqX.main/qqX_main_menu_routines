@@ -825,9 +825,15 @@ iso_select_mount_and_boot () {
 
   if [[ "$(pwd)" != "$VM_Conf_Dir" ]]; then 
     printColor "\n\n  ERROR: iso_select_mount_and_boot not running from correct folder \n\n"
+
   else
+
     IsoList=()
     mapfile -t IsoList <<< "$(ls "$VM_InstanceName"/*.iso 2>/dev/null)"
+    if [[ $SharedDrive ]]; then
+      #https://stackoverflow.com/a/53091662/27611101
+      mapfile -t -O "${#IsoList[@]}" IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
+    fi
 
     printColor "\n\n  ISO formated disk images may be copied into the individual VM folder"
     printf "\n\n  One or more may be added.  If more than one, an ISO should be selected from the list."
@@ -836,6 +842,11 @@ iso_select_mount_and_boot () {
     printf "\n\n\n  To boot from a selected ISO, press the 'esc' key when the start up screen appears."
     printf "\n\n  To auto-mount an ISO when the VM is selected, set 'fixed_iso=\"VM_InstanceName/name.iso\"' in the .conf file"
     printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for partition management."
+    printf "\n\n\n  A shared 'live boot' ISO can be added to the Shared Drive folder, if Shared Drive has been set up."
+    printf "\n\n  Use [bm] utility to toggle boot manager or fastboot, if required. Current status:"
+    if [[ $BootStyle == "fast" ]]; then printColor "  (fastboot)"
+    else  printColor "  (boot menu options active)"
+    fi
     printf "\n"
 
     if [[ $LiveBoot ]]; then

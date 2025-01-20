@@ -140,6 +140,11 @@ function quickemu {
         source "/tmp/qmod-boot-temp" 
         VM_ExecBoot=
 
+        if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
+          printColor "\n\n  Press 'esc' when 'Start boot Option' appears" 
+          printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. \n\n"
+        fi
+
         if [[ $BreakAtVerboseArgs ]]; then
           SpicyPID="$(pgrep spicy)"
           [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &

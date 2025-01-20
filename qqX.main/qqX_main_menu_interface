@@ -46,8 +46,9 @@ else
       printf  "  [u]  show utils & technical"
 
       if [[ ! $LiveBoot ]]; then  # REVIEW show all?
-        if [[ $BootStyle == "fast" ]]; then printf "   (fastboot)"
-        else  printf "   (boot menu options active)"
+        printf "   [bm]"
+        if [[ $BootStyle == "fast" ]]; then printf " (fastboot)"
+        else  printColor " (boot menu options active)"
         fi
       fi
 
@@ -68,7 +69,7 @@ else
       fi
       if [[ ! $LiveBoot ]]; then
         if [[ $BootStyle == "fast" ]]; then printf "   [bm] show guest efi/bios boot menu"
-        else printf "   [fb] hide bios boot menu "
+        else printf "   [fb] use fast boot menu "
         fi
       fi
 
