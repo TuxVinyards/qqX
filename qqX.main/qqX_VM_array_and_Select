@@ -180,7 +180,7 @@ scan_VM_Array_for_sizes () {
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
     du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
-    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
+    du -d 4 -t 30M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
   fi
 
   # machine set for calcs
@@ -192,14 +192,14 @@ scan_VM_Array_for_sizes () {
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
     du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null
-    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
+    du -d 4 -t 30M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
     ((i+=1))
   done
 
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
     du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null
-    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
+    du -d 4 -t 30M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
   fi
 
   if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" ) ]]; then  
