@@ -171,8 +171,8 @@ scan_VM_Array_for_sizes () {
   while [[ ${VM_Array[$i,0]} ]]; do
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
-    du -d 4 -t 1G -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
     ((i+=1))
   done
 
@@ -196,13 +196,12 @@ scan_VM_Array_for_sizes () {
 
 show_VM_Array_sizes_text () {
 
-  printf "\n" > "/tmp/qqX.SizesTotals.txt"
-
-  { sort -nr "/tmp/qqX.Sizes.qcow.txt" 
+  printf "\nBy Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
+  { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
     printf "\n" 
-    sort -nr "/tmp/qqX.Sizes.iso.txt"
+    sort -hr "/tmp/qqX.Sizes.iso.txt"
     printf "\nTotal Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-    printf "\n\n"
+    printf "\n\nBy Folder: \n\n"
     cat "/tmp/qqX.Sizes.qcow.txt"
     printf "\n" 
     cat "/tmp/qqX.Sizes.iso.txt"
@@ -210,9 +209,7 @@ show_VM_Array_sizes_text () {
   }>> "/tmp/qqX.SizesTotals.txt" 
 
   sleep 0.5
-
   (nohup &> /dev/null  "$TextEditor" "/tmp/qqX.SizesTotals.txt" & ) || texteditor_not_found_message
-
 }
 
 VM_selector_menu_refresh () {
