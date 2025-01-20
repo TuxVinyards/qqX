@@ -125,6 +125,7 @@ show_main_menu_header () {
   #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
 
   if [[ $fixed_iso ]]; then Mounted_ISO="$fixed_iso" ; fixed_iso= ; fi
+  if [[ $Mounted_ISO ]]; then [[ ! -e $Mounted_ISO ]] && Mounted_ISO= ; fi
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   LiveBoot=
@@ -832,7 +833,11 @@ iso_select_mount_and_boot () {
     mapfile -t IsoList <<< "$(ls "$VM_InstanceName"/*.iso 2>/dev/null)"
     if [[ $SharedDrive ]]; then
       #https://stackoverflow.com/a/53091662/27611101
-      mapfile -t -O "${#IsoList[@]}" IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
+      if [[ ${IsoList[0]} ]]; then 
+        mapfile -t -O "${#IsoList[@]}" IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
+      else
+        mapfile -t IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
+      fi
     fi
 
     printColor "\n\n  ISO formated disk images may be copied into the individual VM folder"

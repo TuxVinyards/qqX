@@ -218,7 +218,7 @@ else
     fi
 
     # use du with -L on instance menus as are individual totals only and some instances can be symbolically linked
-
+    
     InstanceQcow2_Sizes="$(du -a -L -t 100M "$VM_InstanceName" | grep qcow2 | awk '{print $1}' 2>/dev/null)"
 
     if [[ $InstanceQcow2_Sizes ]]; then  
