@@ -177,6 +177,12 @@ scan_VM_Array_for_sizes () {
     ((i+=1))
   done
 
+  if [[ $SharedDrive ]]; then
+    ArrFolder="$(dirname "$SharedDrive")"
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
+  fi
+
   # machine set for calcs
   # both cases avoid using du with -L or symbolically linked instances will cause double counts when totalling storage
   printf "" > "/tmp/qqX.Sizes.qcow.K.txt"  
@@ -189,6 +195,12 @@ scan_VM_Array_for_sizes () {
     du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
     ((i+=1))
   done
+
+  if [[ $SharedDrive ]]; then
+    ArrFolder="$(dirname "$SharedDrive")"
+    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null
+    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
+  fi
 
   if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" ) ]]; then  
     TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null)"

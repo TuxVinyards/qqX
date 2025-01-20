@@ -230,14 +230,11 @@ function set_drive_paths {
 
     if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then 
       SharedDriveArgs=
-
     elif [[ -e "$SharedDrive" ]]; then
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
       SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
-
     elif [[ $SharedDrive ]]; then 
       DriveLocationError="ERROR SharedDrive NOT found (main settings)"
-
     fi
 
   fi
