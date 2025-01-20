@@ -125,19 +125,27 @@ show_main_menu_header () {
   #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
 
   if [[ $fixed_iso ]]; then Mounted_ISO="$fixed_iso" ; fixed_iso= ; fi
+  # quietly ignore errors if .conf lists an ISO but it has been removed
   if [[ $Mounted_ISO ]]; then [[ ! -e $Mounted_ISO ]] && Mounted_ISO= ; fi
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   LiveBoot=
   if  [[  ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
   elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
-  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then  BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1
+  elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
+    if [[ ! -e "$IsoImg" ]]; then
+      BootAlert="(Live: ISO/IMG Boot)     ERROR - NO BOOT IMAGE FOUND - ERROR "  ; LiveBoot=1 ; LiveBootMissing=1
+    else
+      BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1 ; LiveBootMissing=
+    fi
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
   fi
 
   [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
-  printf "   %s" "$BootAlert"  
+  if [[ "$BootAlert" == *'ERROR'* ||  "$BootAlert" == *'NOT FOUND'* ]]; then printColor "   %s" "$BootAlert"  
+  else printf "   %s" "$BootAlert"
+  fi 
   printf "\n"
 
   [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
