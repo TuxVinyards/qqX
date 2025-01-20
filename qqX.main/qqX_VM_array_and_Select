@@ -165,6 +165,7 @@ scan_folders_list_and_add_VMs () {
 
 scan_VM_Array_for_sizes () {
 
+  # human set for report
   printf "" > "/tmp/qqX.Sizes.qcow.txt"  
   printf "" > "/tmp/qqX.Sizes.iso.txt"  
   local i=0
@@ -176,6 +177,8 @@ scan_VM_Array_for_sizes () {
     ((i+=1))
   done
 
+  # machine set for calcs
+  # both cases avoid using du with -L or symbolically linked instances will cause double counts when totalling storage
   printf "" > "/tmp/qqX.Sizes.qcow.K.txt"  
   printf "" > "/tmp/qqX.Sizes.iso.K.txt"  
   i=0

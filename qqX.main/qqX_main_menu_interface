@@ -216,6 +216,8 @@ else
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
     fi
 
+    # use du with -L on instance menus as are individual totals only and some instances can be symbolically linked
+
     InstanceQcow2_Sizes="$(du -ha -L -t 1G "$VM_InstanceName" | grep qcow2 | awk '{print $1}' | cut -d 'G' -f1 2>/dev/null)"
 
     if [[ $InstanceQcow2_Sizes ]]; then  
