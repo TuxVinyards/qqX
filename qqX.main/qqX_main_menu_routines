@@ -600,22 +600,22 @@ move_rename_Selected_VM () {
 
 read_x86_tiano_vars_list () {
 
-  # current std list
-  String="$(grep -A 20 -m 1 'ovmfs=' /usr/bin/quickemu | grep '"')"    
-
+  # current source list
+  local String=
+  String="$(grep -A 20 -m 1 'ovmfs=' "$QE_SourcePath" | grep -s '"')"    
+  if [[ ! $String ]]; then  TianoVarsGrepError=1 ; return
+  else TianoVarsGrepError=
+  fi
   String="$(tr -cd '[:print:]' <<< "$String")"
   String="${String//'ovmfs=('/}"
   String="${String//','/' '}"
-
   # shellcheck disable=SC1003 
   String="${String//'\'/' '}"
   String="$(tr -s '[= =]' <<< "$String")"
-
   # shellcheck disable=SC2206
   Tiano_x86_FilesList=($String)
   Tiano_x86_CodeList=()
   Tiano_x86_VarsList=()
-
   i=0    
   while [[ "${Tiano_x86_FilesList[i]}" ]]; do Tiano_x86_CodeList+=("${Tiano_x86_FilesList[i]}"); ((i+=2)); done
   i=1    
@@ -629,32 +629,37 @@ refresh_tiano_vars () {
   RtvBack= ; RtvArm=
   read_x86_tiano_vars_list
 
-  if [[ $RunRtvCheck || $RtvManualOnly ]]; then RtvText=1 ; else RtvText= ; fi
+  if [[ $RunRtvCheck || $RtvManualOnly ]]; then RtvText=1 ; else RtvText= 
+  fi
 
   if [[ $RtvText ]]; then
 
-    printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
-    printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old etc \n\n  Your *VMF_VARS.fd file(s) will be reinstalled."
-    if [[ "$VM_InstanceName" == *macos* ]]; then 
-      printf "\n\n  MacOS refreshes require an internet connection. The small boot drive 'OpenCore.qcow2' is also needed."
-      printf "\n\n  For security reasons, these Mac specific files should generally be updated at regular intervals...."
-    fi
-
-    if [[ $(ls "$VM_Conf_Dir/$VM_InstanceName/AAVMF"* 2>/dev/null) ]]; then
-      RtvArm=1
-      if [[ ! $RtvArmFolder ]]; then
-        printf  "\n\n  Using Standard Folder '/usr/share/AAVMF' >> Variations may be placed in main settings"
-        RtvArmFolder="/usr/share/AAVMF"
-      else
-        printf  "\n\n  Using Folder '%s' >>  From variation placed in main settings" "$RtvArmFolder"
+    if [[ $TianoVarsGrepError ]]; then 
+      printColor  "\n\n  ERROR finding Tiano Variables List in Source Code \n\n"
+   else
+      printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
+      printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old etc \n\n  Your *VMF_VARS.fd file(s) will be reinstalled."
+      if [[ "$VM_InstanceName" == *macos* ]]; then 
+        printf "\n\n  MacOS refreshes require an internet connection. The small boot drive 'OpenCore.qcow2' is also needed."
+        printf "\n\n  For security reasons, these Mac specific files should generally be updated at regular intervals...."
       fi
-    fi 
-
-    printColor  "\n\n  [enter] to continue"
+      if [[ $(ls "$VM_Conf_Dir/$VM_InstanceName/AAVMF"* 2>/dev/null) ]]; then
+        RtvArm=1
+        if [[ ! $RtvArmFolder ]]; then
+          printf  "\n\n  Using Standard Folder '/usr/share/AAVMF' >> Variations may be placed in main settings"
+          RtvArmFolder="/usr/share/AAVMF"
+        else
+          printf  "\n\n  Using Folder '%s' >>  From variation placed in main settings" "$RtvArmFolder"
+        fi
+      fi 
+      printColor  "\n\n  [enter] to continue"
+    fi
     printf  "  [b] to go back "
     read -rp "  >  "  RtvBack
 
   fi
+
+  [[ $TianoVarsGrepError ]] && RtvBack="b"
 
   if [[ $RtvBack ]]; then  printf "\n\n  Returning ... " ; sleep 1
 
@@ -663,9 +668,7 @@ refresh_tiano_vars () {
     if [[ $RtvArm ]]; then 
 
       AA_VarsList=("AAVMF_VARS.fd"  "AAVMF32_VARS.fd"  "AAVMF_VARS.ms.fd"  "AAVMF_VARS.snakeoil.fd")
-
       [[ $RtvText ]] && printf "\n\n  Checking: %s" "${AA_VarsList[*]}"
-
       for AA_Var in "${AA_VarsList[@]}"; do
         if [[ -e "$VM_Conf_Dir/$VM_InstanceName/$AA_Var" ]]  &&  [[ -e "/usr/share/AAVMF/$AA_Var" ]]; then
           mv "$VM_Conf_Dir/$VM_InstanceName/$AA_Var" "$VM_Conf_Dir/$VM_InstanceName/${AA_Var}.old"
@@ -693,21 +696,17 @@ refresh_tiano_vars () {
 
       wget -t 3 -T 2 -o "$VM_Conf_Dir/$VM_InstanceName/rtv.log" "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" \
       -O "$VM_Conf_Dir/$VM_InstanceName/OVMF_VARS-1920x1080.fd" || RtvMacGet="Fail"
-
       [[ $RtvText ]] && printf "....."
 
       wget -t 3 -T 2 -a "$VM_Conf_Dir/$VM_InstanceName/rtv.log" "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" \
       -O "$VM_Conf_Dir/$VM_InstanceName/OVMF_CODE.fd" || RtvMacGet="Fail"
-      
       [[ $RtvText ]] && printf "........ \n\n"
 
       wget -t 3 -T 2 -a "$VM_Conf_Dir/$VM_InstanceName/rtv.log" "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" \
       -O "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2" || RtvMacGet="Fail"
-
       [[ $RtvText ]] && grep -v '\.\.\.\.\.\.\.' "$VM_Conf_Dir/$VM_InstanceName/rtv.log" 
 
       echo "$RtvMacGet" > "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log"
-
       [[ $RtvText ]] && printColor "\n  Update:  %s" "$RtvMacGet"
 
     else
@@ -717,7 +716,6 @@ refresh_tiano_vars () {
 
         x86_VarPath="${Tiano_x86_VarsList[i]}"
         x86_VarPath="${x86_VarPath//'"'/}"
-
         x86_Var="$(basename "${Tiano_x86_VarsList[i]}")"
         x86_Var="${x86_Var//'"'/}"
 
