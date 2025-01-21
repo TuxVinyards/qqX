@@ -228,7 +228,7 @@ show_VM_Array_sizes_text () {
   { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
     printf "\n" 
     sort -hr "/tmp/qqX.Sizes.iso.txt"
-    printf "\nTotal Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+    printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
     printf "\n\nBy Folder: \n\n"
     cat "/tmp/qqX.Sizes.qcow.txt"
     printf "\n" 
@@ -299,8 +299,8 @@ VM_loader_selector_and_menu () {
           if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
         done
 
-        printf "\n  Total Storage:  Drives %s  (%s)   ISO's  %s  (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-        printf "   [sz] show size details \n"
+        printf "\n  Total Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+        printf "  [sz] show size details \n"
 
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
