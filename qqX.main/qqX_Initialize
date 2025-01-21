@@ -106,9 +106,7 @@ fi
 
 if [[ $Trace_InputVars ]]; then echo "1: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
-if [[ $1 == "--version" || $1 == "-V" ]] ; then  echo "$qqX_Version" ; exit 
-elif [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit 
-fi
+if [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit ; fi
 
 # @ Ver 1.11, the 'XDG' trigger parameter is now not needed and is deprecated
 [[ $1 == "XDG" ]] && shift

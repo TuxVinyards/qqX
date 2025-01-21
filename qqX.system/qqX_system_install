@@ -177,7 +177,6 @@ if [[ ! $(type -p spicy) ]]; then
   read -rp "  [enter] to ignore or continue > "
 fi
 
-
 New_qqX_Version="$(./qqX --version 2>/dev/null)"
 
 # Default location is next to quickemu in "/usr/bin" This may frequently be set just to "/bin"
@@ -189,6 +188,7 @@ New_qqX_Version="$(./qqX --version 2>/dev/null)"
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
+
 if [[ ! $Current_qqX_Location ]]; then 
   # new install
   qqX_Std_Bin_Dir="/usr/bin"

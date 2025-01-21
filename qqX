@@ -38,20 +38,21 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154 
 
-# Posix compliant Terminal output check
-if [ ! -t 1 ]; then exit ; fi
+# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
+# Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# but minor numbers remain padded to 2dp
+  qqX_Version="1.11.04"
 
-tput civis
+# Allow Posix sub-shell checks (without -t 1) eg. qqX_Version="$(./qqX --version 2>/dev/null)"
+if [ "$1" = '--version' ] || [ "$1" = '-V' ] ; then  echo "$qqX_Version" ; exit ; fi
+
+# Posix compliant Terminal output check  - qqX should output to screen
+if [ ! -t 1 ]; then exit 1 ; fi
 
 #  # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale (Also see qqX_Initialize)
 if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
 fi
-
-# Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
-# Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
-# but minor numbers remain padded to 2dp
-  qqX_Version="1.11.04"
 
 # Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
 sleep 0.4
@@ -106,13 +107,13 @@ function path_diagnostics {
 
 ## INITIALIZE
 
+tput civis
 System_qqX_Path="$(type -p qqX)"
 
 # Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'  
 # Using caps (type -P) will show aliases and qqX re-routes
 # BUT 'QE_SystemFilePath' should be probed at the start of qqX, and before any builtins or re-routes happen,
 # otherwise finding the filepath gets a bit complex ...
-
 
 # Respect standard FHS locations but allow local overide for qqX dev work. NB no spaces in qqX dev path, see notes at end of settings file.
 if [[ -d "./qqX.main" ]]; then qqX_MainFolder="$(realpath "./qqX.main")" ; else qqX_MainFolder="/usr/share/qqX/qqX.main"; fi
