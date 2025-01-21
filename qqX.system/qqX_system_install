@@ -178,7 +178,7 @@ if [[ ! $(type -p spicy) ]]; then
 fi
 
 
-qqX_Version="$(./qqX --version 2>/dev/null)"
+New_qqX_Version="$(./qqX --version 2>/dev/null)"
 
 # Default location is next to quickemu in "/usr/bin" This may frequently be set just to "/bin"
 # as this is often just a symlink and qqX will actually install to "/usr/bin". 
@@ -336,7 +336,7 @@ source "qqX.system/qqX_settings_update_transposer"
 
 printf "\033c"
 echo
-qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $New_qqX_Version "
 
 if [[ "$(whoami)" == root ]]; then 
 
@@ -372,7 +372,7 @@ if [[ -d "/mnt/c/Windows" ]]; then WSL_Install=1 ; else WSL_Install= ; fi
 printf "\033c"
 echo
 
-qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup script $New_qqX_Version "
 
 if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" ]] && [[ ! -d  "./qqX.main" ]] && [[ ! -d  "./qqX.builtins" ]]; then
 
@@ -495,9 +495,9 @@ else
     # Means copying to qqx will copy to qqX, and vice versa. 
     # And check that the right version is there:
 
-    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
+    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$New_qqX_Version" ]] ; then 
       printColor "\n  Files installed: "; printf " All good" 
-    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
+    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$New_qqX_Version" ; sleep 2000  
     fi
 
     Default_VM_Folder=
