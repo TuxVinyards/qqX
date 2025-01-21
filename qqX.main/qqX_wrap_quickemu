@@ -27,34 +27,34 @@ function system_code_check_and_warn {
   if [[ $CodingHotSwap == "System" && ! $QE_SystemFilePath ]]; then
     printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH " 
     printf "\n\n  See https://github.com/quickemu-project/quickemu for more details"
-    printf "\n\n  The 'official' given location is /usr/bin, as loose files, but others may be chosen ... "
-    printf "\n\n\n  The builtin 'Echo' is an older plain System version that may be selected, if wished,"
-    printf " \n\n  but qqX will default to using FreeBird and FreeSpirit will have the latest mods."
-    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
-    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
-    printf "\n\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
+    printf "\n  Official Quickemu packages will install to /usr/bin, as loose files"
+    printf "\n\n  'Echo' is an older plain Quickemu version that is supplied as a built-in."
+    printf "\n\n  qqX will default to using FreeBird and FreeSpirit as these have the latest mods,"
+    printf "\n  contain general improvements, plus various tweaks to enable process controls."
+    printf "\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n  [enter] to continue with FreeBird and/or re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
   elif [[ $CodingHotSwap == "Custom" && ! -d "$Default_VM_Folder/qqX.custom/QE.Custom"  ]]; then
     printColor "\n\n  Custom files should be located as detailed in the general settings file." 
-    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
+    printf "\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
   elif [[ $CodingHotSwap == "Dev" && ! $QE_DevPath ]]; then
     printColor "\n\n  Dev path not present: This should be given in the general settings file." 
     printf "\n\n  Alternatively, if started from a development or download folder, "
-    printf "\n\n  the current folder's FreeSpirit builtins will be auto-selected ...."
-    printf "\n\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
+    printf "\n  the current folder's FreeSpirit builtins will be auto-selected ...."
+    printf "\n\n  [enter] to continue with FreeSpirit and/or set/re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
   elif [[ ! $WarnedOnQE ]] && [[ $CodingHotSwap == "System" || $CodingHotSwap == "Echo" ]]; then
     printColor "\n\n  CAUTION Source Version '%s' \n\n  Not all of the Standard Releases will work, nor will work as they do at the Quickemu command line" "$QE_SourceVersion"
-    printf "\n\n\n  The qqX versions contain general improvements and various tweaks to enable process controls."
-    printf "\n\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
-    printf "\n\n\n  I have backups and I understand ....  [enter] to continue   [f] to select FreeBird\n\n"
+    printf "\n\n  The qqX versions contain general improvements, plus various tweaks to enable process controls."
+    printf "\n  Also fixes, where testing has revealed upstream Quickemu errors yet to be sorted."
+    printf "\n\n  I have backups and I understand ....  [enter] to continue   [f] to select FreeBird\n\n"
     read -rp "  >  "  WarnedOnQE
     [[ $WarnedOnQE ]] && CodingHotSwap="FreeBird"
     WarnedOnQE=1

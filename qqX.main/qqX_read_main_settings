@@ -202,7 +202,7 @@ function sort_qqX_builtin_settings {
   elif [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]]; then
     QE_SourceVersion="Dev"
     FreePath="$QE_DevPath"
-    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
+    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freespirit" ; fi
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}" 
