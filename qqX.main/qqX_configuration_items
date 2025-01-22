@@ -317,7 +317,7 @@ function_conf_error () {
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     printColor "\n\n  [c] continue  (with current settings) looks okay "
-    printf "\\n\n  [e] to edit qqX general settings   [q] to quit \n\n"  
+    printf "\\n\n  [d] delete   [e] to edit qqX general settings   [q] to quit \n\n"  
     
   elif [[ $1 == "folder" ]] ; then 
 
@@ -352,11 +352,13 @@ function_conf_error () {
 
   elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
 
-  elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
+  elif [[ $ErrorMenuSelect == "c" || $ErrorMenuSelect == "d" || $ErrorMenuSelect == "e" || $ErrorMenuSelect == "gt" ]]; then  
   
     IgnoreFolderCheck=1
 
     if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; return
+
+    elif [[ $ErrorMenuSelect == "d" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; MainMenuChoicePreset="del" ; return
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 

@@ -362,6 +362,11 @@ else
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
+    if [[ $MainMenuChoicePreset ]]; then
+      printf "  >  %s" "$MainMenuChoicePreset" 
+      MainMenuChoice="$MainMenuChoicePreset" 
+      MainMenuChoicePreset=
+    fi
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }
