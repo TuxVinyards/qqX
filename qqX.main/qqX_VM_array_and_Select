@@ -389,13 +389,13 @@ VM_loader_selector_and_menu () {
         CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       elif [[ $VM_Selection == "HB"   ]] ; then  
         CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "Ech" || $VM_Selection == "ECH" || $VM_Selection == "ech" ]] ; then  
+      elif [[ ${VM_Selection,,} == ech* ]] ; then  
         CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "Sys" || $VM_Selection == "SYS" || $VM_Selection == "sys" ]] ; then  
+      elif [[ ${VM_Selection,,} == sys* ]] ; then  
         CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1;refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "Cust" || $VM_Selection == "CUST"  || $VM_Selection == "cust" ]] ; then  
+      elif [[ ${VM_Selection} == cust* ]] ; then  
         CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "Dev" || $VM_Selection == "DEV"  || $VM_Selection == "dev" ]] ; then  
+      elif [[ ${VM_Selection,,} == dev* ]] ; then  
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
 
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
