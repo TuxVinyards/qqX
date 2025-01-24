@@ -190,11 +190,12 @@ function_test_iso_url () {
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay "; QGW_Download_BadLink=
       else
-        printf "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
+        printColor "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
       fi
       if [[ $DL_PotentialSize ]]; then 
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
+        printf "\n"
       elif [[ $QGW_Download_BadLink ]]; then
         printf "  and reported size not available either ...."
         [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
@@ -727,8 +728,9 @@ function_quick_get_wrap ()  {
         QGW_List_NumSelected= 
         QGW_OS_Arr_NumSelected=
         QGW_OS_Arr_NameSelected=
+        GT_Exit=1
         function_quick_get_wrap
-        return
+        break
 
       elif [[ $QGW_List_NumSelected == "w" ]]; then 
 
@@ -811,6 +813,7 @@ function_quick_get_wrap ()  {
 
       while true; do 
 
+        [[ ! $QGW_OS_Arr_NameSelected || ! $QGW_Release_Arr_NameSelected ]] && break
         printColor  "  OS / Release   =   %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
         printf "\n\n  Checking editions .... \n\n\n"
 
@@ -1374,17 +1377,12 @@ function_quick_get_wrap ()  {
 
   fi
 
-  [[ $GT_Exit ]] && return
-
   # clear any accidental double pressing of the enter key if instance was slow to close
   # also gives pause needed to give different processes time to output their summaries & finish up
   read -r -t 0.2  
   read -r -t 0.2  
   read -r -t 0.2  
   read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.1	
-  read -r -t 0.1	
   read -r -t 0.1	
   read -r -t 0.1	
   read -r -t 0.1	
@@ -1415,11 +1413,15 @@ function_quick_get_wrap ()  {
     fi
   fi
 
-  if [[ ! -d "$New_VM_InstanceName" ]]; then
+  if [[ -d "$New_VM_InstanceName" ]]; then
+    if [[ $(du -t 10k "$New_VM_InstanceName") ]]; then QGW_DownloadStopped= ; QGW_DownloadStopped=1
+    fi
+  elif [[ ! -d "$New_VM_InstanceName" ]]; then
     # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
     if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
       source "/tmp/qe_new_vm_name.txt"
       New_VM_Conf_File="${New_VM_InstanceName}.conf"
+      QGW_DownloadStopped=
     else
       QGW_DownloadStopped=1
     fi
@@ -1484,8 +1486,11 @@ function_quick_get_wrap ()  {
       sleep 1.4
       cd "$Default_VM_Folder" || DefaultFolderError=1
       Current_VM_Folder="$Default_VM_Folder" 
-      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
-      refresh_sources_and_load_VM_arrays
+      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
+      clear_main_gt_start_vars
+      QGW_List_NumSelected_Next= 
+      #refresh_sources_and_load_VM_arrays
+      function_quick_get_wrap
       return
     fi
 
@@ -1502,7 +1507,9 @@ function_quick_get_wrap ()  {
       sleep 0.5
       cd "$Default_VM_Folder" || DefaultFolderError=1
       Current_VM_Folder="$Default_VM_Folder" 
-      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
+      clear_main_gt_start_vars
+      QGW_List_NumSelected_Next= 
       refresh_sources_and_load_VM_arrays
       return
     fi
@@ -1549,6 +1556,7 @@ function_quick_get_wrap ()  {
   Current_VM_Folder="$VM_Conf_Dir" 
 
   clear_main_gt_start_vars
+  QGW_List_NumSelected_Next=
   SettingsFileAdjusted=1
   ByPass_VM_Array_Selector=1
   GT_Exit=1
