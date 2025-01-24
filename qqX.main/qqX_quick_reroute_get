@@ -133,41 +133,44 @@ function_test_iso_url () {
 
   [[ $GT_Exit ]] && return
 
-  if ! grep -q -e '--url' "$QG_SourcePath"  && ! grep -q -e '--show-iso-url' "$QG_SourcePath" ; then
+  if ! grep -q -e '--url' "$QG_SourcePath" ; then
 
     printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
 
   else
 
-    printf "\n\n  Checking download link .... \n\n"
     DL_Url=
     DL_FileName=
     DL_PotentialSize=
     DL_PotentialOkay=
     DL_PotentialHtml=
-    SECONDS=0
+    printf "\n\n  Checking download link .... \n\n"
     printf "" > "/tmp/qmod-dl-url"
-    # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
-    # running checks in the background (&) means that we can stop the process if it hangs
-    if grep -q -e '--url' "$QG_SourcePath" ; then quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
-    elif grep -q -e '--show-iso-url' "$QG_SourcePath" ; then quickget " --show-iso-url $QGW_DownloadSelection" > "/tmp/qmod-dl-url" &
-    fi
-    sleep 1
-    [[ $ShowQGetLists ]] && { echo "Check URL"; (ps -ef | grep bash | grep quickget); echo; }
-    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
-    if [[ $DataPID ]]; then
-      # only if quickget has url checking ...
-      [[ $ShowQGetLists ]] && { echo; echo "DataPID: '${DataPID}'"; echo; }
-      while true; do
-        [[ $(cat "/tmp/qmod-dl-url") ]] && { sleep 1; break; }
-        [[ "$SECONDS" -ge 20 ]] && { kill "$DataPID" &>/dev/null ; break; }
-        sleep 1
-      done
-    fi
-
-    DL_Url="$(awk '/http/{print $2 $3}' < "/tmp/qmod-dl-url")"
-    [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; }
     printf "" > "/tmp/qmod-dl-size"
+
+    if grep -q -e '--url' "$QG_SourcePath"; then
+      SECONDS=0
+      # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
+      # running checks in the background (&) means that we can stop the process if it hangs
+      # --url uses curl BUT --show-iso-url uses wget and other varied coding >> too complex, @ jan 2025 drop support
+      quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"  &
+      sleep 1
+
+      DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+      [[ $ShowQGetLists ]] && { echo "Check URL:"; (ps -ef | grep bash | grep quickget); echo; }
+      [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+      while true ; do
+        if [[ $(cat "/tmp/qmod-dl-url") ]]; then 
+          DL_Url="$(awk '{print $2 $3}' < "/tmp/qmod-dl-url")"
+          break
+        elif [[ "$SECONDS" -ge 20 ]]; then 
+          [[ $DataPID ]] && kill "$DataPID" &>/dev/null
+          break
+        fi
+        sleep 0.5
+      done
+      [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
+    fi
 
     if [[ ! $DL_Url ]]; then  
       printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
@@ -207,7 +210,6 @@ function_test_iso_url () {
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
       fi
-
     fi
 
   fi
@@ -611,7 +613,8 @@ function_quick_get_wrap ()  {
     QGW_Editions_FullListString=
     QGW_Editions_FullListTotal="0"
 
-    # running checks in the background (&) means that we can stop the process if it hangs
+    # Running checks in the background (&) means that we can stop the process if it hangs
+    # as some Quickget data is obtained dynamically using web checks ...
     printf "" > "/tmp/quickget-rels-data.txt"
     quickget "$QGW_OS_Arr_NameSelected" > "/tmp/quickget-rels-data.txt" &
     sleep 0.5
@@ -621,7 +624,7 @@ function_quick_get_wrap ()  {
     DataCount="0"
     QGW_ChkLoop=
     while true; do
-      if grep -qs 'ERROR! You must specify' "/tmp/quickget-rels-data.txt"; then
+      if grep -qs 'ERROR' "/tmp/quickget-rels-data.txt"; then
         QGW_ReleasesEditions_ListRaw="$(grep -A 10 Releases "/tmp/quickget-rels-data.txt" | grep -B 10 ERROR | grep -v ERROR )"
         break
       fi
@@ -629,8 +632,8 @@ function_quick_get_wrap ()  {
       read -rt 0.5  QGW_ChkLoop
       ((DataCount+=1))
       [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
-      [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
-      [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+      [[ "$DataCount" == '16' ]] && printf "  Servers are busy or you may have been throttled ...\n\n"
+      [[ "$DataCount" == '30' ]] && printf "  [c] cancel and retry ? \n\n"
       [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
       # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
       [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
@@ -712,18 +715,19 @@ function_quick_get_wrap ()  {
       else QGW_List_NumSelected_Previous="${#QGW_OS_Array[@]}"
       fi
 
-      printf "\n\n  [s] scroll to next listing  [p] to previous"  
+      printf "\n\n  [s] scroll to next listing  [p] to previous  [r] reload/refresh/retry \n\n"  
 
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "    [w] to open listed page with web browser" 
+      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "  [w] to open listed page with web browser" 
       fi
 
-      printf "    [b] back to main menu \n\n"   
+      printf "  [b] back to main menu \n\n"   
       read -rp "  >  "  QGW_List_NumSelected  
       printf "\n\n"
     
-      if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "b" ]]; then 
+      if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "r" || $QGW_List_NumSelected == "b" ]]; then 
         
         [[ $QGW_List_NumSelected == "p" ]] && QGW_List_NumSelected_Next="$QGW_List_NumSelected_Previous"
+        [[ $QGW_List_NumSelected == "r" ]] && QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         [[ $QGW_List_NumSelected == "b" ]] && QGW_List_NumSelected_Next=
         QGW_List_NumSelected= 
         QGW_OS_Arr_NumSelected=
@@ -963,7 +967,7 @@ function_quick_get_wrap ()  {
     # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
-      printf "\n\n  Microsoft servers may not report accurately, may block repeat attempts or may need manual download ... "
+      printf "\n\n  Microsoft servers may not report back accurately, may block repeat attempts or may need manual download ... "
       show_distro_homepage_check_results
     elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then 
       printf "\n\n  Apples servers may not report back accurately, but the download may still work ... "

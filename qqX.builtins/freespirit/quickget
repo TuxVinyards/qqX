@@ -1176,12 +1176,14 @@ function check_hash() {
 
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
-    curl --silent --location "${1}"
+    #curl --silent --location "${1}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 "${1}"
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json() {
-     curl --silent --location --header "Accept: application/json" "${1}"
+    #curl --silent --location --header "Accept: application/json" "${1}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -1240,7 +1242,8 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    #if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    if ! curl -L --retry 6 --retry-max-time 4 --retry-delay 2 --max-time 30 --progress-bar --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         echo 
         exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
     fi
@@ -1253,7 +1256,8 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    #REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    REDIRECT_URL=$(curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1274,7 +1278,8 @@ function web_check() {
             shift
         fi
     done
-    curl --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
+    #curl --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
 }
 
 function zsync_get() {
