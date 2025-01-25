@@ -332,14 +332,11 @@ function test_result() {
     else
         OS="${OS}-${RELEASE}"
     fi
-
-    if [ -n "${RESULT}" ]; then
-        # Pad the OS string for consistent output
-        OS=$(printf "%-35s" "${OS}")
-        echo -e "${RESULT}: ${OS} ${URL}"
+    # Pad the OS string for consistent output
+    if [[ "${RESULT}" ]]; then
+        printf "%s %-38s %s\n" "${RESULT}:" "${OS}" "${URL}"
     else
-        OS=$(printf "%-36s" "${OS}:")
-        echo -e "${OS} ${URL}"
+        printf "%-38s %s\n" "${OS}" "${URL}"
     fi
 }
 
@@ -509,15 +506,8 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    local REL=""
-    local RELS=""
-    RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
-    for REL in ${RELS}; do
-        if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
-            echo -n "${REL} "
-        fi
-    done
-}
+    floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")"
+}  
 
 function releases_android() {
     echo 9.0 8.1 7.1
@@ -598,7 +588,7 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
+    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
 }
 
 function editions_bodhi() {
@@ -695,7 +685,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    floatversion -s -M 4 "$(curl -sLf "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
+    floatversion -s -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
 }
 
 function releases_endless() {
@@ -796,11 +786,11 @@ function editions_kolibrios() {
 }
 
 function releases_linuxlite() {
-    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
+    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
 }
 
 function releases_linuxmint() {
-    curl -slf "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
+    web_pipe "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
 }
 
 function editions_linuxmint() {
@@ -1184,6 +1174,8 @@ function web_pipe() {
 function web_pipe_json() {
     #curl --silent --location --header "Accept: application/json" "${1}"
     curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
+    #curl --silent --location --header "Accept: application/json" "${1}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -1533,7 +1525,7 @@ function get_alma() {
 function get_alpine() {
     local HASH=""
     local ISO=""
-    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
+    local URL="https://dl-cdn.alpinelinux.org/alpine/v${RELEASE}/releases/x86_64"
     local VERSION=""
     VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
