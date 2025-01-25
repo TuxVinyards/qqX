@@ -1034,7 +1034,7 @@ function editions_tinycore() {
 }
 
 function releases_trisquel() {
-    echo 11.0 10.0.1
+    floatversion -M 4 "$(web_pipe "https://mirrors.ocf.berkeley.edu/trisquel-images/" | grep 'amd64.iso' | tr '"' '\n' | grep tris)"
 }
 
 function editions_trisquel() {
