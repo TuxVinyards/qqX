@@ -1174,8 +1174,6 @@ function web_pipe() {
 function web_pipe_json() {
     #curl --silent --location --header "Accept: application/json" "${1}"
     curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
-    #curl --silent --location --header "Accept: application/json" "${1}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
