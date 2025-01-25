@@ -142,7 +142,7 @@ function_config_tune_up ()  {
       printf "\n  See the notes in the general settings file for installation"
     fi
     printColor "\n\n  In case of errored download > [d] delete folder and .conf file using file manager"
-    printf "\n\n  [enter] to continue to the menus \n\n"
+    printf "\n\n  [enter] to continue to the menus and/or delete there, if non-errored\n\n"
     ErroredDL=
     read -rp "  > " ErroredDL
     if [[ $ErroredDL ]]; then
