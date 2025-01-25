@@ -506,16 +506,8 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    local REL=""
-    local RELS=""
-    #RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
-    RELS="$(floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" )")"
-    for REL in ${RELS}; do
-        if web_check "https://dl-cdn.alpinelinux.org/alpine/v${REL}/releases/x86_64/"; then
-            echo -n "v${REL} "
-        fi
-    done
-}
+    floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")"
+}  
 
 function releases_android() {
     echo 9.0 8.1 7.1
@@ -1531,7 +1523,7 @@ function get_alma() {
 function get_alpine() {
     local HASH=""
     local ISO=""
-    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
+    local URL="https://dl-cdn.alpinelinux.org/alpine/v${RELEASE}/releases/x86_64"
     local VERSION=""
     VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
