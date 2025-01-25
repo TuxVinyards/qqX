@@ -595,7 +595,7 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
+    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
 }
 
 function editions_bodhi() {
@@ -692,7 +692,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    floatversion -s -M 4 "$(curl -sLf "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
+    floatversion -s -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
 }
 
 function releases_endless() {
@@ -793,11 +793,11 @@ function editions_kolibrios() {
 }
 
 function releases_linuxlite() {
-    floatversion -M 3 -s "$(curl -sLf "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
+    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
 }
 
 function releases_linuxmint() {
-    curl -slf "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
+    web_pipe "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
 }
 
 function editions_linuxmint() {
@@ -1174,13 +1174,13 @@ function check_hash() {
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
     #curl --silent --location "${1}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20  "${1}"
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json() {
     #curl --silent --location --header "Accept: application/json" "${1}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 "${1}"
+    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
