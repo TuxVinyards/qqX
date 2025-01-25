@@ -1418,7 +1418,7 @@ function_quick_get_wrap ()  {
   fi
 
   if [[ -d "$New_VM_InstanceName" ]]; then
-    if [[ $(du -t 10k "$New_VM_InstanceName") ]]; then QGW_DownloadStopped= ; QGW_DownloadStopped=1
+    if [[ $(du -t 10k "$New_VM_InstanceName") ]]; then QGW_DownloadStopped= ; else QGW_DownloadStopped=1
     fi
   elif [[ ! -d "$New_VM_InstanceName" ]]; then
     # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
