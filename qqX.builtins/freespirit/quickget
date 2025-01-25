@@ -332,14 +332,11 @@ function test_result() {
     else
         OS="${OS}-${RELEASE}"
     fi
-
-    if [ -n "${RESULT}" ]; then
-        # Pad the OS string for consistent output
-        OS=$(printf "%-35s" "${OS}")
-        echo -e "${RESULT}: ${OS} ${URL}"
+    # Pad the OS string for consistent output
+    if [[ "${RESULT}" ]]; then
+        printf "%s %-38s %s\n" "${RESULT}:" "${OS}" "${URL}"
     else
-        OS=$(printf "%-36s" "${OS}:")
-        echo -e "${OS} ${URL}"
+        printf "%-38s %s\n" "${OS}" "${URL}"
     fi
 }
 
