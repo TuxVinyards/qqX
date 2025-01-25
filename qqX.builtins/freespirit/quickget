@@ -508,10 +508,11 @@ function editions_alma() {
 function releases_alpine() {
     local REL=""
     local RELS=""
-    RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    #RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    RELS="$(floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" )")"
     for REL in ${RELS}; do
-        if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
-            echo -n "${REL} "
+        if web_check "https://dl-cdn.alpinelinux.org/alpine/v${REL}/releases/x86_64/"; then
+            echo -n "v${REL} "
         fi
     done
 }
