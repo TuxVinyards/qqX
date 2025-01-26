@@ -1220,8 +1220,9 @@ function web_get() {
         exit 1
     fi
 
-    # allow external process (qqX) to pick up the finalized name (and avoid overwrites eg windows 'unattended') 
-    # external proc should clear this file before starting
+    #  Allow qqX or any external process to pick up the FINALIZED NAME
+    # - avoids overwrites eg windows 'unattended'
+    # - external proc should clear this file before starting so the grep test will function
     if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
         printf "\n New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
     fi
@@ -1231,12 +1232,19 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    #if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-    if ! curl -L --retry 6 --retry-max-time 4 --retry-delay 2 --max-time 30 --progress-bar --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-        echo 
-        exit  #rm -f "${DIR}/${FILE}" # qqX needs to take control here
+    # Add retries to the standard Quickemu 4.9.x method ... And crank it up too.
+    # --continue-at -  will continue/resume a previous file transfer but we need to make sure we actually have a connection to start with
+    # Also --append so curl can pick up where it left off, if we need to do a complete restart
+    # if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    if ! curl -L --retry 600 --retry-max-time 4 --retry-delay 2 --progress-bar --append --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+        # qqX needs to take control here, use exit instead
+        if pgrep qqX >/dev/null ; then 
+            echo ; exit
+        else
+            echo "ERROR! Failed to download ${URL} with curl."
+            rm -f "${DIR}/${FILE}" 
+        fi
     fi
-
 }
 
 # checks if a URL needs to be redirected and returns the final URL
