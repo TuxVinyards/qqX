@@ -633,7 +633,7 @@ function_quick_get_wrap ()  {
       ((DataCount+=1))
       [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
       [[ "$DataCount" == '16' ]] && printf "  Servers are busy or you may have been throttled ...\n\n"
-      [[ "$DataCount" == '30' ]] && printf "  [c] cancel and retry ? \n\n"
+      [[ "$DataCount" == '30' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
       [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
       # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
       [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
@@ -851,8 +851,8 @@ function_quick_get_wrap ()  {
             read -rt 0.5  QGW_ChkLoop
             ((DataCount+=1))
             [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
-            [[ "$DataCount" == '12' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
-            [[ "$DataCount" == '20' ]] && printf "  [c] cancel and retry later ? \n\n"
+            [[ "$DataCount" == '16' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+            [[ "$DataCount" == '30' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
             [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
             # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
             [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
@@ -1280,17 +1280,19 @@ function_quick_get_wrap ()  {
       done
     }
 
+    
     # clear any accidental initial double pressing of the enter key
 		read -r -t 0.2  
 		read -r -t 0.2  
 		read -r -t 0.2 		
 
     printColor   "\n  Press [enter] at quickget finish,  at  \"start your .. virtual machine ... etc\" "
-    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to resume later"
-    printf     "\n\n  Note that downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
+    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to possibly resume later"
+    printf     "\n\n  Downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
     [[ "$QGW_DownloadSelection" == *'windows'* ]] && printf "\n\n  Microsoft downloads may sometimes hang when finished but the terminal may be safely closed, if this happens."
 
-    printf   "\n\n\n  Quickemu & downloader output: "
+    printf "\n\n\n  May take a moment to start, if servers are slow or [enter] to restart on a new server ...."
+    printf "\n\n  Quickemu & downloader output: "
     # stop flashing cursor
     tput civis
 
@@ -1307,93 +1309,111 @@ function_quick_get_wrap ()  {
     # qqX ver 1.11 adds an output file into the freespirit code to see if an output folder has been produced
     # as the Quickget final name output can vary from expected. 
     printf "" > "/tmp/qe_new_vm_name.txt"
-
-    quickget "$QGW_DownloadSelection" &  
   
     printf "\n\n\n\n\n"
     printf "\e[3A\r"
-
     #  make line spaces then move the cursor up from the bottom     
     # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc 
 
-    #  WAIT for background things to start happening
-    sleep 3   
-    while true ; do 
-      mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 0.5 ; [[ ${Jobs_Arr[*]} ]] && break
-    done
+    function run_distro_download {
 
-    # THEN wait for an enter key press
-
-    while true ; do    
-
-      # zsync:
-      if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then  show_rcksum_progress &
-      elif [[ $ZsyncDownload ]]; then 
-        if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
-          printf "\n  Comparing images .... \n\n" 
-          LastZsync="0" 
-          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
-        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
-        fi
-      fi
-
-      ##  WAIT HERE for an [enter] to finish, or stop  ##
-      read -r 
-
-      # return cursor to normal
-      tput cnorm 
-
-      for Jobs_PID in "${Jobs_Arr[@]}" ; do 
-        #[[ $Jobs_PID ]] && QGW_DownloadStopped=1
-        kill "$Jobs_PID" 2> /dev/null 
+      quickget "$QGW_DownloadSelection" &  
+      sleep 3   
+      while true ; do 
+        mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 0.5 ; [[ ${Jobs_Arr[*]} ]] && break
       done
 
-      # removing the old rcksum files not only tidies up but also stops the background monitor process
-      [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]] && remove_old_rcksum_files
-      
-      # check macOS particularities ...
-      # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW  
-      P3_Arr=()
-      mapfile -t  P3_Arr <<< "$(pgrep python3)"
-      for P3_PID in "${P3_Arr[@]}" ; do
-        P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2> /dev/null)" 
-        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
-          kill "$P3_PID" 2> /dev/null
-          printColor "\n\nStopped \n\n" 
-          QGW_DownloadStopped=1
-          break
-        fi
-      done   
+      # THEN wait for an enter key press
 
-      if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
-        while true; do 
-          pkill aria2  2> /dev/null
-          pkill curl   2> /dev/null
-          pkill wget   2> /dev/null
-          pkill zsync  2> /dev/null
-          sleep 1
-          if [[ ! $(pgrep aria2) ]] && [[ ! $(pgrep curl) ]] && [[ ! $(pgrep wget) ]] && [[ ! $(pgrep zsync) ]]; then
-            QGW_DownloadStopped=1
-            sleep 1 ; break
+      while true ; do    
+
+        # zsync:
+        if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then  show_rcksum_progress &
+        elif [[ $ZsyncDownload ]]; then 
+          if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
+            printf "\n  Comparing images .... \n\n" 
+            LastZsync="0" 
+            [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
+          else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
           fi
-        done
-      fi
-      break
+        fi
 
+        ##  WAIT HERE for an [enter] to finish, or stop  ##
+        read -r 
+
+        # return cursor to normal
+        tput cnorm 
+
+        for Jobs_PID in "${Jobs_Arr[@]}" ; do 
+          kill "$Jobs_PID" 2> /dev/null 
+        done
+
+        # removing the old rcksum files not only tidies up but also stops the background monitor process
+        [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]] && remove_old_rcksum_files
+        
+        # check macOS particularities ...
+        # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW  
+        P3_Arr=()
+        mapfile -t  P3_Arr <<< "$(pgrep python3)"
+        for P3_PID in "${P3_Arr[@]}" ; do
+          P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2> /dev/null)" 
+          if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
+            kill "$P3_PID" 2> /dev/null
+            printColor "\n\nStopped \n\n" 
+            QGW_DownloadStopped=1
+            break
+          fi
+        done   
+
+        if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
+          while true; do 
+            pkill aria2  2> /dev/null
+            pkill curl   2> /dev/null
+            pkill wget   2> /dev/null
+            pkill zsync  2> /dev/null
+            sleep 1
+            if [[ ! $(pgrep aria2) ]] && [[ ! $(pgrep curl) ]] && [[ ! $(pgrep wget) ]] && [[ ! $(pgrep zsync) ]]; then
+              QGW_DownloadStopped=1
+              sleep 1 ; break
+            fi
+          done
+        fi
+        break
+
+      done
+      RunDL=
+    
+    }
+
+    RunDL=1
+    while true ; do
+      if [[ $RunDL ]]; then 
+        run_distro_download
+      else
+        ResumeDL=
+        printColor "  Download Stopped:  [c] to conclude  [r] to resume \n\n"
+        # clear any accidental double pressing of the enter key if instance was slow to close
+        # also gives pause needed to give different processes time to output their summaries & finish up
+        read -r -t 0.2  
+        read -r -t 0.2  
+        read -r -t 0.2  
+        read -r -t 0.2  
+        read -r -t 0.1	
+        read -r -t 0.1	
+        read -r -t 0.1	
+        read -r -t 0.1	
+        read -rp "  >  " ResumeDL
+        printf "\n\n"
+        if [[ $ResumeDL == "r" ]]; then 
+          RunDL=1; QGW_DownloadStopped=
+          printf "  Resume process starting. May take a moment if servers are slow .... \n\n"
+        elif [[ $ResumeDL == "c" ]]; then break
+        fi
+      fi
     done
 
   fi
 
-  # clear any accidental double pressing of the enter key if instance was slow to close
-  # also gives pause needed to give different processes time to output their summaries & finish up
-  read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.2  
-  read -r -t 0.1	
-  read -r -t 0.1	
-  read -r -t 0.1	
-  read -r -t 0.1	
 
   New_VM_InstanceName=
   New_VM_Conf_File=
