@@ -29,6 +29,7 @@ vm_selector_init_common () {
 
   ZsyncDistrosFound=
   LiveDistrosFound=
+  SymLinksPresent=
   MSR_DistrosFound=
 
 }
@@ -53,13 +54,11 @@ function_vm_folder_item_text () {
   # Newly downloaded VMs will have a qcow disk path in the .conf file 
   # BUT the disk won't be be there yet, not until quickemu has done a first run against the .conf
 
-  if [[ $ArrayConf_Item_Listing == "empty" ]]; then
+  if [[ $ArrayConf_Item_Listing == "empty" ]]; then ArrayConf_Item_Listing="EMPTY FOLDER or Bad Path"
 
-    ArrayConf_Item_Listing="EMPTY FOLDER or Bad Path"
+  elif [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then  ArrayConf_Item_Listing+=" (new)"
 
-  elif [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then 
-
-    ArrayConf_Item_Listing+=" (new)"
+  elif [[ -h "$ArrayConf_Item" ]]; then  ArrayConf_Item_Listing+=" (s)" ; SymLinksPresent=1
 
   elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
 
@@ -77,7 +76,6 @@ function_vm_folder_item_text () {
     fi
 
   fi
-
 }
 
 print_selector_array_A_style () {
