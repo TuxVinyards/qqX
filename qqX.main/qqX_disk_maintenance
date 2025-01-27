@@ -818,5 +818,5 @@ function check_vm_nbd_boot_connected {
     [[ $qf_Launch == "r" ]] && return 1
     [[ $qf_Launch ]] && qcow2_filemanagement_launcher
   done
-
+  return 0
 }
