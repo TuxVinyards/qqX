@@ -283,10 +283,10 @@ function  main_menu_actions {
       printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
-      printf   "\n  The * virtual * Disk Size usually starts off as much larger than the actual size occupied."
-      printf "\n\n  Deleting older snapshots will not only reduce the amount of data that needs storing,"
-      printf "\n\n  but also increase sizing accuracy and limit double counting problems." 
-      printf "\n\n  When there is an actual shortage of space, use the qqX [disk] utility to increase the envelope."
+      printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
+      printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
+      printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
+      printColor "\n\n  Use the qqX [disk] utility to resize and to tidy."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
       [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  

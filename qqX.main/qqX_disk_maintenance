@@ -194,6 +194,7 @@ function manage_and_repair_disks {
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size can be appear lower than the contents ..."
+      printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
 
     fi
 
