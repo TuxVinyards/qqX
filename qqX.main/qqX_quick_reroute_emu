@@ -134,6 +134,13 @@ function quickemu {
 
         drives_and_snapshots  "info_current"
         printf "\n"
+        if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  
+          printColor "  DISK.QCOW2 ERROR  %s  \n\n  Return and run [disk] repair utils \n\n"  "$DiskChkStatus"
+          read -rp "  >  "
+          BreakAtVerboseArgs=1
+          VM_ExecBoot=
+          return
+        fi
 
         [[ $GeneralLoopCheck ]] && printf "\n\n pre-sourcing qmod-boot :" &&  dev_loop_check && printf "\n\n"
 
