@@ -179,10 +179,10 @@ function_test_iso_url () {
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 8 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl -sLf --retry 2 --retry-max-time 3 --retry-delay 1 --max-time 8 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         printf "  twice ........ \n\n"
-        curl --silent --location --head --output "/tmp/qmod-dl-size"  --fail --max-time 16 "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        curl -sLf --retry 3 --retry-max-time 3 --retry-delay 2 --max-time 16 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
@@ -351,8 +351,8 @@ function_quick_get_wrap ()  {
     tput sc
     printf  "               Checking connections ... \n\n" 
 
-    if   curl -L -I -s -o /dev/null --max-time 4 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
-    elif curl -L -I -s -o /dev/null --max-time 4 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
+    if   curl -L -I -s -o /dev/null --max-time 2 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
+    elif curl -L -I -s -o /dev/null --max-time 3 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
     elif curl -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
 
     elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
@@ -559,8 +559,8 @@ function_quick_get_wrap ()  {
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --location --silent --head --output /dev/null --max-time 1 --fail "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              if curl -sLf --retry 3 --retry-max-time 2 --retry-delay 0 --max-time 6 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working)"
+              elif curl -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
                 printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
