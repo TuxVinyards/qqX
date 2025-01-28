@@ -120,7 +120,7 @@ check_for_qqX_updates() {
 # Runs in the background. qqX will run this once. 
 function find_latest_qemu_version {
   printf "" > "/tmp/latest-qemu.txt"
-  { floatversion -M "$(curl -sLf --max-time 5 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
+  { floatversion -M "$(curl -sLf --retry 4 --retry-max-time 2 --retry-delay 0 --max-time 8 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
 }
 
 
