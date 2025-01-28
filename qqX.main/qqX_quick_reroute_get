@@ -1395,11 +1395,6 @@ function_quick_get_wrap ()  {
         # clear any accidental double pressing of the enter key if instance was slow to close
         # also gives pause needed to give different processes time to output their summaries & finish up
         read -r -t 0.2  
-        read -r -t 0.2  
-        read -r -t 0.2  
-        read -r -t 0.2  
-        read -r -t 0.1	
-        read -r -t 0.1	
         read -r -t 0.1	
         read -r -t 0.1	
         read -rp "  >  " ResumeDL
