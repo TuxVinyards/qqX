@@ -831,7 +831,7 @@ function releases_manjaro() {
 
 function releases_mxlinux() {
     # needs header, so not web_pipe:
-    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
+    curl --disable -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
 }
 
 function editions_mxlinux() {
@@ -1165,14 +1165,14 @@ function check_hash() {
 
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
-    #curl --silent --location "${1}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 "${1}"
+    #curl --disable --silent --location "${1}"
+    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 "${1}"
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json() {
-    #curl --silent --location --header "Accept: application/json" "${1}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
+    #curl --disable --silent --location --header "Accept: application/json" "${1}"
+    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -1235,8 +1235,8 @@ function web_get() {
     # Add retries to the standard Quickemu 4.9.x method ... And crank it up too.
     # --continue-at -  will continue/resume a previous file transfer but we need to make sure we actually have a connection to start with
     # Also --append so curl can pick up where it left off, if we need to do a complete restart
-    # if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-    if ! curl -L --retry 600 --retry-max-time 4 --retry-delay 2 --progress-bar --append --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    # if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    if ! curl --disable -L --retry 600 --retry-max-time 4 --retry-delay 2 --progress-bar --append --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         # qqX needs to take control here, use exit instead
         if pgrep qqX >/dev/null ; then 
             echo ; exit
@@ -1253,8 +1253,8 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    #REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
-    REDIRECT_URL=$(curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    #REDIRECT_URL=$(curl --disable --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    REDIRECT_URL=$(curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1275,8 +1275,8 @@ function web_check() {
             shift
         fi
     done
-    #curl --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
-    curl -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
+    #curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
+    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
 }
 
 function zsync_get() {
@@ -2079,10 +2079,10 @@ function get_macos() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
-    appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
+    appleSession=$(curl --disable -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
-    info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
+    info=$(curl --disable -s -X POST -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" \
                            -b "session=\"${appleSession}\"" \
@@ -2497,7 +2497,7 @@ function get_sparkylinux() {
 function get_spirallinux() {
     local HASH=""
     local LATEST=""
-    LATEST="$(floatversion -M "$(curl -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')" 2>/dev/null)"
+    LATEST="$(floatversion -M "$(curl --disable -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')" 2>/dev/null)"
     local ISO="SpiralLinux_${EDITION}_${LATEST}_x86-64.iso"
     local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
@@ -3075,7 +3075,7 @@ function download_windows_server() {
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
     echo " - Parsing download page: ${url}"
-    iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --disable --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -3148,7 +3148,7 @@ function download_windows_server() {
     # Follow redirect so proceeding log message is useful
     # This is a request we make this Fido doesn't
     # We don't need to set "--max-filesize" here because this is a HEAD request and the output is to /dev/null anyway
-    iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
+    iso_download_link="$(curl --disable --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
         # This should only happen if the Microsoft servers are down
         handle_curl_error $?
         return $?
@@ -3209,7 +3209,7 @@ function download_windows_workstation() {
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
     echo " - Parsing download page: ${url}"
-    iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --disable --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -3237,7 +3237,7 @@ function download_windows_workstation() {
     echo " - Permit Session ID: $session_id"
     # Permit Session ID
     # "org_id" is always the same value
-    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+    curl --disable --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
         # This should only happen if there's been some change to how this API works
         handle_curl_error $?
         return $?
@@ -3253,7 +3253,7 @@ function download_windows_workstation() {
 
     echo -n " - Getting language SKU ID: "
     # Get language -> skuID association table
-    language_skuid_table_json="$(curl -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" || {
+    language_skuid_table_json="$(curl --disable -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" || {
         handle_curl_error $?
         return $?
     }
@@ -3283,7 +3283,7 @@ function download_windows_workstation() {
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    iso_download_link_json="$(curl -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
+    iso_download_link_json="$(curl --disable -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
     # capture 'cmd' for the log file
     iso_download_link_cmd="$(echo -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
 
