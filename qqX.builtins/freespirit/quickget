@@ -3258,7 +3258,7 @@ function download_windows_workstation() {
         return $?
     }
     # capture 'cmd' for the log file
-    language_skuid_table_cmd="$(echo -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" 
+    language_skuid_table_cmd="$(echo --disable -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --append --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" 
 
     { echo; date; echo "language_skuid_table_json - FULL "; echo; echo "$language_skuid_table_json"; echo ; echo "End of Page"; echo
     } >  "/tmp/qe_win_dl_lang_table full.txt"
@@ -3285,7 +3285,7 @@ function download_windows_workstation() {
     # --referer: Required by Microsoft servers to allow request
     iso_download_link_json="$(curl --disable -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --append --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
     # capture 'cmd' for the log file
-    iso_download_link_cmd="$(echo -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --append --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
+    iso_download_link_cmd="$(echo --disable -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --append --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
 
     RndNum="$( (tr -cd '5-8' | head -c 1) < /dev/urandom )"
     echo " - And some more, hopefully successful, human seconds before we start .... " ; sleep "$RndNum"
