@@ -30,6 +30,16 @@
 
 - 1.11.04 fixes multiple distro downloads and adds several UX adjustments
 
+1.11.05 is to be released shortly
+
+- to help with branch synchronization, current work has been merged in to the main branch
+
+- although still numbered as 1.11.04, this is currently stable and may be cloned as usable
+
+- just a few finishing touches to add to the builtins and the sequencing
+
+- the FreeSpirit built-in is currently recommended in preference to Freebird
+
 More in the [release notes](#release-notes) and wiki pages
 
 ### Launch from the Linux desktop or from the command line
