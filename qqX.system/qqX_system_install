@@ -148,13 +148,6 @@ if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   [[ $FHS_Alert ]] &&  exit 
 fi
 
-if [[ ! $HideFHSwarnings ]] &&  [[ ! $(type -p bc) ]]; then
-  printf "\n\n  Check your OS >  \n\n  A 'bc' installation should normally be present and is required by qqX ..."
-  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
-  read -rp  "  >  "   FHS_Alert
-  [[ $FHS_Alert ]] &&  exit 
-fi
-
 ##  Check for items sometimes missing 
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
@@ -164,16 +157,15 @@ if [[ ! $(type -p jq) ]]; then
   printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
   read -rp "  [enter] to ignore or continue > "
 fi
-if [[ ! $(type -p bc) ]]; then
-  printf "\n\n  A 'bc' installation should normally be present and is required by qqX ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-if [[ ! $(type -p xrandr) ]]; then
-  printf "\n\n  An 'xrandr' installation should normally be present and is required by qqX ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
+CoreList=("bc" "xrandr" "paste")
+for CP in "${CoreList[@]}"; do 
+  if [[ ! $(type -p "$CP") ]]; then
+    printf "\n\n  A '%s' installation should normally be present and is required by qqX ...\n\n"  "$CP"
+    read -rp "  [enter] to ignore or continue > "
+  fi
+done
 if [[ ! $(type -p wget) ]]; then
-  printf "\n\n  A 'wget' installation should normally be present and is needed in certain places ...\n\n"
+  printf "\n\n  A 'wget' installation should normally be present and may be needed in certain places ...\n\n"
   read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p 7z) ]]; then
@@ -185,8 +177,7 @@ if [[ ! $(type -p spicy) ]]; then
   read -rp "  [enter] to ignore or continue > "
 fi
 
-
-qqX_Version="$(./qqX --version 2>/dev/null)"
+New_qqX_Version="$(./qqX --version 2>/dev/null)"
 
 # Default location is next to quickemu in "/usr/bin" This may frequently be set just to "/bin"
 # as this is often just a symlink and qqX will actually install to "/usr/bin". 
@@ -197,6 +188,7 @@ qqX_Version="$(./qqX --version 2>/dev/null)"
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
+
 if [[ ! $Current_qqX_Location ]]; then 
   # new install
   qqX_Std_Bin_Dir="/usr/bin"
@@ -344,7 +336,7 @@ source "qqX.system/qqX_settings_update_transposer"
 
 printf "\033c"
 echo
-qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $New_qqX_Version "
 
 if [[ "$(whoami)" == root ]]; then 
 
@@ -380,7 +372,7 @@ if [[ -d "/mnt/c/Windows" ]]; then WSL_Install=1 ; else WSL_Install= ; fi
 printf "\033c"
 echo
 
-qqX_logo_title  "quickemu quickget X terminal project - setup script $qqX_Version "
+qqX_logo_title  "quickemu quickget X terminal project - setup script $New_qqX_Version "
 
 if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" ]] && [[ ! -d  "./qqX.main" ]] && [[ ! -d  "./qqX.builtins" ]]; then
 
@@ -503,9 +495,9 @@ else
     # Means copying to qqx will copy to qqX, and vice versa. 
     # And check that the right version is there:
 
-    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$qqX_Version" ]] ; then 
+    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$New_qqX_Version" ]] ; then 
       printColor "\n  Files installed: "; printf " All good" 
-    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$qqX_Version" ; sleep 2000  
+    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$New_qqX_Version" ; sleep 2000  
     fi
 
     Default_VM_Folder=

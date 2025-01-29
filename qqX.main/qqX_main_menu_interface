@@ -46,8 +46,9 @@ else
       printf  "  [u]  show utils & technical"
 
       if [[ ! $LiveBoot ]]; then  # REVIEW show all?
-        if [[ $BootStyle == "fast" ]]; then printf "   (fastboot)"
-        else  printf "   (boot menu options active)"
+        printf "   [bm]"
+        if [[ $BootStyle == "fast" ]]; then printf " (fastboot)"
+        else  printColor " (boot menu options active)"
         fi
       fi
 
@@ -68,7 +69,7 @@ else
       fi
       if [[ ! $LiveBoot ]]; then
         if [[ $BootStyle == "fast" ]]; then printf "   [bm] show guest efi/bios boot menu"
-        else printf "   [fb] hide bios boot menu "
+        else printf "   [fb] use fast boot menu "
         fi
       fi
 
@@ -216,18 +217,47 @@ else
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
     fi
 
-    printf  "\n\n  [gt]  quickget a new distro   [i]  show VM drives info "
+    # use du with -L on instance menus as are individual totals only and some instances can be symbolically linked
+    
+    InstanceQcow2_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep qcow2 | awk '{print $1}' 2>/dev/null)"
 
+    if [[ $InstanceQcow2_Sizes ]]; then  
+      InstanceQcow2_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceQcow2_Sizes" 2>/dev/null)"
+      InstanceQcow2_Sizes="$(paste -sd+  <<< "$InstanceQcow2_Sizes" | bc -l  2>/dev/null)"
+      InstanceQcow2_Sizes="$(bc <<< "scale=1; $InstanceQcow2_Sizes/1000000")"
+    else
+      InstanceQcow2_Sizes="0"
+      InstanceQcow2_SizesCount="0"
+    fi
+
+    InstanceISO_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' 2>/dev/null)"
+
+    if [[ $InstanceISO_Sizes ]]; then  
+      InstanceISO_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceISO_Sizes" 2>/dev/null)"
+      InstanceISO_Sizes="$(paste -sd+  <<< "$InstanceISO_Sizes" | bc -l  2>/dev/null)"
+      InstanceISO_Sizes="$(bc <<< "scale=2; $InstanceISO_Sizes/1000000")"
+    else
+      InstanceISO_Sizes="0"
+      InstanceISO_SizesCount="0"
+    fi
+
+    printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   "
+    printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount" 
+    printf "ISO's: %s (%s)  "  "${InstanceISO_Sizes}G" "$InstanceISO_SizesCount"
+
+    printf  "\n\n"
     filter_and_flag_qemu_errors
 
     if [[ $QemuErrorAlert ]]; then 
       printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then 
-      if [[ $(type -p "$FileManager") ]]; then 
-        printf "   [f] open VM folder"
+      if [[ $(type -p "$FileManager") ]]; then
+        if [[ $LiveBootMissing ]]; then  printColor "  [f] open VM folder"
+        else printf "  [f] open VM folder"
+        fi
         printf "   [qf] | [qqf] open qcow2"
         printf " in file manager"
-      else  printColor "   [set]  ERROR file manager not found" 
+      else  printColor "  [set]  ERROR file manager not found" 
       fi
     fi
 
@@ -332,6 +362,11 @@ else
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
+    if [[ $MainMenuChoicePreset ]]; then
+      printf "  >  %s" "$MainMenuChoicePreset" 
+      MainMenuChoice="$MainMenuChoicePreset" 
+      MainMenuChoicePreset=
+    fi
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice
 
   }

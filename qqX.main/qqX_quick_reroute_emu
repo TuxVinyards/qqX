@@ -134,11 +134,23 @@ function quickemu {
 
         drives_and_snapshots  "info_current"
         printf "\n"
+        if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  
+          printColor "  DISK.QCOW2 ERROR  %s  \n\n  Return and run [disk] repair utils \n\n"  "$DiskChkStatus"
+          read -rp "  >  "
+          BreakAtVerboseArgs=1
+          VM_ExecBoot=
+          return
+        fi
 
         [[ $GeneralLoopCheck ]] && printf "\n\n pre-sourcing qmod-boot :" &&  dev_loop_check && printf "\n\n"
 
         source "/tmp/qmod-boot-temp" 
         VM_ExecBoot=
+
+        if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
+          printColor "\n\n  Press 'esc' when 'Start boot Option' appears" 
+          printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. \n\n"
+        fi
 
         if [[ $BreakAtVerboseArgs ]]; then
           SpicyPID="$(pgrep spicy)"

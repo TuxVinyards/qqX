@@ -230,14 +230,11 @@ function set_drive_paths {
 
     if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then 
       SharedDriveArgs=
-
     elif [[ -e "$SharedDrive" ]]; then
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
       SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
-
     elif [[ $SharedDrive ]]; then 
       DriveLocationError="ERROR SharedDrive NOT found (main settings)"
-
     fi
 
   fi
@@ -248,13 +245,20 @@ function set_drive_paths {
 #  MAIN DRIVE & BOOT
 # 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
 #  everytime a different VM is selected or the .conf file is reconfigured
-#  Quickemu uses vars:  'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
+#  NB Quickemu uses vars:  'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
 #  Error handling for this function is also actioned by 'show_main_menu_header' 
 
 function read_main_drive_and_img_iso_conf_vars {
 
   MainDrive=
   IsoImg=
+
+  if [[ $Trace_InputVars ]]; then 
+    echo "QE Conf Var 'disk_img': $disk_img"  ; echo 
+    echo "QE Conf Var 'img': $img"  ; echo 
+    echo "QE Conf Var 'iso': $iso"  ; echo 
+    sleep "$Trace_InputVars"
+  fi
 
   [[ $disk_img ]] && [[ ! -d  "$(dirname "$disk_img")" ]] && function_conf_error  folder  "disk_img:  $(dirname "$disk_img")"
   [[ $img ]] && [[ ! -d  "$(dirname "$img")" ]] && function_conf_error  folder  "img:  $(dirname "$img")"
@@ -313,7 +317,7 @@ function_conf_error () {
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     printColor "\n\n  [c] continue  (with current settings) looks okay "
-    printf "\\n\n  [e] to edit qqX general settings   [q] to quit \n\n"  
+    printf "\\n\n  [d] delete   [e] to edit qqX general settings   [q] to quit \n\n"  
     
   elif [[ $1 == "folder" ]] ; then 
 
@@ -348,11 +352,13 @@ function_conf_error () {
 
   elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
 
-  elif [[ $ErrorMenuSelect == "c" ]] || [[ $ErrorMenuSelect == "e" ]] || [[ $ErrorMenuSelect == "gt" ]]; then  
+  elif [[ $ErrorMenuSelect == "c" || $ErrorMenuSelect == "d" || $ErrorMenuSelect == "e" || $ErrorMenuSelect == "gt" ]]; then  
   
     IgnoreFolderCheck=1
 
     if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; return
+
+    elif [[ $ErrorMenuSelect == "d" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; MainMenuChoicePreset="del" ; return
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
@@ -397,7 +403,7 @@ qqX_edit_settings() {
 
       while true ; do
 
-        printColor "\n\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
+        printColor "\n\n\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
 
@@ -407,7 +413,8 @@ qqX_edit_settings() {
         else
           cp "$VM_Conf_File" "$VM_InstanceName/${VM_Conf_File}.edit.old.txt"
           (nohup &> /dev/null  "$TextEditor" "$VM_Conf_Dir/$VM_Conf_File" & ) || texteditor_not_found_message
-          printf "\n  [enter] to return, or when editing has been completed, to refresh \n\n"
+          custom_conf_notes
+          printColor "\n  [enter] to return, or when editing has been completed, to refresh \n\n"
           read -rp "  >  "
           ConfSettingsAdjusted=1
           refresh_conf_vars_and_values

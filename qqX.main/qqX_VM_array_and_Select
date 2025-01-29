@@ -26,15 +26,11 @@ add_unlisted_vm_to_vm_array () {
 
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
     TestFolderFile="$1/$2"
-
     [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
 
     if [[ ! ${VM_Array[0,0]} ]]; then 
-    
       New_VM_ElementCount=0  
-
     else 
-    
       New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
       local i=0
       while [[ ${VM_Array[$i,0]} ]]; do
@@ -43,13 +39,11 @@ add_unlisted_vm_to_vm_array () {
         else  ((i+=1))  # carry on interating the array
         fi
       done
-
     fi
 
-      # if it's the first entry, or at the end there is no match found in the array, then add it
-      VM_Array["$New_VM_ElementCount",0]="$1" 
-      VM_Array["$New_VM_ElementCount",1]="$2" 
-
+    # if it's the first entry, or at the end there is no match found in the array, then add it
+    VM_Array["$New_VM_ElementCount",0]="$1" 
+    VM_Array["$New_VM_ElementCount",1]="$2" 
   fi
   
 }
@@ -85,29 +79,20 @@ scan_folders_list_and_add_VMs () {
 
         i=0
         VM_PairsCount=0
-
         while [[ ${VM_Array[$i,0]} ]]; do
-
           ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-
           if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
-
             [[ $VM_PairsCount -eq  "$VM_ElementCount" ]] &&  break
-
             # else carry on interating the array 
             ((i+=1))  
             ((VM_PairsCount+=2))  
-            
           else  
-
             VM_SettingsError=1
             printf "\n\n  Array Element(s) Not Found "
             printf "\n\n  Folder:  %s " "${VM_Array[$i,0]}"
             printf "\n\n  .conf :  %s " "${VM_Array[$i,1]}"
             break
-            
           fi
-          
         done
 
       fi
@@ -117,30 +102,22 @@ scan_folders_list_and_add_VMs () {
       # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
 
       if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then  
-      
         VM_SettingsError=1
         printf "\n\n  Empty Array Element(s) Found "
-
       fi
 
       # All Checks Error dialog
 
       if [[ $VM_SettingsError ]]; then
-
         printColor "\n\n  ERROR in VM array general settings"
-
         printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
         printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
         printf "\n\n  [enter] to open settings editor  [q] to quit \n\n"
-
         read -rp  "  >  "  VM_SettingsError
-
         printf "\n\n"
-
-        if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings ; fi
-
+        if [[ $VM_SettingsError == "q" ]] ; then  exit directly ; else  qqX_edit_settings
+        fi
       else  break
-
       fi
 
     done
@@ -148,9 +125,7 @@ scan_folders_list_and_add_VMs () {
   fi
 
   # Scan rest of list & ADD new found .conf files / distros to the VM array, if they are not yet listed:
-
   i=0
-
   while [[ ${VM_Folder_List[i]} ]]; do
 
     FolderPathName="${VM_Folder_List[i]}"
@@ -187,6 +162,95 @@ scan_folders_list_and_add_VMs () {
 
 }
 
+
+scan_VM_Array_for_sizes () {
+
+  # human set for report
+  printf "" > "/tmp/qqX.Sizes.qcow.txt"  
+  printf "" > "/tmp/qqX.Sizes.iso.txt"  
+  local i=0
+  while [[ ${VM_Array[$i,0]} ]]; do
+    ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+    ArrFolder="${ArrFolderFile/'.conf'/}"
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
+    ((i+=1))
+  done
+
+  if [[ $SharedDrive ]]; then
+    ArrFolder="$(dirname "$SharedDrive")"
+    du -d 4 -t 100M -h -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 2>/dev/null
+    du -d 4 -t 30M -h -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 2>/dev/null
+  fi
+
+  # machine set for calcs
+  # both cases avoid using du with -L or symbolically linked instances will cause double counts when totalling storage
+  printf "" > "/tmp/qqX.Sizes.qcow.K.txt"  
+  printf "" > "/tmp/qqX.Sizes.iso.K.txt"  
+  i=0
+  while [[ ${VM_Array[$i,0]} ]]; do
+    ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
+    ArrFolder="${ArrFolderFile/'.conf'/}"
+    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null
+    du -d 4 -t 30M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
+    ((i+=1))
+  done
+
+  if [[ $SharedDrive ]]; then
+    ArrFolder="$(dirname "$SharedDrive")"
+    du -d 4 -t 100M -a "$ArrFolder" | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null
+    du -d 4 -t 30M -a "$ArrFolder" | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null
+  fi
+
+  if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" ) ]]; then  
+    TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null)"
+    TotalQcow2_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.qcow.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
+    TotalQcow2_Sizes="$(bc <<< "scale=1; $TotalQcow2_Sizes/1000000")"
+  else
+    TotalQcow2_Sizes="0"
+    TotalQcow2_SizesCount="0"
+  fi
+
+  if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" ) ]]; then  
+    Total_ISO_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null)"
+    Total_ISO_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.iso.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
+    Total_ISO_Sizes="$(bc <<< "scale=1; $Total_ISO_Sizes/1000000")"
+  else
+    Total_ISO_Sizes="0"
+    Total_ISO_SizesCount="0"
+  fi
+  
+}
+
+show_VM_Array_sizes_text () {
+
+  printf "\nBy Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
+  { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
+    printf "\n" 
+    sort -hr "/tmp/qqX.Sizes.iso.txt"
+    printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+    printf "\n\nBy Folder: \n\n"
+    cat "/tmp/qqX.Sizes.qcow.txt"
+    printf "\n" 
+    cat "/tmp/qqX.Sizes.iso.txt"
+    printf "\n\n" 
+  }>> "/tmp/qqX.SizesTotals.txt" 
+
+  sleep 0.5
+  (nohup &> /dev/null  "$TextEditor" "/tmp/qqX.SizesTotals.txt" & ) || texteditor_not_found_message
+}
+
+VM_selector_menu_refresh () {
+  ByPass_VM_Array_Loader=
+  ByPass_VM_Array_Selector=
+  ListTitleFolderOld=
+  InvertStyleColors=
+  MenuStylePreviewed=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  VM_InstanceName=
+  VM_Selection=
+}
 
 VM_loader_selector_and_menu () {  
 
@@ -234,6 +298,9 @@ VM_loader_selector_and_menu () {
         for Style in {A..Z} ; do
           if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
         done
+
+        printf "\n  Total Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
+        printf "  [sz] show size details \n"
 
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
@@ -284,18 +351,6 @@ VM_loader_selector_and_menu () {
 
         fi
 
-        vm_menu_interface_refresh () {
-          ByPass_VM_Array_Loader=
-          ByPass_VM_Array_Selector=
-          ListTitleFolderOld=
-          InvertStyleColors=
-          MenuStylePreviewed=
-          VM_Conf_Dir=
-          VM_Conf_File=
-          VM_InstanceName=
-          VM_Selection=
-        }
-
         path_diagnostics
 
         printf "\n\n"
@@ -326,22 +381,22 @@ VM_loader_selector_and_menu () {
         VM_Selection=
         return
 
-      elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+      elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
 
       elif [[ $VM_Selection == "FS"   ]] ; then  
-        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       elif [[ $VM_Selection == "FB"   ]] ; then  
-        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       elif [[ $VM_Selection == "HB"   ]] ; then  
-        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
-      elif [[ $VM_Selection == "Ech" || $VM_Selection == "ECH" || $VM_Selection == "ech" ]] ; then  
-        CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
-      elif [[ $VM_Selection == "Sys" || $VM_Selection == "SYS" || $VM_Selection == "sys" ]] ; then  
-        CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1;refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
-      elif [[ $VM_Selection == "Cust" || $VM_Selection == "CUST"  || $VM_Selection == "cust" ]] ; then  
-        CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
-      elif [[ $VM_Selection == "Dev" || $VM_Selection == "DEV"  || $VM_Selection == "dev" ]] ; then  
-        CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; vm_menu_interface_refresh ; return
+        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+      elif [[ ${VM_Selection,,} == ech* ]] ; then  
+        CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+      elif [[ ${VM_Selection,,} == sys* ]] ; then  
+        CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1;refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+      elif [[ ${VM_Selection} == cust* ]] ; then  
+        CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+      elif [[ ${VM_Selection,,} == dev* ]] ; then  
+        CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
 
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
 
@@ -353,6 +408,12 @@ VM_loader_selector_and_menu () {
 
         VM_Selection=
         qqX_edit_settings 
+        return
+
+      elif [[ $VM_Selection == "sz" ]];then
+
+        VM_Selection=
+        show_VM_Array_sizes_text 
         return
 
       elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
@@ -528,7 +589,8 @@ refresh_sources_and_load_VM_arrays() {
 
   Current_VM_Folder="$Default_VM_Folder"
   function_create_VM_folderList  
-  scan_folders_list_and_add_VMs 
+  scan_folders_list_and_add_VMs
+  scan_VM_Array_for_sizes
 
   cd "$RefreshCallFolder" || printColor "\n\n  ERROR returning to Original Location following the Array refresh" 
   Current_VM_Folder="$RefreshCall_VM_Folder"

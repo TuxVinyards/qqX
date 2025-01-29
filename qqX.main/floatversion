@@ -146,7 +146,7 @@ float_version_from_string ()  {
         CurrentVersion="1.02.02"
         printf "\n CurrentVersion: %s" "$CurrentVersion"
         printf "\n\n Checking for updates....   "
-        LatestVersion="$(floatversion -M "$(curl -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
+        LatestVersion="$(floatversion -M "$(curl --disable -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
         if [[ $LatestVersion ]]; then  
           printf "LatestVersion: %s " "$LatestVersion"
           if floatversion --gt "$LatestVersion $CurrentVersion" 2>/dev/null; then printf " UPGRADEABLE "

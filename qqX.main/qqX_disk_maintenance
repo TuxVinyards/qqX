@@ -194,6 +194,7 @@ function manage_and_repair_disks {
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size can be appear lower than the contents ..."
+      printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
 
     fi
 
@@ -207,38 +208,39 @@ function manage_and_repair_disks {
     # Check there is disk free space to make a backup  
 
     if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
-    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}" 
+    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}"; DiskSize_GiB_OnDisk="${DiskSize_GiB_OnDisk//' '/}" 
     fi
 
-    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -1)"
+    DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -n 1)"
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
+    DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost//' '/}"
 
-    printf "\n\n  Checking for backup disk space on host drive ..."
+    printColor "\n\n  Available disk space on host drive: %s  A back-up will be made: %s" "${DiskFreeGiB_OnHost}G" "${DiskSize_GiB_OnDisk}G"
 
     if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
-
-      printColor "\n\n  WARNING: insufficient or very low space."
-    
+      printColor "\n\n  WARNING %s : insufficient or very low space." "${DiskFreeGiB_OnHost}G"
     else
-
       printf "\n\n\n"
       if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
       elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
       else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
       fi
-
     fi
     
     printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  A BACK-UP WILL BE MADE. All processes will remove any snapshots ...  [b] back to menu " 
+    printf "\n\n  All processes will remove any snapshots ...  [b] back to menu " 
 
   fi
 
+  printf "\n"
   DiskManage=
-  printf "\n\n"
-  read -rp "  >  "  DiskManage
+  while true; do 
+    printf "\n"
+    read -rp "  >  "  DiskManage
+    [[ $DiskManage ]] && break
+  done
   printf "\n\n"	
 
   # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-convert
@@ -263,10 +265,15 @@ function manage_and_repair_disks {
 
     DiskDate="$(date +%b%d.%H.%M)"
     DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
-    mv "$Selected_Drive" "$DiskBackup" 
-
+    
     printf  "  Original drive: %s \n\n" "$Selected_Drive"
-    printColor "  Moved to back up as: %s \n\n" "$DiskBackup"
+
+    if mv "$Selected_Drive" "$DiskBackup" ; then 
+      printColor "  Moved to back up as: %s \n\n" "$DiskBackup"
+    else
+      printColor "  ERROR moving drive to backup - Cancelling process\n\n"
+      sleep 3 ; return
+    fi
 
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
 
@@ -299,7 +306,10 @@ function manage_and_repair_disks {
       
       "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
 
-    else  "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
+    else 
+
+      printf "\n\n  Processing .... \n\n"
+      "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
 
     fi
 
@@ -312,12 +322,19 @@ function manage_and_repair_disks {
         [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog" 
         "$QEMU_IMG" info "$Selected_Drive"
         printColor "\n\n  Drive Updated ..."
+        if [[ $DiskManage == "rd" ]]; then
+          DiskSize_Occupied_New="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
+          DiskSize_Occupied_New="${DiskSize_Occupied_New/'disk size: '/}"
+          DiskSize_Occupied_New="${DiskSize_Occupied_New/'GiB'/}"
+          DiskSize_Occupied_New="${DiskSize_Occupied_New//' '/}"
+          DiskSize_Recovered="$(bc <<< "$DiskSize_GiB_OnDisk - $DiskSize_Occupied_New")G"
+          printColor  "\n\n  Reduction: %s" "$DiskSize_Recovered"
+        fi
       fi
 
     else  printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
 
     fi
-
 
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  
@@ -801,5 +818,5 @@ function check_vm_nbd_boot_connected {
     [[ $qf_Launch == "r" ]] && return 1
     [[ $qf_Launch ]] && qcow2_filemanagement_launcher
   done
-
+  return 0
 }

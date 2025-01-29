@@ -202,7 +202,7 @@ function sort_qqX_builtin_settings {
   elif [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]]; then
     QE_SourceVersion="Dev"
     FreePath="$QE_DevPath"
-    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
+    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freespirit" ; fi
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
     export PATH="${FreePath}:${PATH}" 
@@ -280,8 +280,8 @@ find_quick_version_numbers
 ## Analyse qqX Current Version  (Latest version is carried out in the updater function)
 
 # Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
-# Suffixes more closely follow 'semantic versioning' x.xx.xx-suffix > major.minor.point and with optional as -beta.01 etc
-# Non-major numbers remain padded to 2dp to make easier reading in file managers
+# Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
+# but minor numbers remain padded to 2dp
 
 if [[ $qqX_Version == *[[:alpha:]]* ]] ; then  qqX_CurrentReleaseType="beta"
 else qqX_CurrentReleaseType="release"
