@@ -1038,13 +1038,13 @@ function_quick_get_wrap ()  {
     while true ; do
 
       dev_loop_check
-
+      
       if [[ $MainMenuZsync ]]; then  
         QGW_OverWriteAlert=1
       elif [[ ! $QGW_Download_BadLink ]]; then
         show_current_group_folder_list
         printf "\n\n\n"
-        # printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
+        printf "  Selected:  %s \n\n"  "$QWG_NewVM_Name"
         printColor "  Installation target folder:  %s"   "$QWG_Conf_Dir"
       fi
 
@@ -1118,7 +1118,7 @@ function_quick_get_wrap ()  {
       
       printf " [h] help  [b] back to main menu \n\n\n"
       read -rp "  >  " QGW_DownloadStart
-      printf "\n\n"
+      printf "\n"
 
       case "$QGW_DownloadStart" in
 
