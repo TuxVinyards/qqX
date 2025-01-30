@@ -90,6 +90,10 @@ print_quickget_and_folder_choices () {
       printf -v TxVar "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"
       QGW_TxArr+=("$TxVar")
 
+    elif [[ $1 == "SimilarVM_Arr_Display" ]] ; then
+      printf -v TxVar "  *  %-${QGW_List_Arr_ItemLength}s  "   "$QGW_List_Arr_Item"
+      QGW_TxArr+=("$TxVar")
+
     elif [[ ! $QGW_List_UbuntuOthers ]] && [[ ! $QGW_List_AlphaFilter || ${QGW_List_Arr_Item:0:1} == "$QGW_List_AlphaFilter" ]] ; then
       printf "  %2d)  %-${QGW_List_Arr_ItemLength}s  "  "$QGW_List_DisplayNum"  "$QGW_List_Arr_Item"; ((QGW_List_NewLineCounter+=1))
     fi
@@ -1040,7 +1044,8 @@ function_quick_get_wrap ()  {
       elif [[ ! $QGW_Download_BadLink ]]; then
         show_current_group_folder_list
         printf "\n\n\n"
-        printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
+        # printColor "  Installation target folder:  %s / %s "   "$QWG_Conf_Dir"  "$QWG_NewVM_Name"
+        printColor "  Installation target folder:  %s"   "$QWG_Conf_Dir"
       fi
 
       # If not sync updating, list other copies of similar VM's in the target folder
