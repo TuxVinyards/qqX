@@ -213,18 +213,23 @@ function_config_tune_up ()  {
       printColor "is not present. One should have been made before first booting ..." 
     fi
     printColor "\n\n  This disk has now been created and this line now has no direct effect. " 
+
     if [[ ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
-      printf "\n\n  However, at this stage, it appears that the distro has not been installed, so quitting the tune up wizard,"
-      printf "\n\n  deleting the qcow disk via the file manager and re-starting as 'new' could also be possible."
+      printf "\n\n  Alternatively, this is also an easy point to resize, if you have different thoughts."
+      printf "\n\n  Tests indicates that the distro has not been installed, so quitting the tune up wizard"
+      printf "\n  and deleting the qcow disk via the file manager could also be possible."
+      printf "\n  Re-run the tune up wizard and select the new size."
       if [[ $TuneUpDiskSizeLine -le 64 ]]; then 
         printf "\n\n  Using disk_size=\"64G\" or higher is recommended as qcow2 disks auto-compress & will normally occupy much less space." 
       fi
+      printf "\n"
       if [[ $TuneUpDiskSizeLine ]]; then 
-        printf "  Current max disk size is set as %sG" "$TuneUpDiskSizeLine"
+        printf "\n  Current max disk size is set as %sG" "$TuneUpDiskSizeLine"
       else
-        printf "  More details via the 'disk' option from the utilities menu." 
+        printf "\n  More details via the 'disk' option from the utilities menu." 
       fi
-      printf "  It is easier make disks larger now than to resize later ... " 
+      printf "\n  It is easier make disks larger now than to resize later ... " 
+
     else
       printf "\n\n  Resizing, at this stage may be effected using the qqX 'disk' utilities."
     fi
