@@ -260,10 +260,12 @@ function read_main_drive_and_img_iso_conf_vars {
     sleep "$Trace_InputVars"
   fi
 
-  [[ $disk_img ]] && [[ ! -d  "$(dirname "$disk_img")" ]] && function_conf_error  folder  "disk_img:  $(dirname "$disk_img")"
-  [[ $img ]] && [[ ! -d  "$(dirname "$img")" ]] && function_conf_error  folder  "img:  $(dirname "$img")"
-  [[ $iso ]] && [[ ! -d  "$(dirname "$iso")" ]] && function_conf_error  folder  "iso:  $(dirname "$iso")" 
-
+  if [[ ! $IgnoreConfigErrors ]]; then 
+    [[ $disk_img ]] && [[ ! -d  "$(dirname "$disk_img")" ]] && function_conf_error  folder  "disk_img:  $(dirname "$disk_img")"
+    [[ $img ]] && [[ ! -d  "$(dirname "$img")" ]] && function_conf_error  folder  "img:  $(dirname "$img")"
+    [[ $iso ]] && [[ ! -d  "$(dirname "$iso")" ]] && function_conf_error  folder  "iso:  $(dirname "$iso")" 
+  fi
+  
   [[ -e "$disk_img" ]] && MainDrive="$disk_img"
   [[ -e "$img" ]] && IsoImg="$img"
   [[ -e "$iso" ]] && IsoImg="$iso"
@@ -280,9 +282,6 @@ function_conf_error () {
   read -r -t 0.1  
   read -r -t 0.1  
   read -r -t 0.1  
-  read -r -t 0.1	
-  read -r -t 0.1  
-  read -r -t 0.1 	
 
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
@@ -327,7 +326,9 @@ function_conf_error () {
     printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
     printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
     printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings " 
-    printf "\n\n  [c] ignore and continue   [q] to quit \n\n"   
+    printf "\n\n  [c] ignore and continue"
+    [[ $FileManager ]] && printf "   [f] open group folder in file-manager"
+    printf "   [q] to quit \n\n"   
 
   elif [[ $1 == "qqX_SettingsFile" ]] ; then 
 
@@ -337,7 +338,7 @@ function_conf_error () {
     
   else   
 
-    # includes "$1" = "config"
+    # includes "$1" = ".conf file"
     printColor "\n\n  [Enter] to edit qqX general settings"  
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
     printf "  [c] ignore and continue "
@@ -350,15 +351,17 @@ function_conf_error () {
 
   if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit 
 
+  elif [[ $ErrorMenuSelect == "f" ]]; then (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message 
+
   elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
 
   elif [[ $ErrorMenuSelect == "c" || $ErrorMenuSelect == "d" || $ErrorMenuSelect == "e" || $ErrorMenuSelect == "gt" ]]; then  
   
-    IgnoreFolderCheck=1
+    IgnoreFolderCheck=1 ; IgnoreConfigErrors=1
 
-    if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; return
+    if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; FolderConfigFlag= ; return 0
 
-    elif [[ $ErrorMenuSelect == "d" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; MainMenuChoicePreset="del" ; return
+    elif [[ $ErrorMenuSelect == "d" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; MainMenuChoicePreset="del" ; return 0
 
     elif [[ $ErrorMenuSelect == "e" ]]; then 
 
@@ -371,20 +374,17 @@ function_conf_error () {
       cd "$Default_VM_Folder" || DefaultFolderError=1
       Current_VM_Folder="$Default_VM_Folder" 
       function_quick_get_wrap 
-      return
+      return 0
 
     fi
  
   else  
   
     if [[ $NewSetupFlag || $FolderConfigFlag ]]; then 
-
       NewSetupFlag=
       FolderConfigFlag=
       qqX_edit_settings  "conf" 
-      
     else  qqX_edit_settings
-    
     fi
     
   fi
