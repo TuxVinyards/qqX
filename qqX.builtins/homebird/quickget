@@ -3,7 +3,7 @@
 #  - https://www.shellcheck.net/wiki/SC2317
 #  - Disable globally because many functions are called indirectly
 # shellcheck disable=SC2317
-# Use qqX UTF8  locale, not:  export LC_ALL=C
+# Use qqX C.UTF-8 locale, not:  export LC_ALL=C
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
@@ -57,12 +57,13 @@ function os_info() {
         holoiso)          INFO="HoloISO|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
         kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
         kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
-        kolibrios)        INFO="KolibriOS|-|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
+        kolibrios)        INFO="KolibriOS|-|https://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
         kubuntu)          INFO="Kubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
         linuxlite)        INFO="Linux Lite|-|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.";;
         linuxmint)        INFO="Linux Mint|-|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
         lmde)             INFO="Linux Mint Debian Edition|-|https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
         lubuntu)          INFO="Lubuntu|-|https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
+        maboxlinux)       INFO="Mabox Linux|-|https://maboxlinux.org/|Lightweight, functional and easy to customize Openbox desktop";;
         mageia)           INFO="Mageia|-|https://www.mageia.org/|Stable, secure operating system for desktop & server.";;
         manjaro)          INFO="Manjaro|-|https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
         mxlinux)          INFO="MX Linux|-|https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.";;
@@ -132,7 +133,7 @@ function pretty_name() {
 
 # Just in case quickget want use it
 function os_homepage() {
-    os_info "${1}" | cut -d'|' -f 4
+    os_info "${1}" | cut -d'|' -f 3
 }
 
 function error_specify_os() {
@@ -211,7 +212,13 @@ function handle_missing() {
     # Handle odd missing Fedora combinations
     case "${OS}" in
         fedora)
-            if [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
+            # First we need to handle the Beta naming kludge
+            if [[ "${RELEASE}" == *"_Beta" ]]; then
+                NRELEASE="${RELEASE/_Beta/}"
+                else
+                NRELEASE="${RELEASE}"
+            fi
+            if [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
                 echo "ERROR! Unsupported combination"
                 echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1
@@ -262,7 +269,7 @@ function csv_data() {
     local HAS_ZSYNC=0
 
     # Check if zsync is available
-    if type -p zsync &>/dev/null; then
+    if command -v zsync &>/dev/null; then
         HAS_ZSYNC=1
     fi
 
@@ -437,6 +444,7 @@ function os_support() {
     linuxmint \
     lmde \
     lubuntu \
+    maboxlinux \
     macos \
     mageia \
     manjaro \
@@ -583,13 +591,8 @@ function editions_biglinux() {
 }
 
 function releases_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/gnome/" | grep "\.iso" | cut -c81- | cut -d'"' -f2 | cut -d'-' -f2)
-}
-
-function editions_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/" | grep "\[DIR\]" | cut -c81-90 | cut -d'/' -f1 | grep -v testing | sort -u)
+    # there is now just a single latest iso
+    echo latest
 }
 
 function releases_bodhi() {
@@ -605,12 +608,13 @@ function releases_bunsenlabs() {
 }
 
 function releases_cachyos() {
+    # new cdn setup 10/2024
     echo latest
 }
 
 function editions_cachyos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.cachyos.org/ISO/" | grep "title=" | grep -v testing | grep -v cli | cut -d'"' -f4 | cut -d '/' -f1 | sort)
+    # desktop version now installs different desktop environments
+    echo desktop handheld
 }
 
 function releases_centos-stream() {
@@ -669,7 +673,7 @@ function releases_dragonflybsd() {
     # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
+    echo $(web_pipe "https://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
 }
 
 function releases_easyos() {
@@ -684,7 +688,7 @@ function releases_easyos() {
 }
 
 function releases_elementary() {
-    echo 7.1 7.0
+    echo 8.0 7.1 7.0
 }
 
 function releases_endeavouros() {
@@ -703,12 +707,16 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -r)
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
 }
 
 function editions_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(select(.arch=="x86_64" and .variant!="Labs" and .variant!="IoT" and .variant!="Container" and .variant!="Cloud" and .variant!="Everything"  and .subvariant!="Security" and .subvariant!="Server_KVM" and .subvariant!="SoaS")) | map(.subvariant) | unique | .[]')
+    if [[ -z ${RELEASE} ]]; then
+          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    else
+        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    fi
 }
 
 function releases_freebsd() {
@@ -759,7 +767,7 @@ function releases_guix() {
 }
 
 function releases_haiku() {
-    echo r1beta4 r1beta3
+    echo r1beta5 r1beta4 r1beta3
 }
 
 function editions_haiku() {
@@ -782,12 +790,16 @@ function releases_kolibrios() {
     echo latest
 }
 
+function editions_kolibrios() {
+    echo en_US  ru_RU  it_IT  es_ES
+}
+
 function releases_linuxlite() {
     echo 6.6 6.4 6.2 6.0
 }
 
 function releases_linuxmint() {
-    echo 21.3 21.2 21.1 21 20.3 20.2
+    echo 22 21.3 21.2 21.1 21 20.3 20.2
 }
 
 function editions_linuxmint() {
@@ -800,6 +812,10 @@ function editions_lmde() {
 
 function releases_lmde() {
     echo 6
+}
+
+function releases_maboxlinux() {
+    echo latest
 }
 
 function releases_macos() {
@@ -823,7 +839,8 @@ function releases_manjaro() {
 }
 
 function releases_mxlinux() {
-    echo 23.3
+    # needs header, so not web_pipe:
+    curl --disable -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
 }
 
 function editions_mxlinux() {
@@ -837,7 +854,7 @@ function releases_netboot() {
 function releases_netbsd() {
     # V8 is EOL so filter it out
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
+    echo $(web_pipe "https://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
 }
 
 function releases_nitrux() {
@@ -847,7 +864,7 @@ function releases_nitrux() {
 function releases_nixos() {
     # Lists unstable plus the two most recent releases
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -P '(?<=<Key>nixos-)[0-9]+.[0-9]+(?=</Key>)' | sort -nr | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
 }
 
 function editions_nixos() {
@@ -875,7 +892,7 @@ function editions_openindiana() {
 
 function releases_opensuse() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
+    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) aeon microos tumbleweed
 }
 
 function releases_oraclelinux() {
@@ -884,7 +901,7 @@ function releases_oraclelinux() {
 
 function releases_parrotsec() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n 1)
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" |  grep -o -E 'href="[[:digit:]]\.[[:digit:]]+' | sort -nr | head -n 3 | cut -d\" -f 2 )
 }
 
 function editions_parrotsec() {
@@ -900,7 +917,7 @@ function editions_peppermint() {
 }
 
 function releases_popos() {
-    echo 22.04 21.10 20.04
+    echo 22.04 20.04
 }
 
 function editions_popos() {
@@ -976,17 +993,17 @@ function releases_slint() {
 
 function releases_slitaz() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
+    echo $(web_pipe "https://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
 }
 
 function releases_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'-' -f 2 | sort -ru)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/" | jq -r '.[].name[:-1]' | grep -E "^[0-9-]+$" | sort -u)
 }
 
 function editions_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'.' -f5 | cut -d'-' -f2- | sort -u)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -996,12 +1013,7 @@ function releases_sparkylinux() {
 
 function editions_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    if [ -z "${RELEASE}" ]; then
-        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
-    else
-        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
-    fi
-    
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
 }
 
 function releases_spirallinux() {
@@ -1159,6 +1171,11 @@ function web_pipe() {
     curl --disable --silent --location "${1}"
 }
 
+# Download a JSON file from the web and pipe it to stdout
+function web_pipe_json() {
+     curl --disable --silent --location --header "Accept: application/json" "${1}"
+}
+
 # Download a file from the web
 function web_get() {
     local CHECK=""
@@ -1204,6 +1221,12 @@ function web_get() {
         exit 1
     fi
 
+    # allow external process (qqX) to pick up the finalized name (and avoid overwrites eg windows 'unattended') 
+    # external proc should clear this file before starting
+    if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
+        printf "\n New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
+    fi
+
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
         echo "- URL: ${URL}"
@@ -1222,7 +1245,7 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --disable --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --disable --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1260,7 +1283,7 @@ function zsync_get() {
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
-    elif type -p zsync &>/dev/null; then
+    elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
         else
@@ -1391,6 +1414,8 @@ EOF
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             batocera)
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+            bazzite)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
@@ -1463,8 +1488,8 @@ EOF
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
         fi
 
-        # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == "11" ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
+        # Enable TPM for Windows 11 and Windows Server 2022
+        if [[ "${OS}" == "windows" && "${RELEASE}" == "11" || "${OS}" == "windows-server" && "${RELEASE}" == "2022" ]]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
@@ -1548,6 +1573,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
     echo "${URL} ${HASH}"
 }
 
@@ -1617,8 +1643,8 @@ function get_biglinux() {
 
 function get_blendos() {
     local HASH=""
-    local ISO="blendos-${RELEASE}-stable-${EDITION}.iso"
-    local URL="https://mirror.ico277.xyz/blendos/${EDITION}"
+    local ISO="blendOS.iso"
+    local URL="https://kc1.mirrors.199693.xyz/blend/isos/testing"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1644,12 +1670,10 @@ function get_bunsenlabs() {
 
 function get_cachyos() {
     local HASH=""
-    local REL=""
-    local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n 1)
-    local ISO="cachyos-${EDITION}-linux-${REL}.iso"
-    HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
-    echo "${URL}/${REL}/${ISO} ${HASH}"
+    local URL=""
+    URL="$(web_pipe "https://cachyos.org/download/" | tr '&' '\n' | grep "ISO/${EDITION}" | grep -v 'iso.sha' | grep -v 'iso.sig' | cut -d';' -f2)"
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
 }
 
 function get_centos-stream() {
@@ -1701,7 +1725,7 @@ function get_deepin() {
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
     # Correct URL for 23-RC onwards which has architecture directories
-    if [[ "${RELEASE}" == *"23-RC"* ]] ; then
+    if [ "${RELEASE}" != "20.9" ]; then
         URL+="/amd64"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
@@ -1752,6 +1776,7 @@ function get_elementary() {
     case ${RELEASE} in
         7.0) STAMP="20230129rc";;
         7.1) STAMP="20230926rc";;
+        8.0) STAMP="20241122rc";;
     esac
     local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
@@ -1801,8 +1826,18 @@ function get_fedora() {
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
+    # but we need to convert it back to a space for the URL search in the JSON
     #shellcheck disable=SC2086
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and .sha256 != null)')
+    # if RELEASE contains an underscore, replace it with a space
+     if [[ "${RELEASE}" == *"_"* ]]; then
+        RELEASE="${RELEASE/_/ }"
+    fi
+
+
+
+    # shellcheck disable=SC2086
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -1819,7 +1854,7 @@ function get_freebsd() {
 function get_freedos() {
     local HASH=""
     local ISO=""
-    local URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    local URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
     case ${RELEASE} in
         1.2) ISO="FD12CD.iso"
              HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
@@ -1920,8 +1955,8 @@ function get_kdeneon() {
 
 function get_kolibrios() {
     local HASH=""
-    local ISO="kolibri.iso"
-    local URL="https://builds.kolibrios.org/eng"
+    local ISO="latest-iso.7z"
+    local URL="http://builds.kolibrios.org/${EDITION}"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1947,6 +1982,14 @@ function get_lmde() {
     local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
     HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_maboxlinux() {
+    local HASH=""
+    local URL=""
+    URL="https://sourceforge.net/projects/mabox-linux/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    echo "${URL} ${HASH}"
 }
 
 function generate_id() {
@@ -2016,20 +2059,20 @@ function get_macos() {
     CWD="$(dirname "${0}")"
     if [ -x "${CWD}/chunkcheck" ]; then
         CHUNKCHECK="${CWD}/chunkcheck"
-    elif [ -x "$(type -p chunkcheck)" ]; then
-        CHUNKCHECK="$(type -p chunkcheck)"
+    elif [ -x "$(command -v chunkcheck)" ]; then
+        CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
     appleSession=$(curl --disable -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
-                           -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+                           -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
     info=$(curl --disable -s -X POST -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" \
                            -b "session=\"${appleSession}\"" \
                            -H "Content-Type: text/plain" \
                            -d $'cid='"$(generate_id 16)"$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='"$(generate_id 64)"$'\nfg='"$(generate_id 64)"$'\nos='${OS_TYPE} \
-                           http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+                           https://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
     downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
     downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
     chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
@@ -2210,6 +2253,9 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
+    elif [ "${RELEASE}" == "aeon" ]; then
+        ISO="opensuse-aeon.x86_64.iso"
+        URL="https://mirrorcache.opensuse.org/tumbleweed/appliances/iso"
     elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
@@ -2337,7 +2383,7 @@ function get_rockylinux() {
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
-    URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
+    URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
     HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2397,7 +2443,7 @@ function get_slitaz() {
 
 function get_solus() {
     local HASH=""
-    local ISO="Solus-${RELEASE}-${EDITION}.iso"
+    local ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -3092,10 +3138,10 @@ function download_windows_workstation() {
     local iso_download_page_html=""
     local product_edition_id=""
     local language_skuid_table_cmd=""
-    local language_skuid_table_html=""
+    local language_skuid_table_json=""
     local sku_id=""
     local iso_download_link_cmd=""
-    local iso_download_link_html=""
+    local iso_download_link_json=""
     local iso_download_link=""
 
     echo; echo "Downloading Windows ${RELEASE} (${I18N})"; echo
@@ -3139,9 +3185,9 @@ function download_windows_workstation() {
     # https://github.com/TuxVinyards/qqX
     # Slow down the 'bot' behaviour, make it seem more human, so the anti-ddos routines don't block us:
     local RndNum=
-    RndNum="$( (tr -cd '0-5' | head -c 1) < /dev/urandom )"
-    echo " - Taking a few human seconds to 'read' the download page ... " ; sleep "1$RndNum"
-    echo "   ... to hopefully stop the anti-ddos and anti-bot routines from blocking us"
+    RndNum="$( (tr -cd '5-8' | head -c 1) < /dev/urandom )"
+    echo " - Taking a few human seconds to appear to 'read' the download page ... " ; sleep "$RndNum"
+    echo "   ... to hopefully stop any now or future anti-ddos and anti-bot routines from blocking us"
 
     { echo; date; echo "iso_download_page_html:"; echo; echo "$iso_download_page_html"; echo ; echo "End of Page"; echo
     } >  "/tmp/qe_win_dl_page_html.txt"
@@ -3152,7 +3198,7 @@ function download_windows_workstation() {
     product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
     echo "$product_edition_id"
 
-    { echo "product_edition_id"; echo; echo "$product_edition_id"; echo 
+    { echo "product_edition_id:"; echo; echo "$product_edition_id"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo " - Permit Session ID: $session_id"
@@ -3164,47 +3210,39 @@ function download_windows_workstation() {
         return $?
     }
 
-    RndNum="$( (tr -cd '0-6' | head -c 1) < /dev/urandom )"
-    echo " - A few human seconds here too ...." ; sleep "1$RndNum"
+    RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )"
+    echo " - A few human seconds here too ...." ; sleep "$RndNum"
 
-    # Extract everything after the last slash
-    local url_segment_parameter="${url##*/}"
+    local profile="606624d44113"
 
-    { echo "url_segment_parameter:"; echo; echo "$url_segment_parameter"; echo 
+    { echo "profile:"; echo; echo "$profile"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo -n " - Getting language SKU ID: "
     # Get language -> skuID association table
-    # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
-    # We must make this request so our next one will be allowed
-    # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
-    language_skuid_table_html="$(curl --disable --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+    language_skuid_table_json="$(curl --disable -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" || {
         handle_curl_error $?
         return $?
     }
+    # capture 'cmd' for the log file
+    language_skuid_table_cmd="$(echo -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" 
 
-    language_skuid_table_cmd="$(echo --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" 
-
-    { echo; date; echo "language_skuid_table_html - FULL "; echo; echo "$language_skuid_table_html"; echo ; echo "End of Page"; echo
+    { echo; date; echo "language_skuid_table_json - FULL "; echo; echo "$language_skuid_table_json"; echo ; echo "End of Page"; echo
     } >  "/tmp/qe_win_dl_lang_table full.txt"
 
-    # Limit untrusted size for input validation
-    language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
-
-    { echo "language_skuid_table_cmd"; echo; echo "curl $language_skuid_table_cmd"; echo 
+    { echo "language_skuid_table_cmd:"; echo; echo "curl $language_skuid_table_cmd"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
-    { echo "language_skuid_table_html"; echo; echo "$language_skuid_table_html"; echo 
+    { echo "language_skuid_table_json:"; echo; echo "$language_skuid_table_json"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
-    # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
-    sku_id="$(echo "$language_skuid_table_html" | grep "${I18N}&" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    sku_id="$(echo "${language_skuid_table_json}" | jq -r '.Skus[] | select(.LocalizedLanguage=="'"${I18N}"'").Id')"
     echo "$sku_id"
 
-    RndNum="$( (tr -cd '0-4' | head -c 1) < /dev/urandom )"
-    echo " - And a few human seconds here .... " ; sleep "1$RndNum"
+    RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )"
+    echo " - And a few human seconds here .... " ; sleep "$RndNum"
 
-    { echo "sku_id"; echo; echo "$sku_id"; echo 
+    { echo "sku_id:"; echo; echo "$sku_id"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo " - Getting ISO download link..."
@@ -3212,49 +3250,48 @@ function download_windows_workstation() {
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    iso_download_link_html="$(curl --disable --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
-    iso_download_link_cmd="$(echo --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,${url_segment_parameter}&query=&action=GetProductDownloadLinksBySku&sessionId=${session_id}&skuId=${sku_id}&language=English&sdVersion=2")"
+    iso_download_link_json="$(curl --disable -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
+    # capture 'cmd' for the log file
+    iso_download_link_cmd="$(echo -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
 
-    RndNum="$( (tr -cd '2-5' | head -c 1) < /dev/urandom )"
-    echo " - And some more, hopefully successful, human seconds before we start .... " ; sleep "1$RndNum"
+    RndNum="$( (tr -cd '5-8' | head -c 1) < /dev/urandom )"
+    echo " - And some more, hopefully successful, human seconds before we start .... " ; sleep "$RndNum"
 
-    { echo "iso_download_link_cmd"; echo; echo "curl $iso_download_link_cmd"; echo 
+    { echo "iso_download_link_cmd:"; echo; echo "curl $iso_download_link_cmd"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
-    { echo "iso_download_link_html"; echo; echo "$iso_download_link_html"; echo 
+    { echo "iso_download_link_json:"; echo; echo "$iso_download_link_json"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
     local failed=0
-    if ! [ "$iso_download_link_html" ]; then
+    if ! [ "$iso_download_link_json" ]; then
         # This should only happen if there's been some change to how this API works
         echo; echo " - Microsoft servers gave us an empty response to our request for an automated download."
         failed=1
     fi
 
-    if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+    if echo "$iso_download_link_json" | grep -q "Sentinel marked this request as rejected."; then
         echo; echo " - UNFORTUNATELY: Microsoft blocked the download request based on your IP address."; echo
         failed=1
     fi
 
-    if echo "$iso_download_link_html" | grep -q "We encountered a problem processing your request. Please try again later."; then
+    if echo "$iso_download_link_json" | grep -q "We encountered a problem processing your request. Please try again later."; then
         echo; echo " - UNFORTUNATELY: Microsoft blocked the request and is saying to try again later."; echo
         failed=1
     fi
 
     if [ ${failed} -eq 1 ]; then
+        echo "   RETRY in an hour's time OR continue with the VM creation process, then:" 
         echo "   Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
         echo "   Save the downloaded ISO to: $(realpath "${VM_PATH}")"
-        echo "   Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
-        echo "   Continuing with the VM creation process..." ; echo
+        echo "   Update the config file to reference the downloaded ISO ... "; echo
         return 1
     fi
 
     # Filter for 64-bit ISO download URL
-    # sed: HTML decode "&" character
-    # tr: Filter for only alphanumerics or punctuation
-    iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]')"
+    iso_download_link="$(echo "${iso_download_link_json}" | jq -r '.ProductDownloadOptions[].Uri' | grep x64)"
     
-    { echo "iso_download_link - filtered"; echo; echo "$iso_download_link"; echo 
+    { echo "iso_download_link - filtered:"; echo; echo "$iso_download_link"; echo 
     } >>  "/tmp/qe_win_dl_log.txt"
 
     if ! [ "$iso_download_link" ]; then
@@ -3308,7 +3345,7 @@ function open_homepage() {
     if [ -z "$(os_info "${1}")" ]; then
         error_specify_os
     else
-        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        URL="$(os_info "${1}" | cut -d'|' -f 3)"
         # shellcheck disable=SC2034
         XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
         exit 0
@@ -3352,12 +3389,24 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
+            fi;;
+        kolibrios)
+            if [[ ${ISO} = *".7z" ]]; then
+                if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
+                else
+                    7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+                    rm -f "${VM_PATH}/${ISO}"
+                    ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                    ISO="$(basename "${ISO}")"
+                fi
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
     esac
     make_vm_config "${ISO}"
@@ -3373,6 +3422,7 @@ function create_config() {
         echo "ERROR! Could not create directory: ${VM_PATH}. Please verify that it does not already exist"
         exit 1
     fi
+
     if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
         INPUT="$(web_redirect "${INPUT}")"
         if [[ "${INPUT}" == *".iso" ]] || [[ "${INPUT}" == *".img" ]]; then
@@ -3428,10 +3478,10 @@ function create_config() {
     make_vm_config "${INPUT}" "${FIXED_ISO}"
 }
 
-# Use type -p command to check if quickemu is in the system's PATH and
+# Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
-function resolve_quickemu() {   
-    type -p quickemu || \
+function resolve_quickemu() {
+    command -v quickemu || \
     if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
@@ -3464,7 +3514,7 @@ Advanced usage:
 
 Arguments:
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
@@ -3494,14 +3544,14 @@ fi
 QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
-CURL=$(type -p curl)
+CURL=$(command -v curl)
 if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
-QEMU_IMG=$(type -p qemu-img)
+QEMU_IMG=$(command -v qemu-img)
 if [ ! -x "${QEMU_IMG}" ]; then
     echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
     exit 1
@@ -3535,7 +3585,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "HB 4.9.6.04"
+        echo "HB 4.9.6.08"
         exit 0;;
     --help|-help|--h|-h)
         help_message
