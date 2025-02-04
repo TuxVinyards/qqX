@@ -247,46 +247,62 @@ function check_new_vm_folder_name {
   SimilarVMs=
   SimilarVM_Arr=()
   SimilarVM_Arr_Display=()
+  local SelectedChkNewName="$1"
+  HyphenatedNewname="${SelectedChkNewName// /-}"
+  [[ $HyphenatedNewname == "$SelectedChkNewName" ]] && HyphenatedNewname=
 
-  if [[ -d "$QWG_Conf_Dir/$QWG_NewVM_Name" ]]; then
+  [[ ! $1 ]] && { printColor "\n\n Internal ERROR 'check_new_vm_folder_name' param not present \n\n"; sleep 5; }
 
-    if [[ $(ls -h "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null) ]]; then
-      [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
-    else rm -d "$QWG_Conf_Dir/$QWG_NewVM_Name" 
-    fi
-    
-  else
-
-    # main naming component match
-    SimilarVMs+="$(ls "$QWG_Conf_Dir/${QGW_OS_Arr_NameSelected}"*.conf 2>/dev/null )"
-
-    # first dash separated section match
-    if [[ "$QGW_OS_Arr_NameSelected" == *'-'* ]]; then 
-      SimilarVM_ShorterCheck="$(echo "$QGW_OS_Arr_NameSelected" | cut -d '-' -f1)"
-      SimilarVMs+=" $(ls "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
-    fi
-
-    # first chars in new name match to somewhere in something existing
-    SimilarVM_ShorterCheck="${QGW_OS_Arr_NameSelected:0:5}"
-    SimilarVMs+=" $(ls "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
-    if [[ $SimilarVMs ]]; then
-      SimilarVMs="$(tr ' ' '\n' <<< "$SimilarVMs" )"
-      SimilarVMs="$(sort -u <<< "$SimilarVMs" | uniq )"
-      mapfile -t  SimilarVM_Arr  <<< "$SimilarVMs"
-      for Item in "${SimilarVM_Arr[@]}" ; do  
-        TrimmedItem="$(basename "$Item" .conf)"
-        [[ $TrimmedItem ]] && SimilarVM_Arr_Display+=("$TrimmedItem")
-      done
-    fi
-    if [[ ${SimilarVM_Arr[*]} ]]; then  
-      for DailyCheckVM in "${SimilarVM_Arr[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
-      [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
-      printColor "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n\n"
-      print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
-      printf "\n"
-    fi
-
+  # Alert if same name folder and contains files
+  if [[ $(ls -h "$QWG_Conf_Dir/$SelectedChkNewName" 2>/dev/null) ]]; then
+    [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
   fi
+  # Quickget tends to hyphenate the names, so alert here too 
+  if [[ $HyphenatedNewname && $(ls -h "$QWG_Conf_Dir/$HyphenatedNewname" 2>/dev/null) ]]; then
+    [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
+  fi
+
+  # Check Group Conf_Dir folder for similar names:
+
+  # main naming component match
+  SimilarVMs+="$(echo; ls -1 "$QWG_Conf_Dir/${SelectedChkNewName}"*.conf 2>/dev/null )"
+
+  # first dash separated section match
+  if [[ "$SelectedChkNewName" == *'-'* ]]; then 
+    SimilarVM_ShorterCheck="$(cut -d '-' -f1 <<< "$SelectedChkNewName")"
+    SimilarVMs+=" $(echo; ls -1 "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+  fi
+
+  # first chars match
+  SimilarVM_ShorterCheck="${SelectedChkNewName:0:5}"
+  SimilarVMs+=" $(echo; ls -1 "$QWG_Conf_Dir/"*"${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
+
+  # Create array of uniques from similar names string
+  # https://unix.stackexchange.com/questions/102008/how-do-i-trim-leading-and-trailing-whitespace-from-each-line-of-some-output
+  SimilarVMs="$(grep -sE '[[:alnum:]]' <<<  "${SimilarVMs//'.conf'/}")"
+  SimilarVMs="$(awk '{$1=$1;print}' <<< "$SimilarVMs" 2>/dev/null)"
+  SimilarVMs="$(sort -u <<< "$SimilarVMs" 2>/dev/null)"
+
+  #echo; echo "SimVMs =${SimilarVMs}="
+  if [[ $SimilarVMs ]]; then
+    mapfile -t  SimilarVM_Arr  <<< "$SimilarVMs"
+    #echo; declare -p SimilarVM_Arr
+    for Item in "${SimilarVM_Arr[@]}" ; do  
+      TrimmedItem="$(basename "$Item")"
+      [[ $TrimmedItem ]] && SimilarVM_Arr_Display+=("$TrimmedItem")
+    done
+    #echo; declare -p SimilarVM_Arr_Display
+  fi
+
+  # Alert if found
+  if [[ ${SimilarVM_Arr_Display[*]} ]]; then  
+    for DailyCheckVM in "${SimilarVM_Arr_Display[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
+    [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
+    printColor "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
+    print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
+    printf "\n\n  names-may-get-hyphenated or slightlymodified during download ... \n"
+  fi
+
 }
 
 ## MAIN WRAPPING (QWG Quick Wrap Get)
@@ -635,11 +651,11 @@ function_quick_get_wrap ()  {
       [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
       read -rt 0.5  QGW_ChkLoop
       ((DataCount+=1))
-      [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
-      [[ "$DataCount" == '16' ]] && printf "  Servers are busy or you may have been throttled ...\n\n"
-      [[ "$DataCount" == '30' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
-      [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
-      # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+      [[ "$DataCount" == '12' ]] && printf "  Checking the Distro Servers ...\n\n"
+      [[ "$DataCount" == '30' ]] && printf "  Servers are busy or you may have been throttled ...\n\n"
+      [[ "$DataCount" == '50' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
+      [[ "$DataCount" == '80' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+      # use posix '-n' test here or switching focus back from a dev side-terminal will trigger the read function
       [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
       [[ -n $QGW_ChkLoop ]] && break
     done
@@ -854,11 +870,11 @@ function_quick_get_wrap ()  {
             [[ $ShowQGetLists ]] && { echo "Check loop"; (ps -ef | grep bash | grep quickget); echo; }
             read -rt 0.5  QGW_ChkLoop
             ((DataCount+=1))
-            [[ "$DataCount" == '6' ]] && printf "  Checking the Distro Servers ...\n\n"
-            [[ "$DataCount" == '16' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
-            [[ "$DataCount" == '30' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
-            [[ "$DataCount" == '50' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
-            # use full '-n' test here or switching focus back from a dev side-terminal will trigger the read function
+            [[ "$DataCount" == '12' ]] && printf "  Checking the Distro Servers ...\n\n"
+            [[ "$DataCount" == '30' ]] && printf "  Servers are busy or you have been throttled ...\n\n"
+            [[ "$DataCount" == '50' ]] && printf "  [c] to cancel, or continue to wait ? \n\n"
+            [[ "$DataCount" == '80' && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
+            # use posix '-n' test here or switching focus back from a dev side-terminal will trigger the read function
             [[ -n $QGW_ChkLoop && $DataPID ]] && { kill "$DataPID" &>/dev/null ; break; }
             [[ -n $QGW_ChkLoop ]] && break
           done
@@ -1048,13 +1064,14 @@ function_quick_get_wrap ()  {
         printColor "  Installation target folder:  %s"   "$QWG_Conf_Dir"
       fi
 
-      # If not sync updating, list other copies of similar VM's in the target folder
+      # If NOT sync updating, list other copies of similar VM's in the target folder
       if [[ ! $ZsyncDownload ]]; then
         SimilarVMs=
         SimilarVM_ShorterCheck=
         QGW_OverWriteAlert=
         DailyVMsPresent=
-        check_new_vm_folder_name
+        HyphenatedNewname=
+        check_new_vm_folder_name  "$QWG_NewVM_Name"
       fi
 
       if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then  
@@ -1072,8 +1089,16 @@ function_quick_get_wrap ()  {
 
         if [[ $QGW_OverWriteAlert ]];then  
 
-          printf "\n\n  Files are present. Resume download or overwrite? \n\n"
-          ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name"  2> /dev/null
+          printColor "\n\n  Files are present. Resume download or overwrite? "
+
+          if [[ "$(ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null)" ]]; then
+            printColor "\n\n  Folder: %s \n\n" "$QWG_NewVM_Name"
+            ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name"
+          fi
+          if [[ $HyphenatedNewname && "$(ls -oh "$QWG_Conf_Dir/$HyphenatedNewname" 2>/dev/null)" ]]; then
+            printColor "\n\n  Folder: %s \n\n" "$HyphenatedNewname"
+            ls -oh "$QWG_Conf_Dir/$HyphenatedNewname"
+          fi
 
           DL_SizeAlready=
           DL_PercentageDone=
@@ -1092,7 +1117,9 @@ function_quick_get_wrap ()  {
           fi
 
           printf  "\n\n  [enter] Start the download  "
-          printColor " ?? BACKUP ??  " 
+          if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  " 
+          else printf "> resume     " 
+          fi
 
         else  
 
@@ -1296,7 +1323,8 @@ function_quick_get_wrap ()  {
     printf     "\n\n  Downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
     [[ "$QGW_DownloadSelection" == *'windows'* ]] && printf "\n\n  Microsoft downloads may sometimes hang when finished but the terminal may be safely closed, if this happens."
 
-    printf "\n\n\n  May take a moment to start, if servers are slow or [enter] to restart on a new server ...."
+    printf "\n\n\n  May take a moment to start, if servers are slow:"
+    printf "\n\n  Use [enter] [r] to restart on a new server or to force a download re-check ...\n\n"
     printf "\n\n  Quickemu & downloader output: "
     # stop flashing cursor
     tput civis

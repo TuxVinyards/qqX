@@ -135,6 +135,8 @@ function exit {
     if [[ ! $ExitTrap ]]; then 
       tput cnorm
       command exit "$@"
+    else
+      return 0
     fi
   fi
 
