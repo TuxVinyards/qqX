@@ -146,7 +146,7 @@ function error_specify_os() {
 }
 
 function os_supported() {
-    if [[ ! "$(os_support)" =~ ${OS} ]]; then
+    if [[ ! " $(os_support) " =~ \ "${OS}"\  ]]; then
         echo -e "ERROR! ${OS} is not a supported OS.\n"
         os_support | fmt -w 80
         exit 1
@@ -185,7 +185,7 @@ function error_specify_release() {
 }
 
 function error_not_supported_release() {
-    if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
+    if [[ ! " ${RELEASES[*]} " =~ \ "${RELEASE}"\  ]]; then
         echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
         echo -n ' - Supported releases: '
         "releases_${OS}"
@@ -207,6 +207,28 @@ function error_not_supported_argument() {
     echo "To see all possible arguments, use:"
     echo "   quickget -h  or  quickget --help"
     exit 1
+}
+
+function is_valid_language() {
+    local I18N=""
+    local PASSED_I18N="${1}"
+    for I18N in "${I18NS[@]}"; do
+        if [[ "${I18N}" == "${PASSED_I18N}" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+function is_valid_language() {
+    local I18N=""
+    local PASSED_I18N="${1}"
+    for I18N in "${I18NS[@]}"; do
+        if [[ "${I18N}" == "${PASSED_I18N}" ]]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function handle_missing() {
@@ -332,6 +354,7 @@ function test_result() {
     else
         OS="${OS}-${RELEASE}"
     fi
+
     # Pad the OS string for consistent output
     if [[ "${RESULT}" ]]; then
         printf "%s %-38s %s\n" "${RESULT}:" "${OS}" "${URL}"
@@ -507,7 +530,7 @@ function editions_alma() {
 
 function releases_alpine() {
     floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")"
-}  
+}
 
 function releases_android() {
     echo 9.0 8.1 7.1
@@ -535,9 +558,7 @@ function releases_archlinux() {
 
 function releases_arcolinux() {
     #shellcheck disable=SC2046,SC2005
-    # breaking change in v24.05
-    # v24.05.1 is the first release with the new naming scheme and too complex to parse old and new so just show the new
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v24.0[5-9].[[:digit:]]{2}"  -e "v24.1[0-2].[[:digit:]]{2}" | sort -ru | head -n 5)
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
 }
 
 function editions_arcolinux() {
@@ -810,7 +831,7 @@ function releases_maboxlinux() {
 }
 
 function releases_macos() {
-    echo mojave catalina big-sur monterey ventura sonoma
+    echo mojave catalina big-sur monterey ventura sonoma sequoia
 }
 
 function releases_mageia() {
@@ -2066,6 +2087,8 @@ function get_macos() {
         ventura|13)
             BOARD_ID="Mac-BE088AF8C5EB4FA2";;
         sonoma|14)
+            BOARD_ID="Mac-827FAC58A8FDFA22";;
+        sequoia|15)
             BOARD_ID="Mac-53FDB3D8DB8CA971";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
@@ -3617,8 +3640,9 @@ case "${1}" in
         fi
         exit 0;;
     --version|-version)
-        WHERE=$(dirname "${BASH_SOURCE[0]}")
-        "${WHERE}/quickemu" --version
+        #WHERE=$(dirname "${BASH_SOURCE[0]}")
+        #"${WHERE}/quickemu" --version
+        echo "FS 4.9.8.02"
         exit 0;;
     --help|-help|--h|-h)
         help_message
@@ -3670,7 +3694,7 @@ if [ -n "${2}" ]; then
         EDITIONS=("$(editions_"${OS}")")
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
+            if [[ ! " ${EDITIONS[*]} " = \ "${EDITION}"\  ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
                 echo -n ' - Supported editions: '
                 for EDITION in "${EDITIONS[@]}"; do
@@ -3706,7 +3730,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
+            if ! is_valid_language "${I18N}"; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
