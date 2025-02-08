@@ -811,7 +811,7 @@ function releases_linuxlite() {
 }
 
 function releases_linuxmint() {
-    web_pipe "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6
+    web_pipe "https://mirror.rackspace.com/linuxmint/iso/stable/" | grep href | cut -d'"' -f2 | tr -d '/' | grep -E ^'[1-9]' | sort -nr | head -n 6 | paste -s -d' '
 }
 
 function editions_linuxmint() {
