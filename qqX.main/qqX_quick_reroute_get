@@ -1039,13 +1039,11 @@ function_quick_get_wrap ()  {
     # GET READY to start download 
 
     # clear any accidental double pressing of the enter key to avoid any auto-starts
-
     read -r -t 0.2	
     read -r -t 0.1	
     read -r -t 0.1	
     read -r -t 0.1	
-    read -r -t 0.1
-
+  
     QGW_OverWriteAllow=
     QGW_DownloadStart=
 
@@ -1370,7 +1368,8 @@ function_quick_get_wrap ()  {
         fi
 
         ##  WAIT HERE for an [enter] to finish, or stop  ##
-        read -r 
+        read -r
+        echo
 
         # return cursor to normal
         tput cnorm 
@@ -1422,7 +1421,7 @@ function_quick_get_wrap ()  {
         run_distro_download
       else
         ResumeDL=
-        printColor "  Download Stopped:  [c] to conclude  [r] to resume \n\n"
+        printColor "  Stopped or Completed:  [c] to conclude  [r] to resume \n\n"
         # clear any accidental double pressing of the enter key if instance was slow to close
         # also gives pause needed to give different processes time to output their summaries & finish up
         read -r -t 0.2  
@@ -1576,8 +1575,6 @@ function_quick_get_wrap ()  {
     read -r -t 0.1  
     read -r -t 0.1  
     read -r -t 0.1	
-    read -r -t 0.1  
-    read -r -t 0.1 
 
     VM_InstanceName="$New_VM_InstanceName"   
     VM_Conf_Dir="$QWG_Conf_Dir"
@@ -1605,7 +1602,8 @@ function_quick_get_wrap ()  {
     
   fi
 
-  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ," ; fi
+  if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ,"
+  fi
   Current_VM_Folder="$VM_Conf_Dir" 
 
   clear_main_gt_start_vars
