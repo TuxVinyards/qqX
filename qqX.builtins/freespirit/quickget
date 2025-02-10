@@ -531,7 +531,7 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    floatversion -M 5 "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")"
+    floatversion -M 5 -s "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")" 2>/dev/null
 }
 
 function releases_android() {
@@ -559,8 +559,7 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
+    floatversion -M 5 -s "$(curl -sf "https://ant.seedhost.eu/arcolinux/iso/")" 2>/dev/null
 }
 
 function editions_arcolinux() {
@@ -708,7 +707,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    floatversion -s -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)"
+    floatversion -s -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)" 2>/dev/null
 }
 
 function releases_endless() {
@@ -720,22 +719,19 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
+    web_pipe_json "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -nr | paste -s -d' '
 }
 
 function editions_fedora() {
-    #shellcheck disable=SC2046,SC2005
     if [[ -z ${RELEASE} ]]; then
-          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+        web_pipe_json "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]" | paste -s -d' ' 
     else
-        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+        web_pipe_json "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]" | paste -s -d' '
     fi
 }
 
 function releases_freebsd() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r)
+    web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r | paste -s -d' '
 }
 
 function editions_freebsd() {
@@ -809,7 +805,7 @@ function editions_kolibrios() {
 }
 
 function releases_linuxlite() {
-    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')"
+    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')" 2>/dev/null
 }
 
 function releases_linuxmint() {
@@ -955,7 +951,7 @@ function editions_primtux() {
 }
 
 function releases_proxmox-ve() {
-    floatversion -M 3 "$(web_pipe "https://enterprise.proxmox.com/iso/" | grep proxmox-ve)"
+    floatversion -M 3 -s "$(web_pipe "https://enterprise.proxmox.com/iso/" | grep proxmox-ve)" 2>/dev/null
 }
 
 function releases_pureos() {
@@ -1056,7 +1052,7 @@ function editions_tinycore() {
 }
 
 function releases_trisquel() {
-    floatversion -M 4 "$(web_pipe "https://mirrors.ocf.berkeley.edu/trisquel-images/" | grep 'amd64.iso' | tr '"' '\n' | grep tris)"
+    floatversion -M 4 -s "$(web_pipe "https://mirrors.ocf.berkeley.edu/trisquel-images/" | grep 'amd64.iso' | tr '"' '\n' | grep tris)" 2>/dev/null
 }
 
 function editions_trisquel() {
@@ -1626,8 +1622,8 @@ function get_arcolinux() {
     local HASH=""
     local ISO=""
     local URL=""
-    URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
-    ISO="arco${EDITION}-${RELEASE}-x86_64.iso"
+    URL="https://ant.seedhost.eu/arcolinux/iso/v${RELEASE}"
+    ISO="arco${EDITION}-v${RELEASE}-x86_64.iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
