@@ -572,13 +572,18 @@ function_quick_get_wrap ()  {
           else printf "\n\n  Not available, see webpage for more details \n\n"
           fi
 
+          if [[ "$QGW_OS_Arr_NameSelected" == "macos"* ]]; then 
+            printColor "\n  [W] A Mac OS installation walk-thru is available via the qqX wiki \n"
+          fi
+
+          QGW_OS_HomePage_Working=
           if [[ $QGW_OS_HomePage ]]; then 
             printf "\n  Checking Distro Home Page ...."
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
-              if curl --disable -sLf --retry 3 --retry-max-time 2 --retry-delay 0 --max-time 6 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working)"
-              elif curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"
+              if curl --disable -sLf --retry 3 --retry-max-time 2 --retry-delay 0 --max-time 6 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working)"; QGW_OS_HomePage_Working=1
+              elif curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"; QGW_OS_HomePage_Working=1
               else 
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
                 printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
@@ -735,7 +740,9 @@ function_quick_get_wrap ()  {
 
       printf "\n\n  [s] scroll to next listing  [p] to previous  [r] reload/refresh/retry \n\n"  
 
-      if [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]]; then  printf "  [w] to open listed page with web browser" 
+      if [[ $WebBrowser ]]; then
+        [[ $QGW_OS_HomePage ]] && printf "  [w] to open listed page with web browser"
+        printf "  [W] qqX wiki"
       fi
 
       printf "  [b] back to main menu \n\n"   
@@ -754,10 +761,14 @@ function_quick_get_wrap ()  {
         function_quick_get_wrap
         break
 
-      elif [[ $QGW_List_NumSelected == "w" ]]; then 
+      elif [[ $QGW_List_NumSelected == "w" ||  $QGW_List_NumSelected == "W" ]]; then 
 
-        printf "  Opening Browser ... \n\n" 
-        (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message 
+        printf "  Opening Browser ... \n\n"
+        if [[ $QGW_List_NumSelected == "w" && $QGW_OS_HomePage_Working ]]; then 
+          (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
+        else
+          (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message 
+        fi
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
