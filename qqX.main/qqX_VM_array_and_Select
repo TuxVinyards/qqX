@@ -173,7 +173,7 @@ scan_VM_Array_for_sizes () {
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
     du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 
-    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 
+    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 
     ((i+=1))
   done
 
