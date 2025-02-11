@@ -382,7 +382,12 @@ if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" 
 else
 
   InstallSelect=
-  if [[ $(type -p qqX) ]]; then Current_qqX_Version="$(qqX --version)" ; else Current_qqX_Version= ; fi
+  if [[ $(type -p qqX) ]]; then
+    # do grep as older versions won't return 'qqX --version'
+    Current_qqX_Path="$(type -p qqX)"
+    Current_qqX_Version="$(grep -s -m 1 'qqX_Version=' "$Current_qqX_Path" | cut -d'"' -f2 2>/dev/null)"  
+  else Current_qqX_Version=
+  fi
 
   if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade the current release %s ..."   "$Current_qqX_Version"
   else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME" 
