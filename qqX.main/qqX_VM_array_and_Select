@@ -170,21 +170,31 @@ scan_VM_Array_for_sizes () {
 
   # human set for report
   printf "" > "/tmp/qqX.Sizes.qcow.txt"  
+  printf "" > "/tmp/qqX.Sizes.qcow.F.txt"  
   printf "" > "/tmp/qqX.Sizes.iso.txt"  
+  printf "" > "/tmp/qqX.Sizes.iso.F.txt"  
   local i=0
+  ArrFolderPath=
   while [[ ${VM_Array[$i,0]} ]]; do
+    if [[ $ArrFolderPath ]] && [[ $ArrFolderPath != "${VM_Array[$i,0]}" ]]; then 
+      printf "\n" >> "/tmp/qqX.Sizes.qcow.F.txt" ; printf "\n" >> "/tmp/qqX.Sizes.iso.F.txt"
+    fi
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "%-6s %s\n", $1, $2 }'  >> "/tmp/qqX.Sizes.qcow.txt" 
-    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.iso.txt" 
+    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "\n%-6s %s", $1, $2 }'\
+    | tee -a "/tmp/qqX.Sizes.qcow.txt" -a "/tmp/qqX.Sizes.qcow.F.txt" &> /dev/null
+    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "\n%-6s %s", $1, $2 }'\
+    | tee -a "/tmp/qqX.Sizes.iso.txt" -a "/tmp/qqX.Sizes.iso.F.txt" &> /dev/null
     # https://www.gnu.org/software/gawk/manual/html_node/Printf-Examples.html
+    ArrFolderPath="${VM_Array[$i,0]}"
     ((i+=1))
   done
-
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
-    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.qcow.txt" 
-    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.iso.txt" 
+    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "%-6s %s\n", $1, $2 }'\
+    | tee -a "/tmp/qqX.Sizes.qcow.txt" -a "/tmp/qqX.Sizes.qcow.F.txt" &> /dev/null
+    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }'\
+    | tee -a "/tmp/qqX.Sizes.iso.txt" -a "/tmp/qqX.Sizes.iso.F.txt" &> /dev/null 
   fi
 
   # machine set for calcs
@@ -233,10 +243,12 @@ show_VM_Array_sizes_text () {
     printf "\nISO by Size: \n\n" 
     sort -hr "/tmp/qqX.Sizes.iso.txt"
     printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-    printf "\n\n\nDisk by Folder: \n\n"
-    cat "/tmp/qqX.Sizes.qcow.txt"
-    printf "\nISO by Folder: \n\n" 
-    cat "/tmp/qqX.Sizes.iso.txt"
+    printf "\n\n\nDisk by Folder: \n"
+    cat "/tmp/qqX.Sizes.qcow.F.txt"
+    printf "\n\nISO by Folder: " 
+    cat "/tmp/qqX.Sizes.iso.F.txt"
+    printf "\n\n" 
+    printf "Total Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
     printf "\n\n" 
   }>> "/tmp/qqX.SizesTotals.txt" 
 
