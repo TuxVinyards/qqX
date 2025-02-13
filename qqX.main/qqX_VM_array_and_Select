@@ -175,15 +175,16 @@ scan_VM_Array_for_sizes () {
   while [[ ${VM_Array[$i,0]} ]]; do
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 
-    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 
+    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "%-6s %s\n", $1, $2 }'  >> "/tmp/qqX.Sizes.qcow.txt" 
+    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.iso.txt" 
+    # https://www.gnu.org/software/gawk/manual/html_node/Printf-Examples.html
     ((i+=1))
   done
 
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
-    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.txt" 
-    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.txt" 
+    du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.qcow.txt" 
+    du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }' >> "/tmp/qqX.Sizes.iso.txt" 
   fi
 
   # machine set for calcs
@@ -227,14 +228,14 @@ scan_VM_Array_for_sizes () {
 
 show_VM_Array_sizes_text () {
 
-  printf "\nBy Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
+  printf "\nDisk by Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
   { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
-    printf "\n" 
+    printf "\nISO by Size: \n\n" 
     sort -hr "/tmp/qqX.Sizes.iso.txt"
     printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-    printf "\n\nBy Folder: \n\n"
+    printf "\n\n\nDisk by Folder: \n\n"
     cat "/tmp/qqX.Sizes.qcow.txt"
-    printf "\n" 
+    printf "\nISO by Folder: \n\n" 
     cat "/tmp/qqX.Sizes.iso.txt"
     printf "\n\n" 
   }>> "/tmp/qqX.SizesTotals.txt" 
