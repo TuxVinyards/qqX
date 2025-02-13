@@ -219,7 +219,7 @@ scan_VM_Array_for_sizes () {
   if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" ) ]]; then  
     TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null)"
     TotalQcow2_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.qcow.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
-    TotalQcow2_Sizes="$(bc <<< "scale=1; $TotalQcow2_Sizes/1000000")"
+    TotalQcow2_Sizes="$(bc <<< "scale=2; $TotalQcow2_Sizes/1000000")"
   else
     TotalQcow2_Sizes="0"
     TotalQcow2_SizesCount="0"
@@ -228,7 +228,7 @@ scan_VM_Array_for_sizes () {
   if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" ) ]]; then  
     Total_ISO_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null)"
     Total_ISO_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.iso.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
-    Total_ISO_Sizes="$(bc <<< "scale=1; $Total_ISO_Sizes/1000000")"
+    Total_ISO_Sizes="$(bc <<< "scale=2; $Total_ISO_Sizes/1000000")"
   else
     Total_ISO_Sizes="0"
     Total_ISO_SizesCount="0"
