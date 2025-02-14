@@ -1111,8 +1111,11 @@ function_quick_get_wrap ()  {
 
           if [[ $DL_PotentialSize && $DL_FileName ]]; then
             DL_SizeAlready="$(du -b "$QWG_Conf_Dir/$QWG_NewVM_Name/$DL_FileName" 2>/dev/null | awk '{print $1}' | tr -cd '[:digit:]')"
+            [[ ! $DL_SizeAlready ]] && DL_SizeAlready="0"
             if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then 
-              DL_PercentageDone="$(bc <<< "scale=2; (($DL_SizeAlready/$DL_PotentialSize)*100)/1")"
+              DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
+              DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
+
             else 
               printf "\n\n  Detection of sizes not fully possible: \n\n  Potential size  %s  \n  Already present %s \n" "$DL_PotentialSize" "$DL_SizeAlready"
               DL_PercentageDone="0"
@@ -1431,7 +1434,28 @@ function_quick_get_wrap ()  {
         run_distro_download
       else
         ResumeDL=
-        printColor "  Stopped or Completed:  [c] to conclude  [r] to resume \n\n"
+        # qqX mods to quickget will output a finalized folder name to "/tmp/qe_new_vm_name.txt"
+        # but this may need to contain more than just the principle download item 
+        # so determining whether the download is fully complete can be problematic.
+        DL_SizeAlready=
+        DL_PercentageDone=
+        QWG_FinalName="$(cut -d'"' -f2 < /tmp/qe_new_vm_name.txt 2>/dev/null | tr -cd '[:print:]')"
+        if [[ $DL_PotentialSize && $QWG_FinalName && $DL_FileName ]] && [[ "$DL_FileName" == *'.iso' || "$DL_FileName" == *'.img' ]]; then
+          DL_SizeAlready="$(du -b "$QWG_Conf_Dir/$QWG_FinalName/$DL_FileName" 2>/dev/null | awk '{print $1}' | tr -cd '[:digit:]')"
+          if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then 
+            DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
+            DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
+          else 
+            printf "\n\n  Detection of sizes not fully possible: \n\n  Potential size  %s  \n  Already present %s \n" "$DL_PotentialSize" "$DL_SizeAlready"
+            DL_PercentageDone="0"
+          fi
+        fi
+        if [[ $DL_PercentageDone ]]; then printf "\n  %s Percent appears to be downloaded \n\n"  "$DL_PercentageDone"
+        else printf "\n  Percent downloaded not known \n\n"
+        fi
+
+        printColor "  Completed (or Stopped):  [c] to conclude  [r] to resume, retry or re-check \n\n"
+
         # clear any accidental double pressing of the enter key if instance was slow to close
         # also gives pause needed to give different processes time to output their summaries & finish up
         read -r -t 0.2  
