@@ -308,12 +308,17 @@ function check_new_vm_folder_name {
 function show_QWG_header {
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
-  printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"  
-  printf "(needs internet, including for some menu items & for tests) \n\n" 
+  printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
+  if [[ $InternetUp ]]; then  
+    printf "(internet is working)  [R] to re-check \n\n"
+  else 
+    printf "(internet is needed for some menu items as well as downloads) \n\n" 
+  fi
 }
 
 function show_hot_swap_line {
-    printColor "               Using %s:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]" "$QE_SourceVersion"
+    printColor "               Using %s:  " "$QE_SourceVersion"
+    printf "[FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]"
     printf "  [H] help on different versions\n"
   if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
     printf "\n               Code Source: %s " "$QE_SourcePath" 
@@ -331,8 +336,6 @@ function refresh_QWG_selector {
   print_quickget_and_folder_choices  "QGW_OS_Array" 
   QGW_List_NumSelected= 
 }
-
-InternetUp=
 
 function clear_main_gt_start_vars {
 
@@ -354,48 +357,44 @@ function clear_main_gt_start_vars {
   Current_VM_Folder="$QWG_Conf_Dir" 
 }
 
+test_internet_is_up () {
+
+  #printColor  "               Checking connections ... \n\n" 
+  printf  "\n  Checking connections ...  \n\n" ; sleep 1 
+  if   curl --disable -L -I -s -o /dev/null --max-time 2 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
+  elif curl --disable -L -I -s -o /dev/null --max-time 3 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
+  elif curl --disable -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
+  elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
+  elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
+  # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
+  # No changes to '--spider' in wget2  https://gitlab.com/gnuwget/wget2/-/wikis/home
+  else InternetUp=
+  fi
+}
+
 function_quick_get_wrap ()  {
 
+  InternetUp=
   show_QWG_header
   QGW_List_NumSelected= 
   GT_Exit=
   dev_loop_check ; [[ $GeneralLoopCheck ]] && echo
-
   clear_main_gt_start_vars
 
   while [[ ! $InternetUp ]]; do  
-
     Test_Internet=
     tput sc
-    printf  "               Checking connections ... \n\n" 
-
-    if   curl --disable -L -I -s -o /dev/null --max-time 2 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
-    elif curl --disable -L -I -s -o /dev/null --max-time 3 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
-    elif curl --disable -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
-
-    elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
-    elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
-    
-    # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
-    # No changes to '--spider' in wget2  https://gitlab.com/gnuwget/wget2/-/wikis/home
-
-    fi
-
-    if [[ $InternetUp ]]; then
-      printf "\e[2A" ; printf "\eK"
-      printf "               Connection Looks GOOD       \n\n" 
-      sleep 0.7
-    else 
+    test_internet_is_up
+    if [[ ! $InternetUp ]]; then
       printColor "\n\n  INTERNET CONNECTION NOT FOUND. Check settings and equipment "
       printf "\n\n  [enter] to re-test,  [i] ignore, continue anyway  [b] back to main menu \n\n"
       read -rp "   >  "   Test_Internet
       echo
-      [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="B"  && break   
-      [[ $Test_Internet == "i" ]] && break   
     fi
-
+    tput rc ; tput ed  #  clear back the last lines to sc (set cursor)
+    [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="B"  && break   
+    [[ $Test_Internet == "i" ]] && break   
     show_QWG_header
-
   done
 
   if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
@@ -446,7 +445,7 @@ function_quick_get_wrap ()  {
       elif [[ ${QGW_List_NumSelected,,} == dev* ]] ; then  
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
 
-      elif [[ $QGW_List_NumSelected == "R"  ]] ; then  refresh_QWG_selector
+      elif [[ $QGW_List_NumSelected == "R"  ]] ; then  test_internet_is_up ; refresh_QWG_selector
 
       elif [[ "$QGW_List_NumSelected" == [a-z] ]]; then 
 
