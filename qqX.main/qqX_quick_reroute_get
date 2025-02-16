@@ -907,7 +907,7 @@ function_quick_get_wrap ()  {
             printf "  %s"  "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
           elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printf "  No editions to select in any of the releases ..."
+            printColor "  No editions to select in any of the releases ..."
             printColor "\n\n  [enter] to continue   "
             printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n" 
           elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
@@ -1293,19 +1293,12 @@ function_quick_get_wrap ()  {
           for RckItem in "${RckSumArray[@]}"; do rm "$RckItem"; done
         fi
       }
-
       remove_old_rcksum_files
-
     else
-
       printf "  Once a download and initial setup up has finished, the new folder and .conf file may be easily moved"
-      printf "\n\n  and/or edited before running. Part downloads can usually be re-started, if stopped >> "
-
+      printf "\n\n  and/or edited before running. Part downloads can usually be re-started."
     fi
     
-    if [[ $ZsyncDownload ]]; then  printf "\n\n" ; else printColor "  %s \n\n" "$QWG_NewVM_Name"
-    fi
-
     function show_rcksum_progress {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
@@ -1315,26 +1308,21 @@ function_quick_get_wrap ()  {
         RckDone="$(du -a "$RckFile" 2> /dev/null)"
         RckDone="${RckDone/"$RckFile"/}"
         # gives some kind of rough indication that work is in progress  (percentages don't seem to be possible)
-        printf "  Comparing images >    %s "  "$RckDone" 
+        printf "\n\n  Comparing images >    %s "  "$RckDone" 
         sleep 2
         printf "\e[2K\r"
       done
     }
-
     
     # clear any accidental initial double pressing of the enter key
 		read -r -t 0.2  
 		read -r -t 0.2  
 		read -r -t 0.2 		
 
-    printColor   "\n  Press [enter] at quickget finish,  at  \"start your .. virtual machine ... etc\" "
-    printColor "\n\n  OR  [enter] to STOP ALL current downloads & zsync, either to cancel or to possibly resume later"
-    printf     "\n\n  Downloads can sometimes pause if servers are overloaded but they should auto-resume if given time."
-    [[ "$QGW_DownloadSelection" == *'windows'* ]] && printf "\n\n  Microsoft downloads may sometimes hang when finished but the terminal may be safely closed, if this happens."
-
-    printf "\n\n\n  May take a moment to start, if servers are slow:"
-    printf "\n\n  Use [enter] [r] to restart on a new server or to force a download re-check ...\n\n"
-    printf "\n\n  Quickemu & downloader output: "
+    printf "\n\n  May take a moment to start, if servers are slow:"
+    printColor "\n\n  Use [c] to STOP ALL current downloads, [d] to delete "
+    printColor "\n\n  Or  [c] then [r] to restart on a new server or to force a download re-check ..."
+    printf "\n\n\n  Quickemu & downloader output: "
     # stop flashing cursor
     tput civis
 
@@ -1360,72 +1348,71 @@ function_quick_get_wrap ()  {
     function run_distro_download {
 
       quickget "$QGW_DownloadSelection" &  
-      sleep 3   
-      while true ; do 
-        mapfile -t  Jobs_Arr <<< "$(jobs -p)"; sleep 0.5 ; [[ ${Jobs_Arr[*]} ]] && break
+      qGetPid="$!"
+
+      # zsync:
+      if [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]]; then  show_rcksum_progress &
+      elif [[ $ZsyncDownload ]]; then 
+        if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
+          printf "\n  Comparing images .... \n\n" 
+          LastZsync="0" 
+          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
+        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
+        fi
+      fi
+
+      # WAIT HERE for finish, or  key to stop  
+
+      PidStop=
+      while true; do
+        PidTest="$(ps --no-headers -o cmd "$qGetPid" 2>/dev/null)"
+        if [[ ! $PidTest ]] ; then
+          break
+        else
+          read -rt 0.3  PidStop
+          [[ $PidStop ]] && QGW_DownloadStopped=1 && break
+        fi
       done
 
-      # THEN wait for an enter key press
+      # return cursor to normal
+      tput cnorm 
 
-      while true ; do    
+      # kill background quickget job, if cancelled and still running
+      [[ $qGetPid ]] && kill "$qGetPid" 2>/dev/null 
 
-        # zsync:
-        if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then  show_rcksum_progress &
-        elif [[ $ZsyncDownload ]]; then 
-          if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
-            printf "\n  Comparing images .... \n\n" 
-            LastZsync="0" 
-            [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
-          else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
-          fi
+      # removing the old rcksum files not only tidies up but also stops the background monitor process
+      [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]] && remove_old_rcksum_files
+      
+      # check macOS particularities ...
+      # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW  
+      P3_Arr=()
+      mapfile -t  P3_Arr <<< "$(pgrep python3)"
+      for P3_PID in "${P3_Arr[@]}" ; do
+        P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2>/dev/null)" 
+        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
+          kill "$P3_PID" 2>/dev/null
+          printColor "\n\nStopped \n\n" 
+          QGW_DownloadStopped=1
+          break
         fi
+      done   
 
-        ##  WAIT HERE for an [enter] to finish, or stop  ##
-        read -r
-        echo
-
-        # return cursor to normal
-        tput cnorm 
-
-        for Jobs_PID in "${Jobs_Arr[@]}" ; do 
-          kill "$Jobs_PID" 2> /dev/null 
-        done
-
-        # removing the old rcksum files not only tidies up but also stops the background monitor process
-        [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]] && remove_old_rcksum_files
-        
-        # check macOS particularities ...
-        # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW  
-        P3_Arr=()
-        mapfile -t  P3_Arr <<< "$(pgrep python3)"
-        for P3_PID in "${P3_Arr[@]}" ; do
-          P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2> /dev/null)" 
-          if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
-            kill "$P3_PID" 2> /dev/null
-            printColor "\n\nStopped \n\n" 
+      # tidy up other possible background processes started by quickget ...
+      if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
+        # The use of aria2 and wget has been dropped since april 2024 (?) REVIEW 
+        while true; do 
+          pkill aria2  2>/dev/null
+          pkill curl   2>/dev/null
+          pkill wget   2>/dev/null
+          pkill zsync  2>/dev/null
+          sleep 1
+          if [[ ! $(pgrep aria2) ]] && [[ ! $(pgrep curl) ]] && [[ ! $(pgrep wget) ]] && [[ ! $(pgrep zsync) ]]; then
             QGW_DownloadStopped=1
-            break
+            sleep 1 ; break
           fi
-        done   
-
-        if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
-          while true; do 
-            pkill aria2  2> /dev/null
-            pkill curl   2> /dev/null
-            pkill wget   2> /dev/null
-            pkill zsync  2> /dev/null
-            sleep 1
-            if [[ ! $(pgrep aria2) ]] && [[ ! $(pgrep curl) ]] && [[ ! $(pgrep wget) ]] && [[ ! $(pgrep zsync) ]]; then
-              QGW_DownloadStopped=1
-              sleep 1 ; break
-            fi
-          done
-        fi
-        break
-
-      done
+        done
+      fi
       RunDL=
-    
     }
 
     RunDL=1
@@ -1453,9 +1440,7 @@ function_quick_get_wrap ()  {
         if [[ $DL_PercentageDone ]]; then printf "\n  %s Percent appears to be downloaded \n\n"  "$DL_PercentageDone"
         else printf "\n  Percent downloaded not known \n\n"
         fi
-
         printColor "  Completed (or Stopped):  [c] to conclude  [r] to resume, retry or re-check \n\n"
-
         # clear any accidental double pressing of the enter key if instance was slow to close
         # also gives pause needed to give different processes time to output their summaries & finish up
         read -r -t 0.2  
@@ -1466,7 +1451,7 @@ function_quick_get_wrap ()  {
         if [[ $ResumeDL == "r" ]]; then 
           RunDL=1; QGW_DownloadStopped=
           printf "  Resume process starting. May take a moment if servers are slow .... \n\n"
-        elif [[ $ResumeDL == "c" ]]; then break
+        elif [[ $ResumeDL == "c" || $ResumeDL == "d" ]]; then break
         fi
       fi
     done
@@ -1541,11 +1526,13 @@ function_quick_get_wrap ()  {
   elif [[ -d "$New_VM_InstanceName" ]]; then
   
     printColor "  Folder:  %s "  "$New_VM_InstanceName"
-    [[ -e "$New_VM_Conf_File" ]] && printColor "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
 
-    if [[ ! $New_VM_Conf_File ]] || [[ $QGW_DownloadStopped ]]; then
+    if [[ -e "$New_VM_Conf_File" ]]; then printColor "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
+
+    elif [[ ! -e $New_VM_Conf_File ]] || [[ $QGW_DownloadStopped ]]; then
 
       if [[ $QGW_DownloadStopped ]]; then
+        # post 1.11.05 this section may not be needed ... REVIEW 
         printf "\n\n  Download Stopped > Residual files are present"
         printf "\n\n  Linux part downloads can usually be re-started if the folder is retained."
       fi
@@ -1566,10 +1553,11 @@ function_quick_get_wrap ()  {
         printf "\n\n  Folder/file being deleted ... \n\n"
         [[ -d "$New_VM_InstanceName" ]] && rm -f -r "$New_VM_InstanceName"
         [[ -e "$New_VM_Conf_File" ]] && rm -f "$New_VM_Conf_File"
+        sleep 1
       else  
         printf  "\n\n Folder/file retained \n\n"
+        sleep 1
       fi
-      sleep 1.4
       cd "$Default_VM_Folder" || DefaultFolderError=1
       Current_VM_Folder="$Default_VM_Folder" 
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
@@ -1581,12 +1569,14 @@ function_quick_get_wrap ()  {
     fi
 
   elif [[ ! -d "$New_VM_InstanceName" ]]; then
-  
+
+    # post 1.11.05 this section may not be needed ... REVIEW 
     printf "  NO Folder/Download found ... %s "  "$New_VM_InstanceName"
     if [[ -e "$New_VM_Conf_File" ]]; then printf "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
     else printf "\n .conf file NOT created or found %s "  "$(basename "$New_VM_Conf_File")"
     fi
     if [[ $QGW_DownloadStopped ]]; then
+      # post 1.11.05 this section may not be needed ... REVIEW 
       printf "\n\n  Download Stopped > there may have been an ERROR "
       printColor "\n\n  [enter] to cancel & return \n\n"
       read -rp "  >  "  
@@ -1602,44 +1592,29 @@ function_quick_get_wrap ()  {
 
   fi
 
-  if [[ $New_VM_Conf_File ]] && [[ ! $QGW_DownloadStopped ]]; then
-
-    # clear any accidental initial double pressing of the enter key occuring while experiencing any error or pause
-    read -r -t 0.1  
-    read -r -t 0.1  
-    read -r -t 0.1  
-    read -r -t 0.1	
-
+  if [[ -e $New_VM_Conf_File ]] && [[ ! $QGW_DownloadStopped ]]; then
+    printf "\n\n  Tuning up .... \n"
     VM_InstanceName="$New_VM_InstanceName"   
     VM_Conf_Dir="$QWG_Conf_Dir"
     VM_Conf_File="$(basename "$New_VM_Conf_File")"
-
     refresh_sources_and_load_VM_arrays
-
     NewFileTuneUp=1
     function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"  
-
     # make sure values have been read, and at the least basic in case the tune up utility gets skipped
     refresh_conf_vars_and_values
     NewFileTuneUp=
     NewFileTuneUp_JustDone=1
-
   elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
-
   else  
-  
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-
     printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
     printf "\n\n"
     return
-    
   fi
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ,"
   fi
   Current_VM_Folder="$VM_Conf_Dir" 
-
   clear_main_gt_start_vars
   QGW_List_NumSelected_Next=
   SettingsFileAdjusted=1
