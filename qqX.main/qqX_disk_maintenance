@@ -170,12 +170,10 @@ drives_and_snapshots() {
 
 function manage_and_repair_disks {
 
-  drives_and_snapshots  select  as_disk_util
+  if [[ ! $DiskManage ]]; then drives_and_snapshots  select  as_disk_util
+  fi
 
-  if [[ ! -e "$Selected_Drive" ]]; then
-
-    printf "\n\n  [b] go back to main menu"
-
+  if [[ ! -e "$Selected_Drive" ]]; then printf "\n\n  [b] go back to main menu"
   else
 
     printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
@@ -215,11 +213,12 @@ function manage_and_repair_disks {
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost//' '/}"
 
-    printColor "\n\n  Available disk space on host drive: %s  A back-up will be made: %s" "${DiskFreeGiB_OnHost}G" "${DiskSize_GiB_OnDisk}G"
+    printColor "\n\n  Space required for creating a mandatory back-up: %s  " "${DiskSize_GiB_OnDisk}G"
 
     if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
-      printColor "\n\n  WARNING %s : insufficient or very low space." "${DiskFreeGiB_OnHost}G"
+      printf "\n\n  WARNING %s : insufficient or very low space." "${DiskFreeGiB_OnHost}G"
     else
+      printf "\n\n  Available disk space on host drive: %s"  "${DiskFreeGiB_OnHost}G"
       printf "\n\n\n"
       if [[ $DiskChkExitCode == "3" ]]; then printColor "  [lk] basic leaks repair  [LK] slow method"
       elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
@@ -230,7 +229,7 @@ function manage_and_repair_disks {
     printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  All processes will remove any snapshots ...  [b] back to menu " 
+    printf "\n\n  Snapshots will retained in the backups ...  [b] back to main menu " 
 
   fi
 
@@ -249,18 +248,20 @@ function manage_and_repair_disks {
   
   # REVIEW   qemu's differential 'bitmap' tracking  https://lwn.net/Articles/837053/
 
-  if [[ $DiskManage != "b" ]]; then 
+  if [[ $DiskManage == "b" ]]; then  return
+  else
 
     if [[ $DiskManage == "rz" ]]; then
-
       printf "  This will resize the external envelope. Internal partitions may require additional treatment."
       printf "\n\n  For main drive partitions, follow up with the [iso] utility > 'gparted' is recommended."
       printf "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing " 
-      printColor "\n\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 \n\n"
+      printColor "\n\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 "
+      printf "  [b] to go back"
+      printf "\n\n"
       read -rp "  >  "  ResizePlus
       printf "\n\n"
       ResizePlus="$(tr -cd "[:digit:]" <<< "$ResizePlus")"
-
+      [[ ! $ResizePlus ]] && return
     fi
 
     DiskDate="$(date +%b%d.%H.%M)"
@@ -276,29 +277,21 @@ function manage_and_repair_disks {
     fi
 
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
-
       printf "" > "$Qemu_IMG_ErrorLog"
       DU_BackUpSize="$(du "$DiskBackup" | cut -f 1)"
 
       function dd_progress_report {
-
         sleep 5
-
         while true ; do
-        
           DU_SelectedSize="$(du "$2" | cut -f 1  2>/dev/null)"
           DU_BackUpSize="$1"
           [[ ! $DU_SelectedSize ]] && DU_SelectedSize=1
-
           DD_ProgressPercent="$(bc <<< "scale=5; ($DU_SelectedSize/$DU_BackUpSize)*100")"
           DD_ProgressPercent="$(bc <<< "scale=0; ($DD_ProgressPercent + 0.5)/1")"
           [[ $DD_ProgressPercent -ge 98 ]] && break
-
           printf "\r  New Drive Progress = %s%%   "  "$DD_ProgressPercent"
           sleep 3
-
         done
-
       }
 
       dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &

@@ -286,7 +286,7 @@ function  main_menu_actions {
       printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
       printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
       printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
-      printColor "\n\n  Use the qqX [disk] utility to resize and to tidy."
+      printColor "\n\n  Use the qqX disk utility to resize and to tidy."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
       [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
@@ -297,7 +297,14 @@ function  main_menu_actions {
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
 
-    manage_and_repair_disks
+    DiskManage=
+    while true; do
+      manage_and_repair_disks
+      if [[ $DiskManage == "b" ]]; then
+        DiskManage= 
+        break
+      fi
+    done
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
 

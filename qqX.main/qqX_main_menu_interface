@@ -31,10 +31,6 @@ else
 
   function main_menu_interface {
 
-    printf  "\n"
-    if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  SELECT " ; fi
-    [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && [[ ! $ShowUtilsMenu ]] && printf  "  [m]  msrs help "
-
     # Default to off as can cause confusion when running certain distro installers as to which drive is being used.
     if [[ $LiveBoot ]] && [[ ! $SharedDrive_Mount ]]; then 
       SharedDrive_Conf="no-shared"
@@ -43,7 +39,11 @@ else
 
     if [[ ! $ShowUtilsMenu ]]; then
 
-      printf  "  [u]  show utils & technical"
+      printf  "\n\n"
+      if [[ ! $VM_InstanceName ]]; then printColor  "  [vm]  reselect " ; else   printf  "  [vm]  SELECT "
+      fi
+      printf  "  [u] show UTILS & technical"
+      [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
       if [[ ! $LiveBoot ]]; then  # REVIEW show all?
         printf "   [bm]"
@@ -53,112 +53,121 @@ else
       fi
 
     else
+      printColor "\n  ----------------------------------------------------------------------------"
+      printf "\n\n  [del] delete selected VM   [mv] move, rename or link"
+      printColor  "    [u] hide utils & technical"
 
-      printf "   [del] delete selected VM   [mv] move, rename or link"
-      printColor  "    [u]   hide utils & technical"
-      printColor "\n\n  ---------------------------------------------------------------------------- \n"
-      printf   "\n  [tune] config tune-up wizard    [disk]  resize or repair existing drives" 
       printf "\n\n  [2c]  create [2d] delete a second virtual hard-drive   [3c] create [3m] "
       if [[ $SharedDriveArgs ]]; then printf "unmount"; else printf "mount"
       fi
       printf " shared drive (guest boot)"
+
+      printColor "\n\n  ----------------------------------------------------------------------------"
       if [[ $Mounted_ISO ]]; then
         printf "\n\n  [iso] unmount iso from guest, boot from main drive"
       else
         printf "\n\n  [iso] mount iso to guest, allow boot or read from iso"
       fi
       if [[ ! $LiveBoot ]]; then
-        if [[ $BootStyle == "fast" ]]; then printf "   [bm] show guest efi/bios boot menu"
+        if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
         else printf "   [fb] use fast boot menu "
         fi
       fi
+      printf  "\n\n  [tune] config tune-up wizard   [disk]  resize or repair existing drives   [rtv] reset Tiano VMF Vars" 
 
-      printf "\n\n\n  [rtv] reset Tiano VMF Vars   [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] "
+      printColor "\n\n  ----------------------------------------------------------------------------"
+      printf "\n\n  [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] "
       printf "\n\n  [hdw] add current config to this VM's Virtual Hardware Record    [m] msrs help"
 
-      [[ -e "$HOME/.qqX/qqX_term.conf" ]] && printf "    [tmc] terminal config"
+      [[ -e "$HOME/.qqX/qqX_term.conf" ]] && printf "\n\n   [tmc] terminal config"
 
+      printColor "\n\n  ----------------------------------------------------------------------------"
       if [[ -e "$QemuArgsCustomFile" ]]; then printf "\n\n  [cd]  delete the custom boot file "
       else printf "\n\n  [cc]  create a custom boot file "
       fi
       if [[ $VerboseArgs ]]; then printf  "  [v] hide verbose boot"	
-      else  printf  "  [v] show verbose boot"	
+      else  printf  "  [v] show verbose boot args"	
       fi
       printf  "   [xa]  view or edit extra qemu args  "
 
       [[ $ExtraArgs ]] && printf  "\n\n  Extra Args:  %s"  "$ExtraArgs"
+
       printColor "\n\n  ---------------------------------------------------------------------------- "
 
     fi
     printf  "\n\n  [sc]  create   [sd]  delete   [sa]  apply   [sl]  list   >  SNAPSHOTS "
     printf "\n"
 
-    if [[ -e "$QemuArgsCustomFile" ]]; then 
-
-      #QEMU_Default_SystemType= #QEMU_Default_MachineType=  in the general settings file BUT if not present then = 'qemu-system-x86_64'
-      MenuCustomSystem="$(grep 'qemu-system' "$QemuArgsCustomFile" | grep -v '#' )"
-      MenuCustomMachine="$(grep -m 1 -e '-machine' "$QemuArgsCustomFile" | grep -v '#' | cut -d ',' -f 1)"
-      MenuCustomSystemBaseName="$(basename "$MenuCustomSystem")"
-      MenuCustomSystemBaseName="$(tr -cd '[:graph:]' <<<"$MenuCustomSystemBaseName")"
-
-      if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
-     
-      if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootStyle= ; else ShowCustomBootStyle=1 ; fi
-
-      [[ $ForceCustomBootStyle == "hide" ]] && ShowCustomBootStyle=  && ShowDefault_Hybrid=1
-      [[ $ForceCustomBootStyle == "show" ]] && ShowCustomBootStyle=1 && ShowDefault_Hybrid=
-
-      [[ $PreferHybridCustomMenus ]] && [[ ! $ForceCustomBootStyle ]] && ShowDefault_Hybrid=1 && ShowCustomBootStyle=
-
-    else
-
-      #[[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
-      if [[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]]; then   
-        SettingsFileAdjusted=1
-        refresh_sources_and_load_VM_arrays 
-      fi
-
-    fi
-
-    print_kvm_status_warnings
+    if [[ ! $ShowUtilsMenu ]]; then
     
-    if [[ $ShowCustomBootStyle ]] ; then
+      if [[ -e "$QemuArgsCustomFile" ]]; then 
 
-      # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
-      printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
-      printf "\n\n  [C]  toggle normal/custom menu  or  use normal:  [d] or [df] > sdl   [s] or [sf] > spice   [g] std gtk "
-      printf "\n\n  [ce] edit custom args file    [qd] open Qemu docs in browser"
+        #QEMU_Default_SystemType= #QEMU_Default_MachineType=  in the general settings file BUT if not present then = 'qemu-system-x86_64'
+        MenuCustomSystem="$(grep 'qemu-system' "$QemuArgsCustomFile" | grep -v '#' )"
+        MenuCustomMachine="$(grep -m 1 -e '-machine' "$QemuArgsCustomFile" | grep -v '#' | cut -d ',' -f 1)"
+        MenuCustomSystemBaseName="$(basename "$MenuCustomSystem")"
+        MenuCustomSystemBaseName="$(tr -cd '[:graph:]' <<<"$MenuCustomSystemBaseName")"
 
-    else
-
-      if [[ $ShowDefault_Hybrid ]]; then 
-        printColor "\n\n  [c]   start VM using custom args" 
-        printf "      [ce] edit custom args file    [qd] open Qemu docs in browser"
-      fi
-
-      printColor  "\n\n  [d]   start with SDL display"
+        if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
       
-      if [[ $guest_os == "windows" ]]; then  printColor "   (size as set in Windows)" 
-      elif [[ $guest_os == "macos" ]] && [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then  printColor " (size determined by MacOS with this QE version)" 
-      elif [[ "$SDL_ScreenSize_Cmd" == *screenpct* ]]; then printColor " (%s%%)    [df]  97%% "  "$SDL_ScreenPercent"  
-      elif [[ "$SDL_ScreenSize_Cmd" == *width* ]] && [[ $guest_os == "macos" || $guest_os == "windows" ]]; then printColor " (%s) "  "$SDL_ScreenSize" 
-      elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  97%% "  "$SDL_ScreenSize"  
-      elif [[ $SDL_ScreenSize_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScreenSize_Error"
+        if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootStyle= ; else ShowCustomBootStyle=1 ; fi
+
+        [[ $ForceCustomBootStyle == "hide" ]] && ShowCustomBootStyle=  && ShowDefault_Hybrid=1
+        [[ $ForceCustomBootStyle == "show" ]] && ShowCustomBootStyle=1 && ShowDefault_Hybrid=
+
+        [[ $PreferHybridCustomMenus ]] && [[ ! $ForceCustomBootStyle ]] && ShowDefault_Hybrid=1 && ShowCustomBootStyle=
+
+      else
+
+        #[[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
+        if [[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]]; then   
+          SettingsFileAdjusted=1
+          refresh_sources_and_load_VM_arrays 
+        fi
+
       fi
 
-      if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
-      else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
+      print_kvm_status_warnings
+      
+      if [[ $ShowCustomBootStyle ]] ; then
 
-      printColor "\n\n  [g]   start with GTK display          "
+        # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
+        printColor "\n\n  [c]  start VM using custom args with %s %s" "$MenuCustomSystem" "$MenuCustomMachine"
+        printf "\n\n  [C]  toggle normal/custom menu  or  use normal:  [d] or [df] > sdl   [s] or [sf] > spice   [g] std gtk "
+        printf "\n\n  [ce] edit custom args file    [qd] open Qemu docs in browser"
 
-      if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
-      else printColor "[gl] ON > toggle-off" ; fi   
+      else
 
-      [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
+        if [[ $ShowDefault_Hybrid ]]; then 
+          printColor "\n\n  [c]   start VM using custom args" 
+          printf "      [ce] edit custom args file    [qd] open Qemu docs in browser"
+        fi
+
+        printColor  "\n\n  [d]   start with SDL display"
+        
+        if [[ $guest_os == "windows" ]]; then  printColor "   (size as set in Windows)" 
+        elif [[ $guest_os == "macos" ]] && [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then  printColor " (size determined by MacOS with this QE version)" 
+        elif [[ "$SDL_ScreenSize_Cmd" == *screenpct* ]]; then printColor " (%s%%)    [df]  97%% "  "$SDL_ScreenPercent"  
+        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]] && [[ $guest_os == "macos" || $guest_os == "windows" ]]; then printColor " (%s) "  "$SDL_ScreenSize" 
+        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  97%% "  "$SDL_ScreenSize"  
+        elif [[ $SDL_ScreenSize_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScreenSize_Error"
+        fi
+
+        if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
+        else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
+
+        printColor "\n\n  [g]   start with GTK display          "
+
+        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
+        else printColor "[gl] ON > toggle-off" ; fi   
+
+        [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
+
+      fi
+
+      printf "\n"
 
     fi
-
-    printf "\n"
 
     [[ $DriveLocationError ]] &&  printColor "\n\n  %s"  "$DriveLocationError"
 
