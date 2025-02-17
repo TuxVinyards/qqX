@@ -402,11 +402,11 @@ VM_loader_selector_and_menu () {
 
       elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
 
-      elif [[ $VM_Selection == "FS"   ]] ; then  
+      elif [[ ${VM_Selection^^} == "FS" ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "FB"   ]] ; then  
+      elif [[ ${VM_Selection^^} == "FB" ]] ; then  
         CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
-      elif [[ $VM_Selection == "HB"   ]] ; then  
+      elif [[ ${VM_Selection^^} == "HB" ]] ; then  
         CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection,,} == ech* ]] ; then  
         CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
