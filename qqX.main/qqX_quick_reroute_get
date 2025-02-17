@@ -372,6 +372,14 @@ test_internet_is_up () {
   fi
 }
 
+iso_get_message () {
+  if [[ $QGW_OS_Arr_NameSelected ]] && [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
+    printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
+    printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  Right click on the downloaded ISO, then open-with > "
+    [[ $QGW_OS_HomePage ]] && printf "  HomePage = %s"  "$QGW_OS_HomePage"
+  fi
+}
+
 function_quick_get_wrap ()  {
 
   InternetUp=
@@ -520,14 +528,6 @@ function_quick_get_wrap ()  {
           else 
             QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
           fi
-
-          iso_get_message () {
-            if [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
-              printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
-              printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  Right click on the downloaded ISO, then open-with > "
-              printf "  HomePage = %s"  "$QGW_OS_HomePage"
-            fi
-          }
 
           iso_get_message ; printf "\n\n"
 
@@ -1010,30 +1010,27 @@ function_quick_get_wrap ()  {
     if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
 
       if [[ ! $Zsync_OS_Name || ! $Zsync_Release_Name  ]]; then
-
         printColor "\n\n  ERROR  Variables for OS Name &/or Release NOT found \n\n"
-
       else
-
         printf "\n\n  Updating the live boot development iso with any changes"
         printColor "\n\n  May take a while to compare & synchronize"
-        if [[ $LastZsync -gt 200000 ]]; then 
+        if [[ $LastZsync -lt 360000 ]]; then 
+          printColor " - last updated only %d hrs ago"  "$((LastZsync/3600))"
+          printf "\n\n  A COMPLETE download may have to take place ...."
+        fi
+        if [[ $LastZsync -gt 2000000 ]]; then 
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
           printf "\n\n  Deletion and re-download can sometimes be quicker ...."
         fi
         ZsyncDownload=1
-
         # REVIEW Deletion and re-download may be the way to go.  Zsync has a lot of code to keep maintained ...
-
       fi
 
     elif [[ "$QGW_DownloadSelection" == *'ubuntu'* ]] && [[ "$QGW_DownloadSelection" == *'daily'* ]]; then 
-    
-      printColor "  ** may download with some kind of NAMING variance ** "
+      printColor "\n\n  ** may download with some kind of NAMING variance ** "
       ZsyncDownload=1
 
     else  ZsyncDownload=
-
     fi
 
     if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then 
@@ -1042,20 +1039,15 @@ function_quick_get_wrap ()  {
     else
       QWG_Conf_Dir="$Default_VM_Folder"
     fi
-
-    printf "\n\n"
-
-  
+ 
     # GET READY to start download 
-
     # clear any accidental double pressing of the enter key to avoid any auto-starts
     read -r -t 0.2	
     read -r -t 0.1	
     read -r -t 0.1	
-    read -r -t 0.1	
-  
     QGW_OverWriteAllow=
     QGW_DownloadStart=
+    printf "\n\n"
 
     while true ; do
 
@@ -1087,16 +1079,13 @@ function_quick_get_wrap ()  {
       fi
 
       if [[ $QGW_Download_BadLink ]]; then
-
         printColor "\n\n  [enter]  re-test the download link "
-        [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]] && printf "  [w] try opening the listed page with web browser "  
+        [[ $WebBrowser ]] && [[ $QGW_OS_HomePage ]] && printf "  [w] try opening the listed page with web browser "
 
       else
 
         if [[ $QGW_OverWriteAlert ]];then  
-
           printColor "\n\n  Files are present. Resume download or overwrite? "
-
           if [[ "$(ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null)" ]]; then
             printColor "\n\n  Folder: %s \n\n" "$QWG_NewVM_Name"
             ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name"
@@ -1105,17 +1094,14 @@ function_quick_get_wrap ()  {
             printColor "\n\n  Folder: %s \n\n" "$HyphenatedNewname"
             ls -oh "$QWG_Conf_Dir/$HyphenatedNewname"
           fi
-
           DL_SizeAlready=
           DL_PercentageDone=
-
           if [[ $DL_PotentialSize && $DL_FileName ]]; then
             DL_SizeAlready="$(du -b "$QWG_Conf_Dir/$QWG_NewVM_Name/$DL_FileName" 2>/dev/null | awk '{print $1}' | tr -cd '[:digit:]')"
             [[ ! $DL_SizeAlready ]] && DL_SizeAlready="0"
             if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then 
               DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
               DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
-
             else 
               printf "\n\n  Detection of sizes not fully possible: \n\n  Potential size  %s  \n  Already present %s \n" "$DL_PotentialSize" "$DL_SizeAlready"
               DL_PercentageDone="0"
@@ -1124,18 +1110,15 @@ function_quick_get_wrap ()  {
           if [[ $DL_PercentageDone ]]; then printf "\n  %s Percent appears to be downloaded"  "$DL_PercentageDone"
           else printf "\n  Percent downloaded not known"
           fi
-
           printf  "\n\n  [enter] Start the download  "
           if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  " 
           else printf "> resume     " 
           fi
 
-        else  
-
+        else 
           if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
             printColor "\n\n  WARNING Source Version '%s' :  Stopping and Restarting of partly completed downloads requires the Freebird/FreeSpirit builtins." "$QE_SourceVersion"
           fi
-
           if [[ "${#VM_Folder_List[*]}" -gt 1 ]]; then  printf  "\n\n  [enter] Start the download  "
           else printColor  "\n\n  [enter] Start the download  " 
           fi
@@ -1357,7 +1340,7 @@ function_quick_get_wrap ()  {
           printf "\n  Comparing images .... \n\n" 
           LastZsync="0" 
           [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
-        else  printf "\n  [enter] to close updater  >  zsync has stopped.\n\n" 
+        else  printf "\n  Zsync process is completed ... \n\n" 
         fi
       fi
 
@@ -1463,10 +1446,8 @@ function_quick_get_wrap ()  {
   New_VM_Conf_File=
   QGW_FolderDelete=
 
-  # do pre-process if standard download
-
+  # STANDARD DOWNLOAD folder check the theoretical name ... 
   if [[ ! $ZsyncDownload ]]; then
-    # folder check the theoretical name ... 
     if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
     elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
@@ -1482,25 +1463,25 @@ function_quick_get_wrap ()  {
     elif [[ -f "${QWG_Conf_Dir}/${New_VM_InstanceName}.conf" ]]; then 
       New_VM_Conf_File="${New_VM_InstanceName}.conf"
     fi
+    if [[ -d "$New_VM_InstanceName" ]]; then
+      if [[ $(du -t 10k "$New_VM_InstanceName") ]]; then QGW_DownloadStopped= ; else QGW_DownloadStopped=1
+      fi
+    elif [[ ! -d "$New_VM_InstanceName" ]]; then
+      # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
+      if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
+        source "/tmp/qe_new_vm_name.txt"
+        New_VM_Conf_File="${New_VM_InstanceName}.conf"
+        QGW_DownloadStopped=
+      else
+        QGW_DownloadStopped=1
+      fi
+    fi
   fi
 
-  if [[ -d "$New_VM_InstanceName" ]]; then
-    if [[ $(du -t 10k "$New_VM_InstanceName") ]]; then QGW_DownloadStopped= ; else QGW_DownloadStopped=1
-    fi
-  elif [[ ! -d "$New_VM_InstanceName" ]]; then
-    # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
-    if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
-      source "/tmp/qe_new_vm_name.txt"
-      New_VM_Conf_File="${New_VM_InstanceName}.conf"
-      QGW_DownloadStopped=
-    else
-      QGW_DownloadStopped=1
-    fi
-  fi
+  ## Determine output cases:
 
-  # Determine output cases:
+  # ZSYNC
   if  [[ $ZsyncDownload ]]; then
-
     if [[ $QGW_DownloadStopped ]]; then 
       printf "\n  Download Stopped > Residual files may be present"
       printf "\n\n  Removal of any residual files & folders has to be completed manually"
@@ -1521,9 +1502,11 @@ function_quick_get_wrap ()  {
     # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
     # but Zsync can now give these files root protection so this removal may not work ...   
     # REVIEW Deletion and re-download may be the simpler way to go.  Zsync has a lot of code to keep maintained ...
-      ZsyncDownload=
+    printf "\n\n"
+  fi
 
-  elif [[ -d "$New_VM_InstanceName" ]]; then
+  # STANDARD
+  if [[ -d "$New_VM_InstanceName" ]]; then
   
     printColor "  Folder:  %s "  "$New_VM_InstanceName"
 
@@ -1570,11 +1553,14 @@ function_quick_get_wrap ()  {
 
   elif [[ ! -d "$New_VM_InstanceName" ]]; then
 
-    # post 1.11.05 this section may not be needed ... REVIEW 
-    printf "  NO Folder/Download found ... %s "  "$New_VM_InstanceName"
-    if [[ -e "$New_VM_Conf_File" ]]; then printf "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
-    else printf "\n .conf file NOT created or found %s "  "$(basename "$New_VM_Conf_File")"
+    if [[ $ZsyncDownload ]]; then ZsyncDownload=
+    else
+      printf "  NO Folder/Download found ... %s "  "$New_VM_InstanceName"
+      if [[ -e "$New_VM_Conf_File" ]]; then printf "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
+      else printf "\n .conf file NOT created or found %s "  "$(basename "$New_VM_Conf_File")"
+      fi
     fi
+
     if [[ $QGW_DownloadStopped ]]; then
       # post 1.11.05 this section may not be needed ... REVIEW 
       printf "\n\n  Download Stopped > there may have been an ERROR "

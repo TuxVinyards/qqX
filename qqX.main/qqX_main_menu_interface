@@ -202,21 +202,18 @@ else
       elif [[ $LastRtvUpd -gt 2592000 ]]; then
 
          if [[ "$VM_InstanceName" == *macos* ]]; then 
-
           printf "\n\n  Tiano Core Security Updates .....  "
           refresh_tiano_vars &
           wait "$!" 
           RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log" 2>/dev/null)"
           [[ $RtvMacGet == "Okay" ]] && printf "All Good"
           [[ $RtvMacGet == "Fail" ]] && printColor "\n\n  Failed to update. See rtv logs in the VM folder ...."
-
         else  refresh_tiano_vars &
-
         fi 
 
       fi
 
-    else  date +%s > "$VM_Conf_Dir/$VM_InstanceName/rtv.date.txt"
+    else  date +%s > "$VM_Conf_Dir/$VM_InstanceName/rtv.date.txt"  2>/dev/null
         
     fi
 
@@ -261,10 +258,10 @@ else
       printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then 
       if [[ $(type -p "$FileManager") ]]; then
-        if [[ $LiveBootMissing ]]; then  printColor "  [f] open VM folder"
-        else printf "  [f] open VM folder"
+        if [[ $LiveBootMissing ]]; then  printColor "  [f]   open VM folder"
+        else printf "  [f]   open VM folder"
         fi
-        printf "   [qf] | [qqf] open qcow2"
+        printf "    [qf] | [qqf]  open qcow2"
         printf " in file manager"
       else  printColor "  [set]  ERROR file manager not found" 
       fi
@@ -277,51 +274,39 @@ else
         #  Live VMs only, as zsync only updates the iso file.   
         #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
 
-        if [[ -f "$VM_InstanceName/zsync.date.txt" ]]; then
-
+        if [[ "$(tr -cd '[:digit:]' < "$VM_InstanceName/zsync.date.txt" 2>/dev/null)" ]]; then
           SyncDateNow="$(date +%s)"
-          SyncDateOld="$(cat "$VM_InstanceName/zsync.date.txt" 2>/dev/null)"
+          SyncDateOld="$(tr -cd '[:digit:]' < "$VM_InstanceName/zsync.date.txt" 2>/dev/null)"
           LastZsync="$((SyncDateNow - SyncDateOld))"
-
           printf "\n\n"
-          if [[ $LastZsync -gt 21600 ]]; then  printColor "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
-          else  printf "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
-          fi  #  older than 6hrs (in epoch seconds)
-
+          if [[ $LastZsync -gt 360000 ]]; then  printf "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
+          else  printf "  [z]   daily-live zsync check - last run only %d hrs ago"  "$((LastZsync/3600))"
+          fi  #  older than 24hrs (in epoch seconds)
         else  date +%s > "$VM_InstanceName/zsync.date.txt"
-            
         fi
 
-        ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget  
+        ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget 
 
           # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
           # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
-
           # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
           # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
-          
           # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
           # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
 
-
         # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
         # Expect these to need updating from time to time ...
-
         Zsync_OS_Name="$VM_InstanceName"
-
         Zsync_OS_Name="${Zsync_OS_Name/'-daily'/}"
         Zsync_OS_Name="${Zsync_OS_Name/'-live'/}"
         Zsync_OS_Name="${Zsync_OS_Name/'-canary'/}"
         Zsync_OS_Name="${Zsync_OS_Name/'-legacy'/}"
         Zsync_OS_Name="${Zsync_OS_Name/'-jammy'/}"
         Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
-
         Zsync_Release_Name="$VM_InstanceName"
         Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
         #echo; echo "$Zsync_OS_Name  $Zsync_Release_Name" 
-
         Zsync_Updatable_ISO=1
-
         # zero main menu flag that sets only if updater run from main 
         MainMenuZsync=
 

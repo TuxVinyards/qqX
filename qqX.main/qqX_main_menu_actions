@@ -187,7 +187,11 @@ function  main_menu_actions {
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then 
       printf "\n\n  Updating the live boot development iso with any changes"
       printColor "\n\n  May take a while to compare & synchronize"
-      if [[ $LastZsync -gt 200000 ]]; then 
+      if [[ $LastZsync -lt 360000 ]]; then 
+        printColor " - Last updated only %d hrs ago"  "$((LastZsync/3600))"
+        printf "\n\n  A COMPLETE download may have to take place ...."
+      fi
+      if [[ $LastZsync -gt 2000000 ]]; then 
         printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
         printf "\n\n  Deletion and re-download can sometimes be quicker ...."
       fi
@@ -196,7 +200,11 @@ function  main_menu_actions {
       if [[ $ZsyncRemind ]]; then ZsyncRemind= 
       else MainMenuZsync=1 ; function_quick_get_wrap ; refresh_conf_vars_and_values
       fi
-    else  printColor "\n\n  %s is not being recognised as Zsync updatable Release \n\n"   "$VM_InstanceName"
+    else  
+      printColor "\n\n  %s is not being recognised as Zsync updatable Release"   "$VM_InstanceName"
+      printf "\n\n  Note: only daily-live iso's are zsync updateable ..."
+      printf "\n\n  [enter] to return \n\n"
+      read -rp "  >  "
     fi
 
   elif [[ $MainMenuChoice == "m" ]] ; then KVM_MSR_selector_LoadHelp=1 ; select_msr_config
@@ -296,7 +304,7 @@ function  main_menu_actions {
     read -rp "  >  "  
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
-
+    
     DiskManage=
     while true; do
       manage_and_repair_disks
