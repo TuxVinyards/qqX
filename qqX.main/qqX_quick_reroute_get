@@ -112,16 +112,13 @@ print_quickget_and_folder_choices () {
   QGW_List_NewLineCounter=1
 
   for QGW_List_Arr_Item in "${QGW_TxArr[@]}"; do
-
     [[ $QGW_Tx_ArrNum == "0" ]] && printf "\n"
     printf "%s" "$QGW_List_Arr_Item"
     ((QGW_Tx_ArrNum+=1));  ((QGW_List_NewLineCounter+=1))
-
     if [[ $QGW_List_NewLineCounter -ge "$QGW_List_NewLinePoint" ]];  then
       QGW_List_NewLineCounter=1   # reset counter
       [[ $QGW_Tx_ArrNum -lt "$QGW_Tx_ArrNum_Last" ]] &&  printf "\n\n"
     fi
-
   done
 
 }
@@ -437,6 +434,8 @@ function_quick_get_wrap ()  {
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
 
       elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break 
+
+      elif [[ $QGW_List_NumSelected == "Q" ]]; then  exit maybe  # hidden 
 
       elif [[ ${QGW_List_NumSelected^^} == "FS" ]] ; then  
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays 

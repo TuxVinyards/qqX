@@ -121,10 +121,6 @@ function exit {
     tput cnorm
     command exit
 
-  elif [[ ! $disk_img ]]; then 
-    # don't exit on quickemu error no disk defined, this is handled by qqX
-    return 
-
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
     printf "\n\n"
     printColor "  ERROR :  [i] ignore & continue  [q] quit  \n\n"
@@ -138,6 +134,11 @@ function exit {
     else
       return 0
     fi
+
+   elif [[ ! $disk_img ]]; then 
+    # don't exit on quickemu error no disk defined, this is handled by qqX  REVIEW  
+    return
+
   fi
 
   # zero the optional 'exit 1' bypass flag (if it has been set)
