@@ -363,7 +363,7 @@ VM_loader_selector_and_menu () {
 
           [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
-          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  preview only - use [set] for menu permanency"
+          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  Preview only - use [set] for menu permanency, [r] to return to default "
           elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
           fi
 
