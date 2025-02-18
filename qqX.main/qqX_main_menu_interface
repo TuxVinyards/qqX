@@ -267,50 +267,68 @@ else
       fi
     fi
 
-    if [[ "$VM_InstanceName" == 'ubuntu'* ]] && [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]]; then 
-    
-      if [[ ! $(du -b -t 500000 "$VM_InstanceName/disk.qcow2" 2>/dev/null) ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]] ; then
+    if [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]]; then 
+      # @ feb 2025 note that 'ubuntustudio-dvd' is now in the standard cdimages repo and has no dvd suffix  REVIEW 
+      # record d/l data for daily-live alerts
 
-        #  Live VMs only, as zsync only updates the iso file.   
-        #  Live VM qcow2 disks are normally only 196k. Test ceiling is set at 500k.  REVIEW if problems. eg meta preallocation
-
-        if [[ "$(tr -cd '[:digit:]' < "$VM_InstanceName/zsync.date.txt" 2>/dev/null)" ]]; then
-          SyncDateNow="$(date +%s)"
-          SyncDateOld="$(tr -cd '[:digit:]' < "$VM_InstanceName/zsync.date.txt" 2>/dev/null)"
-          LastZsync="$((SyncDateNow - SyncDateOld))"
-          printf "\n\n"
-          if [[ $LastZsync -gt 360000 ]]; then  printf "  [z]   daily-live zsync check - last run %d hrs ago"  "$((LastZsync/3600))"
-          else  printf "  [z]   daily-live zsync check - last run only %d hrs ago"  "$((LastZsync/3600))"
-          fi  #  older than 24hrs (in epoch seconds)
-        else  date +%s > "$VM_InstanceName/zsync.date.txt"
-        fi
-
-        ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget 
-
-          # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
-          # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
-          # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
-          # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
-          # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-          # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
-
-        # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
-        # Expect these to need updating from time to time ...
-        Zsync_OS_Name="$VM_InstanceName"
-        Zsync_OS_Name="${Zsync_OS_Name/'-daily'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-live'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-canary'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-legacy'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-jammy'/}"
-        Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
-        Zsync_Release_Name="$VM_InstanceName"
-        Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
-        #echo; echo "$Zsync_OS_Name  $Zsync_Release_Name" 
-        Zsync_Updatable_ISO=1
-        # zero main menu flag that sets only if updater run from main 
-        MainMenuZsync=
-
+      LastZsync=
+      Curr_Zsync_SHA=
+      New_Zsync_SHA=
+      if [[ $(cat "$VM_InstanceName/dl-url.txt") ]]; then
+        Zsync_URL="$(awk '/http/{print $2}' "$VM_InstanceName/dl-url.txt")"
+        Zsync_SHA_URL="$(dirname "$Zsync_URL")""/SHA256SUMS"
+        New_Zsync_SHA="$(curl -sf --max-time 5 "$Zsync_SHA_URL" | grep -s amd64 | cut -d' ' -f1 &)"
       fi
+
+      #  Live VMs where zsync updates the iso file.   
+      if [[ "$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")" ]]; then
+        SyncDateNow="$(date +%s)"
+        SyncDateOld="$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")"
+        LastZsync="$((SyncDateNow - SyncDateOld))"
+        printf "\n\n"
+        if [[ $LastZsync -gt 259200 ]]; then  printf "  [z]   daily-live zsync - last run over %d hrs ago"  "$((LastZsync/3600))"
+        else  printf "  [z]   daily-live zsync - last run %d hrs ago"  "$((LastZsync/3600))"
+        fi  #  older than 3 days (in epoch seconds)  REVIEW  
+        if [[ $LastZsync -gt 864000 ]]; then printColor "  (out-of-date)"  # 10 days  (NB esp. important at change of url naming at xx.04 etc)
+        elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then 
+          Curr_Zsync_SHA="$(awk '{print $1}' "$VM_InstanceName/dl-sha.txt")"
+          if [[ ${Curr_Zsync_SHA// /} == "${New_Zsync_SHA// /}"  ]]; then printf "  (up-to-date)"; else printColor "  (update available)"
+          fi
+        else
+          # if check is not yet available 
+          printf "  (refresh to check)"
+        fi
+      else  date +%s > "$VM_InstanceName/zsync.date.txt"
+      fi
+
+      ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget 
+
+        # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
+        # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
+        # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
+        # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
+        # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
+        # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
+
+      # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
+      # Expect these to need updating from time to time ...
+
+      #  TODO   improve for ubuntu variants, for daily-lives, and for renamed instances
+
+      # @ feb 2025 ?? 
+      Zsync_OS_Name="$VM_InstanceName"
+      Zsync_OS_Name="${Zsync_OS_Name/'-daily'/}"
+      Zsync_OS_Name="${Zsync_OS_Name/'-live'/}"
+      Zsync_OS_Name="${Zsync_OS_Name/'-canary'/}"
+      Zsync_OS_Name="${Zsync_OS_Name/'-legacy'/}"
+      Zsync_OS_Name="${Zsync_OS_Name/'-jammy'/}"
+      Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
+      Zsync_Release_Name="$VM_InstanceName"
+      Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
+      #echo; echo; echo "  $Zsync_OS_Name  $Zsync_Release_Name" 
+      Zsync_Updatable_ISO=1
+      # zero main menu flag that sets only if updater run from main 
+      MainMenuZsync=
 
     else 
 
@@ -339,8 +357,9 @@ else
         # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
       if [[ $VM_InstanceName == "ubuntu-"[0-9]* ]]; then  DistroHomePage="https://ubuntu.com/"
       else
-        # first listing, some may have two
-        QGW_OS_Info="$(grep "${VM_InstanceName%%-*})" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+        # first listing, some may have two - but note grep with space or picks (ed)ubuntu first
+        #  TODO   improve for ubuntu variants, for daily-lives, and for renamed instances
+        QGW_OS_Info="$(grep "  ${VM_InstanceName%%-*})" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
         QGW_OS_Info="${QGW_OS_Info//';;'/}"
         QGW_OS_Info="${QGW_OS_Info//'"'/}"
 
@@ -352,7 +371,7 @@ else
     fi
 
     printf  "  [enter] refresh   "
-    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
+    [[ $xxDistroHomePage ]] &&  printf "[w] distro homepage  "  #  FIXME  1.12.01
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics

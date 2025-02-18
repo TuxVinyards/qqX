@@ -195,7 +195,14 @@ function  main_menu_actions {
         printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
         printf "\n\n  Deletion and re-download can sometimes be quicker ...."
       fi
-      printf "\n\n  [enter] to continue   [b] to go back \n\n"
+      printf "\n\n  [enter] to continue"
+      if [[ $LastZsync -gt 3600000 ]]; then printColor "  (out-of-date)"
+      elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then 
+        Curr_Zsync_SHA="$(awk '{print $1}' "$VM_InstanceName/dl-sha.txt")"
+        if [[ ${Curr_Zsync_SHA// /} == "${New_Zsync_SHA// /}" ]]; then printf "  (up-to-date)"; else printf "  (update available)"
+        fi
+      fi
+      printf "   [b] to go back \n\n"
       read -rp "  >  "  ZsyncRemind
       if [[ $ZsyncRemind ]]; then ZsyncRemind= 
       else MainMenuZsync=1 ; function_quick_get_wrap ; refresh_conf_vars_and_values

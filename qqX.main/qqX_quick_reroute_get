@@ -1291,8 +1291,6 @@ function_quick_get_wrap ()  {
     function show_rcksum_progress {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
-      LastZsync="0" 
-      [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]] && date +%s > "$VM_Conf_Dir/$VM_InstanceName/zsync.date.txt"
       while [[ -e "$RckFile" ]]; do
         RckDone="$(du -a "$RckFile" 2> /dev/null)"
         RckDone="${RckDone/"$RckFile"/}"
@@ -1306,7 +1304,7 @@ function_quick_get_wrap ()  {
     # clear any accidental initial double pressing of the enter key
 		read -r -t 0.2  
 		read -r -t 0.2  
-		read -r -t 0.2 		
+		read -r -t 0.2 
 
     printf "\n\n  May take a moment to start, if servers are slow:"
     printColor "\n\n  Use [c] to STOP ALL current downloads, [d] to delete "
@@ -1346,8 +1344,6 @@ function_quick_get_wrap ()  {
           printf "\n  Comparing images .... \n\n" 
         else  printf "\n  Zsync process is completing ... \n\n" 
         fi
-        [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]] && date +%s > "$VM_Conf_Dir/$VM_InstanceName/zsync.date.txt"
-        LastZsync="0" 
       fi
 
       # WAIT HERE for finish, or  key to stop  
@@ -1490,6 +1486,23 @@ function_quick_get_wrap ()  {
   ## Determine output cases:
 
   # ZSYNC
+  if [[ $ZsyncDownload || $MainMenuZsync ]] && [[ $(cat "/tmp/qmod-dl-url") ]]; then
+    # record d/l data for daily-live alerts
+    Zsync_URL="$(awk '/http/{print $2}' "/tmp/qmod-dl-url")"
+    ZsyncDL_Name="$(awk '/http/{print $1}' "/tmp/qmod-dl-url")"
+    Zsync_SHA_URL="$(dirname "$Zsync_URL")""/SHA256SUMS"
+    Zsync_SHA="$(curl -sf --max-time 5 "$Zsync_SHA_URL" | grep -s amd64 )"
+    if [[ $MainMenuZsync ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then
+      cp "/tmp/qmod-dl-url" "$VM_Conf_Dir/$VM_InstanceName/dl-url.txt"
+      printf "%s\n" "$Zsync_SHA" > "$VM_Conf_Dir/$VM_InstanceName/dl-sha.txt"
+      date +%s 2>/dev/null  > "$VM_Conf_Dir/$VM_InstanceName/zsync.date.txt"
+    elif [[ $ZsyncDownload ]] && [[ -d "$QWG_Conf_Dir/$ZsyncDL_Name" ]]; then
+      cp "/tmp/qmod-dl-url" "$QWG_Conf_Dir/$ZsyncDL_Name/dl-url.txt"
+      printf "%s\n" "$Zsync_SHA" > "$QWG_Conf_Dir/$ZsyncDL_Name/dl-sha.txt"
+      date +%s 2>/dev/null  > "$QWG_Conf_Dir/$ZsyncDL_Name/zsync.date.txt"
+    fi
+    LastZsync="0" 
+  fi
   if  [[ $ZsyncDownload ]]; then
     if [[ $QGW_DownloadStopped ]]; then 
       printf "\n  Download Stopped > Residual files may be present"
@@ -1512,6 +1525,7 @@ function_quick_get_wrap ()  {
     # but Zsync can now give these files root protection so this removal may not work ...   
     # REVIEW Deletion and re-download may be the simpler way to go.  Zsync has a lot of code to keep maintained ...
     printf "\n\n"
+
   fi
 
   # STANDARD
@@ -1602,7 +1616,7 @@ function_quick_get_wrap ()  {
   elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
   else  
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-    if [[ ! $MainMenuZsync ]]; then 
+    if [[ ! $MainMenuZsync ]] && [[ ! $ZsyncDownload ]]; then 
       printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
     fi
     printf "\n\n"

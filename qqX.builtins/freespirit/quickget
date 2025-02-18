@@ -2629,8 +2629,8 @@ function get_ubuntu() {
     local URL=""
     local DATA=""
 
-    if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
-        # Ubuntu Studio daily-live images are in the dvd directory
+    if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "xxubuntustudio" ]; then
+        # Ubuntu Studio daily-live images are in the dvd directory  @ feb 2025 no longer the case
         RELEASE="dvd"
     fi
     if [[ "${RELEASE}" == "jammy-daily" ]]; then

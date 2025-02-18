@@ -136,7 +136,11 @@ show_main_menu_header () {
     if [[ ! -e "$IsoImg" ]]; then
       BootAlert="(Live: ISO/IMG Boot)     ERROR - NO BOOT IMAGE FOUND - ERROR "  ; LiveBoot=1 ; LiveBootMissing=1
     else
-      BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1 ; LiveBootMissing=
+      if [[ "$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")" ]]; then
+        BootAlert="(Daily Live: ISO/IMG Boot only > NON INSTALL)"  ; LiveBoot=1 ; LiveBootMissing=
+      else
+        BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1 ; LiveBootMissing=
+      fi
     fi
   elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
