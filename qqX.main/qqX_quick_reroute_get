@@ -349,9 +349,13 @@ function clear_main_gt_start_vars {
   QGW_DownloadStart=
   QGW_DownloadSelection=
   QGW_Download_BadLink=
-  QWG_Conf_Dir="$Default_VM_Folder" 
-  cd "$QWG_Conf_Dir" || { printColor "  ERROR changing to the General VM Location"; sleep 3; }
-  Current_VM_Folder="$QWG_Conf_Dir" 
+  if [[ $MainMenuZsync ]]; then
+    Current_VM_Folder="$(pwd)" 
+  else
+    QWG_Conf_Dir="$Default_VM_Folder" 
+    cd "$QWG_Conf_Dir" || { printColor "  ERROR changing to the General VM Location"; sleep 3; }
+    Current_VM_Folder="$QWG_Conf_Dir" 
+  fi
 }
 
 test_internet_is_up () {
@@ -1015,7 +1019,6 @@ function_quick_get_wrap ()  {
         printColor "\n\n  May take a while to compare & synchronize"
         if [[ $LastZsync -lt 360000 ]]; then 
           printColor " - last updated only %d hrs ago"  "$((LastZsync/3600))"
-          printf "\n\n  A COMPLETE download may have to take place ...."
         fi
         if [[ $LastZsync -gt 2000000 ]]; then 
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
@@ -1102,16 +1105,20 @@ function_quick_get_wrap ()  {
               DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
               DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
             else 
-              printf "\n\n  Detection of sizes not fully possible: \n\n  Potential size  %s  \n  Already present %s \n" "$DL_PotentialSize" "$DL_SizeAlready"
+              printf "\n\n  Detection of sizes not fully possible"
+              if [[ $DL_PotentialSize ]]; then printf ": \n\n  Potential size  %s  \n" "$DL_PotentialSize" ; else printf "\n"
+              fi
               DL_PercentageDone="0"
             fi
           fi
-          if [[ $DL_PercentageDone ]]; then printf "\n  %s Percent appears to be downloaded"  "$DL_PercentageDone"
+          if [[ $DL_PercentageDone ]] && [[ $DL_PercentageDone != "0" ]]; then printf "\n  %s Percent appears to be downloaded"  "$DL_PercentageDone"
           else printf "\n  Percent downloaded not known"
           fi
           printf  "\n\n  [enter] Start the download  "
           if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  " 
-          else printf "> resume     " 
+          else 
+            if [[ $MainMenuZsync ]]; then  printf "> Zsync     "  ; else printf "> resume     "
+            fi
           fi
 
         else 
@@ -1125,7 +1132,7 @@ function_quick_get_wrap ()  {
         fi
 
         if [[ $ZsyncDownload ]]; then
-          [[ ! $(type -p zsync) ]] && printf "\n\n  WARNING 'zsync' not found.  Screen output may vary. Quickget should hopefully revert to using wget ...\n\n "
+          [[ ! $(type -p zsync) ]] && printf "\n\n  WARNING 'zsync' not found.  Screen output may vary. Quickget should hopefully revert to using curl ...\n\n "
         elif [[ "${#VM_Folder_List[*]}" -gt 1 ]]; then
           if [[ $QGW_OverWriteAllow ]]; then printColor "[number] select a DIFFERENT FOLDER  "
           else printf "[number] select a different (preset or current) folder  "
@@ -1285,7 +1292,7 @@ function_quick_get_wrap ()  {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
       LastZsync="0" 
-      [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
+      [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]] && date +%s > "$VM_Conf_Dir/$VM_InstanceName/zsync.date.txt"
       while [[ -e "$RckFile" ]]; do
         RckDone="$(du -a "$RckFile" 2> /dev/null)"
         RckDone="${RckDone/"$RckFile"/}"
@@ -1334,13 +1341,13 @@ function_quick_get_wrap ()  {
 
       # zsync:
       if [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]]; then  show_rcksum_progress &
-      elif [[ $ZsyncDownload ]]; then 
+      elif [[ $ZsyncDownload || $MainMenuZsync ]]; then 
         if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
           printf "\n  Comparing images .... \n\n" 
-          LastZsync="0" 
-          [[ -d "$VM_InstanceName" ]] && date +%s > "$VM_InstanceName/zsync.date.txt"
-        else  printf "\n  Zsync process is completed ... \n\n" 
+        else  printf "\n  Zsync process is completing ... \n\n" 
         fi
+        [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]] && date +%s > "$VM_Conf_Dir/$VM_InstanceName/zsync.date.txt"
+        LastZsync="0" 
       fi
 
       # WAIT HERE for finish, or  key to stop  
@@ -1415,11 +1422,13 @@ function_quick_get_wrap ()  {
             DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
             DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
           else 
-            printf "\n\n  Detection of sizes not fully possible: \n\n  Potential size  %s  \n  Already present %s \n" "$DL_PotentialSize" "$DL_SizeAlready"
-            DL_PercentageDone="0"
+              printf "\n\n  Detection of sizes not fully possible"
+              if [[ $DL_PotentialSize ]]; then printf ": \n\n  Potential size  %s  \n" "$DL_PotentialSize" ; else printf "\n"
+              fi
+              DL_PercentageDone="0"
           fi
         fi
-        if [[ $DL_PercentageDone ]]; then printf "\n  %s Percent appears to be downloaded \n\n"  "$DL_PercentageDone"
+        if [[ $DL_PercentageDone ]] && [[ $DL_PercentageDone != "0" ]]; then printf "\n  %s Percent appears to be downloaded \n\n"  "$DL_PercentageDone"
         else printf "\n  Percent downloaded not known \n\n"
         fi
         printColor "  Completed (or Stopped):  [c] to conclude  [r] to resume, retry or re-check \n\n"
@@ -1432,7 +1441,8 @@ function_quick_get_wrap ()  {
         printf "\n\n"
         if [[ $ResumeDL == "r" ]]; then 
           RunDL=1; QGW_DownloadStopped=
-          printf "  Resume process starting. May take a moment if servers are slow .... \n\n"
+          printf "  Resume process starting  >  [c] to stop  [d] to delete "
+          printf "\n\n  May take a moment if servers are slow .... \n\n"
         elif [[ $ResumeDL == "c" || $ResumeDL == "d" ]]; then break
         fi
       fi
@@ -1592,7 +1602,9 @@ function_quick_get_wrap ()  {
   elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
   else  
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-    printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
+    if [[ ! $MainMenuZsync ]]; then 
+      printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
+    fi
     printf "\n\n"
     return
   fi

@@ -186,12 +186,12 @@ function  main_menu_actions {
 
     if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then 
       printf "\n\n  Updating the live boot development iso with any changes"
-      printColor "\n\n  May take a while to compare & synchronize"
       if [[ $LastZsync -lt 360000 ]]; then 
-        printColor " - Last updated only %d hrs ago"  "$((LastZsync/3600))"
-        printf "\n\n  A COMPLETE download may have to take place ...."
+        printColor "\n\n  Normally only takes a few moments to compare & synchronize"
+        printf " - Last updated only %d hrs ago"  "$((LastZsync/3600))"
       fi
       if [[ $LastZsync -gt 2000000 ]]; then 
+        printColor "\n\n  May take a while to compare & synchronize"
         printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
         printf "\n\n  Deletion and re-download can sometimes be quicker ...."
       fi
