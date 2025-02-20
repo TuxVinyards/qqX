@@ -162,7 +162,7 @@ function_test_iso_url () {
       [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
       while true ; do
         [[ $ShowQGetLists ]] && echo "Secs: $SECONDS"
-        if [[ $(cat "/tmp/qmod-dl-url") ]]; then 
+        if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then 
           DL_Url="$(awk '{print $2 $3}' < "/tmp/qmod-dl-url")"
           break
         elif [[ "$SECONDS" -ge 20 ]]; then 
@@ -1608,6 +1608,7 @@ function_quick_get_wrap ()  {
     VM_Conf_File="$(basename "$New_VM_Conf_File")"
     refresh_sources_and_load_VM_arrays
     NewFileTuneUp=1
+    cp "/tmp/qmod-dl-url" "$VM_Conf_Dir/$VM_InstanceName/dl-url.txt"
     function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"  
     # make sure values have been read, and at the least basic in case the tune up utility gets skipped
     refresh_conf_vars_and_values

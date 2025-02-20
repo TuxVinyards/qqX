@@ -216,7 +216,7 @@ scan_VM_Array_for_sizes () {
     du -d 4 -t 30M -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 
   fi
 
-  if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" ) ]]; then  
+  if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null ) ]]; then  
     TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null)"
     TotalQcow2_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.qcow.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
     TotalQcow2_Sizes="$(bc <<< "scale=2; $TotalQcow2_Sizes/1000000")"
@@ -225,7 +225,7 @@ scan_VM_Array_for_sizes () {
     TotalQcow2_SizesCount="0"
   fi
 
-  if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" ) ]]; then  
+  if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null ) ]]; then  
     Total_ISO_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null)"
     Total_ISO_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.iso.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
     Total_ISO_Sizes="$(bc <<< "scale=2; $Total_ISO_Sizes/1000000")"

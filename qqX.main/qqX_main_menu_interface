@@ -274,10 +274,10 @@ else
       LastZsync=
       Curr_Zsync_SHA=
       New_Zsync_SHA=
-      if [[ $(cat "$VM_InstanceName/dl-url.txt") ]]; then
+      if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
         Zsync_URL="$(awk '/http/{print $2}' "$VM_InstanceName/dl-url.txt")"
         Zsync_SHA_URL="$(dirname "$Zsync_URL")""/SHA256SUMS"
-        New_Zsync_SHA="$(curl -sf --max-time 5 "$Zsync_SHA_URL" | grep -s amd64 | cut -d' ' -f1 &)"
+        New_Zsync_SHA="$(curl -sf --max-time 3 "$Zsync_SHA_URL" | grep -s amd64 | cut -d' ' -f1 &)"
       fi
 
       #  Live VMs where zsync updates the iso file.   
@@ -313,19 +313,23 @@ else
       # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
       # Expect these to need updating from time to time ...
 
-      #  TODO   improve for ubuntu variants, for daily-lives, and for renamed instances
+      # @ feb 2025 improve for ubuntu variants, for daily-live, and for renamed instances
 
-      # @ feb 2025 ?? 
-      Zsync_OS_Name="$VM_InstanceName"
+      if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
+        Zsync_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")"
+      elif [[ $(cat "$VM_InstanceName/QemuVirtHardwareRecord.txt" 2>/dev/null) ]]; then
+        Zsync_RecordedName="$(grep -sm1 -e '-name' "$VM_InstanceName/QemuVirtHardwareRecord.txt" | cut -d'=' -f2)"
+      else Zsync_RecordedName="$VM_InstanceName"
+      fi
+      Zsync_OS_Name="${Zsync_RecordedName,,}"
       Zsync_OS_Name="${Zsync_OS_Name/'-daily'/}"
       Zsync_OS_Name="${Zsync_OS_Name/'-live'/}"
       Zsync_OS_Name="${Zsync_OS_Name/'-canary'/}"
       Zsync_OS_Name="${Zsync_OS_Name/'-legacy'/}"
       Zsync_OS_Name="${Zsync_OS_Name/'-jammy'/}"
       Zsync_OS_Name="${Zsync_OS_Name/'-dvd'/}"
-      Zsync_Release_Name="$VM_InstanceName"
+      Zsync_Release_Name="${Zsync_RecordedName,,}"
       Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
-      #echo; echo; echo "  $Zsync_OS_Name  $Zsync_Release_Name" 
       Zsync_Updatable_ISO=1
       # zero main menu flag that sets only if updater run from main 
       MainMenuZsync=
@@ -353,25 +357,37 @@ else
       printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
     fi
 
-    if  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
-        # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
-      if [[ $VM_InstanceName == "ubuntu-"[0-9]* ]]; then  DistroHomePage="https://ubuntu.com/"
+    if  grep -qs 'os_homepage' "$QG_SourcePath" &&  ! grep -qs -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
+      # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
+      if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
+        VM_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")" 
+      elif [[ $(cat "$VM_InstanceName/QemuVirtHardwareRecord.txt" 2>/dev/null) ]]; then
+        VM_RecordedName="$(grep -sm1 -e '-name' "$VM_InstanceName/QemuVirtHardwareRecord.txt" | cut -d'=' -f2)"
+      else  VM_RecordedName="$VM_InstanceName" 
+      fi
+      VM_RecordedName="${VM_RecordedName,,}"
+      mapfile -t VM_RecordedNameArr <<< "$(tr '-' '\n' <<< "$VM_RecordedName")"
+      # note grep with space or probs like ubuntu picks (ed)ubuntu first
+      # needs to cope with ubuntu variants, for daily-live, for renamed instances, and for custom ISO installed
+      if grep -qs "  ${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]})" "$QG_SourcePath" ; then
+        VM_RecordedName_Listed="${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]}"
+      elif grep -qs "  ${VM_RecordedNameArr[0]})" "$QG_SourcePath" ; then
+        VM_RecordedName_Listed="${VM_RecordedNameArr[0]}"
+      else VM_RecordedName_Listed=
+      fi
+      if [[ ! $VM_RecordedName_Listed ]]; then DistroHomePage=
       else
-        # first listing, some may have two - but note grep with space or picks (ed)ubuntu first
-        #  TODO   improve for ubuntu variants, for daily-lives, and for renamed instances
-        QGW_OS_Info="$(grep "  ${VM_InstanceName%%-*})" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+        QGW_OS_Info="$(grep -m1 "  ${VM_RecordedName_Listed})" "$QG_SourcePath" | cut -d'=' -f2)"
         QGW_OS_Info="${QGW_OS_Info//';;'/}"
         QGW_OS_Info="${QGW_OS_Info//'"'/}"
-
         QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
         mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
         DistroHomePage="${QGW_OS_Info_ARR[2]}"
       fi
-    else DistroHomePage=
     fi
 
     printf  "  [enter] refresh   "
-    [[ $xxDistroHomePage ]] &&  printf "[w] distro homepage  "  #  FIXME  1.12.01
+    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  " 
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
