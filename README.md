@@ -263,7 +263,7 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 At mid Jan 2025, as [here,](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) there are still quite a few places in Quickget where snippets of static code could do with the addition of [floatversion](https://github.com/TuxVinyards/floatversion) tweaks.
 
-If anyone wants to pick those up and add them to the [quickget-distro-fixes](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) branch while I am focussing on the `dev-next` branch, that would be useful.
+If anyone wants to pick those up and add them to the [latest freespirit](https://github.com/TuxVinyards/quickemu/branches) branch while I am focussing on the `dev-next` branch, that would be useful.
 
 ## Why the Vinyards?
 
