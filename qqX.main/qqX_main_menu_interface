@@ -286,8 +286,8 @@ else
         SyncDateOld="$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")"
         LastZsync="$((SyncDateNow - SyncDateOld))"
         printf "\n\n"
-        if [[ $LastZsync -gt 259200 ]]; then  printf "  [z]   daily-live zsync - last run over %d hrs ago"  "$((LastZsync/3600))"
-        else  printf "  [z]   daily-live zsync - last run %d hrs ago"  "$((LastZsync/3600))"
+        if [[ $LastZsync -gt 259200 ]]; then  printf "  [z]   daily-live - last zsync over %d hrs ago"  "$((LastZsync/3600))"
+        else  printf "  [z]   daily-live - last zsync %d hrs ago"  "$((LastZsync/3600))"
         fi  #  older than 3 days (in epoch seconds)  REVIEW  
         if [[ $LastZsync -gt 864000 ]]; then printColor "  (out-of-date)"  # 10 days  (NB esp. important at change of url naming at xx.04 etc)
         elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then 

@@ -1010,22 +1010,26 @@ function_quick_get_wrap ()  {
       function_test_iso_url
     fi
 
-    if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO ]]; then
+    if [[ $MainMenuZsync && $Zsync_Updatable_ISO ]]; then
 
       if [[ ! $Zsync_OS_Name || ! $Zsync_Release_Name  ]]; then
         printColor "\n\n  ERROR  Variables for OS Name &/or Release NOT found \n\n"
       else
         printf "\n\n  Updating the live boot development iso with any changes"
-        printColor "\n\n  May take a while to compare & synchronize"
-        if [[ $LastZsync -lt 360000 ]]; then 
+        if [[ $LastZsync -lt 360000 ]]; then  # 100 hrs
+          printColor "\n\n  Shouldn't take too long to synchronize"
           printColor " - last updated only %d hrs ago"  "$((LastZsync/3600))"
-        fi
-        if [[ $LastZsync -gt 2000000 ]]; then 
+        elif [[ $LastZsync -lt 1036800 ]]; then # 12 days
+          printColor "\n\n  May take a short while to compare & synchronize"
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
+        else 
+          printColor "\n\n  May take a while to compare & synchronize"
+          printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
+        fi
+        if [[ $LastZsync -gt 3456000 ]]; then # 40 days
           printf "\n\n  Deletion and re-download can sometimes be quicker ...."
         fi
         ZsyncDownload=1
-        # REVIEW Deletion and re-download may be the way to go.  Zsync has a lot of code to keep maintained ...
       fi
 
     elif [[ "$QGW_DownloadSelection" == *'ubuntu'* ]] && [[ "$QGW_DownloadSelection" == *'daily'* ]]; then 
@@ -1087,7 +1091,7 @@ function_quick_get_wrap ()  {
       else
 
         if [[ $QGW_OverWriteAlert ]];then  
-          printColor "\n\n  Files are present. Resume download or overwrite? "
+          [[ ! $MainMenuZsync ]] && printColor "\n\n  Files are present. Resume download or overwrite? "
           if [[ "$(ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null)" ]]; then
             printColor "\n\n  Folder: %s \n\n" "$QWG_NewVM_Name"
             ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name"
@@ -1223,14 +1227,13 @@ function_quick_get_wrap ()  {
           if [[ $QGW_Download_BadLink ]]; then  
             QGW_BadLink_ReTest=1 ; function_test_iso_url
           else
-            if [[ $QGW_OverWriteAlert ]]; then 
+            if [[ $QGW_OverWriteAlert ]] && [[ ! $MainMenuZsync ]]; then 
               printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
               printf "\n\n  [enter] to go back" ; printColor "   [yes] to confirm \n\n"
               read -rp "  >  "  ISO_OvWr
               printf "\n\n"
               if [[ $ISO_OvWr ]]; then QGW_OverWriteAllow=1 ; QGW_DownloadStart="start" ; break ; fi  
             else 
-              #printf "\n\n"
               QGW_DownloadStart="start" ; break
             fi
           fi
@@ -1272,9 +1275,15 @@ function_quick_get_wrap ()  {
     QGW_List_NumSelected_Previous=
    
     if [[ $ZsyncDownload ]]; then
-      printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
+      # printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
       printf "\n\n  To resume stopped downloads, any \".iso.part\" files should be retained."
       # https://bugs.launchpad.net/ubuntu/+source/zsync/+bug/477551
+
+      # @ feb 2025 rcksum files no longer seem to be present.
+      # The source at https://github.com/cph6/zsync/tree/master/c remains quite old
+      # BUT, for example, https://git.launchpad.net/ubuntu/+source/zsync/commit/?h=applied/ubuntu/plucky 
+      # shows that zsync is being actively maintained by Debian and Ubuntu ....
+      # There is also reference to zsync-curl as a repo but this now appears to have been abandoned.
 
       function remove_old_rcksum_files {
         if [[ $(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null) ]]; then
@@ -1309,7 +1318,7 @@ function_quick_get_wrap ()  {
     printf "\n\n  May take a moment to start, if servers are slow:"
     printColor "\n\n  Use [c] to STOP ALL current downloads, [d] to delete "
     printColor "\n\n  Or  [c] then [r] to restart on a new server or to force a download re-check ..."
-    printf "\n\n\n  Quickemu & downloader output: "
+    printf "\n\n\n  Quickget output & download reportage: "
     # stop flashing cursor
     tput civis
 
@@ -1338,12 +1347,10 @@ function_quick_get_wrap ()  {
       qGetPid="$!"
 
       # zsync:
+      # @ feb 2025 rcksum files no longer seem to be present. See notes at function 'show_rcksum_progress' > REVIEW removal?
       if [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]]; then  show_rcksum_progress &
       elif [[ $ZsyncDownload || $MainMenuZsync ]]; then 
-        if [[ $(pgrep zsync 2>/dev/null) ]] ; then 
-          printf "\n  Comparing images .... \n\n" 
-        else  printf "\n  Zsync process is completing ... \n\n" 
-        fi
+        printf "\n  Zsync is a multi-stage process >  monitor the hard drive activity light ... \n\n" 
       fi
 
       # WAIT HERE for finish, or  key to stop  
