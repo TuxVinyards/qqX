@@ -51,10 +51,13 @@ drives_and_snapshots() {
     else check_disk_is_okay "$SecondDrive" 
     fi
 
+    check_if_disk_needs_a_cleanup  "$SecondDrive"
+
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
+    [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK needs a clean up  > [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -72,10 +75,13 @@ drives_and_snapshots() {
 
     if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
 
+    check_if_disk_needs_a_cleanup  "$SharedDrive"
+
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
+    [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK needs a clean up  > [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -101,10 +107,13 @@ drives_and_snapshots() {
     else check_disk_is_okay "$MainDrive"
     fi
 
+    check_if_disk_needs_a_cleanup  "$MainDrive"
+
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" 
     fi
+    [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK needs a clean up  > [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -193,6 +202,8 @@ function manage_and_repair_disks {
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size can be appear lower than the contents ..."
       printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
+      check_if_disk_needs_a_cleanup  "$Selected_Drive" 
+      [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 needs an [rd] clean up "
 
     fi
 
@@ -259,7 +270,7 @@ function manage_and_repair_disks {
       printf "  [b] to go back"
       printf "\n\n"
       read -rp "  >  "  ResizePlus
-      printf "\n\n"
+      printf "\n"
       ResizePlus="$(tr -cd "[:digit:]" <<< "$ResizePlus")"
       [[ ! $ResizePlus ]] && return
     fi
@@ -267,14 +278,16 @@ function manage_and_repair_disks {
     DiskDate="$(date +%b%d.%H.%M)"
     DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
     
-    printf  "  Original drive: %s \n\n" "$Selected_Drive"
+    printf  "\n\n  Original drive: %s " "$Selected_Drive"
 
     if mv "$Selected_Drive" "$DiskBackup" ; then 
-      printColor "  Moved to back up as: %s \n\n" "$DiskBackup"
+      printColor "\n\n  Safely moved to back up as: %s " "$DiskBackup"
     else
-      printColor "  ERROR moving drive to backup - Cancelling process\n\n"
+      printColor "\n\n  ERROR moving drive to backup - Cancelling process"
       sleep 3 ; return
     fi
+
+    printf "\n\n  Backups may be easily renamed and reused as previously, using the file manager"
 
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
       printf "" > "$Qemu_IMG_ErrorLog"
@@ -295,13 +308,11 @@ function manage_and_repair_disks {
       }
 
       dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
-      printColor "\n\n  Attemping repair .... \n\n"
-      
+      printColor "\n  Attemping repair .... \n\n"
       "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
 
     else 
-
-      printf "\n\n  Processing .... \n\n"
+      printf "\n  Processing >  monitor the hard drive activity light ... \n\n"
       "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
 
     fi
@@ -324,16 +335,19 @@ function manage_and_repair_disks {
           printColor  "\n\n  Reduction: %s" "$DiskSize_Recovered"
         fi
       fi
+      DiskManage="b"
 
-    else  printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
+    else 
+
+      printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
+      printf "\n\n  Check the VM folder with a file manager. The backup may be renamed and reused as previously"
 
     fi
 
     printf "\n\n  [enter] to return to menu \n\n "
-    read -rp "  >  "  
+    read -rp "  >  " 
 
   fi
-
 }
 
 function qqX_snapshot_delete {

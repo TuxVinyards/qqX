@@ -169,10 +169,9 @@ show_main_menu_header () {
 # When a VM_InstanceName exists, check the VM disk is not corrupt  (quickemu default name only)
 # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-check
 
-function check_disk_is_okay {
+check_disk_is_okay () {
 
   local PrintErrors=
-
   for CheckArg in "$@" ; do 
     if [[ $CheckArg == "PrintErrors" ]]; then PrintErrors=1 ; shift ; fi
   done
@@ -185,39 +184,46 @@ function check_disk_is_okay {
     if [[ $2 ]]; then DiskCheck_Disk="$2" ; else DiskCheck_Disk="disk.qcow2"; fi
   fi
 
-  DiskChkExitCode=
-  DiskChkStatus=
+  DiskChkExitCode= ;  DiskChkStatus=
 
   if [[ -e "$DiskCheckFolderName/$DiskCheck_Disk" ]]; then
 
     # Disk won't exist if new (or named differently REVIEW )
     # Qemu-img with '-q' only outputs if error & on outputs on stderr   The exit status remains separately recorded.
-
     if [[ $PrintErrors ]]; then  "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"
     else "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"  2>/dev/null ; fi
 
     # Note "Okay"  is also used as a flag  > caution if changing   # REVIEW  could also be flagged using:
     # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)" 
-
     case "$?" in 
-
       0) DiskChkStatus="Okay" ;;
-      
       1) DiskChkStatus="Check not completed because of internal errors" ;;
-
       2) DiskChkStatus="Check completed, image is corrupted" 
          DiskChkExitCode=2 ;;
-
       3) DiskChkStatus="Check completed, image has leaked clusters, but is not corrupted" 
          DiskChkExitCode=3  ;;
-
-      63) DiskChkStatus="Checks are not supported by the image format -- not qcow2 ??" ;;
-
+     63) DiskChkStatus="Checks are not supported by the image format -- not qcow2 ??" ;;
     esac
-
   fi
-
 }
+
+check_if_disk_needs_a_cleanup  () {
+
+  if [[ $1 ]] && [[ ! $2 ]]; then
+    DiskCheckFolderName="$(dirname "$1")"
+    DiskCheck_Disk="$(basename "$1")"
+  else
+    if [[ $1 ]]; then DiskCheckFolderName="$1" ; else DiskCheckFolderName="$VM_InstanceName"; fi
+    if [[ $2 ]]; then DiskCheck_Disk="$2" ; else DiskCheck_Disk="disk.qcow2"; fi
+  fi
+  local FileLength= ; local DiskSize= ; DiskDisparity=0
+  FileLength="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null | awk '/file length/{print $3}')"
+  DiskSize="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null | grep -A 20 Child | awk '/disk size/{print $3}')"
+  if [[ $FileLength && $DiskSize ]]; then
+    DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.15")"
+  fi
+}
+
 
 ## filter for 'ERRORS' that changes in QEMU might throw up and that WE WANT TO IGNORE  (see main settings)
 
@@ -228,13 +234,11 @@ filter_and_flag_qemu_errors () {
   elif [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
 
     QemuErrorAlert=1
-
     if [[ "${QemuErrorFilter[*]}" ]]; then
       for ErrChk in "${QemuErrorFilter[@]}"; do
         if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorAlert= ; return ; fi
       done
     fi
-
     if [[ "${QemuError_VM_Filter[*]}" ]]; then
       for ErrChk in "${QemuError_VM_Filter[@]}"; do
         if grep -q -s "$ErrChk" "$QemuErrorLog" ; then QemuErrorAlert= ; return ; fi
@@ -242,9 +246,7 @@ filter_and_flag_qemu_errors () {
     fi
 
   else  QemuErrorAlert=
-    
   fi
-
 }
 
 

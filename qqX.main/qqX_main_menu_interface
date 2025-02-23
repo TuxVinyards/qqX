@@ -349,7 +349,10 @@ else
       source "$qqX_Upd_VarsTmpFile" ; qqX_UpdaterPID= 
     fi
 
+    check_if_disk_needs_a_cleanup
+
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
+    elif [[ $DiskDisparity == "1" ]]; then  printColor "  DISK.QCOW2 needs a clean up  > [disk] repair utils \n\n"
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
