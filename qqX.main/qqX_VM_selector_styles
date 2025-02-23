@@ -56,24 +56,23 @@ function_vm_folder_item_text () {
 
   if [[ $ArrayConf_Item_Listing == "empty" ]]; then ArrayConf_Item_Listing="EMPTY FOLDER or Bad Path"
 
+  elif [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
+
+    #  Are Live VMs only, as zsync only updates the iso file.   
+    ArrayConf_Item_Listing+=" (Z)"
+    ZsyncDistrosFound=1
+
   elif [[ ! -e "${VM_Array[$i,0]}/$QcowTarget" ]]; then  ArrayConf_Item_Listing+=" (new)"
 
   elif [[ -h "$ArrayConf_Item" ]]; then  ArrayConf_Item_Listing+=" (s)" ; SymLinksPresent=1
 
-  elif  [[  ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
+  elif  [[ ! $(du -b -t 1000000 "${VM_Array[$i,0]}/$QcowTarget" 2>/dev/null) ]]; then
 
     #  Live VM qcow2 disks are as little as only 196k. 
     #  But set test ceiling is set at 1,000,000k (1G) to allow for meta preallocation etc REVIEW 
-
-    if [[ "${VM_Array[$i,1]}" == 'ubuntu'* ]] && [[ "${VM_Array[$i,1]}" == *'daily'* ]]; then
-      #  Are Live VMs only, as zsync only updates the iso file.   
-      ArrayConf_Item_Listing+=" (Z)"
-      ZsyncDistrosFound=1
-    else
-      #  Live VMs only, in general, running off the iso file.   
-      ArrayConf_Item_Listing+=" (L)"
-      LiveDistrosFound=1
-    fi
+    #  Live VMs only, in general, running off the iso file.   
+    ArrayConf_Item_Listing+=" (L)"
+    LiveDistrosFound=1
 
   fi
 }

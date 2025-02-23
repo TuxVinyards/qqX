@@ -161,7 +161,13 @@ elif [ -t 1 ] ; then
   grep -m 1 -A 10 'IF:' "$0"
   printf "\n\n    [enter] to exit \n\n    "
   read -r reply
+fi
 
+if [ -t 1 ] ; then  
+  printf "\n\n\n    %s:"  "$UserTerm"
+  printf "\n\n    Some distros may need or will have needed this window to stay open \n    until the installer has completed its tasks ..."  
+  printf "\n\n    [enter] to close \n\n  "
+  read -r reply
 fi
 
 # Exit the script. But also check whether it has been run with a --hold optioned terminal, as Dolphin does, for example.

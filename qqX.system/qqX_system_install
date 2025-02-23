@@ -382,7 +382,12 @@ if [[ ! -e "./qqX_settings" ]] && [[ ! -e "./qqX" ]] && [[ ! -d  "./qqX.system" 
 else
 
   InstallSelect=
-  if [[ $(type -p qqX) ]]; then Current_qqX_Version="$(qqX --version)" ; else Current_qqX_Version= ; fi
+  if [[ $(type -p qqX) ]]; then
+    # do grep as older versions won't return 'qqX --version'
+    Current_qqX_Path="$(type -p qqX)"
+    Current_qqX_Version="$(grep -s -m 1 'qqX_Version=' "$Current_qqX_Path" | cut -d'"' -f2 2>/dev/null)"  
+  else Current_qqX_Version=
+  fi
 
   if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade the current release %s ..."   "$Current_qqX_Version"
   else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME" 
@@ -617,27 +622,45 @@ if [[ ! $SkipMkLauncher ]]; then
   elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
     # empty or errored file, so remove it
     rm "$HOME/.qqX/qqX_term.conf"
- 
-  elif [[ "$(cat "/tmp/qqX.termlist" 2>/dev/null)"  ]]; then 
-
-    mapfile -t TermChooseArr <<< "$(cat "/tmp/qqX.termlist" 2>/dev/null)"
-    UserTerm="${TermChooseArr[0]}" 
-    printColor "\n\n  Found:"
-    i=0 ; n=1
-    while [[ "${TermChooseArr[i]}" ]]; do
-      printf "\n\n  %s  %s" "$n" "${TermChooseArr[i]}"
-      ((i+=1))
-      ((n+=1))
-    done
-    printf "\n\n  [enter] for %s  or  [number] of terminal to use \n\n"  "$UserTerm"
-    read -rp "  >  "  TermChoose
-    if [[ $TermChoose ]]; then 
-      TermChoose="$(tr -cd '[:digit:]' <<< "$TermChoose")"
-      i="$((TermChoose-=1))"
-      UserTerm="${TermChooseArr[i]}"
-    fi
-
   fi
+
+  while true; do
+    if [[ "$(cat "/tmp/qqX.termlist" 2>/dev/null)"  ]]; then 
+
+      mapfile -t TermChooseArr <<< "$(cat "/tmp/qqX.termlist" 2>/dev/null)"
+      UserTerm="${TermChooseArr[0]}" 
+      printColor "\n\n  Found:"
+      i=0 ; n=1
+      while [[ "${TermChooseArr[i]}" ]]; do
+        printf "\n\n  %s  %s" "$n" "${TermChooseArr[i]}"
+        [[ ${TermChooseArr[i]} == "alacritty" ]] && printf "  -  some distros may need a custom profile and .toml file"
+        ((i+=1))
+        ((n+=1))
+      done
+      printf "\n\n  [enter] for %s  or  [number] of terminal to use   "  "$UserTerm"
+      printColor "[h] for help \n\n"
+      read -rp "  >  "  TermChoose
+
+      case "$TermChoose" in
+        '[0-9]'|'[0-9][0-9]')
+          i="$((TermChoose-=1))"
+          UserTerm="${TermChooseArr[i]}"
+          break ;;
+        h) 
+          printf "\n\n\n  85%% of users are probably covered by \"gnome-terminal\" \"konsole\" \"mate-terminal\" "
+          printf "\n\n  \"xfce4-terminal\" and over 95%% probably when \"qterminal\" and \"alacritty\" are added."
+          printf "\n\n  For qqX purposes, alacritty works better in tiling window managers."
+          printf "\n\n\n  Try \"xterm/uxterm\" or \"foot\" if you are having problems."
+          printf "\n\n  Otherwise, read the guidance notes at the start of the system_install file in qqX.main"
+          printf "\n"
+          TermChoose=
+          ;;
+        *) break ;;
+      esac
+
+    else break 
+    fi
+  done
 
   # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
   [[ ! $UserTerm ]] && source "$(pwd)/qqX.system/qqX_termfind"
