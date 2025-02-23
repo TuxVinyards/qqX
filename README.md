@@ -16,29 +16,25 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.0](https://github.com/TuxVinyards/qqX/releases/latest)
 
-1.11.0 is a large code update with lots of new features and Quickemu improvements.
+Building on 1.11.0's  large code update and new feature   _mounting of qcow2 drives in a file manager,_
 
-- new feature allows  _mounting of qcow2 drives in a file manager_
+1.12.0 now adds storage maintence tools
 
-- adds fixes for Arch hosts EFI and for Windows downloads
+- collection size analysis
 
-- extended testing includes tiling WM's and all major desktops
+- individual disk disparity checks
 
-- adds new handling routines for KDE6, XFCE, LXQT and Gnome3
+- new utilities interface
 
-- 1.11.04 fixes multiple distro downloads and adds several UX adjustments
+Add to this
 
-1.11.05 is to be released shortly
+- Stop, start resume for downloads. Even with overnight pauses.
 
-- to help with branch synchronization, current work has been merged in to the main branch
+- And an updated 'daily-live' synchronizer with new release alerts
 
-- although still numbered as 1.11.04, this is currently stable and may be cloned as usable
-
-- just a few finishing touches to add to the builtins and the sequencing
-
-- the FreeSpirit built-in is currently recommended in preference to Freebird
+Plus improvements for Linux mint and the now usual collection of fixes for quickget ....
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -62,7 +58,7 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ### Simple and Straightforward
 
-- Multiple display modes, utilities, optimizers and tools
+- Clear to read display modes, utilities, optimizers and tools
 
 - Choice of Custom Menus or 5 built-in _menu styles_
 
@@ -135,26 +131,11 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 @ Nov 27th Beta 1.11.0.2
 
 - New feature _mounting of qcow2 drives in a file manager_ ....
-
-- adds several quickget distro updates
-
-- adds a fix for Arch hosts EFI
-
-- adds a new version manager and checker
-  
-- adds some improved menus and menu sub-features
-
-- improves vm selector transfer speed
-
-- further improves terminal handling on Qt based desktops
-
-- plus tweaks for i3 and gnome3
-
-- adds a fix for Arch hosts EFI
+- added several quickget distro updates
+- improved vm selector transfer speed
+- further improved terminal handling on Qt based desktops, i3 and gnome3
 
 @ Dec 23  Release 1.11.02
-
-- Extensive testing was completed, including in a wide range of tiling window managers
 
 - The fix for Windows downloads, recently pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98)
 has now been merged
@@ -165,19 +146,37 @@ has now been merged
 
 - fix for Quickget hanging on URL checks when server or internet is slow
 
-- also fixes issue where quickget occasionally outputs multiline release and edition data
+- also fixed issue where quickget occasionally outputs multiline release and edition data
 
-- updates FreeSpirit to latest Quickemu 4.9.7/8  > adds proxmox and a couple of other items not in 1.11.02
+- updated FreeSpirit to latest Quickemu 4.9.7/8  > adds proxmox and a couple of other items not in 1.11.02
 
-@ Jan 6 Release [1.11.04](https://github.com/TuxVinyards/qqX/releases/latest)
+@ Jan 6 Release 1.11.04
 
-- adds several UX adjustments and general polish
+- added several UX adjustments and general polish
 
-- a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
+- and a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
+
+### New Release
+
+@ Feb 23 [1.12.0](https://github.com/TuxVinyards/qqX/releases/latest) now> adds storage maintence tools
+
+- collection size analysis
+
+- individual disk disparity checks
+
+- new utilities interface
+
+Add to this
+
+- Stop, start resume for downloads. Even with overnight pauses.
+
+- And an updated 'daily-live' synchronizer with new release alerts
+
+Plus improvements for Linux mint and the now usual collection of fixes for quickget ....
+
+- moves latest FreeSpirit to FreeBird, following testing
 
 ## Reliability
-
-- Testing is always carried out on a variety of mainstream distros before release. (more so on 1.10)
 
 - All scripts are carefully Shellcheck linted & have full error handling routines.
 
@@ -192,8 +191,6 @@ has now been merged
 - Fixes the problem where telescoped/nested VM grind to a halt.
 
 - Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
-
-- And qqX's config autotune fixes Windows boot issue [#1387](https://github.com/quickemu-project/quickemu/issues/1387#top)
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
 
