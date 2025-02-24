@@ -176,6 +176,8 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 
 - moves latest FreeSpirit to FreeBird, following testing
 
+![stop-start-resume](https://github.com/user-attachments/assets/d710f47f-a2b9-4bda-beda-5f5290dfad52)
+
 ## Reliability
 
 - All scripts are carefully Shellcheck linted & have full error handling routines.
