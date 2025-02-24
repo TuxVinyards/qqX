@@ -191,6 +191,7 @@ scan_VM_Array_for_sizes () {
   done
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
+    printf "\n" >> "/tmp/qqX.Sizes.iso.txt"
     du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "\n%-6s %s", $1, $2 }'\
     | tee -a "/tmp/qqX.Sizes.qcow.txt" -a "/tmp/qqX.Sizes.qcow.F.txt" &> /dev/null
     du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }'\
