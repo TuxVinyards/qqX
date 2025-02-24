@@ -156,6 +156,8 @@ has now been merged
 
 - and a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
 
+![new size-ui](https://github.com/user-attachments/assets/0df37ca8-b4c1-4af8-a883-82ef60744649)
+
 ### New Release
 
 @ Feb 23 [1.12.0](https://github.com/TuxVinyards/qqX/releases/latest) now> adds storage maintence tools
