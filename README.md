@@ -198,6 +198,20 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
 
+## Known Issue
+
+@ Mar 11 2025 an issue with the **Windows installer sequence** has come to the fore, also on the Discord forum.
+
+Although qqX tests have shown Windows to both download and run, this long standing [Quickemu problem](https://github.com/quickemu-project/quickemu/issues/1475) has unfortunately been simmering on the issue lists since back in October ....
+
+Initial tests have shown some success can be achieved by using qqX's `[iso]` boot selection utility and `[bm]` boot manager.  However, the full answer will take a little bit of experimentation. Users should set Windows to boot from 'unattended.iso' and make sure that the other two iso's are also visible in the boot manager.
+
+Use of `[v]` verbose mode is additionally recommended.
+
+The issue has also highlighted a couple of trivial UI glitches that will need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.
+
+A reliable fix should hopefully be out shortly ...
+
 ## FAQs and Help
 
 - Lots of _Quickemu Help_ available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help) too, not just qqX
