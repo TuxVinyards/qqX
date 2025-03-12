@@ -216,11 +216,18 @@ check_if_disk_needs_a_cleanup  () {
     if [[ $1 ]]; then DiskCheckFolderName="$1" ; else DiskCheckFolderName="$VM_InstanceName"; fi
     if [[ $2 ]]; then DiskCheck_Disk="$2" ; else DiskCheck_Disk="disk.qcow2"; fi
   fi
-  local FileLength= ; local DiskSize= ; DiskDisparity=0
-  FileLength="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null | awk '/file length/{print $3}')"
-  DiskSize="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null | grep -A 20 Child | awk '/disk size/{print $3}')"
-  if [[ $FileLength && $DiskSize ]]; then
-    DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.15")"
+  local FileLength= ; local DiskSize= ; local FileLengthGiB= ; local DiskSizeGiB= ; local DiskData=
+  DiskDisparity=0
+  DiskData="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null)"
+  # make sure units match and disk is of significant size
+  FileLengthGiB="$(grep -s 'file length' <<< "$DiskData" | grep -s 'GiB')"
+  DiskSizeGiB="$(grep -s -m1 'disk size' <<< "$DiskData" | grep -s 'GiB')"
+  if [[ $FileLengthGiB && $DiskSizeGiB ]]; then
+    FileLength="$(awk '/file length/{print $3}' <<< "$DiskData")"
+    DiskSize="$(grep -A 20 Child <<< "$DiskData" | awk '/disk size/{print $3}')"
+    if [[ $FileLength && $DiskSize ]]; then
+      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.15")"
+    fi
   fi
 }
 
