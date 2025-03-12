@@ -45,11 +45,17 @@ else
       printf  "  [u] show UTILS & technical"
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
-      if [[ ! $LiveBoot ]]; then  # REVIEW show all?
-        printf "   [bm]"
-        if [[ $BootStyle == "fast" ]]; then printf " (fastboot)"
-        else  printColor " (boot menu options active)"
+      # force boot manager on Windows NEW INSTALLS
+      if [[ -e "$VM_InstanceName/unattended.iso" ]]; then 
+        BootStyle="slow"
+        VerboseArgs=1
+        printColor "   >> Windows install: Boot Menu and Verbose mode enabled <<"
+      else
+        printf "   [bm] > "
+        if [[ $BootStyle == "fast" ]]; then printf " fastboot"
+        else  printColor " boot menu enabled"
         fi
+        printf "  (toggle)"
       fi
 
     else
@@ -68,10 +74,8 @@ else
       else
         printf "\n\n  [iso] mount iso to guest, allow boot or read from iso"
       fi
-      if [[ ! $LiveBoot ]]; then
-        if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
-        else printf "   [fb] use fast boot menu "
-        fi
+      if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
+      else printf "   [fb] use fast boot menu "
       fi
       printf  "\n\n  [tune] config tune-up wizard   [disk]  resize or repair existing drives   [rtv] reset Tiano VMF Vars" 
 
