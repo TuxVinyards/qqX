@@ -46,16 +46,21 @@ else
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
       # force boot manager on Windows NEW INSTALLS
-      if [[ -e "$VM_InstanceName/unattended.iso" ]]; then 
+      if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
         BootStyle="slow"
         VerboseArgs=1
         printColor "   >> Windows install: Boot Menu and Verbose mode enabled <<"
       else
         printf "   [bm] > "
-        if [[ $BootStyle == "fast" ]]; then printf " fastboot"
-        else  printColor " boot menu enabled"
+        if [[ $BootStyle == "fast" ]]; then 
+          printf " fastboot"
+          if [[ $Mounted_ISO ]]; then printf "  (toggle to enable ISO boot)"
+          else printf "  (toggle)"
+          fi
+        else  
+          printColor " boot menu enabled"
+          printf "  (toggle)"
         fi
-        printf "  (toggle)"
       fi
 
     else

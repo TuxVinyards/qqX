@@ -271,8 +271,10 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     if [[ $secureboot == "on" ]]; then 
       printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
+      printf "\n\n  # Secure Boot:  Set \n\n\n" >> "$QemuArgsShortFile"
     else    
       printf "\n\n  Secure Boot:  Not Set \n\n\n" >> "$QemuArgsFile"
+      printf "\n\n  # Secure Boot:  Not Set \n\n\n" >> "$QemuArgsShortFile"
     fi
 
 
