@@ -204,11 +204,11 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 
 Although qqX tests have shown Windows to both download and run, this long standing [Quickemu problem](https://github.com/quickemu-project/quickemu/issues/1475) has unfortunately been simmering on the issue lists since back in October ....
 
-Initial tests have shown some success can be achieved by using qqX's `[iso]` boot selection utility and `[bm]` boot manager.  However, the full answer will take a little bit of experimentation. Users should set Windows to boot from 'unattended.iso' and make sure that the other two iso's are also visible in the boot manager.
+Initial tests have shown some success can be achieved by using qqX's `[iso]` boot selection utility and `[bm]` boot manager.  However, the full answer will take a little bit of experimentation. Use of `[v]` verbose mode is additionally recommended.
 
-Use of `[v]` verbose mode is additionally recommended.
+The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.  
 
-The issue has also highlighted a couple of trivial UI glitches that will need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.
+@ Mar 12 fixes for the UI glitches are now in the `dev-next` branch.
 
 A reliable fix should hopefully be out shortly ...
 
