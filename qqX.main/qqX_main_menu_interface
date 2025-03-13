@@ -49,7 +49,8 @@ else
       if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
         BootStyle="slow"
         VerboseArgs=1
-        printColor "   >> Windows install: Boot Menu and Verbose mode enabled <<"
+        printColor "   >> Windows install: Verbose mode enabled <<"
+        printColor "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
       else
         printf "   [bm] > "
         if [[ $BootStyle == "fast" ]]; then 
