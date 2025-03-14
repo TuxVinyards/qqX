@@ -16,7 +16,7 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.12.0](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.01](https://github.com/TuxVinyards/qqX/releases/latest)
 
 Building on 1.11.0's  large code update and new feature   _mounting of qcow2 drives in a file manager,_
 
@@ -34,7 +34,9 @@ Add to this
 
 - And an updated 'daily-live' synchronizer with new release alerts
 
-Plus improvements for Linux mint and the now usual collection of fixes for quickget ....
+Plus improvements for Linux mint and the now usual collection of fixes for quickget
+
+And the 1.12.01 fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -160,7 +162,7 @@ has now been merged
 
 ### New Release
 
-@ Feb 23 [1.12.0](https://github.com/TuxVinyards/qqX/releases/latest) now> adds storage maintence tools
+@ Feb 23 1.12.0 added storage maintence tools
 
 - collection size analysis
 
@@ -180,6 +182,16 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 
 ![stop-start-resume](https://github.com/user-attachments/assets/d710f47f-a2b9-4bda-beda-5f5290dfad52)
 
+@ March 14, version [1.12.01]((https://github.com/TuxVinyards/qqX/releases/latest)) fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+
+This issue with the **Windows installer sequence** recently came to the fore, also on the Discord forum.
+
+Although qqX tests had shown Windows to both download and run, this long standing Quickemu problem had unfortunately been simmering on the issue lists since back in October ....
+
+The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.  
+
+Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
+
 ## Reliability
 
 - All scripts are carefully Shellcheck linted & have full error handling routines.
@@ -197,20 +209,6 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 - Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
-
-## Known Issue
-
-@ Mar 11 2025 an issue with the **Windows installer sequence** has come to the fore, also on the Discord forum.
-
-Although qqX tests have shown Windows to both download and run, this long standing [Quickemu problem](https://github.com/quickemu-project/quickemu/issues/1475) has unfortunately been simmering on the issue lists since back in October ....
-
-Initial tests have shown some success can be achieved by using qqX's `[iso]` boot selection utility and `[bm]` boot manager.  However, the full answer will take a little bit of experimentation. Use of `[v]` verbose mode is additionally recommended.
-
-The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.  
-
-@ Mar 12 fixes for the UI glitches are now in the `dev-next` branch.
-
-A reliable fix should hopefully be out shortly ...
 
 ## FAQs and Help
 
