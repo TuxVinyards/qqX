@@ -233,7 +233,7 @@ check_if_disk_needs_a_cleanup  () {
     FileLength="$(awk '/file length/{print $3}' <<< "$DiskData")"
     DiskSize="$(grep -A 20 Child <<< "$DiskData" | awk '/disk size/{print $3}')"
     if [[ $FileLength && $DiskSize ]]; then
-      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.15")"
+      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.20")"
     fi
   fi
 }
