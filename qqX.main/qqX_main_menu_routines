@@ -142,7 +142,6 @@ show_main_menu_header () {
         BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1 ; LiveBootMissing=
       fi
     fi
-  elif  [[  $Mounted_ISO ]]; then  BootAlert="(Mounted ISO: $Mounted_ISO_DisplayName)" 
   else  BootAlert= 
   fi
 
@@ -151,6 +150,14 @@ show_main_menu_header () {
   else printf "   %s" "$BootAlert"
   fi 
   printf "\n"
+
+  if [[ $Mounted_ISO ]]; then 
+    printf "\n  Additional "
+    if [[ $BootStyle == "slow" ]]; then printf "(mounted & boot selectable)"
+    else printf "(mounted, not bootable)"
+    fi
+    printf " ISO: %s \n" "$Mounted_ISO_DisplayName"
+  fi
 
   [[ $KVM_MSR_Error ||  $Show_MSR_Warnings  || $MSR_Warnings || $Verbose_MSR_dialog ]] && print_kvm_status_warnings
 
@@ -226,7 +233,7 @@ check_if_disk_needs_a_cleanup  () {
     FileLength="$(awk '/file length/{print $3}' <<< "$DiskData")"
     DiskSize="$(grep -A 20 Child <<< "$DiskData" | awk '/disk size/{print $3}')"
     if [[ $FileLength && $DiskSize ]]; then
-      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.15")"
+      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.20")"
     fi
   fi
 }
@@ -864,16 +871,16 @@ iso_select_mount_and_boot () {
     fi
 
     printColor "\n\n  ISO formated disk images may be copied into the individual VM folder"
+    printf "\n\n  A shared 'live boot' ISO can be added to the Shared Drive folder, if Shared Drive has been set up."
     printf "\n\n  One or more may be added.  If more than one, an ISO should be selected from the list."
     printf "\n\n  Current Quickemu code is retricted to one only to be present as mounted at a time."
-
-    printf "\n\n\n  To boot from a selected ISO, press the 'esc' key when the start up screen appears."
     printf "\n\n  To auto-mount an ISO when the VM is selected, set 'fixed_iso=\"VM_InstanceName/name.iso\"' in the .conf file"
-    printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for partition management."
-    printf "\n\n\n  A shared 'live boot' ISO can be added to the Shared Drive folder, if Shared Drive has been set up."
-    printf "\n\n  Use [bm] utility to toggle boot manager or fastboot, if required. Current status:"
-    if [[ $BootStyle == "fast" ]]; then printColor "  (fastboot)"
-    else  printColor "  (boot menu options active)"
+    printf "\n\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for partition management."
+    printf "\n\n  Some iso's may not work as secondary boots, notably Kolibri."
+    printColor "\n\n  Use [bm] main menu utility to toggle boot manager and ISO boot selection."
+    printf " Current status:"
+    if [[ $BootStyle == "fast" ]]; then printf "  (fastboot)"
+    else  printf "  (boot menu options active)"
     fi
     printf "\n"
 
@@ -891,13 +898,13 @@ iso_select_mount_and_boot () {
       print_quickget_and_folder_choices  IsoList
     fi
 
-    if [[ $Mounted_ISO ]]; then printColor "\n\n  %s  is currently mounted to guest" "$Mounted_ISO"
-    else printf "\n\n  No ISO is currently mounted to guest"
+    if [[ $Mounted_ISO ]]; then printColor "\n\n  %s  is mounted additionally to guest" "$Mounted_ISO"
+    else printf "\n\n  Currently, no ISO is mounted additionally to guest"
     fi
 
     IsoSelect=
     printf "\n\n" 
-    if [[ $LiveBoot ]]; then
+    if [[ $LiveBoot ]] && [[ ${#IsoList[*]} -eq 1 ]]; then
       printColor "  [b] to go back"
     else
       if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
@@ -909,14 +916,14 @@ iso_select_mount_and_boot () {
     printf "\n\n"
     read -rp "  >  "  IsoSelect
 
-    if [[ $IsoSelect == "m" ]]; then  
-      if [[ ! $Mounted_ISO ]]; then Mounted_ISO="${IsoList[0]}" ; else Mounted_ISO= ; fi
-    elif [[ "$IsoSelect" == [1-9] || "$IsoSelect" == [1-9][0-9] ]]; then 
-      ((IsoSelect-=1)) 
-      if [[ ! $Mounted_ISO ]]; then Mounted_ISO="${IsoList[IsoSelect]}" 
-      elif [[ $Mounted_ISO == "${IsoList[IsoSelect]}" ]]; then Mounted_ISO=
-      elif [[ $Mounted_ISO != "${IsoList[IsoSelect]}" ]]; then Mounted_ISO="${IsoList[IsoSelect]}"
+      if [[ $IsoSelect == "m" ]]; then  
+        if [[ ! $Mounted_ISO ]]; then [[ "${IsoList[0]}" ]] && Mounted_ISO="${IsoList[0]}" ; else Mounted_ISO= ; fi
+      elif [[ "$IsoSelect" == [1-9] || "$IsoSelect" == [1-9][0-9] ]]; then 
+        ((IsoSelect-=1)) 
+        if [[ ! $Mounted_ISO ]]; then [[ "${IsoList[IsoSelect]}" ]] && Mounted_ISO="${IsoList[IsoSelect]}" 
+        elif [[ $Mounted_ISO == "${IsoList[IsoSelect]}" ]]; then Mounted_ISO=
+        elif [[ $Mounted_ISO != "${IsoList[IsoSelect]}" ]]; then [[ "${IsoList[IsoSelect]}" ]] && Mounted_ISO="${IsoList[IsoSelect]}"
+        fi
       fi
-    fi
   fi
 }

@@ -345,7 +345,7 @@ VM_SelectorStyle="A"
 
 # VERBOSE BOOT
 # Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.  
-# Set blank for log file only. NB An main menu toggle is also available and a log file is always outputted to the VM's folder
+# Set blank for log file only. NB A main menu toggle is also available and a log file is always outputted to the VM's folder
   VerboseArgs= 
 
 #  -------------------------------------------------------------------------------------------------------------------

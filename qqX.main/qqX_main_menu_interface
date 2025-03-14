@@ -45,10 +45,22 @@ else
       printf  "  [u] show UTILS & technical"
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
-      if [[ ! $LiveBoot ]]; then  # REVIEW show all?
-        printf "   [bm]"
-        if [[ $BootStyle == "fast" ]]; then printf " (fastboot)"
-        else  printColor " (boot menu options active)"
+      # force verbose boot on Windows NEW INSTALLS
+      if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
+        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev. 
+        VerboseArgs=1
+        printColor "   >> Windows install: Verbose mode enabled <<"
+        printColor "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
+      else
+        printf "   [bm] > "
+        if [[ $BootStyle == "fast" ]]; then 
+          printf " fastboot"
+          if [[ $Mounted_ISO ]]; then printf "  (toggle to enable ISO boot)"
+          else printf "  (toggle)"
+          fi
+        else  
+          printColor " boot menu enabled"
+          printf "  (toggle)"
         fi
       fi
 
@@ -68,10 +80,8 @@ else
       else
         printf "\n\n  [iso] mount iso to guest, allow boot or read from iso"
       fi
-      if [[ ! $LiveBoot ]]; then
-        if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
-        else printf "   [fb] use fast boot menu "
-        fi
+      if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
+      else printf "   [fb] use fast boot menu "
       fi
       printf  "\n\n  [tune] config tune-up wizard   [disk]  resize or repair existing drives   [rtv] reset Tiano VMF Vars" 
 

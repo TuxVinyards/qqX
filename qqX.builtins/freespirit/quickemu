@@ -1479,10 +1479,6 @@ function vm_boot() {
         args+=(-boot order=d
             -drive if=ide,index=2,media=cdrom,file="${iso}")
         iso=""
-    elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
-        # Attach the unattended configuration to Windows guests when booting from ISO
-        # shellcheck disable=SC2054
-        args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
     fi
 
     if [ -n "${floppy}" ]; then
@@ -1495,7 +1491,24 @@ function vm_boot() {
         args+=(-drive media=cdrom,index=0,file="${iso}")
     fi
 
-    if [ -n "${fixed_iso}" ]; then
+    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
+        # Attach the unattended configuration to Windows guests when booting from ISO
+        if [[ ! -e "${VMDIR}/disk.qcow2" ]] || [[ ! $(du -b -t 1000000 "${VMDIR}/disk.qcow2" 2>/dev/null) ]]; then
+            if [ -e "${VMDIR}/unattended.iso" ] && [ -n "${fixed_iso}" ]; then
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=1,file="${VMDIR}/unattended.iso")
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=2,file="${fixed_iso}")
+            else
+                echo; echo "ERROR!  Windows download incomplete:"
+                echo "Required ISO files 'virtio-win.iso' and 'unattended.iso' not found." 
+                exit 1
+            fi
+        else
+            # shellcheck disable=SC2054
+            args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+        fi
+    elif [ -n "${fixed_iso}" ]; then
         # shellcheck disable=SC2054
         args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
     fi
@@ -2013,7 +2026,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.8.02"
+readonly VERSION="FS 4.9.8.03"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
