@@ -1491,13 +1491,19 @@ function vm_boot() {
         args+=(-drive media=cdrom,index=0,file="${iso}")
     fi
 
-    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ] && [ -n "${fixed_iso}" ]; then
+    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
         # Attach the unattended configuration to Windows guests when booting from ISO
         if [[ ! -e "${VMDIR}/disk.qcow2" ]] || [[ ! $(du -b -t 1000000 "${VMDIR}/disk.qcow2" 2>/dev/null) ]]; then
-            # shellcheck disable=SC2054
-            args+=(-drive media=cdrom,index=1,file="${VMDIR}/unattended.iso")
-            # shellcheck disable=SC2054
-            args+=(-drive media=cdrom,index=2,file="${fixed_iso}")
+            if [ -e "${VMDIR}/unattended.iso" ] && [ -n "${fixed_iso}" ]; then
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=1,file="${VMDIR}/unattended.iso")
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=2,file="${fixed_iso}")
+            else
+                echo; echo "ERROR!  Windows download incomplete:"
+                echo "Required ISO files 'virtio-win.iso' and 'unattended.iso' not found." 
+                exit 1
+            fi
         else
             # shellcheck disable=SC2054
             args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
