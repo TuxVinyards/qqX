@@ -114,7 +114,7 @@ function quickemu {
         read -rp "  >  "  Mounted_ISO_Return
 
       elif [[ $BootStyle == "fast" ]]; then
-        printColor "  BIOS Boot Manager may be session enabled in utils ..."
+        printColor "  qqX Boot Manager may be session enabled in utils, if required ..."
         printf "\n\n  Use the qqX [iso] utility to select a specific bootable image file \n\n"
 
       elif [[ $BootStyle == "slow" ]]; then
@@ -125,17 +125,18 @@ function quickemu {
 
       fi
 
+      if [[ $BootStyle == "fast" ]] && [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
+        printf "  [enter] to continue \n\n"
+        read -rp "  >  "
+      fi
+
       if [[ $Mounted_ISO_Return ]]; then  return
-
       else
-
         # These logs only get cleared just before running, so stay until a boot sequence is run, irrespective of
         # whether the run is made as [v] verbose & terminated
         printf "" > "/tmp/qqX_echo_output.log"
         printf "" > "$QemuErrorLog"
-
         [[ $GeneralLoopCheck ]] && printf "\n\n pre drives_and_snapshots :" &&  dev_loop_check
-
         drives_and_snapshots  "info_current"
         printf "\n"
         if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  
@@ -145,26 +146,20 @@ function quickemu {
           VM_ExecBoot=
           return
         fi
-
         [[ $GeneralLoopCheck ]] && printf "\n\n pre-sourcing qmod-boot :" &&  dev_loop_check && printf "\n\n"
-
         source "/tmp/qmod-boot-temp" 
         VM_ExecBoot=
-
         if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
           printColor "\n\n  Press 'esc' when 'Start boot Option' appears" 
           printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. \n\n"
         fi
-
         if [[ $BreakAtVerboseArgs ]]; then
           SpicyPID="$(pgrep spicy)"
           [[ $SpicyPID ]] && kill "$SpicyPID" 2>/dev/null &
         fi
-
       fi
 
     fi
-
 
   fi
 

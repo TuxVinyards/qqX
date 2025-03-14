@@ -45,9 +45,9 @@ else
       printf  "  [u] show UTILS & technical"
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
-      # force boot manager on Windows NEW INSTALLS
+      # force verbose boot on Windows NEW INSTALLS
       if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
-        BootStyle="slow"
+        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev. 
         VerboseArgs=1
         printColor "   >> Windows install: Verbose mode enabled <<"
         printColor "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
