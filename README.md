@@ -2,6 +2,8 @@
 
 - Create an easy to build collection of distros and desktops for testing, using and evaluating
 
+- Safe, carefully written, well tested and checked
+
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
 - Adds fixes, tools and general improvements to the [Quickemu](https://github.com/quickemu-project/quickemu) system
@@ -224,49 +226,53 @@ Also try the Quickemu forum at <https://discord.gg/sNmz3uw>
 
 ## Why Bash?
 
-Bash, or similar, is automatically there on the Linux command line. Most users already know or can understand at least a little of it.
+Bash is automatically there on almost every Linux system, directly on the command line.
 
-- Improving your knowledge of Bash is always time well spent.
+- easily integrates with the Linux core utilities and sub-system
+
+- is more performant than basic Posix Shell
+
+Improving your knowledge of Bash is always time well spent
+
+- Most users already know or can understand at least a little of it.
 
 ### Keeping it Simple
 
-- The qqX coding is clear and annotated sufficiently for newcomers to find their feet.
+The qqX coding is clear and annotated sufficiently for newcomers to find their feet
 
-Quickemu currently uses simple Bash scripts. QEMU / KVM does all the heavy lifting.
+- qqX uses a more modern interpretation of Bash than that used in Quickemu
 
-- Much easier for community contributions. Much easier to edit and easy to fix.
+- but anything in quickemu can still be easily modded, shaped and improved
 
-qqX uses a more modern writing style but is much the the same.
+QEMU / KVM does all the heavy lifting
 
-- Anything in quickemu can be easily modded, shaped and improved.
+- Much easier for community contributions
 
-### ... and Straightforward
+- Much easier to edit and easy to fix
 
-There are none of the complexities that LibVirt creates by using only machine readable configurations.
+## ... and Straightforward
 
-And none of steep learning curves that come with languages such as Rust, C or Vala.
+qqX follows quickemu's pattern of using human orientated configuration files
 
-- Even seemingly simple LibVirt front-ends like Gnome Boxes can contain whole learning curves for the most basic of things, like moving the default VM folder for example.  Forget anything [more](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads)
+- none of the complexities of only having machine readable configurations, as with LibVirt
+
+Requires no special setup as do languages such as Rust, C or Vala
+
+- no potentially steep [learning](https://gitlab.gnome.org/GNOME/gnome-boxes/-/tree/main/src?ref_type=heads) curves
 
 ## Relationship with Quickemu
 
-qqX should be seen as complementary to Quickemu and as something to improve the Quickemu user experience.
+Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June a growing count of developers decided to walk away.
 
-That said, we do seem to be at a point where qqX is becoming an increasingly separate project.
-
-Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June I added to the growing count of developers who had decided to walk away.
-
-- An increasing number of fixes for Quickemu are having to be added downstream
-
-- Lots of fixes are using separate qqX licensed code
-
-I would like to see an improvement in relationships, so that more people could benefit from the work being done here.
-
-At the beginning of 2025, reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
-
-While an analogy could be Ubuntu not promoting derivatives like Linux Mint and Debian not promoting Ubuntu, this doesn't mean that we  have to do the same.
+- An increasing number of fixes for Quickemu are now having to be added downstream
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
+
+There needs to be an improvement in relationships, so that more people can benefit from the work being done here.
+
+- Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
+
+![qqX-on-the-quickemu-wiki](https://github.com/user-attachments/assets/3c11249e-4898-4882-a82e-c460472e8099)
 
 ## Development and Roadmap
 
