@@ -200,8 +200,8 @@ function manage_and_repair_disks {
     if [[ $DiskChkStatus == "Okay" ]]; then
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
-      printf "\n\n  Copy on Write and snapshots can sometimes make envelope size can be appear lower than the contents ..."
-      printf "\n\n  File Length greater than Disk Size indicates the need to tidy and compress." 
+      printf "\n\n  Copy on Write and snapshots can sometimes make envelope size appear to be lower than the contents ..."
+      printf "\n\n  File Length greater than Disk Size can indicate a need to tidy and compress." 
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
       [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 needs an [rd] clean up "
 

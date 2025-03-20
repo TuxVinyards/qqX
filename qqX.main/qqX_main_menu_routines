@@ -223,19 +223,23 @@ check_if_disk_needs_a_cleanup  () {
     if [[ $1 ]]; then DiskCheckFolderName="$1" ; else DiskCheckFolderName="$VM_InstanceName"; fi
     if [[ $2 ]]; then DiskCheck_Disk="$2" ; else DiskCheck_Disk="disk.qcow2"; fi
   fi
-  local FileLength= ; local DiskSize= ; local FileLengthGiB= ; local DiskSizeGiB= ; local DiskData=
+  local VirtualSize= ; local FileLength= ; local DiskSize= ; local DiskData=
   DiskDisparity=0
   DiskData="$(qemu-img info "$DiskCheckFolderName/$DiskCheck_Disk" 2>/dev/null)"
   # make sure units match and disk is of significant size
-  FileLengthGiB="$(grep -s 'file length' <<< "$DiskData" | grep -s 'GiB')"
-  DiskSizeGiB="$(grep -s -m1 'disk size' <<< "$DiskData" | grep -s 'GiB')"
-  if [[ $FileLengthGiB && $DiskSizeGiB ]]; then
-    FileLength="$(awk '/file length/{print $3}' <<< "$DiskData")"
-    DiskSize="$(grep -A 20 Child <<< "$DiskData" | awk '/disk size/{print $3}')"
-    if [[ $FileLength && $DiskSize ]]; then
-      DiskDisparity="$(bc <<< "scale=2; $FileLength/$DiskSize > 1.20")"
+  VirtualSize="$(grep -s 'virtual size' <<< "$DiskData" | grep -s 'GiB' | awk '{print $3}')"
+  FileLength="$(grep -s 'file length' <<< "$DiskData" | grep -s 'GiB' | awk '{print $3}')"
+  DiskSize="$(grep -s -m1 'disk size' <<< "$DiskData" | grep -s 'GiB' | awk '{print $3}')"
+  if [[ $VirtualSize && $FileLength && $DiskSize ]]; then
+    if [[ $VirtualSize -le 32 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+10)" 2>/dev/null)"
+    elif [[ $VirtualSize -le 64 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+15)" 2>/dev/null)"
+    elif [[ $VirtualSize -le 96 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+20)" 2>/dev/null)"
+    else DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+25)" 2>/dev/null)"
     fi
   fi
+  # bc's math library (-l) should refuse garbage, so if Qemu info layout changes then 'DiskDisparity' should theoretically be null.
+  # However, suppress error alerts as problems should show soon enough, and clearer, in other checks ... REVIEW 
+  [[ ! $DiskDisparity ]] && DiskDisparity=0  
 }
 
 
