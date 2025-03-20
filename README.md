@@ -22,7 +22,9 @@
 
 Building on 1.11.0's  large code update and new feature   _mounting of qcow2 drives in a file manager,_
 
-1.12.0 now adds storage maintence tools
+1.12.01 adds a fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+
+1.12.0 features new storage maintence tools
 
 - collection size analysis
 
@@ -30,15 +32,17 @@ Building on 1.11.0's  large code update and new feature   _mounting of qcow2 dri
 
 - new utilities interface
 
-Add to this
+Plus
 
 - Stop, start resume for downloads. Even with overnight pauses.
 
-- And an updated 'daily-live' synchronizer with new release alerts
+- An updated 'daily-live' synchronizer with new release alerts
 
-Plus improvements for Linux mint and the now usual collection of fixes for quickget
+- Improvements for Linux Mint
 
-And the 1.12.01 fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+And
+
+- the now usual collection of _downstream fixes for quickget_
 
 More in the [release notes](#release-notes) and wiki pages
 
