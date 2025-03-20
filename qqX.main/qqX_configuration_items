@@ -46,13 +46,14 @@ custom_conf_notes () {
     tpm=\"on\"          secureboot=\"off\"
     gl=\"off\"          (scaleable SDL, easier restarts) (?)
 
+    Early 2025 Insider betas are now requesting Secure Boot. 
+    Tests are showing seemingly successful outcomes when set to \"on\"
+
     Difficult booting: 
     boot=\"legacy\"  &  gl=\"off\"  may help ...
 
     highlight then shift-ctrl-c  to copy ...  
-    
   \n"
-
 }
 
 function check_screen_percentage_and_output {
@@ -400,13 +401,12 @@ qqX_edit_settings() {
 
       printf "\n\n"
       cat "$VM_Conf_Dir/$VM_Conf_File"
-
+      printf "\n\n"
+      
       while true ; do
-
-        printColor "\n\n\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
+        printColor "\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
-
         if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
         elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
