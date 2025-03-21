@@ -201,7 +201,7 @@ function manage_and_repair_disks {
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size appear to be lower than the contents ..."
-      printf "\n\n  File Length greater than Disk Size can indicate a need to tidy and compress." 
+      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
       [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
 
@@ -246,6 +246,8 @@ function manage_and_repair_disks {
 
   printf "\n"
   DiskManage=
+  DiskStorageChanges=
+  
   while true; do 
     printf "\n"
     read -rp "  >  "  DiskManage
@@ -288,6 +290,7 @@ function manage_and_repair_disks {
     fi
 
     printf "\n\n  Backups may be easily renamed and reused as previously, using the file manager"
+    DiskStorageChanges=1
 
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
       printf "" > "$Qemu_IMG_ErrorLog"
@@ -332,7 +335,8 @@ function manage_and_repair_disks {
           DiskSize_Occupied_New="${DiskSize_Occupied_New/'GiB'/}"
           DiskSize_Occupied_New="${DiskSize_Occupied_New//' '/}"
           DiskSize_Recovered="$(bc <<< "$DiskSize_GiB_OnDisk - $DiskSize_Occupied_New")G"
-          printColor  "\n\n  Reduction: %s" "$DiskSize_Recovered"
+          printColor "\n\n  File Size should now report correctly"
+          printColor "\n\n  Disk usage reduction: %s" "$DiskSize_Recovered"
         fi
       fi
       DiskManage="b"
@@ -441,25 +445,15 @@ function qqX_snapshot_delete {
     read -rp " >  "  SnapDeleteConfirm
 
 
-    if [[ $SnapDeleteConfirm == "b" ]]; then
-
-      printf "\n\n Deletion schedule has been CANCELLED"
-
+    if [[ $SnapDeleteConfirm == "b" ]]; then  printf "\n\n Deletion schedule has been CANCELLED"
     else
-
-      if [[ $SpecialSnapName ]]; then
-
+       if [[ $SpecialSnapName ]]; then  
         "$QEMU_IMG" snapshot -q -d "$SpecialSnapName" "$Selected_Drive" 
-
-      else
-    
-        SnapDeleteRangeCounter=$SnapDeleteStart
-
-        while [[ $SnapDeleteRangeCounter -le $SnapDeleteEnd ]]; do
-
+       else
+         SnapDeleteRangeCounter=$SnapDeleteStart
+         while [[ $SnapDeleteRangeCounter -le $SnapDeleteEnd ]]; do
           IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[$SnapDeleteRangeCounter]}"
           SnapName="${SnapListArrSeparated[1]}"
-
           if [[ ! $SnapName ]]; then
             printColor "\n\n ERROR with SnapShot Array List \n\n"
             sleep 5
@@ -469,21 +463,22 @@ function qqX_snapshot_delete {
             "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive" 
           fi
           ((SnapDeleteRangeCounter+=1))
-
         done
-
       fi
-
       "$QEMU_IMG" info "$Selected_Drive" 
-
       Selected_Drive_NewSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
       if [[ "$Selected_Drive_NewSize" == *GiB* ]] && [[ "$Selected_DriveSize" == *GiB* ]]; then
         SelDrvOld="${Selected_DriveSize//'GiB'/}"
         SelDrvNew="${Selected_Drive_NewSize//'GiB'/}"
         SelDrv_SpaceSaved="$(bc <<< "$SelDrvOld - $SelDrvNew ") GiB"
       fi
-
+      check_if_disk_needs_a_cleanup  "$Selected_Drive" 
+      if [[ $DiskDisparity == "1" ]]; then
+        printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
+        printf "\n\n  Try the main menu Disk Utility for a clean up ....\n"
+      fi
       printColor "\n\n Initial Disk Size: %s  -  Space Saved: %s \n"  "$Selected_DriveSize"  "$SelDrv_SpaceSaved"
+      DiskStorageChanges=1
 
     fi
 

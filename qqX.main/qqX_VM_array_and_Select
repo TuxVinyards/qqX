@@ -373,9 +373,20 @@ VM_loader_selector_and_menu () {
         path_diagnostics
         IgnoreConfigErrors=
 
-        printf "\n\n"
-        read -rp  "   >  "  VM_Selection
+        if [[ $VM_Selection_Overide ]];then
+          VM_Selection="$VM_Selection_Overide"
+          VM_Selection_Overide=
+        else
+          printf "\n\n"
+          read -rp  "   >  "  VM_Selection
+        fi
+      fi
 
+      if [[ $VM_Selection == "sz" ]] && [[ $DiskStorageChanges ]]; then 
+        DiskStorageChanges=
+        VM_Selection_Overide="sz"
+        printf "\n\n  Storage Changes >> Refreshing the Size Arrays \n\n" ; sleep 0.5
+        refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       fi
 
       #

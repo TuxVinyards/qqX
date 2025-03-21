@@ -313,7 +313,7 @@ function  main_menu_actions {
     else
       printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
       printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
-      printf "\n\n  File Length greater than Disk Size can indicate a need to tidy and compress." 
+      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
       printColor "\n\n  Use the qqX disk utility to resize and to tidy."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
@@ -360,6 +360,7 @@ function  main_menu_actions {
       SnapTitle="${SnapTitle// /.}"
       "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
       "$QEMU_IMG" info "$Selected_Drive"
+      DiskStorageChanges=1
       printColor "\n\n  Drive Updated ..."
       printf "\n\n  [enter] to return to menu \n\n "
       read -rp "  >  "  
