@@ -75,6 +75,15 @@ function_vm_folder_item_text () {
     LiveDistrosFound=1
 
   fi
+
+  if [[ $FD_Space ]]; then printf "\n\n  %-35s" " " ; FD_Space= ; fi
+  if [[ $FD_Phrase && ${ArrayConf_Item_Listing,,} == *"$FD_Phrase"* ]] || [[ $FD_Start && ${ArrayConf_Item_Listing,,} == "$FD_Start"* ]] ; then  
+    printf "\n\n  %-35s" " "
+    ArrayConf_Item_Listing="***  ${ArrayConf_Item_Listing^^}  ***"
+    FD_Space=1
+  else FD_Space=
+  fi
+
 }
 
 print_selector_array_A_style () {

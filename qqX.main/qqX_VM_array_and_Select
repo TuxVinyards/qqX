@@ -340,8 +340,11 @@ VM_loader_selector_and_menu () {
 
         else
 
-          printf "\n\n  [number] to select a VM         "        
-          printf "   [set] view or edit settings file"
+          printf "\n\n  [number] to select a VM         "
+          [[ ! $ShowFindPoint ]] && ShowFindPoint=32
+          if [[ $VM_ElementCount -ge "$ShowFindPoint" ]]; then  printf "   [set] edit settings  [fd] find distro"
+          else printf "   [set] view or edit settings file"
+          fi
           printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
 
           if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
@@ -372,6 +375,8 @@ VM_loader_selector_and_menu () {
 
         path_diagnostics
         IgnoreConfigErrors=
+        FD_Phrase=
+        FD_Start=
 
         if [[ $VM_Selection_Overide ]];then
           VM_Selection="$VM_Selection_Overide"
@@ -398,6 +403,24 @@ VM_loader_selector_and_menu () {
         [[ $VM_Selection != "c" ]] && qqX_edit_settings 
         VM_Selection=
         return
+
+      elif [[ $VM_Selection == "fd" ]]; then
+
+        printColor "\n\n  Find Distro - Use multi-part cmd at the standard prompt:"
+        printf "\n\n  Contains      fd c search-phrase"
+        printf "\n\n  Starts with   fd s a-z or phrase"
+        printColor "\n\n  [enter] to continue \n\n"
+        read -rp "  >  "
+        return
+
+      elif [[ "$VM_Selection" == fd* ]]; then 
+
+        if [[  "$VM_Selection" == 'fd c '*  ]]; then  FD_Phrase="${VM_Selection/'fd c '/}"
+        elif [[  "$VM_Selection" == 'fd s '*  ]]; then  FD_Start="${VM_Selection/'fd s '/}"
+        else 
+          printf "\n\n  Find Distro command not recognised ... \n\n" ; sleep 1 ; return
+        fi
+        refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then 
       
