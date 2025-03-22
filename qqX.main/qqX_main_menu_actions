@@ -314,6 +314,7 @@ function  main_menu_actions {
       printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
       printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
       printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations ..." 
       printColor "\n\n  Use the qqX disk utility to resize and to tidy."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 

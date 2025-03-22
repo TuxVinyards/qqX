@@ -201,7 +201,8 @@ function manage_and_repair_disks {
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size appear to be lower than the contents ..."
-      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
+      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
       [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
 
@@ -478,7 +479,8 @@ function qqX_snapshot_delete {
       fi
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
       if [[ $DiskDisparity == "1" ]]; then
-        printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
+        printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
         printf "\n\n  Try the main menu Disk Utility for a clean up ....\n"
       fi
       printColor "\n\n Initial Disk Size: %s  -  Space Saved: %s \n"  "$Selected_DriveSize"  "$SelDrv_SpaceSaved"
