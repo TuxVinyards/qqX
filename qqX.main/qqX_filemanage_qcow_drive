@@ -263,7 +263,8 @@ while true; do
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then (nohup &> /dev/null  "$TextEditor"  "$0" & ) || texteditor_not_found_message
-  elif [[ $qf_DriveSelect == "f" ]]; then (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
+  elif [[ $qf_DriveSelect == "f" ]]; then 
+    (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
   elif [[ $qf_DriveSelect == "r" ]]; then
     if [[ $qqf_Input_Drivepath ]]; then 
       printf "\n qqf_Input_Drivepath=\"%s\" \n" "$qqf_Input_Drivepath" >> "/tmp/qqX_nbd_vars"

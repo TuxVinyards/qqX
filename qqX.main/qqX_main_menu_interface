@@ -187,9 +187,11 @@ else
       if [[ $SelectArrayError ]]; then printColor "\n\n  Settings Error = %s"  "$SelectArrayError" ; SelectArrayError=
       elif [[ $DefaultFolderError ]]; then printColor "\n\n  Settings Error = Default Folder NOT found" ; DefaultFolderError=
       elif [[ $ExtraFolderError ]]; then printColor "\n\n  Settings Error = %s  NOT found"  "$ExtraFolderError" ; ExtraFolderError=
-      else printf "\n\n  Settings have been refreshed and reloaded ...." ; fi
+      else [[ ! $FileManager_Run  ]] && printf "\n\n  Settings have been refreshed and reloaded ...."
+      fi
       ConfSettingsAdjusted=
       SettingsFileAdjusted=
+      FileManager_Run=
 
     fi
 
@@ -261,6 +263,7 @@ else
     printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   "
     printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount" 
     printf "ISO's: %s (%s)  "  "${InstanceISO_Sizes}G" "$InstanceISO_SizesCount"
+    [[ $(ls "$VM_InstanceName"/*.OLD.qcow2 2>/dev/null) ]] && printColor "(backup disk present)"
 
     printf  "\n\n"
     filter_and_flag_qemu_errors
@@ -405,6 +408,7 @@ else
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
+
     if [[ $MainMenuChoicePreset ]]; then
       printf "  >  %s" "$MainMenuChoicePreset" 
       MainMenuChoice="$MainMenuChoicePreset" 

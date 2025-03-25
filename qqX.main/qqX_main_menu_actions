@@ -54,7 +54,7 @@ function  main_menu_actions {
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
 
-  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "r" || $MainMenuChoice == "ln" ]]; then 
+  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "rn" || $MainMenuChoice == "ln" ]]; then 
 
     move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
@@ -137,7 +137,12 @@ function  main_menu_actions {
     [[ $QL_LogView  == "w" ]] && QemuError_VM_Filter+=("warning" "deprecated" "info:" "usb_desc_get_descriptor") && QemuErrorAlert=
     [[ $QL_LogView  == "c" ]] && printf "" > "$QemuErrorLog" && QemuErrorAlert=
 
-  elif [[ $MainMenuChoice == "f" ]] ; then  (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  & ) || file_manager_not_found_message
+  elif [[ $MainMenuChoice == "f" ]] ; then
+
+    (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  & ) || file_manager_not_found_message
+    DiskStorageChanges=1 ; FileManager_Run=1
+    printf "\n\n  [enter] to refresh and continue \n\n"
+    read -rp "  >  "
 
   elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
 
@@ -475,8 +480,7 @@ function  main_menu_actions {
 
   else
 
-    # the [enter] to refresh option:
-    MainMenuChoice=
+    # the [enter] to refresh option with 'rq' as hidden quiet
     ShowUtilsMenu=
     VM_ExecBoot=
     refresh_and_load_quickemu_sources

@@ -189,7 +189,7 @@ source "$qqX_MainFolder/qqX_main_menu_actions"
 
 function main_menu {
   while true ; do
-    MainMenuChoice=
+    MainMenuChoice= 
     SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
     if [[ $KillPID_Menu_Exited ]] ; then
@@ -239,7 +239,7 @@ while true ; do
   # Where 'ByPass_VM_Array_Selector' implies run the loader section only (eg. XDG and .conf clicked starts)
   # The array must still be loaded as may be needed for reselecting later ...
 
-  if [[ ! $VM_InstanceName ]] || [[ $ByPass_VM_Array_Selector ]]; then  
+  if [[ ! $VM_InstanceName ]] || [[ $ByPass_VM_Array_Selector ]]; then 
     VM_loader_selector_and_menu 
   else  
     # PWD should now be the conf directory but make sure we are actually there.  

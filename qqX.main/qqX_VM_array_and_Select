@@ -48,7 +48,6 @@ add_unlisted_vm_to_vm_array () {
   
 }
 
-
 scan_folders_list_and_add_VMs () {
 
   #  Scans of current & listed VM folders for other potential '.conf' files to add to the VM array
@@ -121,7 +120,7 @@ scan_folders_list_and_add_VMs () {
       fi
 
     done
-
+    
   fi
 
   # Scan rest of list & ADD new found .conf files / distros to the VM array, if they are not yet listed:
@@ -165,7 +164,6 @@ scan_folders_list_and_add_VMs () {
 
 }
 
-
 scan_VM_Array_for_sizes () {
 
   # human set for report
@@ -198,8 +196,11 @@ scan_VM_Array_for_sizes () {
     | tee -a "/tmp/qqX.Sizes.iso.txt" -a "/tmp/qqX.Sizes.iso.F.txt" &> /dev/null 
   fi
 
+  BackUpQcowPresent="$(grep -cs '.OLD.qcow2' "/tmp/qqX.Sizes.qcow.txt")"
+  [[ $BackUpQcowPresent == "0" ]] && BackUpQcowPresent=
+
   # machine set for calcs
-  # both cases avoid using du with -L or symbolically linked instances will cause double counts when totalling storage
+  # both cases avoid using du with -L otherwise symbolically linked instances will cause double counts when totalling storage
   printf "" > "/tmp/qqX.Sizes.qcow.K.txt"  
   printf "" > "/tmp/qqX.Sizes.iso.K.txt"  
   i=0
@@ -234,7 +235,6 @@ scan_VM_Array_for_sizes () {
     Total_ISO_Sizes="0"
     Total_ISO_SizesCount="0"
   fi
-  
 }
 
 show_VM_Array_sizes_text () {
@@ -243,6 +243,11 @@ show_VM_Array_sizes_text () {
   { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
     printf "\nISO by Size: \n\n" 
     sort -hr "/tmp/qqX.Sizes.iso.txt"
+    if [[ $BackUpQcowPresent ]]; then
+      printf "\nBackups: \n\n"
+      grep -s '.OLD.qcow2' "/tmp/qqX.Sizes.qcow.txt"
+      printf "\n"
+    fi
     printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
     printf "\n\n\nDisk by Folder: \n"
     if [[ "$(cat "/tmp/qqX.Sizes.qcow.F.txt" 2>/dev/null)" ]]; then 
@@ -319,7 +324,9 @@ VM_loader_selector_and_menu () {
         done
 
         printf "\n  Total Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-        printf "  [sz] show size details \n"
+        [[ $BackUpQcowPresent ]] && printf "  Backups (%s)"  "$BackUpQcowPresent"
+        printf "  [r] refresh  [sz] show size details"
+        printf "\n"
 
         [[ ! $SelectArrayError ]] && print_selector_array_"$VM_SelectorStyle"_style
 
@@ -367,7 +374,8 @@ VM_loader_selector_and_menu () {
 
           [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
 
-          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]]; then printColor "\n\n  Preview only - use [set] for menu permanency, [r] to return to default "
+          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]] && [[ ! $VM_Selection_Overide ]]; then 
+            printColor "\n\n  Preview only - use [set] for menu permanency, [r] to return to default "
           elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
           fi
 
@@ -378,6 +386,11 @@ VM_loader_selector_and_menu () {
         FD_Phrase=
         FD_Start=
 
+        if [[ $DiskStorageChanges ]]; then
+          DiskStorageChanges=
+          VM_Selection_Overide="r"
+        fi
+
         if [[ $VM_Selection_Overide ]];then
           VM_Selection="$VM_Selection_Overide"
           VM_Selection_Overide=
@@ -385,13 +398,6 @@ VM_loader_selector_and_menu () {
           printf "\n\n"
           read -rp  "   >  "  VM_Selection
         fi
-      fi
-
-      if [[ $VM_Selection == "sz" ]] && [[ $DiskStorageChanges ]]; then 
-        DiskStorageChanges=
-        VM_Selection_Overide="sz"
-        printf "\n\n  Storage Changes >> Refreshing the Size Arrays \n\n" ; sleep 0.5
-        refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
       fi
 
       #
@@ -420,10 +426,11 @@ VM_loader_selector_and_menu () {
         else 
           printf "\n\n  Find Distro command not recognised ... \n\n" ; sleep 1 ; return
         fi
-        refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        return
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then 
       
+        # NB different to VM_selector_menu_refresh
         VM_SelectorStyle="$VM_Selection" 
         ByPass_VM_Array_Loader=1
         MenuStylePreviewed=1
@@ -435,22 +442,24 @@ VM_loader_selector_and_menu () {
         VM_Selection=
         return
 
-      elif [[ $VM_Selection == "r" ]]; then  refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+      # Note, for this script, 'refresh_sources_and_load_VM_arrays' gets run at start of loop on return
+
+      elif [[ $VM_Selection == "r" ]]; then  VM_selector_menu_refresh ; return
 
       elif [[ ${VM_Selection^^} == "FS" ]] ; then  
-        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection^^} == "FB" ]] ; then  
-        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection^^} == "HB" ]] ; then  
-        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection,,} == ech* ]] ; then  
-        CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection,,} == sys* ]] ; then  
-        CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1;refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection} == cust* ]] ; then  
-        CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
       elif [[ ${VM_Selection,,} == dev* ]] ; then  
-        CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays ; VM_selector_menu_refresh ; return
+        CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
 
       elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
 
@@ -644,6 +653,7 @@ refresh_sources_and_load_VM_arrays() {
   find_texteditor
 
   Current_VM_Folder="$Default_VM_Folder"
+
   function_create_VM_folderList  
   scan_folders_list_and_add_VMs
   scan_VM_Array_for_sizes
