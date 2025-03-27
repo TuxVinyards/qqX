@@ -18,6 +18,18 @@
 # For notes on custom vm menus > edit > find > "Custom styles" in 'qqX.main/qqX_VM_selector_styles'
 
 
+VM_selector_menu_refresh () {
+  ByPass_VM_Array_Loader=
+  ByPass_VM_Array_Selector=
+  ListTitleFolderOld=
+  InvertStyleColors=
+  MenuStylePreviewed=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  VM_InstanceName=
+  VM_Selection=
+}
+
 VM_loader_selector_and_menu () {  
 
   ShowUtilsMenu=
@@ -251,6 +263,7 @@ VM_loader_selector_and_menu () {
           VM_Conf_Dir="${VM_Array[$VM_Selection,0]}"
           VM_Conf_File="${VM_Array[$VM_Selection,1]}"
           VM_Selection=
+          VM_check_and_load
           break
         fi
 
@@ -273,84 +286,12 @@ VM_loader_selector_and_menu () {
         VM_Conf_Dir="${VM_Array[0,0]}"
         VM_Conf_File="${VM_Array[0,1]}"
         VM_Selection=
+        VM_check_and_load
         break
 
       fi
 
     done
-
-  fi
-
-  if  [[ $VM_Renamed || ! $ByPass_VM_Array_Selector ]] && [[ ! $SelectArrayError ]]; then  
-
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 2:" &&  dev_loop_check
-
-    ## Check file/folder exists and that we are where we need to be
-    [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder" "$VM_Conf_Dir" && SelectArrayError=1
-
-    # change directory to where the VM is
-    ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1
-    Current_VM_Folder="$VM_Conf_Dir"
-
-    if [[ ! $IgnoreFolderCheck ]] && [[ $VM_Conf_File != "empty" ]] && [[ ! -e "$VM_Conf_File" ]]; then  
-      function_conf_error  ".conf file" && SelectArrayError=1
-    fi
-
-    # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder 
-    VM_InstanceName="${VM_Conf_File/.conf}"
-
-    # Check that the dir contains the right files  &&  grep .conf for right content
-    if [[ $IgnoreFolderCheck || $VM_Conf_File == "empty" ]]; then IgnoreFolderCheck=
-    elif [[ ! $(ls "$VM_InstanceName"/*.qcow2 2>/dev/null) ]]; then
-      if [[ $(ls "$VM_InstanceName"/*.iso 2>/dev/null) || $(ls "$VM_InstanceName"/*.img 2>/dev/null) ]]; then 
-        SelectArrayError=1; function_conf_error  "new" 
-      else
-        SelectArrayError=1; function_conf_error  "folder"
-      fi
-    fi
-
-    if [[ ! $SelectArrayError ]]; then
-      ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
-    fi
-    
-    if [[ ! $SelectArrayError ]]; then
-      # Check KVM parameter settings of new selection & advise accordingly
-      KVM_MSR_selector=
-      find_kvm_msr_default_and_status
-      if [[ $Verbose_MSR_dialog ]] || [[ ! $Verbose_MSR_dialog ]] && [[ "$VM_InstanceName" == *windows* || "$VM_InstanceName" == *macos* ]]; then 
-        msrs_conflict_check_resolver
-      fi
-    fi
-
-  fi  
-
-  
-  if [[ $SelectArrayError || $SettingsFileAdjusted ]] && [[ ! $NewFileTuneUp_JustDone ]]; then 
-  
-    VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=  
-    # reload if the editor was called, or called due to settings error > zero vars triggers the main qqX loop
-
-  else
-
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 3:" &&  dev_loop_check
-
-    # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
-    # otherwise any items specified in the previous config, but not in the new one, will remain.
-    refresh_conf_vars_and_values
-
-    # Set or adjust any VM_Conf_Dir or other related globals  (VM is now selected OR has been re-selected)
-    refresh_logfile_locations
-    alert_on_new
-
-    # clear any no-longer needed flags
-    VM_Selection=
-    ByPass_VM_Array_Loader=
-    ByPass_VM_Array_Selector=
-    MenuStylePreviewed=
-    NewFileTuneUp=
-    VM_Renamed=
-
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 4:" &&  dev_loop_check
 
   fi
 
