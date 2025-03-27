@@ -544,7 +544,6 @@ function refresh_conf_vars_and_values {
     source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
-  
     # check any menu values that are based on the file .conf 
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
@@ -553,9 +552,7 @@ function refresh_conf_vars_and_values {
     
     refresh_logfile_locations
 
-
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
-
 
   fi
 

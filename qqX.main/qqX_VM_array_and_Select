@@ -25,18 +25,25 @@ VM_loader_selector_and_menu () {
   ShowDefault_Hybrid=
   ForceCustomBootStyle=
 
-  # LOADER  
+  # LOADER 
 
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
     # just clear the flag, may be bypassed if array present and nothing new added, or if settings not changed ... 
     ByPass_VM_Array_Loader=
-  else 
+    [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM loader:" &&  dev_loop_check
+  else
     refresh_sources_and_load_VM_arrays
+    [[ $GeneralLoopCheck ]] && printf "\n\n VM selector, post refresh_sources_and_load_VM_arrays:" &&  dev_loop_check
   fi
- 
+
   # SELECTOR
 
-  if [[ ! $ByPass_VM_Array_Selector ]] ; then
+  if [[ $ByPass_VM_Array_Selector ]] ; then  
+  
+    VM_check_and_load
+    [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM array selector :" &&  dev_loop_check
+
+  else
 
     VM_Selection=
     VM_Conf_Dir=
@@ -52,6 +59,8 @@ VM_loader_selector_and_menu () {
     Current_VM_Folder="$Default_VM_Folder"
 
     while true; do
+
+      [[ $GeneralLoopCheck ]] && printf "\n\n VM selector loop:" &&  dev_loop_check
 
       if [[ $Run_GT ]]; then  Run_GT= ; VM_Selection="gt"
       
