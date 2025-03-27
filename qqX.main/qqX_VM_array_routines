@@ -239,8 +239,20 @@ scan_VM_Array_for_sizes () {
 
 show_VM_Array_sizes_text () {
 
+  printf ""  > "/tmp/qqX.Sizes.Disparity.qcow.txt"
+  [[ $VM_ElementCount -ge "36" ]] && printf "\n  Checking ... \n\n"
+  mapfile -t SizesScanArr < "/tmp/qqX.Sizes.qcow.txt"
+  for SSArrChk in "${SizesScanArr[@]}"; do
+    SSArrChk_Disk="$(awk '{print $2}' <<< "$SSArrChk")"
+    check_if_disk_needs_a_cleanup "$SSArrChk_Disk"
+    [[ $DiskDisparity == "1" ]] && printf "SIZE DISPARITY: %s \n\n" "$SSArrChk_Disk"  >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
+  done
+  [[ ! $(cat "/tmp/qqX.Sizes.Disparity.qcow.txt") ]] &&  printf "No disk size disparity problems found \n\n"   >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
+
   printf "\nDisk by Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
-  { sort -hr "/tmp/qqX.Sizes.qcow.txt" 
+  { sort -hr "/tmp/qqX.Sizes.qcow.txt"
+    printf "\n"
+    cat "/tmp/qqX.Sizes.Disparity.qcow.txt"
     printf "\nISO by Size: \n\n" 
     sort -hr "/tmp/qqX.Sizes.iso.txt"
     if [[ $BackUpQcowPresent ]]; then
