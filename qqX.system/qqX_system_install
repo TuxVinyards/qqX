@@ -973,10 +973,10 @@ if [[ $Start_qqX ]]; then
   cd "$HOME" || printf "\n\n  ERROR switching to home folder %s ?? \n\n" "$HOME" 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 1
-    eval "$Start_qqX" 
+    eval "$Start_qqX"   &>/dev/null
     read -rp "  >  "
     exit
-  else exec bash -c "$Start_qqX" 
+  else exec bash -c "$Start_qqX"  &>/dev/null
   fi
 else  
   exit 
