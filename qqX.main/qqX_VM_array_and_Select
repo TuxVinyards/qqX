@@ -18,18 +18,6 @@
 # For notes on custom vm menus > edit > find > "Custom styles" in 'qqX.main/qqX_VM_selector_styles'
 
 
-VM_selector_menu_refresh () {
-  ByPass_VM_Array_Loader=
-  ByPass_VM_Array_Selector=
-  ListTitleFolderOld=
-  InvertStyleColors=
-  MenuStylePreviewed=
-  VM_Conf_Dir=
-  VM_Conf_File=
-  VM_InstanceName=
-  VM_Selection=
-}
-
 VM_loader_selector_and_menu () {  
 
   ShowUtilsMenu=
@@ -164,20 +152,13 @@ VM_loader_selector_and_menu () {
         VM_Selection=
         return
 
-      elif [[ $VM_Selection == "fd" ]]; then
-
-        printColor "\n\n  Find Distro - Use multi-part cmd at the standard prompt:"
-        printf "\n\n  Contains      fd c search-phrase"
-        printf "\n\n  Starts with   fd s a-z or phrase"
-        printColor "\n\n  [enter] to continue \n\n"
-        read -rp "  >  "
+      elif [[ $VM_Selection == "fd" ]]; then  FD_help_notes
 
       elif [[ "$VM_Selection" == fd* ]]; then 
 
         if [[  "$VM_Selection" == 'fd c '*  ]]; then  FD_Phrase="${VM_Selection/'fd c '/}"
         elif [[  "$VM_Selection" == 'fd s '*  ]]; then  FD_Start="${VM_Selection/'fd s '/}"
-        else 
-          printf "\n\n  Find Distro command not recognised ... \n\n" ; sleep 1 
+        else  FD_help_notes
         fi
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then 
@@ -291,3 +272,30 @@ VM_loader_selector_and_menu () {
   fi
 
 }
+
+FD_help_notes () {
+  printColor "\n\n  Find Distro - Use multi-part cmd at the standard prompt:"
+  printf "\n\n  Contains      fd c search-phrase"
+  printf "\n\n  Starts with   fd s [a-z] or phrase"
+  printColor "\n\n  [enter] to continue \n\n"
+  read -rp "  >  "
+}
+
+
+VM_selector_menu_refresh () {
+  ByPass_VM_Array_Loader=
+  ByPass_VM_Array_Selector=
+  ListTitleFolderOld=
+  InvertStyleColors=
+  MenuStylePreviewed=
+  VM_Conf_Dir=
+  VM_Conf_File=
+  VM_InstanceName=
+  VM_Selection=
+}
+
+# https://code.visualstudio.com/  (recommended)
+
+# vim:tabstop=2:shiftwidth=2:expandtab
+
+## 
