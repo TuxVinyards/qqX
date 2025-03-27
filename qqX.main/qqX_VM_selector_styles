@@ -327,8 +327,11 @@ print_selector_array_E_style () {
 
 if [[ -e "$Default_VM_Folder/qqX.custom/custom_vm_selectors" ]]; then source "$Default_VM_Folder/qqX.custom/custom_vm_selectors" ; fi
 
-# Method: Use an existing style as a template. More than one function may be created. 
-# Create above stated folder & file. Add "#!/usr/bin/env bash" to line 1 then paste-in and edit the functions. 
+# Method: 
+# Create plain text folder & file 'custom_vm_selectors' as above. Add "#!/usr/bin/env bash" to line 1.  
+# Use an existing style to create a template. This is the easiest way.
+# Copy and paste any of the style functions into the new file. 
+# Only the needed style function has to be copied but more than one function may be added.
 # Use style letters from end of alphabet eg R to Z   Letters must be CAPS but sequence may be non-contiguous. 
 
 
