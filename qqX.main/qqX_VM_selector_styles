@@ -147,7 +147,7 @@ print_selector_array_B_style () {
     function_vm_folder_item_text
 
     if [[ $FD_Highlight ]]; then
-      if [[ $i -gt 9 ]]; then printColor "{%d} " "$i" ; else printColor "{%d}  " "$i" ; fi
+      if [[ $i -gt 9 ]]; then printf "{%d} " "$i" ; else printf "{%d}  " "$i" ; fi
     else
       if [[ $i -gt 9 ]]; then printf "[%d] " "$i" ; else printf "[%d]  " "$i" ; fi
     fi
