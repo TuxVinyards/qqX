@@ -171,16 +171,14 @@ VM_loader_selector_and_menu () {
         printf "\n\n  Starts with   fd s a-z or phrase"
         printColor "\n\n  [enter] to continue \n\n"
         read -rp "  >  "
-        return
 
       elif [[ "$VM_Selection" == fd* ]]; then 
 
         if [[  "$VM_Selection" == 'fd c '*  ]]; then  FD_Phrase="${VM_Selection/'fd c '/}"
         elif [[  "$VM_Selection" == 'fd s '*  ]]; then  FD_Start="${VM_Selection/'fd s '/}"
         else 
-          printf "\n\n  Find Distro command not recognised ... \n\n" ; sleep 1 ; return
+          printf "\n\n  Find Distro command not recognised ... \n\n" ; sleep 1 
         fi
-        return
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then 
       
@@ -194,7 +192,6 @@ VM_loader_selector_and_menu () {
         VM_Conf_File=
         VM_InstanceName=
         VM_Selection=
-        return
 
       # Note, for this script, 'refresh_sources_and_load_VM_arrays' gets run at start of loop on return
 
@@ -219,7 +216,7 @@ VM_loader_selector_and_menu () {
 
       elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
 
-      elif [[ $VM_Selection == "qf" ]]; then  qcow2_filemanagement_launcher "qqf-setvars" ; qcow2_filemanagement_launcher  ; return
+      elif [[ $VM_Selection == "qf" ]]; then  qcow2_filemanagement_launcher "qqf-setvars" ; qcow2_filemanagement_launcher
 
       elif [[ $VM_Selection == "set" ]];then
 
@@ -231,13 +228,11 @@ VM_loader_selector_and_menu () {
 
         VM_Selection=
         show_VM_Array_sizes_text 
-        return
 
       elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
 
         if [[ $VM_Selection == "f"  ]]; then  show_qqX_general_help "f" ; else show_qqX_general_help ; fi
         VM_Selection=
-        return
 
       elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
 
@@ -264,7 +259,7 @@ VM_loader_selector_and_menu () {
           VM_Conf_File="${VM_Array[$VM_Selection,1]}"
           VM_Selection=
           VM_check_and_load
-          break
+          return
         fi
 
       elif [[ $VM_Selection ]]; then 
@@ -287,7 +282,7 @@ VM_loader_selector_and_menu () {
         VM_Conf_File="${VM_Array[0,1]}"
         VM_Selection=
         VM_check_and_load
-        break
+        return
 
       fi
 
