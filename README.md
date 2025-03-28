@@ -18,11 +18,13 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.12.01](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.02](https://github.com/TuxVinyards/qqX/releases/latest)
 
-Building on 1.11.0's  large code update and new feature   _mounting of qcow2 drives in a file manager,_
+1.12.02 gives a collection of UI / UX improvements and adds a distro finder
 
 1.12.01 adds a fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+
+Building on 1.11.0's ability to _mount qcow2 drives in a file manager,_
 
 1.12.0 features new storage maintence tools
 
@@ -188,7 +190,7 @@ Plus improvements for Linux mint and the now usual collection of fixes for quick
 
 ![stop-start-resume](https://github.com/user-attachments/assets/d710f47f-a2b9-4bda-beda-5f5290dfad52)
 
-@ March 14, version [1.12.01]((https://github.com/TuxVinyards/qqX/releases/latest)) fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+@ March 14, version 1.12.01 fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
 
 This issue with the **Windows installer sequence** recently came to the fore, also on the Discord forum.
 
@@ -197,6 +199,12 @@ Although qqX tests had shown Windows to both download and run, this long standin
 The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.  
 
 Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
+
+@ March 28 [1.12.02](https://github.com/TuxVinyards/qqX/releases/latest) focuses on UI / UX improvements
+
+- generally polishes and refines the user experience for all the recent additions
+
+- adds a distro finder for helping with large distro collections
 
 ## Reliability
 
