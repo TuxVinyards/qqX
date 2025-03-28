@@ -404,10 +404,13 @@ qqX_edit_settings() {
       printf "\n\n"
       
       while true ; do
-        printColor "\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
+        printColor "\n  [enter] to edit   [n] conf notes  [d] conf defaults list   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
-        if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
+        if [[ $ConfEdit_Select == "n" ]] ; then  custom_conf_notes
+        elif [[ $ConfEdit_Select == "d" ]] ; then
+          printColor "\n\n  Standard Quickemu hard-coded defaults: \n"  
+          grep -s -B 200 ACCESS "/tmp/qmod-qe-all-vars-temp" | grep -v -e ACCESS -e MAIN -e Lowercase
         elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
         else
