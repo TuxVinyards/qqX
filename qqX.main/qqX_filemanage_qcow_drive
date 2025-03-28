@@ -278,6 +278,7 @@ while true; do
       printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
       printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
     fi
+    printf "\n\n  %s: " "$TargetName" 
     printColor "\n\n  [c] connect  [d] disconnect current and unmount  [enter] [r] to reselect or return"
     printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
     printf "\n\n"
