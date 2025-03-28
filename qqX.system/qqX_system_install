@@ -934,13 +934,15 @@ if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX
 if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then  Start_qqX="${Start_qqX/' -- '/' --wait -- '}" ; fi
 
 End_Install=
-printColor  "\n\n  Install process finished:  "
-
-printf "\n\n\n  Start qqX straight from the system's MAIN MENU,"
-printf   "\n  by typing 'qqX' the terminal, or by mouse clicks on VM or ISO files ..."
-printf "\n\n  Start qqX to edit the settings file, or before starting"
-printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
-
+if [[ $Current_qqX_Version ]]; then
+  printf  "\n\n   Upgrade changes are now complete \n\n"
+else
+  printColor  "\n\n  Install process finished:  "
+  printf "\n\n\n  Start qqX straight from the system's MAIN MENU,"
+  printf   "\n  by typing 'qqX' the terminal, or by mouse clicks on VM or ISO files ..."
+  printf "\n\n  Start qqX to edit the settings file, or before starting"
+  printf   "\n  at %s \n\n\n"  "$HOME/.qqX/qqX_settings"
+fi
 if [[ $UserTerm == "qterminal" ]]; then
   printColor "\n\n  LXQT 'qterminal' does not have size commands BUT it may be resized quite easily \n\n  and should remember its sizes between uses. \n\n"
 fi
@@ -971,10 +973,10 @@ if [[ $Start_qqX ]]; then
   cd "$HOME" || printf "\n\n  ERROR switching to home folder %s ?? \n\n" "$HOME" 
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 1
-    eval "$Start_qqX" 
+    eval "$Start_qqX"   &>/dev/null
     read -rp "  >  "
     exit
-  else exec bash -c "$Start_qqX" 
+  else exec bash -c "$Start_qqX"  &>/dev/null
   fi
 else  
   exit 

@@ -15,13 +15,9 @@
 
 #  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
 
-
-## VM selector style default
-
+## VM selector style
 Default_VM_SelectorStyle="A"
-
 [[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="$Default_VM_SelectorStyle"
-
 
 function_create_VM_folderList() {
 

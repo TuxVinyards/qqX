@@ -49,8 +49,9 @@ else
       if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
         #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev. 
         VerboseArgs=1
-        printColor "   >> Windows install: Verbose mode enabled <<"
-        printColor "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
+        printColor "   >> Windows install: Verbose mode enabled << \n\n"
+        [[ $WebBrowser ]] && printColor "  [qW]"
+        printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
       else
         printf "   [bm] > "
         if [[ $BootStyle == "fast" ]]; then 
@@ -186,9 +187,11 @@ else
       if [[ $SelectArrayError ]]; then printColor "\n\n  Settings Error = %s"  "$SelectArrayError" ; SelectArrayError=
       elif [[ $DefaultFolderError ]]; then printColor "\n\n  Settings Error = Default Folder NOT found" ; DefaultFolderError=
       elif [[ $ExtraFolderError ]]; then printColor "\n\n  Settings Error = %s  NOT found"  "$ExtraFolderError" ; ExtraFolderError=
-      else printf "\n\n  Settings have been refreshed and reloaded ...." ; fi
+      else [[ ! $FileManager_Run  ]] && printf "\n\n  Settings have been refreshed and reloaded ...."
+      fi
       ConfSettingsAdjusted=
       SettingsFileAdjusted=
+      FileManager_Run=
 
     fi
 
@@ -260,6 +263,7 @@ else
     printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   "
     printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount" 
     printf "ISO's: %s (%s)  "  "${InstanceISO_Sizes}G" "$InstanceISO_SizesCount"
+    [[ $(ls "$VM_InstanceName"/*.OLD.qcow2 2>/dev/null) ]] && printColor "(backup disk present)"
 
     printf  "\n\n"
     filter_and_flag_qemu_errors
@@ -362,7 +366,7 @@ else
     check_if_disk_needs_a_cleanup
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
-    elif [[ $DiskDisparity == "1" ]]; then  printColor "  DISK.QCOW2 needs a clean up  > [disk] repair utils \n\n"
+    elif [[ $DiskDisparity == "1" ]]; then  printColor "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
     fi
 
@@ -404,6 +408,7 @@ else
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
+
     if [[ $MainMenuChoicePreset ]]; then
       printf "  >  %s" "$MainMenuChoicePreset" 
       MainMenuChoice="$MainMenuChoicePreset" 

@@ -446,9 +446,13 @@ function_config_tune_up ()  {
       printColor "\n\n Windows: "
       printf "\n\n  Software TPM should be set as \"on\" until at least the registration process is complete"
       printf "\n\n  but can be set to \"off\" at later stages. Lines may commented-out with a \"#\" \n"
+      printf "\n\n  Secure Boot should normally be set to \"off\" but early 2025 Insider betas are now requesting this feature."
+      printf "\n\n  Tests on 2025 Insider are showing seemingly successful outcomes when set to \"on\" \n"
       
       ConfLine="$(grep -s '# for Windows, normally' "$TuneUpTmpCopy")"
-      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then  printf "\n\n# for Windows, normally set tpm as on & secureboot as off:"   >> "$TuneUpTargetDraft" ; fi
+      if [[ ! $ConfLine ]] || [[ "$ConfLine" == *'#'* ]]; then  
+        printf "\n\n# for Windows, normally set tpm as on & secureboot as off, although early 2025 insider betas are now needing secureboot=\"on\""  >> "$TuneUpTargetDraft" 
+      fi
       {   printf "\ntpm=\"on\"" 
           printf "\nsecureboot=\"off\"\n\n"
       }   >> "$TuneUpTargetDraft"

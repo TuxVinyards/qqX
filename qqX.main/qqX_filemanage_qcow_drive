@@ -263,7 +263,8 @@ while true; do
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then (nohup &> /dev/null  "$TextEditor"  "$0" & ) || texteditor_not_found_message
-  elif [[ $qf_DriveSelect == "f" ]]; then (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
+  elif [[ $qf_DriveSelect == "f" ]]; then 
+    (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
   elif [[ $qf_DriveSelect == "r" ]]; then
     if [[ $qqf_Input_Drivepath ]]; then 
       printf "\n qqf_Input_Drivepath=\"%s\" \n" "$qqf_Input_Drivepath" >> "/tmp/qqX_nbd_vars"
@@ -277,6 +278,7 @@ while true; do
       printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
       printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
     fi
+    printf "\n\n  %s: " "$TargetName" 
     printColor "\n\n  [c] connect  [d] disconnect current and unmount  [enter] [r] to reselect or return"
     printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
     printf "\n\n"

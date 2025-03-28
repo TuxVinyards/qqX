@@ -46,13 +46,14 @@ custom_conf_notes () {
     tpm=\"on\"          secureboot=\"off\"
     gl=\"off\"          (scaleable SDL, easier restarts) (?)
 
+    Early 2025 Insider betas are now requesting Secure Boot. 
+    Tests are showing seemingly successful outcomes when set to \"on\"
+
     Difficult booting: 
     boot=\"legacy\"  &  gl=\"off\"  may help ...
 
     highlight then shift-ctrl-c  to copy ...  
-    
   \n"
-
 }
 
 function check_screen_percentage_and_output {
@@ -400,14 +401,16 @@ qqX_edit_settings() {
 
       printf "\n\n"
       cat "$VM_Conf_Dir/$VM_Conf_File"
-
+      printf "\n\n"
+      
       while true ; do
-
-        printColor "\n\n\n  [enter] to edit   [r] config reminder notes   [t] config tune-up wizard   [b] go back"
+        printColor "\n  [enter] to edit   [n] conf notes  [d] conf defaults list   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
-
-        if [[ $ConfEdit_Select == "r" ]] ; then     custom_conf_notes
+        if [[ $ConfEdit_Select == "n" ]] ; then  custom_conf_notes
+        elif [[ $ConfEdit_Select == "d" ]] ; then
+          printColor "\n\n  Standard Quickemu hard-coded defaults: \n"  
+          grep -s -B 200 ACCESS "/tmp/qmod-qe-all-vars-temp" | grep -v -e ACCESS -e MAIN -e Lowercase
         elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
         else
@@ -544,7 +547,6 @@ function refresh_conf_vars_and_values {
     source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
-  
     # check any menu values that are based on the file .conf 
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
@@ -553,9 +555,7 @@ function refresh_conf_vars_and_values {
     
     refresh_logfile_locations
 
-
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
-
 
   fi
 

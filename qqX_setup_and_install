@@ -163,9 +163,15 @@ elif [ -t 1 ] ; then
   read -r reply
 fi
 
-if [ -t 1 ] ; then  
-  printf "\n\n\n    %s:"  "$UserTerm"
-  printf "\n\n    Some distros may need or will have needed this window to stay open \n    until the installer has completed its tasks ..."  
+if [ -t 1 ] ; then 
+  printf "\n"
+  printf "\n\n    qqX installer:  %s"  "$UserTerm"
+  printf "\n"
+  printf "\n\n    Help and info always available at https://github.com/TuxVinyards/qqX/wiki" 
+  printf "\n"
+  printf "\n\n    Your terminal or distro/terminal combination may need, or may have needed "
+  printf "\n\n    this window to stay open until qqX has completed its tasks ..."
+  printf "\n"
   printf "\n\n    [enter] to close \n\n  "
   read -r reply
 fi

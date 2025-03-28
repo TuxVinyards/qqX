@@ -111,6 +111,11 @@ VM_SelectorStyle="A"
 # For custom main menu: see file "qqX_main_menu_interface"
 # Also see qqX wiki.
 
+# FIND DISTRO:
+# Set number of distros showing before find option shows on menu. Useful for large collections. 
+# Set value at 2x actual. Suggest around 15 or 20 distros, eg set @ 30 or 40, default = 32
+  ShowFindPoint="32"
+
 #  -------------------------------------------------------------------------------------------------------------------
 
 ## 'QUICKEMU' & 'QUICKGET'  SOURCE:

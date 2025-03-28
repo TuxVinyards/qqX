@@ -886,7 +886,10 @@ function configure_os_quirks() {
 
 function configure_storage() {
     local create_options=""
-    echo " - Disk:     ${disk_img} (${disk_size})"
+    # 'disk_size' is only reliable on first creation as it is read from .conf ....
+    #  remove size report here as disks can be resized when using qqX, plus qqX supplies much more boot data anyway
+    # echo " - Disk:     ${disk_img} (${disk_size})"
+    echo " - Disk:     ${disk_img}"
     if [ ! -f "${disk_img}" ]; then
         # If there is no disk image, create a new image.
         mkdir -p "${VMDIR}" 2>/dev/null
@@ -2026,7 +2029,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.8.03"
+readonly VERSION="FS 4.9.8.04"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
