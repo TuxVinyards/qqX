@@ -250,11 +250,16 @@ show_VM_Array_sizes_text () {
   [[ ! $(cat "/tmp/qqX.Sizes.Disparity.qcow.txt") ]] &&  printf "No disk size disparity problems found \n\n"   >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
 
   printf "\nDisk by Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
-  { sort -hr "/tmp/qqX.Sizes.qcow.txt"
+  { 
+    if [[ $(cat "/tmp/qqX.Sizes.qcow.txt") ]]; then  sort -hr "/tmp/qqX.Sizes.qcow.txt"
+    else printf "\nNo distros have yet been installed to disk"
+    fi
     printf "\n"
     cat "/tmp/qqX.Sizes.Disparity.qcow.txt"
-    printf "\nISO by Size: \n\n" 
-    sort -hr "/tmp/qqX.Sizes.iso.txt"
+    printf "\nISO by Size: \n\n"
+    if [[ $(cat "/tmp/qqX.Sizes.iso.txt") ]]; then  sort -hr "/tmp/qqX.Sizes.iso.txt"
+    else printf "\nNo ISOs are present"
+    fi
     if [[ $BackUpQcowPresent ]]; then
       printf "\nBackups: \n\n"
       grep -s '.OLD.qcow2' "/tmp/qqX.Sizes.qcow.txt"
