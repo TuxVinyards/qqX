@@ -20,31 +20,17 @@
 
 ## [Latest release 1.12.02](https://github.com/TuxVinyards/qqX/releases/latest)
 
-1.12.02 gives a collection of UI / UX improvements and adds a distro finder
+1.12.02 gives a collection of UI/UX improvements and adds a distro finder
 
 1.12.01 adds a fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
 
-Building on 1.11.0's ability to _mount qcow2 drives in a file manager,_
+- Includes the new storage maintence tools
 
-1.12.0 features new storage maintence tools
+- Extended stop, start and resume for downloads.
 
-- collection size analysis
+- And the now usual collection of _downstream fixes for quickget_
 
-- individual disk disparity checks
-
-- new utilities interface
-
-Plus
-
-- Stop, start resume for downloads. Even with overnight pauses.
-
-- An updated 'daily-live' synchronizer with new release alerts
-
-- Improvements for Linux Mint
-
-And
-
-- the now usual collection of _downstream fixes for quickget_
+1.11.0 added the ability to [_mount qcow2 drives in a file manager_](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing#other-tools)
 
 More in the [release notes](#release-notes) and wiki pages
 
@@ -136,11 +122,11 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 ## Release notes
 
-1.11 was a large code update with lots of new features and Quickemu improvements
+### 1.11 was a large code update with lots of new features and Quickemu improvements
 
 @ Nov 27th Beta 1.11.0.2
 
-- New feature _mounting of qcow2 drives in a file manager_ ....
+- New feature [_mounting of qcow2 drives in a file manager_](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing#other-tools)
 - added several quickget distro updates
 - improved vm selector transfer speed
 - further improved terminal handling on Qt based desktops, i3 and gnome3
@@ -148,13 +134,13 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 @ Dec 23  Release 1.11.02
 
 - The fix for Windows downloads, recently pushed to Quickemu via Pete Batard's work at [Fido](https://github.com/pbatard/Fido/issues/98)
-has now been merged
+was merged
 
-- The updater and installer has been adjusted and is generally improved. Direct downloads will not be affected but depending on your current updater version you may need to navigate to the download folder using your file manager and run the installer from there until the changes work through system.
+- The updater and installer was adjusted and is generally improved.
 
 @ Dec 31  Release 1.11.03
 
-- fix for Quickget hanging on URL checks when server or internet is slow
+- Fix was issued for Quickget hanging on URL checks when server or internet is slow
 
 - also fixed issue where quickget occasionally outputs multiline release and edition data
 
@@ -164,33 +150,27 @@ has now been merged
 
 - added several UX adjustments and general polish
 
-- and a new [branch](https://github.com/TuxVinyards/qqX/tree/quickget-distro-fixes-2025) now contains qqX _exclusive fixes_ for multiple distro downloads
+- added a new branch for [qqX _exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes)
+
+### New Release 1.12
 
 ![new size-ui](https://github.com/user-attachments/assets/0df37ca8-b4c1-4af8-a883-82ef60744649)
 
-### New Release
-
 @ Feb 23 1.12.0 added storage maintence tools
 
-- collection size analysis
+- Distro collection size analysis and size disparity checks
 
-- individual disk disparity checks
+- A new utilities interface
 
-- new utilities interface
+- An updated 'daily-live' synchronizer with new release alerts
 
-Add to this
+- Improvements for Linux Mint
 
-- Stop, start resume for downloads. Even with overnight pauses.
-
-- And an updated 'daily-live' synchronizer with new release alerts
-
-Plus improvements for Linux mint and the now usual collection of fixes for quickget ....
-
-- moves latest FreeSpirit to FreeBird, following testing
+- And added extended **stop, start and resume** for downloads:
 
 ![stop-start-resume](https://github.com/user-attachments/assets/d710f47f-a2b9-4bda-beda-5f5290dfad52)
 
-@ March 14, version 1.12.01 fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
+@ March 14, version 1.12.01 [downstream fix for the Quickemu Windows Installer issue #1475](https://github.com/quickemu-project/quickemu/issues/1475)
 
 This issue with the **Windows installer sequence** recently came to the fore, also on the Discord forum.
 
@@ -200,11 +180,15 @@ The issue also highlighted a couple of UI glitches that need sorting. A false di
 
 Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
 
-@ March 28 [1.12.02](https://github.com/TuxVinyards/qqX/releases/latest) focuses on UI / UX improvements
+@ March 28 [1.12.02](https://github.com/TuxVinyards/qqX/releases/latest) focuses on **UI/UX improvements**
 
 - generally polishes and refines the user experience for all the recent additions
 
 - adds a distro finder for helping with large distro collections
+
+The prompt `[fd] find distro` will  automatically appear for those with 12 distros or more.
+
+- type `fd` on any VM selector menu to test it out ...
 
 ## Reliability
 
