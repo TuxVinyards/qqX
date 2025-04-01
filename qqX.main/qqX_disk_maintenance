@@ -719,16 +719,18 @@ qcow2_filemanagement_launcher () {
   local qqf_Input=
   local qqf_Input_Drivepath=
 
-  if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
+  if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ;  read -rp "  [enter] to continue  >  "
+  fi
 
   if [[ $1 == "qqf-info" ]]; then qqf_StandaloneInfo=1 ; shift
   fi
   if [[ $1 == "qqf-setvars" ]]; then qqf_SetVars=1 ; shift
   fi
   [[ $1 ]] && qqf_Input_Drivepath="$(realpath "$1")" && shift
-  [[ -e "$qqf_Input_Drivepath" ]] && qqf_Input_Drivepath=
+  [[ ! -e "$qqf_Input_Drivepath" ]] && qqf_Input_Drivepath=
 
-  if [[ $Trace_InputVars ]]; then echo "qqf_Input_Drivepath: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+  if [[ $Trace_InputVars ]]; then echo "qqf_Input_Drivepath: $qqf_Input_Drivepath"  ; echo  ;  read -rp "  [enter] to continue  >  "
+  fi
 
   if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
     printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."

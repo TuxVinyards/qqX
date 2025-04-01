@@ -38,14 +38,14 @@ fi
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
-if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
-
-if [[ -e "$1" ]]; then 
-  qqf_Input_Drivepath="$1" ; shift
+if [[ $Trace_InputVars ]]; then  echo "Args: $*"  ; echo
 fi
 
-if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+if [[ -e "$1" ]]; then  qqf_Input_Drivepath="$1" ; shift
+fi
 
+if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo ; sleep "$Trace_InputVars"
+fi
 
 if [[ ! $(type -p "$FileManager") ]] ; then 
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
