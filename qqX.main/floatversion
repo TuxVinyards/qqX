@@ -16,9 +16,8 @@
 # Various versioning systems exist: 
 # See https://en.wikipedia.org/wiki/Software_versioning  and  http://semver.org/ 
 
-# For this script: x.xx.xx-suffix > major.minor.point and with optionals as -beta.01 etc
-# Non-major numbers are padded to 2dp to make easier reading in file managers
-# Current Version 1.02.02  > set locally in function case statements
+# For this script: x.x.xx-suffix > major.minor.point
+# Current Version > set locally in function case statements
 
 # POSIX and Mac/HomeBrew compliant initial Bash test:
 if [ ! "$(command -v bash)" ] || ! bash --version | grep bash | grep -qEo '[ ]+[5-9]+[.]' ; then
@@ -68,7 +67,8 @@ float_version_from_string ()  {
 
 	show_help () {
 	  printf "
-  floatversion --options  \"quoted-input-source\"
+  floatversion --options  \"quoted-input-source-or-data\"  
+  OR  data | floatversion --options \"optional-additional\" 
 
   Extracts point separated numbers, or semantic version numbers with optional suffixes,
   and other common variations upon, from a given string or text-file
@@ -100,6 +100,9 @@ float_version_from_string ()  {
 
   Tests show 'jq' sort methods as more reliable than 'sort -V' esp. with alpha suffixes
   All cases, returns false if none.  Direct \'2>/dev/null\' to quieten messages.
+
+  Full version required for stdin and pipes. Either or both input methods may be used.
+  May also be installed with 'fv' as an alias or symbolic link. 
   
   License: MIT  Copyright (c) Alex Genovese  
   Further Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
@@ -119,6 +122,7 @@ float_version_from_string ()  {
   local SortNum=
   local GrepFull=
   local InputText=
+  local StdIn=
   local Nums=
   local NumsCount=
   local FilterString=
@@ -143,10 +147,10 @@ float_version_from_string ()  {
       -h|--help)  
         show_help ; return 0 ;;
       -V|--version)
-        CurrentVersion="1.02.02"
+        CurrentVersion="1.3.0"
         printf "\n CurrentVersion: %s" "$CurrentVersion"
         printf "\n\n Checking for updates....   "
-        LatestVersion="$(floatversion -M "$(curl --disable -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
+        LatestVersion="$(floatversion -M "$(curl -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
         if [[ $LatestVersion ]]; then  
           printf "LatestVersion: %s " "$LatestVersion"
           if floatversion --gt "$LatestVersion $CurrentVersion" 2>/dev/null; then printf " UPGRADEABLE "
@@ -204,13 +208,25 @@ float_version_from_string ()  {
     esac
   done
 
-  # if input is file name, then read file,
-  # sanitize and make sure that all input is a safe line separated list, or becomes one
+  # If input is file name, then READ FILE
   [[ -e "$InputText" ]] && InputText="$(cat -vet "$InputText")"
-  InputText="$(tr ';' ' '  <<< "$InputText" | tr '$' ' \n' | tr ' ' '\n' | grep -sE '[[:print:]]')" 
+  # If and/or pipe/stdin (full version only)
+  # https://unix.stackexchange.com/questions/484630/check-if-no-command-line-arguments-and-stdin-is-empty
+  [[ ! -t 0 ]] && StdIn="$(cat -vet "/dev/stdin" 2>/dev/null)"
+
+  # Sanitize and make sure that all input is a safe line separated list, or becomes one
+  [[ $InputText ]] && InputText="$(tr ';' ' '  <<< "$InputText" | tr '$' ' \n' | tr ' ' '\n' | grep -sE '[[:print:]]')" 
+  [[ $StdIn ]] && StdIn="$(tr ';' ' '  <<< "$StdIn" | tr '$' ' \n' | tr ' ' '\n' | grep -sE '[[:print:]]')" 
+
+  if [[ $InputText ]]; then [[ $StdIn ]] && InputText="$InputText $StdIn"
+  else InputText="$StdIn"
+  fi
 
   if [[ ! $InputText ]]; then 
-    printf "\n  ERROR: no input found.  Is input present as a quoted element? \n" >&2
+    { printf "\n  ERROR: no input found?"
+      printf "\n  Input data should be piped or presented as a quoted element"
+      printf "\n  To suppress empty pipe errors use '2>/dev/null' \n"
+    } >&2
     show_help >&2 ; return 1
   fi
 
