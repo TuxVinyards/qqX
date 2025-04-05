@@ -155,7 +155,7 @@ while true; do
   if [[ ! $HideRefreshMsgs ]] && [[ $qqf_CmdLineStart ]]; then 
     printColor "\n\n  qqF - Cmd Line Start  >  "
     printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
-    printf "\n\n  Or for spot input, use mouse right click or CLI. See qqX --help for details."  
+    printf "\n\n  For spot input, use a right mouse click on the disk or at a new terminal type qqX \"/path/disk_name.qcow2\"" 
     printf "\n"
   fi
   if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_CmdLineStart ]]; then 
