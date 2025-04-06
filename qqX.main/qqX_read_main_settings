@@ -122,6 +122,8 @@ find_texteditor () {
 find_file_manager_browser
 find_texteditor
 
+## PATHS
+
 # Set the original initial value of paths as found on start up. Check Once.
 OriginalPATH="$PATH"
 QE_SystemFilePath="$(type -p quickemu)"  
@@ -136,85 +138,78 @@ function sort_qqX_builtin_settings {
 
   [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 1 :" &&  dev_loop_check
 
-  export PATH="$OriginalPATH"
-  QE_SourcePath=
-  QG_SourcePath=
+  QE_SourcePath= ; QG_SourcePath= ; FreePath=
 
   if [[ $CodingHotSwap ]]; then QE_SourceVersion="$CodingHotSwap" ; fi
+  [[ ! $QE_SourceVersion ]] && QE_SourceVersion="freebird"
 
-  if [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
+  # simplfy checks and standardization, make all lower case, for now 
+  QE_SourceVersion="${QE_SourceVersion,,}"
+
+  if [[ $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
     printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4 
   fi  
 
-  if [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then 
+  if [[ $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then 
     printf "\n\n  ERROR - Dev Folder not found \n\n  Re-check Installation &/or Installation instructions" 
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4
   fi  
 
-  if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "system" ]]; then 
+  if [[ $QE_SourceVersion == "system" ]]; then 
     if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then 
       QE_SourceVersion="System" 
       QE_SourcePath="$QE_SystemFilePath" 
       QG_SourcePath="$QG_SystemFilePath" 
     else  
-      QE_SourceVersion=
-      QE_SourcePath=
-      QG_SourcePath=
+      QE_SourceVersion="Missing System Files"
+      QE_SourcePath= ; QG_SourcePath= ; FreePath=
     fi
   fi
 
-  if [[ ! $QE_SourceVersion ]] || [[ $QE_SourceVersion == "FreeBird" || $QE_SourceVersion == "Freebird" || $QE_SourceVersion == "freebird" ]]; then
-    QE_SourceVersion="FreeBird"
-    FreePath="$qqX_BuiltinsFolder/freebird"
+  if [[ $QE_SourceVersion != "System" ]]; then 
+
+    if [[ $QE_SourceVersion == "freebird" ]]; then
+      QE_SourceVersion="FreeBird"
+      FreePath="$qqX_BuiltinsFolder/freebird"
+    elif [[ $QE_SourceVersion == "freespirit" ]]; then
+      QE_SourceVersion="FreeSpirit"
+      FreePath="$qqX_BuiltinsFolder/freespirit"
+    elif [[ $QE_SourceVersion == "homebird" ]]; then
+      QE_SourceVersion="HomeBird"
+      FreePath="$qqX_BuiltinsFolder/homebird"
+    elif [[ $QE_SourceVersion == "echo" ]]; then
+      QE_SourceVersion="Echo"
+      FreePath="$qqX_BuiltinsFolder/echo"
+    elif [[ $QE_SourceVersion == "custom" ]]; then
+      QE_SourceVersion="Custom"
+      FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
+      if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
+    elif [[ $QE_SourceVersion == "dev" ]]; then
+      QE_SourceVersion="Dev"
+      FreePath="$QE_DevPath"
+      if [[ ! -e "$FreePath" ]]; then
+        QE_SourceVersion="FreeSpirit"
+        FreePath="$qqX_BuiltinsFolder/freespirit"
+        printf "\n\n  Dev path  '%s'  Not Found   >>  Using FreeSpirit \n\n"  "$QE_DevPath"
+        sleep 2 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1	
+      fi
+    else
+      printf "\n\n  Source Setting  '%s'  Not Recognised   >>  Using FreeBird \n\n"  "$QE_SourceVersion"
+      sleep 3 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1	
+      QE_SourceVersion="FreeBird"
+      FreePath="$qqX_BuiltinsFolder/freebird"
+    fi
+
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
+
+  fi
+
+  if [[ $FreePath ]]; then
     export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_SourceVersion == "FreeSpirit" || $QE_SourceVersion == "Freespirit" || $QE_SourceVersion == "freespirit" ]]; then
-    QE_SourceVersion="FreeSpirit"
-    FreePath="$qqX_BuiltinsFolder/freespirit"
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_SourceVersion == "HomeBird" || $QE_SourceVersion == "Homebird" || "$QE_SourceVersion" == *'homebird'* ]]; then
-    QE_SourceVersion="HomeBird"
-    FreePath="$qqX_BuiltinsFolder/homebird"
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_SourceVersion == "Echo" || $QE_SourceVersion == "echo" ]]; then
-    QE_SourceVersion="Echo"
-    FreePath="$qqX_BuiltinsFolder/echo"
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"
-  elif [[ $QE_SourceVersion == "Custom" || $QE_SourceVersion == "custom" ]]; then
-    QE_SourceVersion="Custom"
-    FreePath="$Default_VM_Folder/qqX.custom/QE.Custom"
-    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freebird" ; fi
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"   
-  elif [[ $QE_SourceVersion == "Dev" || $QE_SourceVersion == "dev" ]]; then
-    QE_SourceVersion="Dev"
-    FreePath="$QE_DevPath"
-    if [[ ! -e "$FreePath" ]]; then FreePath="$qqX_BuiltinsFolder/freespirit" ; fi
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}" 
-  elif [[ $QE_SourceVersion && $QE_SourceVersion != "System" ]]; then
-    printf "\n\n  Source Setting  '%s'  Not Recognised   >>  Using FreeBird \n\n"  "$QE_SourceVersion"
-    sleep 2
-    # clear any pressing of the enter key occuring during error message pause
-    read -r -t 0.1  
-    read -r -t 0.1  
-    read -r -t 0.1  
-    read -r -t 0.1	
-    QE_SourceVersion="FreeBird"
-    FreePath="$qqX_BuiltinsFolder/freebird"
-    QE_SourcePath="$FreePath/quickemu"
-    QG_SourcePath="$FreePath/quickget"
-    export PATH="${FreePath}:${PATH}"
+  else 
+    export PATH="$OriginalPATH"
   fi
 
   QE_VerNumber=
