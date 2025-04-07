@@ -61,7 +61,6 @@ qqX_Upd_VarsTmpFile="/tmp/qqX.upd.chk.txt"
 
 echo > "$qqX_Upd_VarsTmpFile"
 
-
 check_for_qqX_updates() {
 
   # Quietly do a check for new releases 
@@ -76,31 +75,18 @@ check_for_qqX_updates() {
       qqX_Latest_Secure_TarSha="${qqX_Latest_Secure_TarBall}.sha256"
     fi
 
-    # Versioning, normally as x.xx.xx-suffix > major.minor.point and with optional suffix as -beta.01 etc
-    # Loosely following 'semantic versioning' but non-major non-zero numbers padded to 2dp to make easier reading in file managers
-
-    # Changes @ 24/11 with intro of 'floatversion' from system of:  beta as x.x.0.2dp > major.minor.0.dev-point.
-    # Where a single 0 in the third register indicates beta and 'x' = any whole number. The last register always as 2dp.
-    # The 4th register may also be used for dev-point or micro point branching for small tweaks and small fixes
-    #
-    # To clarify and expand eg for Version 1.10 - 1.10.0.01 would be beta 1 and 1.10.0.02 beta 2 etc,
-    # then first release would be 1.10.01 with 1.10.01.02 as a second issue with a few tweaks,
-    # or 1.10.02 as the next point release, with possibly a new small feature or two.
-
-    # Flag up release type.
-    # Current Version is carried out at the start, in similar way
+    # Versioning, normally as x.x.xx-suffix > major.minor.point and with optional suffix as -beta1 etc
+    # Flag up release type. Current Version is carried out at the start, in similar way
     if [[ $qqX_LatestRelease == *[[:alpha:]]* ]] ; then  qqX_LatestReleaseType="beta"
     else qqX_LatestReleaseType="release"
     fi
 
     #  If current ver is beta OR if beta notifications are requested in the general settings:
     [[ $qqX_CurrentReleaseType == "beta" ]] && Hide_qqX_BetaUpdates=
-
     #  Also flag up about beta notifications if transitioning from beta to release:
     [[ $qqX_CurrentReleaseType == "beta" ]] && [[ $qqX_LatestReleaseType == "release" ]] && BetaTxReleasePoint=1
 
     # Set up TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
-
     if [[ ! $Hide_qqX_BetaUpdates && $qqX_LatestReleaseType == "beta" ]] || [[ $qqX_LatestReleaseType == "release" ]]; then
       if  floatversion --gt "$qqX_LatestRelease  $qqX_Version" 2>/dev/null ; then
         { printf "\n\n qqX_UpdateAvail=\"1\""   
@@ -181,16 +167,12 @@ function download_new_release {
     done
 
     if [[ $qqX_NoReleaseDL ]]; then  qqX_NoReleaseDL=
-
     else
-
       # each release to its own folder makes things tidier
       qqX_LatestTarBall_Folder="$qqX_LatestTarBall_Folder/qqX.releases/$qqX_LatestRelease"
       mkdir -p "$qqX_LatestTarBall_Folder"
-
       # record where to come back to, when done and not to confuse with '$Current_VM_Folder' 
       ReturnFolder="$(pwd)"
-
       cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder ??"
 
       if [[ $qqX_Latest_Secure_TarBall ]]; then
@@ -200,10 +182,13 @@ function download_new_release {
         SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz.sha256")"
         printColor "\n  SHA256 Check: %s "  "$SHA_Check"
         [[ "$SHA_Check" != *'OK' ]] &&  printf "\n\n  ERROR  - RETRY  DOWNLOAD \n\n"
-      else  eval curl --disable -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" "$qqX_Latest_Secure_TarBall"
+      else
+        printf "\n  Problem auto-downloading via Secure Tarball (?) \n\n  Reverting to standard non sha256-checked \n\n"
+        qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_LatestRelease}.tar.gz" 
+        eval curl --disable -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
       fi
 
-      printColor "\n\n  Files downloaded to %s"  "$qqX_LatestTarBall_Folder"
+      printColor "\n\n  File download target %s"  "$qqX_LatestTarBall_Folder"
 
       if [[ $BetaTxReleasePoint ]]; then 
         printf "\n\n\n  Transitioning from beta to release ...  If required,"
@@ -215,14 +200,30 @@ function download_new_release {
       printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
       read -rp "  >  "  qqX_UpdateExit
 
-      if [[ $qqX_UpdateExit != "r" ]]; then 
+      if [[ ! -e "qqX-${qqX_LatestRelease}.tar.gz" ]]; then 
+        printColor "\n\n  ERROR: Download folder/file not found ??"
+        printf "\n\n  [enter] to close and retry \n\n"
+        read -rp "  >  "
+      else
         # https://stackoverflow.com/questions/651018/opening-a-tar-gz-file-with-a-single-command
-        tar xvfz "$qqX_LatestTarBall_Folder/qqX-${qqX_LatestRelease}.tar.gz" 
+        tar xfz "qqX-${qqX_LatestRelease}.tar.gz"
         sleep 0.5
+        if [[ -d "qqX-${qqX_LatestRelease}" ]]; then
+          # is using fall-back mode
+          cp -r "qqX-${qqX_LatestRelease}"/* .
+        fi
+        sleep 0.5
+        if [[ ! -e "qqX_setup_and_install" ]] ; then 
+          printColor "\n\n  ERROR extracting the download files ??"
+          printf "\n\n  [enter] to close and retry \n\n"
+          read -rp "  >  "
+          qqX_UpdateExit="r"
+        fi
+      fi
+      if [[ $qqX_UpdateExit != "r" ]]; then
         # start the SYSTEM installer (use the posix installer for initial or manual installs)
         exec  bash -c "$qqX_LatestTarBall_Folder/qqX.system/qqX_system_install  Upgrade" 
       fi
-
       sleep 0.6
       cd "$ReturnFolder"  || printColor "\n\n  ERROR  returning from qqX.releases folder"
 
