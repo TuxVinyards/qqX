@@ -169,11 +169,16 @@ if [[ ! $(type -p wget) ]]; then
   read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p 7z) ]]; then
-  printf "\n\n  A command line '7zip' installation is needed for some distro downloads...\n\n"
+  printf "\n\n  A command line '7zip'/'p7zip' installation is needed for some distro downloads...\n\n"
   read -rp "  [enter] to ignore or continue > "
 fi
 if [[ ! $(type -p spicy) ]]; then
   printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
+  read -rp "  [enter] to ignore or continue > "
+fi
+if [[ ! $(type -p qemu-system-x86_64) ]]; then
+  # REVIEW Arm compatibility
+  printf "\n\n  Check for 'qemu' installations: qemu-system-x86_64 or qemu-full-desktop etc ...\n\n"
   read -rp "  [enter] to ignore or continue > "
 fi
 
