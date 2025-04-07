@@ -200,7 +200,7 @@ float_version_from_string ()  {
           printf "\n  ERROR:  '%s'  not recognised \n" "$1" >&2
           show_help >&2 ; return 1
         elif [[ $InputText ]]; then
-          printf "\n  ERROR: QUOTED Input String or Text File Name should be given only once \n" >&2
+          printf "\n  ERROR: QUOTED Input String or Text File Name should be given \n" >&2
           show_help >&2 ; return 1
         else
           InputText="$1" ; shift 
@@ -223,8 +223,7 @@ float_version_from_string ()  {
   fi
 
   if [[ ! $InputText ]]; then 
-    { printf "\n  ERROR: no input found?"
-      printf "\n  Input data should be piped or presented as a quoted element"
+    { printf "\n  Input data should be piped or presented as a quoted element"
       printf "\n  To suppress empty pipe errors use '2>/dev/null' \n"
     } >&2
     show_help >&2 ; return 1

@@ -462,21 +462,30 @@ else
 
       printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
       printf   "\n  for the subfolders and files of qqX.main and from 1.8 onwards of qqX.builtins"
+      
+      printf "\n\n  Existing builtin, main and lib folders should be cleaned. " 
+      printf   "\n  Custom should be left as is."
 
       # Using -p  to make sure that "$qqX_Std_Share_Path/qqX.custom" doesn't get overwritten
-
       printColor "\n\n  sudo mkdir -p \"%s/qqX.custom\" " "$qqX_Std_Share_Path"
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.main" 
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.builtins" 
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.lib" 
+      printf "\n"
       printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
+      printColor "\n\n  sudo cp -r \"./qqX.lib\"  \"%s\" " "$qqX_Std_Share_Path"
+      printf "\n"
       printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
       printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_File_Path" 
       printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_lc_Link_Path" 
       
-      printf "\n\n  NOTE command line installation only. Auto-install is needed for desktop launchers and shortcuts"
+      printf "\n\n  NOTE command line installation only. "
+      printf "\n\n  Auto-install is needed for desktop launchers and shortcuts"
       printf "\n"
       print_manual_uninstall_notes
 
-      printf "\n\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
+      printColor "\n  [enter] changed mind, use auto-install   [y] to confirm action completed \n\n"
       read -rp  "  >  "  SeparateSudo
       printf "\n"
 
@@ -486,20 +495,25 @@ else
 
       printColor "\n  Auto-Installing .... \n\n  "
       sudo cp "qqX" "$qqX_Std_File_Path"
+      # make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link.   
       [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
-      [[ ! -d "$qqX_Std_Share_Path" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.custom"
+      [[ ! -d "$qqX_Std_Share_Path/qqX.custom" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.custom"
+      # remove any old and possibly obsolete and unneeded files (make sure custom is not overwritten)
+      [[ -d "$qqX_Std_Share_Path/qqX.main" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.main"
+      [[ -d "$qqX_Std_Share_Path/qqX.builtins" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.builtins"
+      [[ -d "$qqX_Std_Share_Path/qqX.lib" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.lib"
+      # copy new file set
       sudo cp -r "./qqX.main"  "$qqX_Std_Share_Path"
       sudo cp -r "./qqX.builtins"  "$qqX_Std_Share_Path"
+      sudo cp -r "./qqX.lib"  "$qqX_Std_Share_Path"
+      sudo ln -f -s "$qqX_Std_Share_Path/qqX.lib/floatversion" "$qqX_Std_Share_Path/qqX.lib/fv"
       sudo chmod a+rx -R  "$qqX_Std_Share_Path/"
       sudo chmod a+rx "$qqX_Std_File_Path"
       sudo chmod a+rx "$qqX_Std_lc_Link_Path"
 
     fi
-  
-    # Make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link.   
-    # Means copying to qqx will copy to qqX, and vice versa. 
-    # And check that the right version is there:
-
+    
+    # Check that the right version is there:
     if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$New_qqX_Version" ]] ; then 
       printColor "\n  Files installed: "; printf " All good" 
     else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$New_qqX_Version" ; sleep 2000  
