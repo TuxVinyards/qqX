@@ -207,9 +207,9 @@ function sort_qqX_builtin_settings {
   fi
 
   if [[ $FreePath ]]; then
-    export PATH="${FreePath}:${qqX_LibraryFolder}:${PATH}"
+    export PATH="${FreePath}:${qqX_LibraryFolder}:${OriginalPATH}"
   else 
-    export PATH="${qqX_LibraryFolder}:$OriginalPATH"
+    export PATH="${qqX_LibraryFolder}:${OriginalPATH}"
   fi
 
   QE_VerNumber=
