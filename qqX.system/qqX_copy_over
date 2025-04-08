@@ -24,6 +24,8 @@ qqX_Std_Share_Path="/usr/share/qqX"
 
 function copy_files {
 	printf "\n"
+	# remove any old and possibly obsolete and unneeded files
+  [[ -d "$qqX_Std_Share_Path/qqX.main" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.main"
 	sudo cp  -r qqX.main  "$qqX_Std_Share_Path/"  || CopyFail=1
 	sudo cp  qqX   "$qqX_Std_Bin_Dir/qqX"  || CopyFail=1
 	sudo chmod a+rx -R  "$qqX_Std_Share_Path/qqX.main"
@@ -35,8 +37,13 @@ function copy_files {
 
 function copy_builtins {
 	printf "\n"
+	[[ -d "$qqX_Std_Share_Path/qqX.builtins" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.builtins"
+	[[ -d "$qqX_Std_Share_Path/qqX.lib" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.lib"
 	sudo cp -r qqX.builtins   "$qqX_Std_Share_Path/"  || CopyFail=1
 	sudo chmod a+rx -R  "$qqX_Std_Share_Path/qqX.builtins"
+	sudo cp -r qqX.lib   "$qqX_Std_Share_Path/"  || CopyFail=1
+	sudo ln -f -s "$qqX_Std_Share_Path/qqX.lib/floatversion" "$qqX_Std_Share_Path/qqX.lib/fv"
+	sudo chmod a+rx -R  "$qqX_Std_Share_Path/qqX.lib"
 	source "qqX.system/qqX_settings_update_transposer"
 	source "qqX.system/Func_echo_colors"
 	printf "\n Builtins Copied \n"
