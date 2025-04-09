@@ -68,13 +68,17 @@ check_for_qqX_updates() {
   [[ -e "/tmp/latest-qqX" ]] && qqX_Latest_ReleaseNumber="$(floatversion --full -M  "$(grep -si 'tag_name' "/tmp/latest-qqX")" 2>/dev/null)"
 
   if [[ $qqX_Latest_ReleaseNumber ]]; then
-
     # make sure that GitHub is listing a tarball download address
     # eg. "https://github.com/TuxVinyards/qqX/releases/download/$qqX_Latest_ReleaseNumber/qqX-$qqX_Latest_ReleaseNumber.tar.gz"
     if [[ "$(tr '"' '\n' < "/tmp/latest-qqX" | grep -s http | grep -sc download)" == "2" ]] ; then
       qqX_Latest_SecureTarBall_Addr="$(tr '"' '\n' < "/tmp/latest-qqX" | grep -s http | grep -s -m 1 download)"
       qqX_Latest_SecureTarSha_Addr="${qqX_Latest_SecureTarBall_Addr}.sha256"
     fi
+  else
+    qqX_Latest_ReleaseNumber="$(curl -sf https://github.com/TuxVinyards/qqX/tags | grep 's/tag' | fv -M --full)"
+  fi
+
+  if [[ $qqX_Latest_ReleaseNumber ]]; then
 
     # Versioning, normally as x.x.xx-suffix > major.minor.point and with optional suffix as -beta1 etc
     # Flag up release type. Current Version is carried out at the start, in similar way
@@ -119,9 +123,11 @@ function download_new_release {
     qqX_logo_printf_title  "qqX updater"
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    if [[ ! $qqX_Latest_SecureTarBall_Addr ]] ; then printColor "\n\n  ERROR  No latest release found.  Return & retry ..."
+    if [[ ! $qqX_UpdateAvail ]] ; then printColor "\n\n  ERROR  No latest release found.  Return & retry ..."
     else 
-      printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
+      if [[ $qqX_Latest_SecureTarBall_Addr ]]; then printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
+      else printf "\n\n  Only Non-SHA checked download available (?)\n"
+      fi
       AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -sA 12 'body')"
       AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
       AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
@@ -198,23 +204,37 @@ function download_new_release {
             SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz.sha256")"
             printColor "\n  SHA256 Check: %s "  "$SHA_Check"
             if [[ "$SHA_Check" != *'OK' ]]; then
-              rm -r ./* 
+              rm -r ./*  2>/dev/null
               printf "\n\n  ERROR  - RETRYING  DOWNLOAD \n\n"
-            else break
+            else printf "\n\n" ; break
             fi
             ((dlCount++))
           done
         fi
         if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
-          rm -r ./* 
-          printColor "\n\n\n  Problem auto-downloading via Secure Tarball (?) "
-          printf "\n\n  Reverting to standard non sha256-checked \n\n"
-          qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_Latest_ReleaseNumber}.tar.gz" 
-          eval curl --disable -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
-          echo
+          rm -r ./*  2>/dev/null
+          printf "\n  Problem auto-downloading via Secure Tarball"
+          printColor "\n\n  Using standard NON sha256-checked \n\n"
+          dlCount="1"
+          while [[ $dlCount -le "3" ]]; do
+            qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_Latest_ReleaseNumber}.tar.gz" 
+            eval curl --disable -L -m 10 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
+            echo
+            if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
+              rm -r ./*  2>/dev/null
+              printf "\n\n  ERROR  - RETRYING  DOWNLOAD \n\n"
+            else printf "\n\n" ; break
+            fi
+            ((dlCount++))
+          done
         fi
 
-        printColor "\n\n  File download target %s"  "$qqX_LatestTarBall_Folder"
+        if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
+          printf "  Problem auto-downloading Tarball"
+          printColor "\n\n  Download file '%s not found \n\n" "qqX-${qqX_Latest_ReleaseNumber}.tar.gz"
+        fi
+
+        printColor "  File download target %s"  "$qqX_LatestTarBall_Folder"
 
         if [[ $BetaTxReleasePoint ]]; then 
           printf "\n\n\n  Moving from beta to release ... "
@@ -223,10 +243,12 @@ function download_new_release {
 
         printf "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
         printf "\n\n  All option settings, locations and preferences will be kept."
-        printf "\n\n\n  [enter] to run the installer script   [r] to return to main menu \n\n"
+        printf "\n\n\n  " 
+        [[ -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]] && printf "[enter] to run the installer script   "
+        printf "[r] to return to main menu \n\n"
         read -rp "  >  "  qqX_UpdateExit
 
-        if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then 
+        if [[ $qqX_UpdateExit != "r" ]] && [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then 
           printColor "\n\n  ERROR: Download folder/file not found ??"
           printf "\n\n  [enter] to close and retry \n\n"
           read -rp "  >  "
