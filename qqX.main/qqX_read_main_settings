@@ -274,8 +274,8 @@ find_quick_version_numbers
 # Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
 # but minor numbers remain padded to 2dp
 
-if [[ $qqX_Version == *[[:alpha:]]* ]] ; then  qqX_CurrentReleaseType="beta"
-else qqX_CurrentReleaseType="release"
+if [[ $qqX_Version == *[[:alpha:]]* ]] ; then  qqX_Current_ReleaseType="beta"
+else qqX_Current_ReleaseType="release"
 fi
 
 ## Check for Qemu & set up some of quickemu's variables, the upper case ones. (Adaption of the quickemu scripting)

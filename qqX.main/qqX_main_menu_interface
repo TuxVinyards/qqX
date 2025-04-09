@@ -367,7 +367,7 @@ else
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
     elif [[ $DiskDisparity == "1" ]]; then  printColor "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
-    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_LatestReleaseType" "$qqX_LatestRelease"
+    else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_Latest_ReleaseType" "$qqX_Latest_ReleaseNumber"
     fi
 
     if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then 
