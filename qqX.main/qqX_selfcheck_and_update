@@ -59,13 +59,21 @@ qqX_Latest_SecureTarBall_Addr=
 qqX_Latest_SecureTarSha_Addr=
 qqX_UpdateAvail=
 qqX_Upd_VarsTmpFile="/tmp/qqX.upd.chk.txt"
-echo > "$qqX_Upd_VarsTmpFile"
+printf "\n\n qqX_UpdateAvail="  > "$qqX_Upd_VarsTmpFile"
 
 check_for_qqX_updates() {
 
   # Quietly do a check for new releases and return required vars if update available
-  curl --disable -sLf -m 10 -o "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest" 
-  [[ -e "/tmp/latest-qqX" ]] && qqX_Latest_ReleaseNumber="$(floatversion --full -M  "$(grep -si 'tag_name' "/tmp/latest-qqX")" 2>/dev/null)"
+  # API method first, general release page second ... (?)
+  # only fv --full detects beta releases 
+
+  curl --disable -sLf -m 10 -o "/tmp/latest-qqX"  "https://api.github.com/repos/TuxVinyards/qqX/releases/latest"
+  sleep 0.5
+  if [[ -e "/tmp/latest-qqX" ]]; then
+    if [[ $Hide_qqX_BetaUpdates ]]; then qqX_Latest_ReleaseNumber="$(fv -M  "$(grep -si 'tag_name' "/tmp/latest-qqX")" 2>/dev/null)"
+    else qqX_Latest_ReleaseNumber="$(fv --full -M  "$(grep -si 'tag_name' "/tmp/latest-qqX")" 2>/dev/null)"
+    fi
+  fi
 
   if [[ $qqX_Latest_ReleaseNumber ]]; then
     # make sure that GitHub is listing a tarball download address
@@ -75,38 +83,35 @@ check_for_qqX_updates() {
       qqX_Latest_SecureTarSha_Addr="${qqX_Latest_SecureTarBall_Addr}.sha256"
     fi
   else
-    qqX_Latest_ReleaseNumber="$(curl -sf https://github.com/TuxVinyards/qqX/tags | grep 's/tag' | fv -M --full)"
+    # function 'download_new_release' will react to whether 'qqX_Latest_SecureTarBall_Addr' is available
+    if [[ $Hide_qqX_BetaUpdates ]]; then 
+      qqX_Latest_ReleaseNumber="$(curl -sf https://github.com/TuxVinyards/qqX/tags | grep 's/tag' | fv -M )"
+    else qqX_Latest_ReleaseNumber="$(curl -sf https://github.com/TuxVinyards/qqX/tags | grep 's/tag' | fv -M --full)"
+    fi
   fi
 
   if [[ $qqX_Latest_ReleaseNumber ]]; then
-
-    # Versioning, normally as x.x.xx-suffix > major.minor.point and with optional suffix as -beta1 etc
-    # Flag up release type. Current Version is carried out at the start, in similar way
-    if [[ $qqX_Latest_ReleaseNumber == *[[:alpha:]]* ]] ; then  qqX_Latest_ReleaseType="beta"
-    else qqX_Latest_ReleaseType="release"
-    fi
-
-    #  If currently using beta:
-    if [[ $qqX_Current_ReleaseType == "beta" ]]; then 
-      Hide_qqX_BetaUpdates=
-      # flag up about beta notifications if transitioning from beta to release:
-      [[ $qqX_Latest_ReleaseType == "release" ]] && BetaTxReleasePoint=1
-    fi
-
-    # Using TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
-    if [[ ! $Hide_qqX_BetaUpdates && $qqX_Latest_ReleaseType == "beta" ]] || [[ $qqX_Latest_ReleaseType == "release" ]]; then
-      # --gt check where eg "1.12.02-beta1 1.12.01" is true
-      if  floatversion --gt "$qqX_Latest_ReleaseNumber  $qqX_Version" 2>/dev/null ; then
-        { printf "\n\n qqX_UpdateAvail=\"1\""   
-          printf "\n\n qqX_Latest_ReleaseNumber=\"%s\""  "$qqX_Latest_ReleaseNumber" 
-          printf "\n\n qqX_Latest_SecureTarBall_Addr=\"%s\""  "$qqX_Latest_SecureTarBall_Addr" 
-          printf "\n\n qqX_Latest_SecureTarSha_Addr=\"%s\""  "$qqX_Latest_SecureTarSha_Addr" 
-          printf "\n\n qqX_Latest_ReleaseType=\"%s\""  "$qqX_Latest_ReleaseType" 
-        } >> "$qqX_Upd_VarsTmpFile"
-      else  printf "\n\n qqX_UpdateAvail="   > "$qqX_Upd_VarsTmpFile"
+    # --gt check where eg "1.12.02-beta1 1.12.01" is true
+    if  floatversion --gt "$qqX_Latest_ReleaseNumber  $qqX_Version" 2>/dev/null ; then
+      # Versioning, normally as x.x.xx-suffix > major.minor.point and with optional suffix as -beta1 etc
+      # Flag up release type. Current Version is carried out at the start, in similar way
+      if [[ $qqX_Latest_ReleaseNumber == *[[:alpha:]]* ]] ; then  qqX_Latest_ReleaseType="beta"
+      else qqX_Latest_ReleaseType="release"
       fi
+      #  If currently using beta:
+      if [[ $qqX_Current_ReleaseType == "beta" ]]; then 
+        Hide_qqX_BetaUpdates=
+        # flag up about beta notifications if transitioning from beta to release:
+        [[ $qqX_Latest_ReleaseType == "release" ]] && BetaTxReleasePoint=1
+      fi
+      # Using TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
+      { printf "\n\n qqX_UpdateAvail=\"1\""   
+        printf "\n\n qqX_Latest_ReleaseNumber=\"%s\""  "$qqX_Latest_ReleaseNumber" 
+        printf "\n\n qqX_Latest_SecureTarBall_Addr=\"%s\""  "$qqX_Latest_SecureTarBall_Addr" 
+        printf "\n\n qqX_Latest_SecureTarSha_Addr=\"%s\""  "$qqX_Latest_SecureTarSha_Addr" 
+        printf "\n\n qqX_Latest_ReleaseType=\"%s\""  "$qqX_Latest_ReleaseType" 
+      } > "$qqX_Upd_VarsTmpFile"
     fi
-
   fi 
 }
 
@@ -123,23 +128,26 @@ function download_new_release {
     qqX_logo_printf_title  "qqX updater"
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
 
-    if [[ ! $qqX_UpdateAvail ]] ; then printColor "\n\n  ERROR  No latest release found.  Return & retry ..."
+    if [[ ! $qqX_UpdateAvail ]] ; then 
+      printColor "\n\n  ERROR  No latest release found.  Return & retry ..."
     else 
-      if [[ $qqX_Latest_SecureTarBall_Addr ]]; then printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
-      else printf "\n\n  Only Non-SHA checked download available (?)\n"
+      if [[ ! $qqX_Latest_SecureTarBall_Addr ]]; then
+        printf "\n\n  Only Non-SHA checked download available (?)\n"
+      else 
+        printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
+        AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -sA 12 'body')"
+        AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
+        AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
+        AboutRelease="${AboutRelease//\"/}"
+        AboutRelease="${AboutRelease//'### '/}"
+        AboutRelease="${AboutRelease//'## '/}"
+        AboutRelease="${AboutRelease//'\n'/}"
+        AboutRelease="${AboutRelease//'\r'/}"
+        AboutRelease="${AboutRelease//'}'/}"
+        IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
+        for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n * %s"  "$Line" ; fi ; done
+        # as long as there are no trailing colons or spaces in release list, prints a tidied up bullet-point summary
       fi
-      AboutRelease="$(tr ',' '\n' < "/tmp/latest-qqX" | grep -sA 12 'body')"
-      AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
-      AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
-      AboutRelease="${AboutRelease//\"/}"
-      AboutRelease="${AboutRelease//'### '/}"
-      AboutRelease="${AboutRelease//'## '/}"
-      AboutRelease="${AboutRelease//'\n'/}"
-      AboutRelease="${AboutRelease//'\r'/}"
-      AboutRelease="${AboutRelease//'}'/}"
-      IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
-      for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n * %s"  "$Line" ; fi ; done
-      # as long as there are no trailing colons or spaces in release list, prints a tidied up bullet-point summary
     fi
 
     printf "\n\n\n"
