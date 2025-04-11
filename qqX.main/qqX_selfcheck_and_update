@@ -70,7 +70,7 @@ check_for_qqX_updates() {
   # Fix API version for consistency. Better to briefly drop to non-sha than get garbled data.
   # Using fv --full only detects beta releases 
 
-  curl --header "X-GitHub-Api-Version:2022-11-28" --disable -sLf -m 20 --retry 4 \
+  curl --header "X-GitHub-Api-Version:2022-11-28" --disable -sLf -m 12 --retry 4 \
   -o "${qqX_Latest_ReleaseFile}" "https://api.github.com/repos/TuxVinyards/qqX/releases/latest"
   # -m --max-time Maximum time in seconds that you allow each transfer to take.
   # If you enable retrying the transfer (--retry) then the maximum time counter is reset each time the transfer is retried.
@@ -92,8 +92,8 @@ check_for_qqX_updates() {
   else
     # function 'download_new_release' will react to whether 'qqX_Latest_SecureTarBall_Addr' is available
     if [[ $Hide_qqX_BetaUpdates ]]; then 
-      qqX_Latest_ReleaseNumber="$(curl -qsf -m 20 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M )"
-    else qqX_Latest_ReleaseNumber="$(curl -qsf -m 20 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M --full)"
+      qqX_Latest_ReleaseNumber="$(curl -qsf -m 12 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M )"
+    else qqX_Latest_ReleaseNumber="$(curl -qsf -m 12 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M --full)"
     fi
   fi
 
@@ -125,7 +125,7 @@ check_for_qqX_updates() {
 # Runs in the background. qqX will run this once. 
 function find_latest_qemu_version {
   printf "" > "/tmp/latest-qemu.txt"
-  { floatversion --full -M "$(curl --disable -sLf --retry 4 --retry-max-time 2 --retry-delay 0 --max-time 8 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
+  { floatversion --full -M "$(curl --disable -sLf --retry 3 --max-time 8 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
 }
 
 
@@ -212,9 +212,9 @@ function download_new_release {
         if [[ $qqX_Latest_SecureTarBall_Addr ]]; then
           dlCount="1"
           while [[ $dlCount -le "3" ]]; do
-            eval curl --disable -Lf -m 30 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz"  "$qqX_Latest_SecureTarBall_Addr"
+            eval curl --disable -Lf -m 20 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz"  "$qqX_Latest_SecureTarBall_Addr"
             echo
-            eval curl --disable -Lf -m 30 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz.sha256"  "$qqX_Latest_SecureTarSha_Addr"
+            eval curl --disable -Lf -m 20 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz.sha256"  "$qqX_Latest_SecureTarSha_Addr"
             echo
             SHA_Check="$(sha256sum -c "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz.sha256")"
             printColor "\n  SHA256 Check: %s "  "$SHA_Check"
@@ -233,7 +233,7 @@ function download_new_release {
           dlCount="1"
           while [[ $dlCount -le "3" ]]; do
             qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_Latest_ReleaseNumber}.tar.gz" 
-            eval curl --disable -Lf -m 30 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
+            eval curl --disable -Lf -m 20 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
             echo
             if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
               rm -r ./*  2>/dev/null
