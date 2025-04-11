@@ -118,7 +118,7 @@ drives_and_snapshots() {
 
   fi
 
-  if [[ $1 == "select" ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
+  if [[ $1 == "select" ]] && [[ ! $Selected_DrivePreset ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
 
     printColor "\n  SELECT:  [enter]  MAIN DRIVE (or back to main menu)"
     
@@ -446,7 +446,7 @@ function qqX_snapshot_delete {
 
     fi
 
-    printColor "\n [enter] to delete  [b] back to main menu (or reselect) \n\n"
+    printColor "\n [enter] to delete   [b] back to main menu (or reselect) \n\n"
     read -rp " >  "  SnapDeleteConfirm
 
 
@@ -487,9 +487,12 @@ function qqX_snapshot_delete {
       DiskStorageChanges=1
 
     fi
-
-    printf "\n\n [enter] to return to menu \n\n "
-    read -rp " >  "  
+    sdReturn=
+    printf "\n\n [enter] to return to menu   [sc] create new snap \n\n "
+    read -rp " >  "  sdReturn
+      if [[ $sdReturn ]]; then MainMenuChoicePreset="sc" ; Selected_DrivePreset=1
+      else MainMenuChoicePreset= ; Selected_DrivePreset=
+      fi
 
   fi
 

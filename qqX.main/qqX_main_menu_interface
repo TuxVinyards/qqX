@@ -410,7 +410,7 @@ else
     path_diagnostics
 
     if [[ $MainMenuChoicePreset ]]; then
-      printf "  >  %s" "$MainMenuChoicePreset" 
+      printf "  >  %s \n" "$MainMenuChoicePreset" 
       MainMenuChoice="$MainMenuChoicePreset" 
       MainMenuChoicePreset=
     fi
