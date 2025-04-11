@@ -6,6 +6,8 @@
 
 - Things can always get sorted out in a separate branch if need be, later
 
+- Updates and new additions to Quickget/FreeSpirit are always welcome.
+
 ## Do explain what's going and why
 
 - If no one can follow or understand what you have done, it won't get added
