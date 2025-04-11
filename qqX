@@ -7,8 +7,8 @@
 # A text based Virtual Machine Manager for use with the 'quickemu' project  
 # https://github.com/quickemu-project/quickemu  
 
-# Users should install 'quickemu' and may set up Virtual Machines as normal.
-# See notes in the Setup & Install script 
+# This script may be run directly from the folder but will need the settings file installing first.
+# See notes in the Setup & Install script.
 
 # Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
