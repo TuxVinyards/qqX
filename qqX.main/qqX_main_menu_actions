@@ -354,9 +354,9 @@ function  main_menu_actions {
 
     drives_and_snapshots  select
 
-    printColor "\n\n  [enter] automatic date.time title  "
-    printf "  [text input] descriptor   [b] back to menu " 
-    SnapTitle=
+    printColor "\n\n  [enter] Create snap with date.time title "
+    printf "  [text input] Create with text descriptor   [b] back to main menu " 
+    SnapTitle= ; scReturn=
     printf "\n\n"
     read -rp "  >  "  SnapTitle
     printf "\n\n"	
@@ -368,8 +368,11 @@ function  main_menu_actions {
       "$QEMU_IMG" info "$Selected_Drive"
       DiskStorageChanges=1
       printColor "\n\n  Drive Updated ..."
-      printf "\n\n  [enter] to return to menu \n\n "
-      read -rp "  >  "  
+      printf "\n\n  [enter] to return to menu   [sd] delete older snaps \n\n "
+      read -rp "  >  "  scReturn
+      if [[ $scReturn ]]; then MainMenuChoicePreset="sd" ; Selected_DrivePreset=1
+      else MainMenuChoicePreset= ; Selected_DrivePreset=
+      fi
     fi
 
   elif  [[ $MainMenuChoice == "sd" ]] ; then

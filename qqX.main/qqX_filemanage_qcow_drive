@@ -38,14 +38,14 @@ fi
 source "/tmp/qqX_nbd_vars"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
-if [[ $Trace_InputVars ]]; then echo "Args: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
-
-if [[ -e "$1" ]]; then 
-  qqf_Input_Drivepath="$1" ; shift
+if [[ $Trace_InputVars ]]; then  echo "Args: $*"  ; echo
 fi
 
-if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo  ; sleep "$Trace_InputVars" ; fi
+if [[ -e "$1" ]]; then  qqf_Input_Drivepath="$1" ; shift
+fi
 
+if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo ; sleep "$Trace_InputVars"
+fi
 
 if [[ ! $(type -p "$FileManager") ]] ; then 
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
@@ -92,7 +92,7 @@ show_nbd_help () {
 
 check_sudo_nbd_active () {
   # https://superuser.com/a/1183480/2243702  
-  if ! sudo -nv 2>/dev/null ; then printf "\n\n  " ; sudo -v
+  if ! sudo -nv 2>/dev/null ; then sudo -v ; printf "\n"
   fi
   if ! lsmod | grep -q nbd ; then sudo modprobe nbd max_part=8 nbds_max=4
   fi
@@ -155,7 +155,7 @@ while true; do
   if [[ ! $HideRefreshMsgs ]] && [[ $qqf_CmdLineStart ]]; then 
     printColor "\n\n  qqF - Cmd Line Start  >  "
     printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
-    printf "\n\n  Or for spot input, use mouse right click or CLI. See qqX --help for details."  
+    printf "\n\n  For spot input, use a right mouse click on the disk or at a new terminal type qqX \"/path/disk_name.qcow2\"" 
     printf "\n"
   fi
   if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_CmdLineStart ]]; then 
@@ -244,7 +244,7 @@ while true; do
     [[ $EmptyInput ]] && [[ -e "$qqf_Input_Drivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
   fi
 
-  printColor "\n\n\n  [enter] to change the connections   or  [option] for different selection  "
+  printColor "\n\n\n  [enter] to change %s connections   or  [option] for different selection"  "$TargetName" 
   printf "\n\n  [r] to refresh vars  [f] open drive in file-manager  [h] help   [q] to quit "
 
   printf "\n\n"
@@ -273,14 +273,10 @@ while true; do
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
   else 
 
-    check_sudo_nbd_active
-    if [[ ! $(sudo modinfo -n nbd 2>/dev/null) ]] ; then 
-      printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
-      printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
-    fi
     printf "\n\n  %s: " "$TargetName" 
     printColor "\n\n  [c] connect  [d] disconnect current and unmount  [enter] [r] to reselect or return"
-    printf "\n\n  If connecting, drives should be mounted as standard in the file-manager."  
+    printf "\n\n  Connected drives may be mounted as standard in the file-manager"
+    printf "\n\n  External formats are not always readable using the ndb method ..."  # REVIEW  is a convertion possible ?
     printf "\n\n"
     read -rp "  >  " qf_DriveSelect
     printf "\n\n"
@@ -288,7 +284,12 @@ while true; do
     if [[ $qf_DriveSelect ]] && [[ $qf_DriveSelect != "r" ]]; then 
 
       if [[ $qf_DriveSelect == "c" || $qf_DriveSelect == "d" ]]; then 
-        printf "  checking mounts ... \n\n"
+        check_sudo_nbd_active
+        if [[ ! $(sudo modinfo -n nbd 2>/dev/null) ]] ; then 
+          printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
+          printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
+        fi
+        printf "checking mounts ... \n\n"
         if [[ "$TargetName" == All* ]]; then  
           [[ $MainMountPoint ]] && umount "$MainMountPoint"
           [[ $SecondMountPoint ]] && umount "$SecondMountPoint"
@@ -306,7 +307,7 @@ while true; do
       # But drive must be un-mounted in order to connect, which happily is relatively easy 
 
       if [[ $qf_DriveSelect == "d" ]]; then 
-        printf "  qemu-nbd disconnecting ... \n\n"
+        printf "qemu-nbd disconnecting \n\n"
         if [[ "$TargetName" == All* ]]; then  
           sudo qemu-nbd -d "/dev/nbd0"
           sudo qemu-nbd -d "/dev/nbd1"
@@ -319,7 +320,7 @@ while true; do
         fi
 
       elif [[ $qf_DriveSelect == "c" ]]; then 
-        printf "  qemu-nbd connecting ... \n\n" 
+        printf "qemu-nbd connecting \n\n" 
 
         if [[ "$TargetName" == All* ]]; then  
           [[ $InputAvailable ]] && sudo qemu-nbd -c "/dev/nbd0"  -f qcow2  "$qqf_Input_Drivepath"
@@ -334,7 +335,8 @@ while true; do
 
       fi
 
-      sleep 1.5
+      printColor "\n  [enter] to return \n\n"
+      read -rp "  >  "
 
     fi
 

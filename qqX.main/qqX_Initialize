@@ -61,10 +61,8 @@ show_CLI_usage () {
   printf   "\n\n 'qqX' to start the distro/vm selector menu,"
   printf   "\n\n  qqX \"vm-name.conf\" or \"path/vm-name.conf\" to start a specific machine,"
   printf   "\n\n  qqX --version & qqX --help  as standard"
-  printf   "\n"
   printf   "\n\n  To set up an ISO: qqX \"iso_name.iso\" or \"/path/iso_name.iso\" "
-  printf   "\n\n  Or to analyse a Qcow2 disk: qqX \"disk_name.qcow2\" or \"/path/disk_name.qcow2\" "
-  printf   "\n\n  To non-specifically open the Qcow2 mounter use \'qqX --qqf\'"
+  printf   "\n\n  Or to analyse a Qcow2 disk: qqX \"/path/disk_name.qcow2\" then follow the menu."
   printf   "\n"
   printf   "\n\n  Mouse click - Right:"
   printf   "\n\n  On an ISO file and using 'open-with' will open the qqX distro installer."
@@ -74,6 +72,11 @@ show_CLI_usage () {
   printf   "\n\n  Mouse click - Left:"
   printf   "\n\n  Double click .conf files or select 'run in terminal' "
   printf   "\n\n  Adjust behaviour using qqX [tune]"
+  printf   "\n"
+  printf   "\n\n  If distro behaviour blocks qqX desktop launchers from opening a terminal,"
+  printf   "\n\n  or if the distro stops qqX from opening new terminals:"
+  printf   "\n\n  Use the distro's standard terminal opening method then type \'qqX\'"
+  printf   "\n\n  or alternatively \'qqX --qqf\' to open the Qcow2 mounter."
   printf   "\n"
   printf   "\n\n  More Help:"
   printf   "\n\n  https://github.com/TuxVinyards/qqX/wiki/Command-line-and-Mouse \n\n"
@@ -131,24 +134,41 @@ if [[ -e "$1" ]]; then
   XDG_RealPathName="$(realpath "$1")"
   XDG_MimeType="$(mimetype "$XDG_RealPathName" 2>/dev/null)"
   Current_VM_Folder="$(dirname "$XDG_RealPathName")"
-  if [[ $Trace_InputVars ]]; then echo "RP $XDG_RealPathName  MT $XDG_MimeType" ; echo "CF  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars" ; fi
+  if [[ $Trace_InputVars ]]; then 
+    echo "RP $XDG_RealPathName" ; echo "MT $XDG_MimeType" ; echo "CF  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars" 
+  fi
 
   if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then 
+
     XDG_MimeType_is_QCOW=1
     # is a right-click start on a qcow2 disk (flag is set for later)  
     QCOW_Input_Dir="$(dirname "$XDG_RealPathName")"
     QCOW_Input_DiskName="$(basename "$XDG_RealPathName")"  
     QCOW_Input_Conf_Dir="$(dirname "$QCOW_Input_Dir")"
     QCOW_Input_VM_Dir_Name="$(basename "$QCOW_Input_Dir")"
-    if [[ $Trace_InputVars ]]; then 
-      echo "D $QCOW_Input_Dir  CD $QCOW_Input_Conf_Dir"  
-      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName " ; echo  ; sleep "$Trace_InputVars"
+
+    if grep -qs "disk_img="'"'"$QCOW_Input_VM_Dir_Name/$QCOW_Input_DiskName" "$QCOW_Input_Dir.conf" ; then
+      XDG_Input_NON_qqX= ; XDG_Input_VM_qqX=1
+    else 
+      XDG_Input_NON_qqX=1 ; XDG_Input_VM_qqX= 
     fi
     # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
     #  standard right-click open-with actions will use the current folder
-    cd "$QCOW_Input_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
-    #cd ..  || printf "\n\n XDG .desktop starter  >  Disk's root Folder not found " 
-    Current_VM_Folder="$QCOW_Input_Conf_Dir"
+    if [[ $XDG_Input_NON_qqX ]]; then
+      cd "$QCOW_Input_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+      Current_VM_Folder="$QCOW_Input_Dir"
+    else
+      cd "$QCOW_Input_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+      Current_VM_Folder="$QCOW_Input_Conf_Dir"
+    fi
+    if [[ $Trace_InputVars ]]; then 
+      echo "In D $QCOW_Input_Dir  Conf D $QCOW_Input_Conf_Dir"  
+      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName " 
+      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName " 
+      echo "VM_qqX = $XDG_Input_VM_qqX  NON_qqX = $XDG_Input_NON_qqX " 
+      echo "pwd  $(pwd)" 
+      echo; sleep "$Trace_InputVars"
+    fi
 
   elif [[ "$XDG_RealPathName" == *'.iso' ]]; then 
     XDG_FileType_Recognised=1
