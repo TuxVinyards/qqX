@@ -910,8 +910,7 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" |  grep -o -E 'href="[[:digit:]]\.[[:digit:]]+' | sort -nr | head -n 3 | cut -d\" -f 2 )
+    web_pipe "https://download.parrot.sh/parrot/iso/" | grep href | fv -s -M 3
 }
 
 function editions_parrotsec() {
@@ -3639,7 +3638,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FB 4.9.8.02"
+        echo "FB 4.9.8.02b"
         exit 0;;
     --help|-help|--h|-h)
         help_message
