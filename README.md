@@ -18,7 +18,9 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.12.02](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.03](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- Reworked update downloader plus other improvements and fixes
 
 1.12.02 gives a collection of UI/UX improvements and adds a distro finder
 
@@ -180,7 +182,9 @@ The issue also highlighted a couple of UI glitches that need sorting. A false di
 
 Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
 
-@ March 28 [1.12.02](https://github.com/TuxVinyards/qqX/releases/latest) focuses on **UI/UX improvements**
+@ March 28
+
+- 1.12.02 focuses on **UI/UX improvements**
 
 - generally polishes and refines the user experience for all the recent additions
 
@@ -189,6 +193,12 @@ Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX
 The prompt `[fd] find distro` will  automatically appear for those with 12 distros or more.
 
 - type `fd` on any VM selector menu to test it out ...
+
+@ April 12 [1.12.03](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- Reworked update downloader plus other improvements and fixes
+
+- See [commits](https://github.com/TuxVinyards/qqX/commits/main/) list for details
 
 ## Reliability
 
