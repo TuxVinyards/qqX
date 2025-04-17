@@ -18,9 +18,13 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.12.03](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.04](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Reworked update downloader plus other improvements and fixes
+- Updates Quickget with a slew of distro fixes
+
+- Upgrades floatversion to 1.4.01
+
+1.12.03 reworks the update downloader plus adds other improvements and fixes
 
 1.12.02 gives a collection of UI/UX improvements and adds a distro finder
 
@@ -194,11 +198,25 @@ The prompt `[fd] find distro` will  automatically appear for those with 12 distr
 
 - type `fd` on any VM selector menu to test it out ...
 
-@ April 12 [1.12.03](https://github.com/TuxVinyards/qqX/releases/latest)
+@ April 12
 
-- Reworked update downloader plus other improvements and fixes
+- 1.12.03 reworks the update downloader plus adds other improvements and fixes
 
 - See [commits](https://github.com/TuxVinyards/qqX/commits/main/) list for details
+
+@ April 17 [1.12.04](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- Upgrades floatversion to 1.4.01
+
+Updates Quickget with distro fixes for:
+
+- AntiX
+- Freedos
+- Garuda
+- Kolibri
+- Oracle
+- Parrot Sec
+- PC Linux
 
 ## Reliability
 
