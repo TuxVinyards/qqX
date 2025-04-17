@@ -78,6 +78,7 @@ function os_info() {
         opensuse)         INFO="openSUSE|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
         oraclelinux)      INFO="Oracle Linux|-|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
         parrotsec)        INFO="Parrot Security|parrot:parrot|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.";;
+        pclinuxos)        INFO="PCLinuxOS|-|https://www.pclinuxos.com/|PCLinuxOS is a free easy to use Linux-based Operating System for x86_64 desktops or laptops.";;
         peppermint)       INFO="PeppermintOS|-|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
         popos)            INFO="Pop!_OS|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
         porteus)          INFO="Porteus|-|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
@@ -482,6 +483,7 @@ function os_support() {
     opensuse \
     oraclelinux \
     parrotsec \
+    pclinuxos \
     peppermint \
     popos \
     porteus \
@@ -531,7 +533,7 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    floatversion -M 5 -s "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/")" 2>/dev/null
+    floatversion -M 5 -qs "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" 2>/dev/null)" 
 }
 
 function releases_android() {
@@ -543,7 +545,7 @@ function editions_android() {
 }
 
 function releases_antix() {
-    echo 23.1 23 22 21
+    floatversion -M 3 -qs "$(web_pipe "https://sourceforge.net/projects/antix-linux/files/Final" | grep -s released )"
 }
 
 function editions_antix() {
@@ -559,7 +561,7 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    floatversion -M 5 -s "$(curl -sf "https://ant.seedhost.eu/arcolinux/iso/")" 2>/dev/null
+    floatversion -M 5 -qs "$(curl -sf "https://ant.seedhost.eu/arcolinux/iso/" 2>/dev/null)"
 }
 
 function editions_arcolinux() {
@@ -610,7 +612,7 @@ function releases_blendos() {
 }
 
 function releases_bodhi() {
-    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')" 2>/dev/null
+    floatversion -M 3 -qs "$(web_pipe "https://sourceforge.net/projects/bodhilinux/files/" | grep -s 'class="name')"
 }
 
 function editions_bodhi() {
@@ -707,7 +709,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    floatversion -s -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep href | grep iso)" 2>/dev/null
+    floatversion -qs -M 4 "$(web_pipe "https://mirrors.gigenet.com/endeavouros/iso/" | grep -s href | grep -s iso)"
 }
 
 function releases_endless() {
@@ -739,7 +741,7 @@ function editions_freebsd() {
 }
 
 function releases_freedos() {
-    echo 1.3 1.2
+    echo 1.4 1.3 1.2
 }
 
 function releases_garuda() {
@@ -747,7 +749,7 @@ function releases_garuda() {
 }
 
 function editions_garuda() {
-    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+    echo cinnamon dr460nized dr460nized-gaming gnome hyprland i3 kde-lite mokka sway xfce
 }
 
 function releases_gentoo() {
@@ -801,11 +803,11 @@ function releases_kolibrios() {
 }
 
 function editions_kolibrios() {
-    echo en_US  ru_RU  it_IT  es_ES
+    echo en_US es_ES ru_RU
 }
 
 function releases_linuxlite() {
-    floatversion -M 3 -s "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep 'class="name')" 2>/dev/null
+    floatversion -M 3 -qs "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep -s 'class="name')"
 }
 
 function releases_linuxmint() {
@@ -906,15 +908,24 @@ function releases_opensuse() {
 }
 
 function releases_oraclelinux() {
-    echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
+    #echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
+    floatversion -qs -M 5  "$(web_pipe "https://yum.oracle.com/oracle-linux-isos.html" | grep -s -e '<td><strong>')" 
 }
 
 function releases_parrotsec() {
-    web_pipe "https://download.parrot.sh/parrot/iso/" | grep href | fv -s -M 3
+  floatversion -qs -M 3  "$(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -s href)" 
 }
 
 function editions_parrotsec() {
     echo home htb security
+}
+
+function releases_pclinuxos() {
+    web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' | head -n 1
+}
+
+function editions_pclinuxos() {
+    echo kde kde-darkstar mate xfce
 }
 
 function releases_peppermint() {
@@ -950,7 +961,7 @@ function editions_primtux() {
 }
 
 function releases_proxmox-ve() {
-    floatversion -M 3 -s "$(web_pipe "https://enterprise.proxmox.com/iso/" | grep proxmox-ve)" 2>/dev/null
+    floatversion -M 3 -qs "$(web_pipe "https://enterprise.proxmox.com/iso/" | grep -s proxmox-ve)"
 }
 
 function releases_pureos() {
@@ -1051,7 +1062,7 @@ function editions_tinycore() {
 }
 
 function releases_trisquel() {
-    floatversion -M 4 -s "$(web_pipe "https://mirrors.ocf.berkeley.edu/trisquel-images/" | grep 'amd64.iso' | tr '"' '\n' | grep tris)" 2>/dev/null
+    floatversion -M 4 -qs "$(web_pipe "https://mirrors.ocf.berkeley.edu/trisquel-images/" | grep -s 'amd64.iso' | tr '"' '\n' | grep -s tris)"
 }
 
 function editions_trisquel() {
@@ -1893,6 +1904,9 @@ function get_freedos() {
              HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
         1.3) ISO="FD13-LiveCD.zip"
              HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
+        1.4) ISO="FD14-LiveCD.zip"
+             URL="${URL/'/official'/}"
+             HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
     esac
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2326,6 +2340,21 @@ function get_parrotsec() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_pclinuxos() {
+    case ${EDITION} in
+        mate) RELEASE="${RELEASE//./-}";;
+        # in case an edition is added that uses the mate style and sorts higher
+        kde|kde-darkstar) RELEASE="${RELEASE//-/.}";;
+        xfce) RELEASE="${RELEASE//-/.}";;
+        *) ;;
+    esac
+# shellcheck disable=SC2155
+    local HASH="$(web_pipe "${URL}/pclinuxos64-${EDITION}-${RELEASE}.md5sum" | head -c 32)"
+    local ISO="pclinuxos64-${EDITION}-${RELEASE}.iso"
+    local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
+    echo "${URL}/${ISO} ${HASH}"
+}
+    
 function get_peppermint() {
     local HASH=""
     local ISO=""
@@ -2516,7 +2545,7 @@ function get_sparkylinux() {
 function get_spirallinux() {
     local HASH=""
     local LATEST=""
-    LATEST="$(floatversion -M "$(curl --disable -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')" 2>/dev/null)"
+    LATEST="$(floatversion -M -qs "$(curl --disable -sLf "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name')")"
     local ISO="SpiralLinux_${EDITION}_${LATEST}_x86-64.iso"
     local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
@@ -3638,7 +3667,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FB 4.9.8.02b"
+        echo "FB 4.9.8.03"
         exit 0;;
     --help|-help|--h|-h)
         help_message
@@ -3710,7 +3739,9 @@ if [ -n "${2}" ]; then
             exit 1
         fi
         handle_missing
-        VM_PATH="${OS}-${RELEASE}-${EDITION}"
+        if [[ $RELEASE == "latest" ]]; then VM_PATH="${OS}-${EDITION}"
+        else VM_PATH="${OS}-${RELEASE}-${EDITION}"
+        fi
         create_vm "$("get_${OS}" "${EDITION}")"
     elif [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
