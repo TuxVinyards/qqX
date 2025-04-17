@@ -21,7 +21,7 @@
 
 # POSIX and Mac/HomeBrew compliant initial Bash test:
 if [ ! "$(command -v bash)" ] || ! bash --version | grep bash | grep -qEo '[ ]+[5-9]+[.]' ; then
-  echo; echo "  Sorry, you need Bash, probably 5.0 or newer to run this script."; echo
+  echo; echo "  FloatVersion: you need Bash, probably 5.0 or newer to run this script."; echo
   echo "  FloatVersion has only been tested on up-to-date versions of Bash"; echo
   echo "  Certain elements require at least ver 4.2 .... "; echo
   if [ "$(uname -o)" = "Darwin" ]; then echo "  An update is needed via HomeBrew"; echo ; fi
@@ -37,21 +37,23 @@ fi
 # MacOS requires Homebrew additions of Bash and of Grep. Also needs JQ.
 if [[ "$(uname -o)" == "Darwin" ]]; then 
   if [[ ! -d "/usr/local/opt/grep/libexec/gnubin" ]]; then 
-    echo; echo "  Sorry, you need to update 'grep' via HomeBrew to run this script."; echo
+    echo; echo "  FloatVersion: you need to update 'grep' via HomeBrew to run this script."; echo
   elif ! grep -q 'gnubin' <<< "$PATH" ; then export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
   fi
   if [[ ! -d "/usr/local/Cellar/jq" ]]; then 
-    echo; echo "  Sorry, you need to add 'jq' via HomeBrew to run this script."; echo
+    echo; echo "  FloatVersion: you need to add 'jq' via HomeBrew to run this script."; echo
   fi
 fi
 
 # Flag for dev analysis, set =1 to use compact version when running from script  OR -C / --compact  as $1
 CompactVersion=
 
-# Optional output array:
-# When embedding in Bash scripts, the optional array '${fvOutputArr[*]}' is by default set as global
-# In standalone full mode, setting a path here will enable output in plain text column format
-# to a transfer file eg '/tmp/fv-arr.txt' that can be be mapped by most scripts
+# Array output:
+# When embedding in Bash scripts, the array '${fvOutputArr[*]}' is accessible by default
+# via the global (-g) declaration at the function start
+# Additionally, full embedded or standalone will automatically output to '/tmp/fv-arr.txt'
+# in a plain text column format, creating a transfer file that can be be mapped by most scripts.
+# Or, when using $PATH controlled standalones, an alternative array filepath may be specified here. 
 FvArrFilePath=
 
 ##
@@ -66,6 +68,7 @@ FvArrFilePath=
 float_version_from_string ()  {
 
 	show_help () {
+    if [[ ! $HideErrors  && ! $HideErrorHelp ]] ; then
 	  printf "
   floatversion --options  \"quoted-input-source-or-data\"  
   OR  data | floatversion --options \"optional-additional\" 
@@ -75,8 +78,8 @@ float_version_from_string ()  {
 
   -h | --help         show help 
   -V | --version      show version
-  -c | --col          show list as column instead of string
-  -s | --space        use single spaced string (for alternative machine reading)
+  -c | --col          show list as column instead of string  (-qc quieter errors)
+  -s | --space        use single spaced string for machine reading (-qs quieter errors)
   -r | --rev          show list in reverse order  
   -a | --all          show all extracted values, not just unique 
   -n | --num          sort by standard numbering, not versioning
@@ -89,25 +92,28 @@ float_version_from_string ()  {
   -RM [int]           Outputs the single lowest/earliest value in the list. With integer, as -M but 
                       reverses only the M filter set, not the list, eg. -M 3  > 3 2 1  -RM 3 > 1 2 3
                       also accepts '-r' to reverse a lowest set filter ...
-  -g | --gt           A > B, returns true/false eg. if fv -g \"A B\"; then .. (.nums or sem ver)  
-                      Normally quiet and to be tested.  Use -v for screen output or piping.
-  -v | --verbose      for problem output, show algorithm sequences (full version only) 
+  -g | -qg | --gt     A > B, returns true/false eg. if fv -g \"A B\"; then .. (.nums or sem ver)  
+                      use -v for dev output, normally quiet and allows conditional testing (-qg quieter errors)
+  -Q | --quiet        Quieten general error messages, as alternative to using '2>/dev/null'
+                      Use -qc | -qs | -qg  for reduced error output on full machine tests (no help notes)
+  -v | --verbose      show algorithm sequences (full version only) for problem output.
        --sort-v       use sort -V (if present) in preference to the default jq methods
        --no-svb       no falling back to 'jq' if 'sort -V' is unavailable, show error instead
 
   Without options, produces a single sorted string of all unique items found
   Filters output as string, column or max. Post-output grep requires columns.
 
-  Tests show 'jq' sort methods as more reliable than 'sort -V' esp. with alpha suffixes
-  All cases, returns false if none.  Direct \'2>/dev/null\' to quieten messages.
-
-  Full version required for stdin and pipes. Either or both input methods may be used.
-  May also be installed with 'fv' as an alias or symbolic link. 
+  Tests show 'jq' sort methods as more reliable than 'sort -V' when encountering suffixes
+  In all cases, returns false if none found in data, with error if data missing.
+  
+  Stdin and Pipes require the Standalone version.  Either or both input methods may be used.
+  Only use 'fv' or short name links in PATH controlled situations. See readme for further notes.
   
   License: MIT  Copyright (c) Alex Genovese  
   Further Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
 
-"  
+" 
+fi 
   }
 
   local ShowAsCol=
@@ -122,6 +128,8 @@ float_version_from_string ()  {
   local SortNum=
   local GrepFull=
   local InputText=
+  local HideErrors=
+  local HideErrorHelp=
   local StdIn=
   local Nums=
   local NumsCount=
@@ -129,6 +137,7 @@ float_version_from_string ()  {
   local StartString=
   local DeleteString=   
   local GTcompare=
+  local GT=
   local Verbose=
   local UseSortV=
   local NoSortVfallback=
@@ -147,7 +156,7 @@ float_version_from_string ()  {
       -h|--help)  
         show_help ; return 0 ;;
       -V|--version)
-        CurrentVersion="1.3.0"
+        CurrentVersion="1.4.01"
         printf "\n CurrentVersion: %s" "$CurrentVersion"
         printf "\n\n Checking for updates....   "
         LatestVersion="$(floatversion -M "$(curl -sf --max-time 5 "https://github.com/TuxVinyards/floatversion/releases" | grep 's/tag')" 2>/dev/null)"
@@ -160,9 +169,19 @@ float_version_from_string ()  {
         fi
         printf "\n\n (c) Alex Genovese  https://github.com/TuxVinyards/floatversion \n\n"
         return 0 ;;
-      -c|--col)
+      -Q|--quiet)
+        HideErrors=1; shift ;;
+      -v|--verbose)
+        Verbose=1 ; shift ;;
+      --sort-v)
+        UseSortV=1 ; shift ;;
+      --no-svb)
+        NoSortVfallback=1 ; shift ;;
+      -c|-qc|--col)
+        [[ $1 == "-qc" ]] && HideErrorHelp=1
         ShowAsCol=1 ; shift ;;
-      -s|--space )
+      -s|-qs|--space )
+        [[ $1 == "-qs" ]] && HideErrorHelp=1
         SingleSpace=1 ; shift ;;
       -r|--rev)
         ShowRev=1 ; shift ;;
@@ -187,21 +206,18 @@ float_version_from_string ()  {
       -RM)
         ShowMax=1 ; RevMax=1 ; shift 
         [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
-      -g|--gt)
+      -g|-qg|--gt)
+        [[ $1 == "-qg" ]] && HideErrorHelp=1
         GTcompare=1; shift ;;
-      -v|--verbose)
-        Verbose=1 ; shift ;;
-      --sort-v)
-        UseSortV=1 ; shift ;;
-      --no-svb)
-        NoSortVfallback=1 ; shift ;;
       *) 
         if [[ "$1" == '-'* ]]; then
-          printf "\n  ERROR:  '%s'  not recognised \n" "$1" >&2
-          show_help >&2 ; return 1
+          if [[ ! $HideErrors ]]; then  printf "\n  FloatVersion:  '%s'  not recognised \n\n" "$1" >&2 ; show_help >&2
+          fi
+          return 1
         elif [[ $InputText ]]; then
-          printf "\n  ERROR: QUOTED Input String or Text File Name should be given \n" >&2
-          show_help >&2 ; return 1
+          if [[ ! $HideErrors ]]; then printf "\n  FloatVersion: QUOTED Input String or Text File Name not found \n\n" >&2 ; show_help >&2
+          fi
+          return 1
         else
           InputText="$1" ; shift 
         fi ;;
@@ -222,11 +238,12 @@ float_version_from_string ()  {
   else InputText="$StdIn"
   fi
 
-  if [[ ! $InputText ]]; then 
-    { printf "\n  Input data should be piped or presented as a quoted element"
-      printf "\n  To suppress empty pipe errors use '2>/dev/null' \n"
-    } >&2
-    show_help >&2 ; return 1
+  if [[ ! $InputText ]]; then
+    if [[ ! $HideErrors ]]; then 
+      printf "\n  FloatVersion: Input Data Missing or not found. \n\n" >&2
+      show_help >&2
+    fi
+    return 1
   fi
 
   [[ $FilterString ]] && mapfile -t FilterArr <<< "$(tr ' ' '\n' <<< "$FilterString")"
@@ -248,16 +265,21 @@ float_version_from_string ()  {
 
   if [[ $UseSortV ]] &&  ! sort --help | grep -sq -o 'version-sort' ; then 
     if [[ $NoSortVfallback ]]; then 
-      printf "\n  Sorry, 'sort -V' is not available, you need 'jq' to run this script. \n"  >&2
+      printf "\n  FloatVersion: 'sort -V' is not available, you need 'jq' to run this script. \n"  >&2
     else UseSortV= ; fi
   fi
 
   if [[ ! $UseSortV ]] && [[ ! "$(command -v jq)" ]]; then
-    printf "\n  Sorry, you need to install 'jq' to run this script. \n" >&2
+    printf "\n  FloatVersion: you need to install 'jq' to run this script. \n" >&2
   fi
 
-  # -gt test data is fairly controllable and always using full grep avoids error fails 
-  [[ $GTcompare ]] && GrepFull=1
+  # -gt test data is fairly controllable and always using full grep avoids error fails unless numeric is specified
+  if [[ $GTcompare ]]; then 
+    if [[ $SortNum ]] ; then 
+      [[ ! "$(command -v bc)" ]] && printf "\n  FloatVersion: you need to install 'bc' for standard numerical comparisons. \n" >&2
+      GrepFull=
+    else GrepFull=1 ; fi
+  fi
 
   # extract 
   if [[ $GrepFull ]]; then 
@@ -280,9 +302,12 @@ float_version_from_string ()  {
 
   [[ $Verbose ]] && { echo "Nums: ($NumsCount)"; echo "$Nums"; echo ;}
 
-  if [[ $GTcompare ]] && [[ "$NumsCount" != 2 ]]; then 
-    printf "\n  ERROR:  two floating point or semantic version values should be supplied" >&2
-    show_help >&2 ; return 1
+  if [[ $GTcompare ]] && [[ "$NumsCount" != 2 ]]; then
+    if [[ ! $HideErrors ]]; then 
+      printf "\n  FloatVersion:  TWO floating point or TWO semantic version values should be supplied \n\n" >&2
+      show_help >&2
+    fi
+    return 1
   fi
 
   # none found, return false
@@ -400,26 +425,31 @@ float_version_from_string ()  {
 
   # output
   if [[ $GTcompare ]]; then
-    if [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]]; then 
-    [[ $Verbose ]] && { echo "true"; echo ;} ; return 0
+    if [[ $SortNum ]]; then 
+      # use 'bc' as 'sort -n' is not reliable when parity is technical eg 1.220 vs 1.22 shows incorrectly as true
+      [[ "$(bc -l <<< "${NumArrTemp[0]} > ${NumArrTemp[1]}")" == "1" ]] && GT=1
+    else
+      [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]] && GT=1
+    fi
+    if [[ $GT ]]; then  [[ $Verbose ]] && { echo "true"; echo ;} ; return 0
     else [[ $Verbose ]] && { echo "false"; echo ;} ; return 1
     fi
-  elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then
     if [[ $SingleSpace ]]; then printf "%s " "${fvOutputArr[@]}"
-    else printf "%s  " "${fvOutputArr[@]}"
-    fi
+    else printf "%s  " "${fvOutputArr[@]}"; fi
     printf "\n"
-  elif [[ $ShowAsCol ]]; then
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $ShowAsCol ]]; then
     printf "%s\n" "${fvOutputArr[@]}"
-  elif [[ $RevMax ]]; then
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $RevMax ]]; then
     echo "${fvOutputArr[0]}"
-  else
+  elif [[ "${fvOutputArr[*]}" ]]; then
     # then default to = ShowMax (-1 ie the last one in the array)
     echo "${fvOutputArr[-1]}"
+  else return 1
   fi
 
-  if [[ $FvArrFilePath ]]; then
-    printf "%s\n" "${fvOutputArr[@]}" > "$FvArrFilePath"
+  if [[ $FvArrFilePath ]]; then printf "%s\n" "${fvOutputArr[@]}" > "$FvArrFilePath"
+  else printf "%s\n" "${fvOutputArr[@]}" > "/tmp/fv-arr.txt"
   fi
 
 }
@@ -427,52 +457,57 @@ float_version_from_string ()  {
 ##
 
 # COMPACT VERSION, suitable for embedding into other scripts, if preferred  (help and annotation removed)
+#  For quiet, use -Q.  Use of  -qc | -qs | -qg  reduces error output on full machine tests only (no help notes)
 # # NB make sure that locale is set in the main script. See notes at start.
 
 floatversion ()  {
   # floatversion --options  "quoted-input-string-or-text-file" 
   # (c) Alex Genovese - version 1.02.02 (compact) - Usage/Help/Details @ https://github.com/TuxVinyards/floatversion
-  local ShowAsStr= ; local ShowAsCol= ; local ShowMax= ; local ShowRev= ; local ShowAll= ; local SortNum= ; local GrepFull= 
-  local InputText= ; local Nums= ; local NumsCount= ; local FilterString= ; local StartString= ; local DeleteString= ; local GTcompare=
+  local ShowAsStr= ; local ShowAsCol= ; local ShowMax= ; local ShowRev= ; local ShowAll= ; local SortNum= ; local GrepFull= ; local HideErrors=
+  local InputText= ; local Nums= ; local NumsCount= ; local FilterString= ; local StartString= ; local DeleteString= ; local GTcompare=; local GT=
   local UseSortV= ; local NoSortVfallback= ; declare -a NumArrTemp ; declare -a NumArrSorted ; declare -a SelectArrTemp 
   declare -a FilterArr ; declare -a StartArr ; declare -a DeleteArr ; declare -ga fvOutputArr 
   while [[ "$1" ]] ; do
-    case "$1" in 
-      -c|--col)     ShowAsCol=1 ; shift ;;
-      -s|--space )  SingleSpace=1 ; shift ;;
-      -r|--rev)     ShowRev=1 ; shift ;;
-      -a|--all)     ShowAll=1 ; shift ;;
-      -n|--num)     SortNum=1 ; shift ;;
-      -f|--full)    GrepFull=1 ; shift ;;
-      -F|--filter)  [[ ! $2 ]] && return 1 ; FilterString="$2" ; shift 2 ;;
-      -S|--start)   [[ ! $2 ]] && return 1 ; StartString="$2" ; shift 2 ;;
-      -D|--delete)  [[ ! $2 ]] && return 1 ; DeleteString="$2" ; shift 2 ;;
+    case "$1" in
+      -Q|--quiet)       HideErrors=1 ;  shift ;;
+      -c|-qc|--col)     ShowAsCol=1 ;   shift ;;
+      -s|-qs|--space)   SingleSpace=1 ; shift ;;
+      --sort-v)         UseSortV=1 ;    shift ;;
+      --no-svb)     NoSortVfallback=1 ; shift ;;
+      -r|--rev)     ShowRev=1 ;   shift ;;
+      -a|--all)     ShowAll=1 ;   shift ;;
+      -n|--num)     SortNum=1 ;   shift ;;
+      -f|--full)    GrepFull=1 ;  shift ;;
+      -F|--filter)  [[ ! $2 ]] && return 1 ; FilterString="$2" ;  shift 2 ;;
+      -S|--start)   [[ ! $2 ]] && return 1 ; StartString="$2" ;   shift 2 ;;
+      -D|--delete)  [[ ! $2 ]] && return 1 ; DeleteString="$2" ;  shift 2 ;;
       -M|--max)     ShowMax=1 ; shift ; [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
       -RM)          ShowMax=1 ; RevMax=1 ; shift ; [[ "$1" == [1-9] || "$1" == [1-9][0-9] ]] && { TopMax="$1"; ShowMax=; shift; } ;;
-      -g|--gt)      GTcompare=1 ; shift ;;
-      --sort-v)     UseSortV=1 ; shift ;;
-      --no-svb)     NoSortVfallback=1 ; shift ;;
-      *)  if [[ "$1" == '-'* ]]; then printf "\n  ERROR:  '%s'  not recognised \n\n" "$1" >&2 ; return 1
-          elif [[ $InputText ]]; then printf "\n  ERROR:  QUOTED Input String or Text File Name should be given only once \n\n" >&2 ; return 1
+      -g|-qg|--gt)  GTcompare=1 ; shift ;;
+      *)  if [[ "$1" == '-'* ]]; then [[ ! $HideErrors ]] && printf "\n  FloatVersion:  '%s'  not recognised \n\n" "$1" >&2 ; return 1
+          elif [[ $InputText ]]; then [[ ! $HideErrors ]] && printf "\n  FloatVersion:  QUOTED Input String or Text File Name Name not found \n\n" >&2 ; return 1
           else InputText="$1" ; shift ; fi ;;
     esac
   done
   [[ -e "$InputText" ]] && InputText="$(cat -A "$InputText")"
   InputText="$(tr -cd '[:print:]' <<< "$InputText" | tr ';' ' ' | tr '$' ' ' | tr ' ' '\n' | grep -sE '[[:print:]]')" 
-  [[ ! $InputText ]] && printf "\n  ERROR: no input found.  Is '-i' or '-g' the last parameter plus input the last quoted element? \n\n" >&2 && return 1
+  if [[ ! $InputText ]]; then [[ ! $HideErrors ]] && printf "\n  FloatVersion: Input Data Missing or not found.  \n\n" >&2 ; return 1 ; fi
   [[ $FilterString ]] && mapfile -t FilterArr <<< "$(tr ' ' '\n' <<< "$FilterString")"
   [[ $StartString ]] && mapfile -t StartArr <<< "$(tr ' ' '\n' <<< "$StartString")"
   [[ $DeleteString ]] && mapfile -t DeleteArr <<< "$(tr ' ' '\n' <<< "$DeleteString")" 
   if [[ $ShowMax ]]; then ShowAsStr= ; ShowAsCol= ; elif [[ $ShowAsCol ]]; then ShowAsStr= ; else ShowAsStr=1 ; fi
   if [[ $UseSortV ]] &&  ! sort --help | grep -sq -o 'version-sort' ; then 
-    if [[ $NoSortVfallback ]]; then  printf "\n  Sorry, 'sort -V' is not available, you need 'jq' to run this script. \n\n" >&2 ; else UseSortV= ; fi
+    if [[ $NoSortVfallback ]]; then  [[ ! $HideErrors ]] && printf "\n  FloatVersion: 'sort -V' is not available, you need 'jq' to run this script. \n\n" >&2 ; else UseSortV= ; fi
   fi
-  if [[ ! $UseSortV ]] && [[ ! "$(command -v jq)" ]]; then printf "\n  Sorry, you need to install 'jq' to run this script. \n\n" >&2 ; fi
-  [[ $GTcompare ]] && GrepFull=1
+  if [[ ! $UseSortV ]] && [[ ! "$(command -v jq)" ]]; then [[ ! $HideErrors ]] && printf "\n  FloatVersion: you need to install 'jq' to run this script. \n\n" >&2 ; fi
+  if [[ $GTcompare ]]; then 
+    if [[ $SortNum ]] ; then [[ ! "$(command -v bc)" ]] && printf "\n  FloatVersion: you need to install 'bc' for standard numerical comparisons. \n" >&2 ; GrepFull=
+    else GrepFull=1 ; fi
+  fi
   if [[ $GrepFull ]]; then Nums="$(grep -sEo '[0-9]+([.][0-9]+)+([.][0-9]+)?+([.][0-9]+)?+([.][0-9]+)?+([-][[:alnum:]]+)?+([.][[:digit:]]+)?' <<< "$InputText" )"
   else Nums="$(grep -sEo '[0-9]+([.][0-9]+)+([.][0-9]+)?+([.][0-9]+)?+([.][0-9]+)?' <<< "$InputText" )"; fi ;  printf -v Nums "%s\n" "$Nums"
   Nums="$(grep -s '[[:print:]]' <<< "$Nums")" ; NumsCount="$(grep -sc '[[:print:]]' <<< "$Nums")" 
-  if [[ $GTcompare ]] && [[ "$NumsCount" != 2 ]]; then printf "\n  ERROR:  two floating point or semantic version values should be supplied \n\n" >&2 ; return 1 ; fi
+  if [[ $GTcompare ]] && [[ "$NumsCount" != 2 ]]; then [[ ! $HideErrors ]] && printf "\n  FloatVersion:  TWO floating point or TWO semantic version values should be supplied \n\n" >&2 ; return 1 ; fi
   [[ ! $Nums ]] && return 1
   mapfile -t NumArrTemp  <<< "$(tr ' ' '\n' <<< "$Nums")"
   if [[ $ShowAll ]]; then mapfile -t  NumArrSorted <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
@@ -492,25 +527,21 @@ floatversion ()  {
         mapfile -t  NumArrTemp <<< "$(printf "%s\n" "${fvOutputArr[@]}" | grep -s "${FilterArr[n]}")"
         while [[ $i -lt "${#NumArrTemp[@]}" ]]; do SelectArrTemp+=("${NumArrTemp[i]}"); ((i+=1)); done; ((n++))
       done 
-      fvOutputArr=(); i=0 ; while [[ $i -lt "${#SelectArrTemp[@]}" ]]; do fvOutputArr+=("${SelectArrTemp[i]}"); ((i+=1)); done
-    fi
+      fvOutputArr=(); i=0 ; while [[ $i -lt "${#SelectArrTemp[@]}" ]]; do fvOutputArr+=("${SelectArrTemp[i]}"); ((i+=1)); done ; fi
     if [[ $StartString ]]; then n=0
       while [[ $n -lt "${#StartArr[@]}" ]]; do NumArrTemp=(); i=0 
         mapfile -t  NumArrTemp <<< "$(printf "%s\n" "${fvOutputArr[@]}" | grep -sE ^"${StartArr[n]}")"
         while [[ $i -lt "${#NumArrTemp[@]}" ]]; do SelectArrTemp+=("${NumArrTemp[i]}"); ((i+=1)); done; ((n++))
       done 
-      fvOutputArr=(); i=0 ; while [[ $i -lt "${#SelectArrTemp[@]}" ]]; do fvOutputArr+=("${SelectArrTemp[i]}"); ((i+=1)); done
-    fi
+      fvOutputArr=(); i=0 ; while [[ $i -lt "${#SelectArrTemp[@]}" ]]; do fvOutputArr+=("${SelectArrTemp[i]}"); ((i+=1)); done ; fi
     if [[ $DeleteString ]]; then n=0
       while [[ $n -lt "${#DeleteArr[@]}" ]]; do NumArrTemp=(); i=0 
         while [[ $i -lt "${#fvOutputArr[@]}" ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i+=1)); done
         mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}" | grep -sv "${DeleteArr[n]}")" ; ((n++))
-      done
-    fi
+        done ; fi
     if [[ $ShowRev ]]; then NumArrTemp=(); i="${#fvOutputArr[@]}"; ((i-=1))
       while [[ $i -ge 0  ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
-      mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
-    fi
+      mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")" ; fi
     if [[ $TopMax ]]; then  NumArrTemp=(); i="${#fvOutputArr[@]}"
       if [[ $i -gt "$TopMax" ]]; then TopShow="$((i-TopMax))"; else TopShow="$i"; fi ; ((i-=1)) ; [[ $TopShow -gt "$i" ]] && TopShow="0"
       while true; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); [[ $i -lt "$TopShow" ]] && break; done
@@ -518,17 +549,18 @@ floatversion ()  {
       if [[ $RevMax ]]; then NumArrTemp=(); i="${#fvOutputArr[@]}"; ((i-=1))
         while [[ $i -ge 0 ]]; do NumArrTemp+=("${fvOutputArr[i]}"); ((i-=1)); done
         mapfile -t  fvOutputArr <<< "$(printf "%s\n" "${NumArrTemp[@]}")"
-      fi
-    fi
+      fi ; fi
   fi
   if [[ $GTcompare ]]; then 
-    if [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]]; then return 0 ; else return 1 ; fi
-  elif [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then 
+    if [[ $SortNum ]]; then [[ "$(bc -l <<< "${NumArrTemp[0]} > ${NumArrTemp[1]}")" == "1" ]] && GT=1
+    else [[ "${NumArrTemp[0]}" == "${fvOutputArr[-1]}" ]] && [[ "${NumArrTemp[0]}" != "${NumArrTemp[1]}" ]] && GT=1 ; fi
+    if [[ $GT ]]; then  [[ $Verbose ]] && { echo "true"; echo ;} ; return 0 ; else [[ $Verbose ]] && { echo "false"; echo ;} ; return 1 ; fi
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $ShowAsStr || $ShowAll ]] && [[ ! $ShowAsCol ]]; then 
     if [[ $SingleSpace ]]; then printf "%s " "${fvOutputArr[@]}"; else printf "%s  " "${fvOutputArr[@]}"; fi
-  elif [[ $ShowAsCol ]]; then printf "%s\n" "${fvOutputArr[@]}"
-  elif [[ $RevMax ]]; then  echo "${fvOutputArr[0]}"  
-  else  echo "${fvOutputArr[-1]}"
-  fi
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $ShowAsCol ]]; then printf "%s\n" "${fvOutputArr[@]}"
+  elif [[ "${fvOutputArr[*]}" ]] && [[ $RevMax ]]; then  echo "${fvOutputArr[0]}"  
+  elif [[ "${fvOutputArr[*]}" ]]; then echo "${fvOutputArr[-1]}"
+  else return 1 ; fi
 }
 
 
@@ -542,3 +574,4 @@ fi
 
 # https://code.visualstudio.com/ 
 # vim:tabstop=2:shiftwidth=2:expandtab
+
