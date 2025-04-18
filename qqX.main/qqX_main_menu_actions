@@ -316,9 +316,10 @@ function  main_menu_actions {
       printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
-      printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
-      printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
-      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
+      printf   "\n  VIRTUAL DISK SIZE is normally larger than the actual size occupied but both the CoW and snapshot "
+      printf "\n\n  processes can sometimes make the envelope size appear to be lower than the contents."
+      printf "\n\n  Deleting snapshots will reduce Disk Size even if host reported sizes may not always reflect this."
+      printf "\n\n  FILE LENGTH greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
       printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations ..." 
       printColor "\n\n  Use the qqX disk utility to resize and to tidy."
     fi

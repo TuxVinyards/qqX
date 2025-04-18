@@ -57,7 +57,7 @@ drives_and_snapshots() {
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] && printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] && printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -81,7 +81,7 @@ drives_and_snapshots() {
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -113,7 +113,7 @@ drives_and_snapshots() {
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" 
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -204,7 +204,7 @@ function manage_and_repair_disks {
       printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
       printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
-      [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
+      [[ $DiskDisparity -ge "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
 
     fi
 
@@ -478,7 +478,7 @@ function qqX_snapshot_delete {
         SelDrv_SpaceSaved="$(bc <<< "$SelDrvOld - $SelDrvNew ") GiB"
       fi
       check_if_disk_needs_a_cleanup  "$Selected_Drive" 
-      if [[ $DiskDisparity == "1" ]]; then
+      if [[ $DiskDisparity -ge "1" ]]; then
         printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
       printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
         printf "\n\n  Try the main menu Disk Utility for a clean up ....\n"

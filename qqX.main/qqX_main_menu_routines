@@ -231,7 +231,10 @@ check_if_disk_needs_a_cleanup  () {
   FileLength="$(grep -s 'file length' <<< "$DiskData" | grep -s 'GiB' | awk '{print $3}')"
   DiskSize="$(grep -s -m1 'disk size' <<< "$DiskData" | grep -s 'GiB' | awk '{print $3}')"
   if [[ $VirtualSize && $FileLength && $DiskSize ]]; then
-    if [[ "$(bc -l <<< "$FileLength > ($DiskSize*1.5)" 2>/dev/null)" == "1" ]]; then  DiskDisparity=1
+    if [[ "$(bc -l <<< "$FileLength > ($DiskSize*2.1)" 2>/dev/null)" == "1" ]]; then  DiskDisparity=4
+    elif [[ "$(bc -l <<< "$FileLength > ($DiskSize*1.9)" 2>/dev/null)" == "1" ]]; then  DiskDisparity=3
+    elif [[ "$(bc -l <<< "$FileLength > ($DiskSize*1.7)" 2>/dev/null)" == "1" ]]; then  DiskDisparity=2
+    elif [[ "$(bc -l <<< "$FileLength > ($DiskSize*1.5)" 2>/dev/null)" == "1" ]]; then  DiskDisparity=1
     elif [[ $VirtualSize -le 32 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+10)" 2>/dev/null)"
     elif [[ $VirtualSize -le 64 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+15)" 2>/dev/null)"
     elif [[ $VirtualSize -le 96 ]]; then  DiskDisparity="$(bc -l <<< "$FileLength > ($DiskSize+20)" 2>/dev/null)"

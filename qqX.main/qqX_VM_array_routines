@@ -245,7 +245,7 @@ show_VM_Array_sizes_text () {
   for SSArrChk in "${SizesScanArr[@]}"; do
     SSArrChk_Disk="$(awk '{print $2}' <<< "$SSArrChk")"
     check_if_disk_needs_a_cleanup "$SSArrChk_Disk"
-    [[ $DiskDisparity == "1" ]] && printf "SIZE DISPARITY: %s \n\n" "$SSArrChk_Disk"  >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
+    [[ $DiskDisparity -ge "1" ]] && printf "SIZE DISPARITY: %s \n\n" "$SSArrChk_Disk"  >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
   done
   [[ ! $(cat "/tmp/qqX.Sizes.Disparity.qcow.txt") ]] &&  printf "No disk size disparity problems found \n\n"   >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
 
