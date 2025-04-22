@@ -1,11 +1,11 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 #  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
-#  Licence:  GPL3   https://www.gnu.org/licenses 
+#  Licence:  GPL3   https://www.gnu.org/licenses
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-# Settings file for qqX - quickemu quickget X terminal project 
+# Settings file for qqX - quickemu quickget X terminal project
 
 # qqX installer will create a hidden folder at $HOME & will place the settings there.
 # Settings may normally opened and edited via the qqX menu interface.
@@ -15,7 +15,7 @@
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-## SET THE DEFAULT GENERAL VM FOLDER, where the Virtual Machines are normally stored. 
+## SET THE DEFAULT GENERAL VM FOLDER, where the Virtual Machines are normally stored.
 #  Installation pre-set is "$HOME/VMQs"  -  Reconfigure as appropriate.
 #  Contains the .conf files and the 'InstanceName' containers.
 
@@ -23,8 +23,8 @@ Default_VM_Folder="$HOME/VMQs"
 
 # ADD any EXTRA FOLDERS OR SUB-FOLDERS where VM's may be located:
 # leave blank for none, set one entry per folder as +=("/full/path/folder") or +=("$Default_VM_Folder/folder")
-# or multiple as quoted and space separated as in +=("/full/path/folder" "/full/path/folder" "/full/path/folder") 
-# or as in +=("$HOME/VMQs/folder" "$HOME/VMQs/folder" "$HOME/VMQs/folder") 
+# or multiple as quoted and space separated as in +=("/full/path/folder" "/full/path/folder" "/full/path/folder")
+# or as in +=("$HOME/VMQs/folder" "$HOME/VMQs/folder" "$HOME/VMQs/folder")
 
 Extra_VM_Folder+=("")
 
@@ -34,10 +34,10 @@ Extra_VM_Folder+=("")
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-##  GENERAL COLOR & THEMING  
-#  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1   
+##  GENERAL COLOR & THEMING
+#  Yellow 3 (recommended), Blue 4, Cyan 6 (brighter blue), Red 1
 #  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-X_Shade="3" 
+X_Shade="3"
 
 ## Other SETTINGS SECTIONS AVAILABLE:
 
@@ -55,16 +55,16 @@ X_Shade="3"
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-## VM SELECTOR: 
+## VM SELECTOR:
 
-#  Normally the first opening menu, used to select VM's. Default style A. 
+#  Normally the first opening menu, used to select VM's. Default style A.
 #  Style may be previewed in the menu.  Suggest E or B as numbers of distros increases.
 
 VM_SelectorStyle="A"
 
 # OPTIONAL: select VM's to show AT THE TOP of the list
 
-# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file  
+# Where [n,0] is the full path general folder / sub-folder  &  [n,1] is the .conf file
 
 # eg:
 
@@ -83,26 +83,26 @@ VM_SelectorStyle="A"
 
 # VM_Array[2,0]= ; VM_Array[2,1]=
 
-# MUST BE set as CONTIGIUOUS, non-sparse, no numeric sequence gaps  
+# MUST BE set as CONTIGIUOUS, non-sparse, no numeric sequence gaps
 # ie:  0, 1, 2, 3 ...  when counting the first number of the first pair, on each line
-# COMMENT OUT with # any Non-Present VM entries 
+# COMMENT OUT with # any Non-Present VM entries
 
 
-# ITEMS PER LINE: 
+# ITEMS PER LINE:
 # Number counts starts at 0, may be adjusted to match terminal size and/or VM quota
 
-# Style A setting, default ="4"   
+# Style A setting, default ="4"
   VM_Select_Items_style_A_PerLine=
 
-# Style B setting, default ="1"  
+# Style B setting, default ="1"
   VM_Select_Items_style_B_PerLine=
 
-# Style C & D setting, default ="3"  
+# Style C & D setting, default ="3"
   VM_Select_Items_style_C_PerLine=
 
-# Style E setting, default ="2"  
+# Style E setting, default ="2"
   VM_Select_Items_style_E_PerLine=
-  
+
 # Default is set internally at ="7"  but certain internal functions may temporarily reduce this to as low as 2 or 3
 # Use with caution.  Suggest 5 or 6 as lowest setting.  Normally leave blank.
   Force_GetList_NewLinePoint=
@@ -112,7 +112,7 @@ VM_SelectorStyle="A"
 # Also see qqX wiki.
 
 # FIND DISTRO:
-# Set number of distros showing before find option shows on menu. Useful for large collections. 
+# Set number of distros showing before find option shows on menu. Useful for large collections.
 # Set value at 2x actual. Suggest around 15 or 20 distros, eg set @ 30 or 40, default = 32
   ShowFindPoint="32"
 
@@ -120,17 +120,17 @@ VM_SelectorStyle="A"
 
 ## 'QUICKEMU' & 'QUICKGET'  SOURCE:
 
-# IMPORTANT @ 2024/04  quickemu underwent major changes. 
+# IMPORTANT @ 2024/04  quickemu underwent major changes.
 
 # TO KEEP qqX STABLE, built-in releases were introduced from qqX version 1.8 onwards.
 # These are essentially identical to the official releases, except for changes to the version number, for identification purposes.
 
 # Quickemu is a good project but it has suffered at times from an intermittent maintenance cycle with
 # short notice releases and often months long periods of community-only activity.
-# 2024/04 has been A TURNING POINT which cames at the end of what was a frustratingly long period for many people,  
+# 2024/04 has been A TURNING POINT which cames at the end of what was a frustratingly long period for many people,
 # during which fixes and features from the quickemu community had accumulated and sat there waiting to be merged.
 
-# The idea is to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes, 
+# The idea is to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes,
 # and to have the possibilty, if needed or wished, of allowing in selected pre-release community contributions.
 
 # Versions may be start default set and  additionally hot-swapped via the standard qqX menus
@@ -157,7 +157,7 @@ VM_SelectorStyle="A"
 
 # FreeBird or FreeSpirit are recommended.
 
-  QE_SourceVersion="FreeBird"    
+  QE_SourceVersion="FreeBird"
 
 #  -------------------------------------------------------------------------------------------------------------------
 
@@ -170,15 +170,15 @@ VM_SelectorStyle="A"
   Hide_qqX_BetaUpdates=
 
 # Option for a Specified folder, in which sub folder "qqX.releases" gets to be placed, other than the usual like ~/Downloads
-# Give full path eg "/media/xxx/Storage/qqX.files"  
+# Give full path eg "/media/xxx/Storage/qqX.files"
   Specified_Updates_Location=
 
 #  -------------------------------------------------------------------------------------------------------------------
 
 ## OTHER PROGRAMS:
 
-# TEXT EDITOR  
-# Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor 
+# TEXT EDITOR
+# Leave blank to use system defaults for editing the settings file, otherwise give "name" of a specific editor
 # eg. gedit, pluma, gnome-text-editor, kate, mousepad, leafpad ...  If not found qqX will try defaults ...
 # For qt based distros, eg KDE, LXQT, then Kate is recommended, for gnome base use gnome-text-editor.
 # Typing/pasting 'xdg-mime query default text/plain' at the terminal may help
@@ -205,14 +205,14 @@ VM_SelectorStyle="A"
 
 # For BIOS settings, see TIANO BIOS further down.
 
-# SCREEN %PERCENTAGE may be added here or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenPercent' 
+# SCREEN %PERCENTAGE may be added here or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenPercent'
 # Use just the value, eg. ="68"   Suggested values from 50 to 70 as a percentage of the physical monitor
 # From quickemu 4.8 onwards, where value is integer from 25 to 99  & for Linux VM's, SDL only.
   Default_SDL_ScreenPercent="60"
 
 # VM SCREEN SIZE may be added here. Standard values are suggested. Oddball sizes may cause unsharp display.
-# Or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenSize' 
-# From quickemu 4.9.5 onwards For Linux VM's, SDL only.  
+# Or INDIVIDUALLY in the .conf file as 'Custom_SDL_ScreenSize'
+# From quickemu 4.9.5 onwards For Linux VM's, SDL only.
 # qqX still allows percent as a value in later code. Size, if present, takes priority over percent.
 # Windows determines its own sizes, as does earlier code for Macs.
 # For later code MacOS should now use Size as per release in the conf files. See qqX wiki notes for Mac.
@@ -230,40 +230,40 @@ VM_SelectorStyle="A"
 
 # While "on" can give enhanced output, "off" has increased distro compatibility and also allows scaling in SDL mode
 # Leave blank for "on" or set =1 for "off"  Individually, both states of "on" or "off" may be set in the .conf file.
-  SetGL_DefaultAsOff=  
+  SetGL_DefaultAsOff=
 #
 
-# LOCALE 
+# LOCALE
 # Setting to =1  will increase the use of more locale-centric language/typeface features, if needed
 # BUT this may upset some input/output filters ....  (CAUTION)
   AllowMoreLocale=
 
 # MSR
-# Set =1 for more prompting.  Standard prompting will be less active in warning situations.  
+# Set =1 for more prompting.  Standard prompting will be less active in warning situations.
 # Setting MSR_Warnings to =1 will unhide minor warnings on the standard (non technical) interface
   MSR_Warnings=
   Verbose_MSR_dialog=
-  
-# File location for default KVM behaviour for unhandled machine-specific registers. 
-# Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently. 
+
+# File location for default KVM behaviour for unhandled machine-specific registers.
+# Leave blank for standard settings. Edit here if your OS locates 'modprobe.d' differently.
 # quickemu / qwrap / qqX  default is "/etc/modprobe.d/kvm-quickemu.conf"
   KVM_MSR_ModProbeFile=
 
-# KILL DIALOG  
+# KILL DIALOG
 # Time adjuster for pkill display. Adds a delay to allow background processes time to output to screen.
 # Normal recommended integer = 2 to 10 secs   Adjust if your guest/host combo's find this too fast or slow.
-# Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ... 
+# Originally intended, primarily, to handle the "gl_version 46" output.  This particular is now filtered from QEMU 8.0 on ...
   P_Kill_WaitSecs="4"
 
 #  -------------------------------------------------------------------------------------------------------------------
 
-##  SHARED or SECOND DRIVES:  
+##  SHARED or SECOND DRIVES:
 
 # May be auto-created in qqX via the utils menu.
-# The Shared drive is a useful when in SDL mode & available to all VMs while a Second drive is a quick way to expand 
-# an individual VM's storage. Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount. 
+# The Shared drive is a useful when in SDL mode & available to all VMs while a Second drive is a quick way to expand
+# an individual VM's storage. Use Gparted, 'Disks' or similar, inside a VM, to set a file table, format and mount.
 
-# Give SharedDrive *full* location here  eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"   
+# Give SharedDrive *full* location here  eg. ="$Default_VM_Folder/SharedDrive/shared.qcow2"
 # SET SharedDrive_Conf as ="no-shared" IN THE .CONF FILE to individually stop the Shared Drive from loading
   SharedDrive=""
 
@@ -275,7 +275,7 @@ VM_SelectorStyle="A"
 # SET MacLegacyDrive as ="true" to load Second Drive (& not Shared) as 'ide-hd' instead of 'virtio-blk-pci'
 # SharedDrive always loads as 'virtio-blk-pci'   See https://en.wikipedia.org/wiki/MacOS_version_history
 
-# qqX adds SecondDrives to the .CONF FILE, eg as ="Windows-11/storage.qcow2" 
+# qqX adds SecondDrives to the .CONF FILE, eg as ="Windows-11/storage.qcow2"
 
 #  -------------------------------------------------------------------------------------------------------------------
 
@@ -285,16 +285,16 @@ VM_SelectorStyle="A"
 # Add here any 'errors' that changes in QEMU might throw up and that we want to generally ignore  eg. "warning" or "deprecated"
 # Add QemuError_VM_Filter=("warning" "deprecated") eg. to the .conf file for INDIVIDUALLY problematic distros.
 # @ 2023/12 Defaults:  # QemuErrorFilter=("gl_version" "signal 15 from pid")
-# 2024/07 add https://discussion.fedoraproject.org/t/selinux-alert-gst-plugin-scan-getattr-run-pcscd-pcscd-comm/79378  
+# 2024/07 add https://discussion.fedoraproject.org/t/selinux-alert-gst-plugin-scan-getattr-run-pcscd-pcscd-comm/79378
 # MacOS can often throw "usb_desc_get_descriptor" if the mouse/keyboard setting is not quite right,
 # but these not always critical and can be session supressed in the [ql] menu, then permanently in the .conf when the config is okay ...
 # Add any new values to the checking arrays as double quoted & space separated. Use the '+=' for further lines.
   QemuErrorFilter=("gl_version" "signal 15 from pid" "gst-plugin-scan")
-# QemuErrorFilter+=("") 
+# QemuErrorFilter+=("")
 
 
 # FIXES for QUICKEMU'S  QEMU  'args'
-# Selected fixes & hot-fixes for the quickemu code that gets passed to QEMU, 
+# Selected fixes & hot-fixes for the quickemu code that gets passed to QEMU,
 # where quickemu has not yet fixed things or has released the fix.  Some may not be needed or may be distro specfic.
 # Set = blank to disable, if causing problems or if not needed with your particular installation.  Set = 1 to activate.
   FixArgs_hpet=1
@@ -310,9 +310,9 @@ VM_SelectorStyle="A"
 
 # Hardcoded quickemu default is 'qemu-system-x86_64' with machine 'q35'
 # For unexpected QEMU changes, system may be set here, if required.
-# At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options  
+# At the cmd line, type: "qemu-system-x86_64 -machine help"  to see machine options
   QEMU_Default_SystemType=
-  QEMU_Default_MachineType=  
+  QEMU_Default_MachineType=
 
 
 ##  qqX CUSTOM BOOTING, including simple tweaks or the Arm, Risc-V and other machine & system types
@@ -327,31 +327,31 @@ VM_SelectorStyle="A"
   PreferHybridCustomMenus=
 
 # Extra * QEMU * args may be added here, as GLOBAL. Also add ad hoc via the main menu.
-# Format = "group quoted" with single-space separated elements eg:  ExtraArgs="-device tpm-tis,tpmdev=tpm0" 
+# Format = "group quoted" with single-space separated elements eg:  ExtraArgs="-device tpm-tis,tpmdev=tpm0"
 # See  https://qemu.readthedocs.io/en/latest/system/invocation.html
   ExtraArgs=
 
-# Extra * QUICKEMU * parameters to be used GLOBALLY at VM run time  
-# Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--screen 0" 
-# See quickemu --help for full list   NB  not all options can be applicable  CAUTION 
+# Extra * QUICKEMU * parameters to be used GLOBALLY at VM run time
+# Format = "group quoted" with single-space separated elements eg:  Extra_QE_Params="--screen 0"
+# See quickemu --help for full list   NB  not all options can be applicable  CAUTION
 # Of note:  "--full-screen" only works with spice display ...  &&  will overide --screenpct
 # DUAL DISPLAY  users should set "--screen 0" or "--screen 1" to select the monitor
 # See quickemu project main page for more details: https://github.com/quickemu-project/quickemu
   Extra_QE_Params=
 
 # HEADLESS commands may be set using Extra_QE_Params using "--display none"  BUT
-# to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file 
+# to avoid this affecting all machines it is recommended to add 'HeadlessDisplay' as ="true" to the .conf file
 # NB headless ONLY RUNS IN SPICE and an SSH connection may need to be set as an extra QE parameter
 # Originally: https://github.com/quickemu-project/quickemu#headless   --ssh-port <port> : Set ssh-port manually
 # BUT Improved from Quickemu 4.9.1  https://github.com/quickemu-project/quickemu/pull/835
-# --access : Enable remote spice access support. 'local' | 'remote' | 'clientipaddress'     
+# --access : Enable remote spice access support. 'local' | 'remote' | 'clientipaddress'
 # May be set INDIVIDUALLY by placing eg ACCESS="1.1.1.1" in the .conf file  (NB 'ACCESS' in CAPS, but value in lower case)
 # Note that if unset then quickemu will default this to = local
 
 # VERBOSE BOOT
-# Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.  
+# Set =1  to normally display the qemu args, with okay dialogue, in human readable & before booting.
 # Set blank for log file only. NB A main menu toggle is also available and a log file is always outputted to the VM's folder
-  VerboseArgs= 
+  VerboseArgs=
 
 #  -------------------------------------------------------------------------------------------------------------------
 
@@ -360,26 +360,26 @@ VM_SelectorStyle="A"
 # The Tiano boot system that is used by quickemu will require updating if there are feature or security changes made to the code.
 # (03/2024) Quickemu, currently places edk.fd vars into the VM folder. And there they remain.
 # It is theoretically possible that system updates containing feature changes may seek variables in these files that don't exist.
-# Quickemu will also place binary files, in the case of MacOS, which are only downloaded by running Quickget. 
-# There are also .bin files listed in the Quickemu code for use by some Linux distros .... 
+# Quickemu will also place binary files, in the case of MacOS, which are only downloaded by running Quickget.
+# There are also .bin files listed in the Quickemu code for use by some Linux distros ....
 
 # qqX features an [rtv] option which may be run manually, to Refresh (the) Tiano Variables (and such).
 # But to avoid tedium, this feature defaults to periodically auto-running. Set = 1 to turn this off, if required (?)
   RtvManualOnly=
 
-# In manual-only mode, qqX will remind you, from time to time, to run the updater. 
+# In manual-only mode, qqX will remind you, from time to time, to run the updater.
 # The MacOS reminder runs more frequently, as this is viewed as more critical.
-# As above, set = 1 to turn these off too, if required (?)  
+# As above, set = 1 to turn these off too, if required (?)
   RtvStdRmdOff=
   RtvMacosRmdOff=
 
-# Standard Arm AAVMF source folder = "/usr/share/AAVMF"  >>  Variations may be placed here.  
+# Standard Arm AAVMF source folder = "/usr/share/AAVMF"  >>  Variations may be placed here.
 # Defaults to auto-update, as below.
   RtvArmFolder=
 
 # The Tiano core provides a 3 second window to access the BIOS via the escape key.
-# This allows you to select a boot from ISO option and can also be useful for Windows updates. 
-# Instance Session overides can be toggled from the Utilities menu, or individually by placing 
+# This allows you to select a boot from ISO option and can also be useful for Windows updates.
+# Instance Session overides can be toggled from the Utilities menu, or individually by placing
 # 'BootStyle' either as ="fast" or ="slow" in the .conf file
 # Default ="fast" as this will slightly speed up the normal boot sequence:
   BootStyle="fast"
@@ -400,10 +400,10 @@ VM_SelectorStyle="A"
 # CUSTOM QUICKEMU & QUICKGET and DEVELOPMENT
 # Sometimes different quickemu/quickget versions maybe be needed, or different custom versions produced.
 
-# Official versions may be downloaded at https://github.com/quickemu-project/quickemu/releases   
+# Official versions may be downloaded at https://github.com/quickemu-project/quickemu/releases
 # Remember that official releases of quickget tend to check quickemu for the version number.
-# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable,  
-# as long as, a structure similar to quickemu 4.4 onwards has been used. 
+# In the past, different quickget/quickemu release/custom versions have been generally mix/matchable,
+# as long as, a structure similar to quickemu 4.4 onwards has been used.
 
 # Place 'Custom' scripts in a 'QE.Custom' sub-folder to "$Default_VM_Folder/qqX.custom" in a similar manner
 # to that used for FreeBird. This preset path will be auto-checked.
@@ -413,7 +413,7 @@ VM_SelectorStyle="A"
   QE_DevPath=
 
 # QE_SourceVersion may also be set here as a temporary overwrite to the main settings at the top of the script.
-# This will get reset here, if doing a settings update ... 
+# This will get reset here, if doing a settings update ...
 # QE_SourceVersion="Dev"
 
 # Inside the folder, all script names should be as standard. Plus, add all ancilliary scripts, such as macrecovery/chunkcheck etc.
@@ -423,7 +423,7 @@ VM_SelectorStyle="A"
 
 # Branches    - Source code and diff comparisons are at  https://github.com/TuxVinyards/quickemu/branches
 
-# Named versions are generally as follows: 
+# Named versions are generally as follows:
 
 # FreeSpirit - As FreeBird, or as FreeBird but more spirited, with newer ideas and fixes if they are EXPECTED TO BE STABLE.
 #              Probably includes some official pre-release, or qqX and Community pre-release, or both.

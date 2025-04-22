@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
-##  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files 
+##  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files
 
 #  From version 1.10.03  a posix friendly .sh script is used as a wrapper, to make sure that it double click executes properly
-#  in Qt / KDE XFCE etc desktop environments. 
+#  in Qt / KDE XFCE etc desktop environments.
 
 # From the main qqX release download folder run "./qqX_setup_and_install"  OR  run this script "./qqX_system_install" directly
 
-##  TO INSTALL:  
+##  TO INSTALL:
 #   if your file manager allows > mouse click & 'run as program' or 'run in terminal'
-#   OR: 
+#   OR:
 #   in the folder > right click > open in terminal >  type "./qqX_system_install"  (note prefix ./)
 
 ##  CUSTOM TERMINAL SIZES & PROFILE  may be set further down, just after the initial system checks
 #   qqX should test and setup most standard desktop associated terminals without problem.
-#   From version 1.10.02 onwards, a 'CustomTerminalProfile' will also be stored in the qqX settings folder. 
-#   The (hidden) file '$HOME/.qqX/qqX_term.conf' will be checked and auto-read when carrying out updates 
+#   From version 1.10.02 onwards, a 'CustomTerminalProfile' will also be stored in the qqX settings folder.
+#   The (hidden) file '$HOME/.qqX/qqX_term.conf' will be checked and auto-read when carrying out updates
 #   and may also be edited following initial setup, which is possibly easier ...
 
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
-# 	Otherwise:  
+# 	Otherwise:
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,16 +37,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses  
+# https://www.gnu.org/licenses
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
 
 
-##  qqX - quickemu quickget X terminal project   
+##  qqX - quickemu quickget X terminal project
 
-# STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx   
+# STANDARD INSTALLATION default, next to quickemu @ /usr/bin/qqX && link @ /usr/bin/qqx
 # From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 
 # Although popular, using a start line of "#!/usr/bin/env bash" will mask process names & inhibit process controls.
@@ -54,18 +54,18 @@
 
 # SOME USERS may need to change the qqX script start line from  #!/bin/bash, or other, to point to where their bash binary is located.
 # Only the main qqX script itself should need to be changed. This is easiest if done before running the installer but can also be done afterwards.
-# The commands "type -p bash" or "which bash" should help locate this.  
+# The commands "type -p bash" or "which bash" should help locate this.
 
 # From version qqX 1.11 changes should also be made to 'qqX_filemanage_qcow_drive' in qqX.main
 
 # See https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my#29620
 
-#  Differences may be present in non FHS distros & may need special installation 
-#  See var 'qqX_Std_Bin_Dir' below  &  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard  
+#  Differences may be present in non FHS distros & may need special installation
+#  See var 'qqX_Std_Bin_Dir' below  &  https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
 
-# In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID, 
+# In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID,
 # this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
-# See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756 
+# See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756
 
 # From qqX 1.6 onwards, a folder /usr/share/qqX should be created. This location may be group edited, further on in the script.
 
@@ -79,17 +79,17 @@
 
 if [ ! -t 1 ]; then exit ; fi
 
-if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 5 ]; then 
+if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 5 ]; then
   echo; echo "  Sorry, you need Bash, probably 5.0 or newer to run this script."; echo
   echo "  qqX has only been tested on up-to-date versions of Bash ...."; echo
   if [ -n "$(command -v bash)" ]; then echo "  Your version: "; echo ; bash --version ; echo
   fi
-  echo ; echo "  Press [enter] to try anyway   [e]  to  exit and update  >  " 
+  echo ; echo "  Press [enter] to try anyway   [e]  to  exit and update  >  "
   read -r   UpdateBash
   if [ -n "$UpdateBash" ]; then echo;  exit 1
-  else  
-    echo; echo "  I have backups and I understand that some processes may fail to work .... " 
-    echo ; echo "  [enter] to confirm  [e] to exit > " 
+  else
+    echo; echo "  I have backups and I understand that some processes may fail to work .... "
+    echo ; echo "  [enter] to confirm  [e] to exit > "
     read -r   UpdateBash
   fi
   echo
@@ -97,7 +97,7 @@ if [ -z "$(command -v bash)" ] || [ "$(echo "$BASH_VERSION" | cut -d. -f1)" -lt 
   fi
 fi
 
-# Posix caller in the main folder will look in the system folder for this script 
+# Posix caller in the main folder will look in the system folder for this script
 # but the installer was originally designed to work from the main folder, so move there:
 if [[ ! -d "./qqX.system" ]]; then
   cd .. || echo "  Problems switching to main folder"
@@ -105,7 +105,7 @@ fi
 
 HideFHSwarnings=     # To disable FHS warnings. Set =1
 
-if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/share"  ]]; then 
+if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/share"  ]]; then
 
   # https://superuser.com/questions/332610/where-is-the-temporary-directory-in-linux#332616
 
@@ -114,19 +114,19 @@ if [[ ! $HideFHSwarnings ]] && [[ ! -d "/tmp" || ! -d "/usr/share"  ]]; then
   printf "\n\n  [q] to quit   [enter]  ignore & continue \n\n"
   read -rp  "  >  "   FHS_Alert
 
-  [[ $FHS_Alert ]] &&  exit 
+  [[ $FHS_Alert ]] &&  exit
 
 fi
 
-# Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem 
+# Auto-change of the qqX shebang could be implemented BUT it is likely that users encountering this problem
 # will need more adjustments than just this, so flag up for them to read the notes & probably other:
 
-# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'  
+# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'
 # Using caps (type -P) will show aliases and qqX re-routes
 
 OS_BashLocation="$(type -p bash)"
 
-if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then 
+if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
 
   printf "\n\n\n  Please read the notes at the start of this installer script."
 
@@ -138,17 +138,17 @@ if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
 
   printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
-  [[ $FHS_Alert ]] &&  exit 
+  [[ $FHS_Alert ]] &&  exit
 fi
 
 if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
   printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
   printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
   read -rp  "  >  "   FHS_Alert
-  [[ $FHS_Alert ]] &&  exit 
+  [[ $FHS_Alert ]] &&  exit
 fi
 
-##  Check for items sometimes missing 
+##  Check for items sometimes missing
 if [[ ! $(type -p curl) ]]; then
   printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
   read -rp "  [enter] to ignore or continue > "
@@ -158,7 +158,7 @@ if [[ ! $(type -p jq) ]]; then
   read -rp "  [enter] to ignore or continue > "
 fi
 CoreList=("bc" "xrandr" "paste")
-for CP in "${CoreList[@]}"; do 
+for CP in "${CoreList[@]}"; do
   if [[ ! $(type -p "$CP") ]]; then
     printf "\n\n  A '%s' installation should normally be present and is required by qqX ...\n\n"  "$CP"
     read -rp "  [enter] to ignore or continue > "
@@ -185,50 +185,50 @@ fi
 New_qqX_Version="$(./qqX --version 2>/dev/null)"
 
 # Default location is next to quickemu in "/usr/bin" This may frequently be set just to "/bin"
-# as this is often just a symlink and qqX will actually install to "/usr/bin". 
-# However, this doesn't always follow. Although the bash shebang itself starts at "/bin" 
-# some systems have not adopted or allowed for the newer standard method and will only route 
+# as this is often just a symlink and qqX will actually install to "/usr/bin".
+# However, this doesn't always follow. Although the bash shebang itself starts at "/bin"
+# some systems have not adopted or allowed for the newer standard method and will only route
 # items on an individual basis.
 
 # In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
 
-if [[ ! $Current_qqX_Location ]]; then 
+if [[ ! $Current_qqX_Location ]]; then
   # new install
   qqX_Std_Bin_Dir="/usr/bin"
-else 
+else
   # updating existing install
   qqX_Std_Bin_Dir="$(dirname "$Current_qqX_Location")"
 fi
-qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"   
-qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"   
+qqX_Std_File_Path="$qqX_Std_Bin_Dir/qqX"
+qqX_Std_lc_Link_Path="$qqX_Std_Bin_Dir/qqx"
 
-#  NB For non FHS OS packaging, also edit at start of main file 'qqX' ...  
+#  NB For non FHS OS packaging, also edit at start of main file 'qqX' ...
 #  WiP: attention may need to be given to the qqX updater too ...
 
 #  From qqX 1.6 onwards, a folder /usr/share/qqX should be created for the subfolder and files of qqX.main
 #  And from 1.8 the subfolder qqX.builtins
 
-qqX_Std_Share_Path="/usr/share/qqX"   
+qqX_Std_Share_Path="/usr/share/qqX"
 
-#  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+#  See $: xdg-desktop-menu --manual  # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html
 #  qqX 1.9 on, move .desktop "$HOME/.local/share/applications" to "/usr/share/applications"
 
 XDG_GUI_desktop_Folder="/usr/share/applications"
-XDG_GUI_desktop_Name="qqX.desktop" 
-XDG_GUI_desktop_PathName="$XDG_GUI_desktop_Folder/$XDG_GUI_desktop_Name"  
+XDG_GUI_desktop_Name="qqX.desktop"
+XDG_GUI_desktop_PathName="$XDG_GUI_desktop_Folder/$XDG_GUI_desktop_Name"
 
 
 function print_manual_uninstall_notes {
 
   cat << Notes
 
-  Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME 
-  and any desktop items in folder:  $qqX_Std_Share_Path  
-  followed by: sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
+  Manual uninstall, standard procedure  >>  remove the hidden .qqX folder from $HOME
+  and any desktop items in folder:  $qqX_Std_Share_Path
+  followed by: sudo update-desktop-database  "$XDG_GUI_desktop_Folder"
 
-  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx 
+  Sudo remove the scripts  > sudo rm /usr/bin/qqX  &  sudo rm /usr/bin/qqx
   From qqX 1.6 onwards also remove  sudo rm -r /usr/share/qqX
 
 Notes
@@ -239,11 +239,11 @@ Notes
 
 function print_terminal_notes {
 
-  # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code     
+  # See https://stackoverflow.com/questions/22697688/how-to-cat-eof-a-file-containing-code
   # ( NB use of escape EOF, or quotes, not used )
 
   cat << Notes
- 
+
   TO MANUALLY SPECIFY the terminal name, the installer script's 'UserTerm' variable may be used.
 
   From qqX version 1.10.02 onwards, a 'CustomTerminalProfile' will now be stored in the qqX settings folder.
@@ -252,7 +252,7 @@ function print_terminal_notes {
   For first installs or profile re-imposition the 'system' installer script may be directly edited.
   Open the script in a standard text editor at around line 240.
 
-  If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited (hidden) 
+  If updating, the file '$HOME/.qqX/qqX_term.conf' may also be edited (hidden)
   MAKE SURE to SELECT option [r] reconfigure desktop launcher, as this where the terminal command is finally used.
 
   It is quite common for different distros to rename or tweak a standard terminal.
@@ -263,15 +263,15 @@ function print_terminal_notes {
   so the terminal window size will usually alter when the font size is changed.
 
   Some terminals do not have a -geometry parameter and must be pre-set in the actual terminal.
-  For example, 'qterminal' which also uses PIXELS.  Try 1500 x 1000. 
+  For example, 'qterminal' which also uses PIXELS.  Try 1500 x 1000.
 
 Notes
 
 }
 
-## SET TERMINAL SIZES & PROFILE 
+## SET TERMINAL SIZES & PROFILE
 
-# Changes made here, to height and width values, will be one-time only.  
+# Changes made here, to height and width values, will be one-time only.
 # Also to UserTerm.
 
 Term_Width=145
@@ -288,7 +288,7 @@ UserTerm=
 
 # NB the Profile should finish with ' -e ' or ' -- ' or any specific execute command variant that the terminal requires
 
-# The use of CustomTerminalProfile will also cause UserTerm to be stored. 
+# The use of CustomTerminalProfile will also cause UserTerm to be stored.
 # Any size variables copied from below will eventually become stored as numerics.
 
 CustomTerminalProfile=
@@ -326,7 +326,7 @@ KonsoleTerminalProfile_Standard=" --title $KonsoleTitle --hide-menubar --hide-ta
 KonsoleTerminalProfile_HostSize=" --title $KonsoleTitle --hide-menubar --hide-tabbar --notransparency"
 
 ##  Check we are in the right place
-if [[ ! -d "$(pwd)/qqX.system" ]]; then 
+if [[ ! -d "$(pwd)/qqX.system" ]]; then
   printf  "\n\n  ERROR  qqX install script must be run from inside the original qqX folder \n\n"
   sleep 8  ; exit 1
 fi
@@ -337,13 +337,13 @@ source "qqX.system/qqX_add_in_boot_level_chrome"
 # and add in the settings updater
 source "qqX.system/qqX_settings_update_transposer"
 
-## START 
+## START
 
 printf "\033c"
 echo
 qqX_logo_title  "quickemu quickget X terminal project - setup, install, uninstall & update script for qqX $New_qqX_Version "
 
-if [[ "$(whoami)" == root ]]; then 
+if [[ "$(whoami)" == root ]]; then
 
   UserLand_Name="$(users)"
   printColor "\n\n  User-Interactive Scripts:\n\n  Root installation is not currently available. "
@@ -355,15 +355,15 @@ fi
 
 echo
 
-## PROBE SYSTEM ENVIRONMENT  
+## PROBE SYSTEM ENVIRONMENT
 
-LinuxType=$(uname -o) 
-LinuxMachine=$(uname -m) 
+LinuxType=$(uname -o)
+LinuxMachine=$(uname -m)
 
-if [[ ! $LinuxType ]] || [[ "$LinuxType" != *Linux ]] && [[ $LinuxMachine != "x86_64" ]] ; then 
+if [[ ! $LinuxType ]] || [[ "$LinuxType" != *Linux ]] && [[ $LinuxMachine != "x86_64" ]] ; then
 
   printf "\n\n  ERROR OS found: %s  %s "  "$LinuxType"  "$LinuxMachine"
-  printColor "\n\n  @ 2023 Quickemu scripts are intended for 64 bit LINUX X86 distributions only \n\n"   
+  printColor "\n\n  @ 2023 Quickemu scripts are intended for 64 bit LINUX X86 distributions only \n\n"
   printf   "\n  Make sure that you have read this script and the docs before continuing \n\n"
   read -rp "  Use 'ctrl-c' to exit or [enter] to continue > "
 
@@ -390,12 +390,12 @@ else
   if [[ $(type -p qqX) ]]; then
     # do grep as older versions won't return 'qqX --version'
     Current_qqX_Path="$(type -p qqX)"
-    Current_qqX_Version="$(grep -s -m 1 'qqX_Version=' "$Current_qqX_Path" | cut -d'"' -f2 2>/dev/null)"  
+    Current_qqX_Version="$(grep -s -m 1 'qqX_Version=' "$Current_qqX_Path" | cut -d'"' -f2 2>/dev/null)"
   else Current_qqX_Version=
   fi
 
   if [[ $1 == "Upgrade" ]] || [[ -d "$HOME/.qqX" ]]; then  printf  "\n   Upgrade the current release %s ..."   "$Current_qqX_Version"
-  else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME" 
+  else  printColor  "\n   Install a settings file to %s & add program scripts?"   "$HOME"
   fi
 
   cat "qqX.system/icons/qqX.ascii.logo.8bit.25.txt"
@@ -410,8 +410,8 @@ else
   printf "   [q] to quit \n\n"
   read -rp "   >  "  InstallSelect
 
-  if [[ $InstallSelect == "q" ]]; then  
-  
+  if [[ $InstallSelect == "q" ]]; then
+
     sleep 0.6 ; exit
 
   elif [[ $InstallSelect == "u" ]]; then
@@ -425,7 +425,7 @@ else
     qqX_RemovalTarget_X="$(type -p qqX)"
     qqX_Remove=
 
-    printColor "\n\n  [y] sudo auto removal of qqX scripts and settings and builtins." 
+    printColor "\n\n  [y] sudo auto removal of qqX scripts and settings and builtins."
     printf " \n\n  All VM folders will be left as they are ... [enter] to quit \n\n"
     read -rp "  >  "  qqX_Remove
     printf "\n\n"
@@ -434,11 +434,11 @@ else
 
       [[ $qqX_RemovalTarget ]] && sudo rm "$qqX_RemovalTarget"
       [[ $qqX_RemovalTarget_X ]] && sudo rm "$qqX_RemovalTarget_X"
-      [[ -d "/usr/share/qqX" ]] && sudo rm -r "/usr/share/qqX"  
-      [[ -d "$HOME/.qqX" ]] && rm -r "$HOME/.qqX" 
+      [[ -d "/usr/share/qqX" ]] && sudo rm -r "/usr/share/qqX"
+      [[ -d "$HOME/.qqX" ]] && rm -r "$HOME/.qqX"
 
-      [[ -e "$XDG_GUI_desktop_Folder/qqX.desktop"  ]] && sudo rm "$XDG_GUI_desktop_Folder/qqX.desktop" 
-      [[ $(type -p update-desktop-database) ]] && sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
+      [[ -e "$XDG_GUI_desktop_Folder/qqX.desktop"  ]] && sudo rm "$XDG_GUI_desktop_Folder/qqX.desktop"
+      [[ $(type -p update-desktop-database) ]] && sudo update-desktop-database  "$XDG_GUI_desktop_Folder"
 
       printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
       printColor "\n\n  Removal processing complete \n\n"
@@ -457,7 +457,7 @@ else
 
     SeparateSudo=
 
-    if  [[ $InstallSelect == "m" ]] ; then 
+    if  [[ $InstallSelect == "m" ]] ; then
 
       printf "\n\n  Open another terminal IN THE SOURCE FOLDER"
       printf   "\n  where the following commands should be issued:"
@@ -467,24 +467,24 @@ else
 
       printf "\n\n  From qqX 1.6 onwards, a folder /usr/share/qqX should also be created"
       printf   "\n  for the subfolders and files of qqX.main and from 1.8 onwards of qqX.builtins"
-      
-      printf "\n\n  Existing builtin, main and lib folders should be cleaned. " 
+
+      printf "\n\n  Existing builtin, main and lib folders should be cleaned. "
       printf   "\n  Custom should be left as is."
 
       # Using -p  to make sure that "$qqX_Std_Share_Path/qqX.custom" doesn't get overwritten
       printColor "\n\n  sudo mkdir -p \"%s/qqX.custom\" " "$qqX_Std_Share_Path"
-      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.main" 
-      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.builtins" 
-      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.lib" 
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.main"
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.builtins"
+      printColor "\n\n  sudo rm -r \"%s\" " "$qqX_Std_Share_Path/qqX.lib"
       printf "\n"
-      printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path" 
-      printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path" 
+      printColor "\n\n  sudo cp -r \"./qqX.main\"  \"%s\" " "$qqX_Std_Share_Path"
+      printColor "\n\n  sudo cp -r \"./qqX.builtins\"  \"%s\" " "$qqX_Std_Share_Path"
       printColor "\n\n  sudo cp -r \"./qqX.lib\"  \"%s\" " "$qqX_Std_Share_Path"
       printf "\n"
-      printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path" 
-      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_File_Path" 
-      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_lc_Link_Path" 
-      
+      printColor "\n\n  sudo chmod a+rx -R  \"%s/\" " "$qqX_Std_Share_Path"
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_File_Path"
+      printColor "\n\n  sudo chmod a+rx  \"%s/\" " "$qqX_Std_lc_Link_Path"
+
       printf "\n\n  NOTE command line installation only. "
       printf "\n\n  Auto-install is needed for desktop launchers and shortcuts"
       printf "\n"
@@ -500,8 +500,8 @@ else
 
       printColor "\n  Auto-Installing .... \n\n  "
       sudo cp "qqX" "$qqX_Std_File_Path"
-      # make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link.   
-      [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"  
+      # make symbolic link lowercase 'qqx' , as in: ln -s  textfile.txt  my_link.
+      [[ ! -e "$qqX_Std_lc_Link_Path" ]]  &&  sudo ln -s "$qqX_Std_File_Path" "$qqX_Std_lc_Link_Path"
       [[ ! -d "$qqX_Std_Share_Path/qqX.custom" ]] && sudo mkdir -p "$qqX_Std_Share_Path/qqX.custom"
       # remove any old and possibly obsolete and unneeded files (make sure custom is not overwritten)
       [[ -d "$qqX_Std_Share_Path/qqX.main" ]] && sudo rm -r "$qqX_Std_Share_Path/qqX.main"
@@ -517,54 +517,54 @@ else
       sudo chmod a+rx "$qqX_Std_lc_Link_Path"
 
     fi
-    
+
     # Check that the right version is there:
-    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$New_qqX_Version" ]] ; then 
-      printColor "\n  Files installed: "; printf " All good" 
-    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$New_qqX_Version" ; sleep 2000  
+    if [[ -e "$qqX_Std_File_Path" &&  -e "$qqX_Std_lc_Link_Path" ]] && [[ "$(qqx --version 2>/dev/null)" == "$New_qqX_Version" ]] ; then
+      printColor "\n  Files installed: "; printf " All good"
+    else  printColor "\n\n  ERROR qqX version %s not installed correctly. Check 'bin' path in installer script. Quit and retry." "$New_qqX_Version" ; sleep 2000
     fi
 
     Default_VM_Folder=
 
-    if grep -q -s Default_VM_Folder= "$HOME/.qqX/qqX_settings" ; then 
+    if grep -q -s Default_VM_Folder= "$HOME/.qqX/qqX_settings" ; then
       TestDefVMs="$(grep -m 1 -s Default_VM_Folder= "$HOME/.qqX/qqX_settings")"
       if [[ $TestDefVMs ]]; then eval "$TestDefVMs"; fi
     fi
 
     if [[ -d  "$HOME/VMQs" ]] ; then
 
-      printColor "\n\n\n  The default VM directory has been found >> "  
-      printf "\n\n  %s " "$HOME/VMQs" 
+      printColor "\n\n\n  The default VM directory has been found >> "
+      printf "\n\n  %s " "$HOME/VMQs"
 
     elif [[ -d "$Default_VM_Folder" ]]; then
 
-      printColor "\n\n\n  A Custom default VM directory has been found >> "  
+      printColor "\n\n\n  A Custom default VM directory has been found >> "
       printf "\n\n  %s " "$Default_VM_Folder"
-      
+
     else
 
       MkDefDir=
-      printColor "\n\n\n  A default VM directory is required >> "  
+      printColor "\n\n\n  A default VM directory is required >> "
       printf "\n\n  %s\n\n  This location can be easily moved and/or renamed later," "$HOME/VMQs"
       printf "\n\n  simply by using the file manager and by editing the qqX settings."
       printColor "\n\n  [enter] make folder '%s'" "$HOME/VMQs"
-      printColor "  [n] not yet >> edit the settings file later ... \n\n" 
+      printColor "  [n] not yet >> edit the settings file later ... \n\n"
       read -rp "  >  "  MkDefDir
 
-      if [[ ! $MkDefDir ]] && [[ ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n" 
+      if [[ ! $MkDefDir ]] && [[ ! -d "$HOME/VMQs" ]]; then  mkdir "$HOME/VMQs"  ||  printColor "\n\n  ERROR  making Default VM folder %s \n\n"
       fi
-      #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW  
+      #  qqX default location: has to be slightly opinionated here (and at end of script) for the updater to work  REVIEW
 
     fi
 
     if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n"
-    fi 
-
-    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  ""
-    else cp "qqX_settings" "$HOME/.qqX/qqX_settings"    
     fi
 
-    cp -r "qqX.system/icons"  "$HOME/.qqX" 
+    if [[ -e "$HOME/.qqX/qqX_settings" ]]; then  update_old_settings_file_with_new_options  ""
+    else cp "qqX_settings" "$HOME/.qqX/qqX_settings"
+    fi
+
+    cp -r "qqX.system/icons"  "$HOME/.qqX"
     printColor "\n\n  Running settings file and desktop icons routines ..."
 
     if [[ ! $(type -p qqx) ]] && [[ ! $(type -p qqX) ]] || [[ ! -e "$HOME/.qqX/qqX_settings" ]] || [[ ! -e "$HOME/.qqX/icons/qqX.std.logo.128.png" ]]; then
@@ -588,7 +588,7 @@ SkipMkLauncher=
 
 if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
 
-  printColor "\n\n  A desktop launcher already exists >> " 
+  printColor "\n\n  A desktop launcher already exists >> "
 
   ForceReconfigure=
   if ! grep -qs 'x-cd-image' "$XDG_GUI_desktop_PathName" ; then ForceReconfigure=1
@@ -601,53 +601,53 @@ if [[ -e  "$XDG_GUI_desktop_PathName" ]] ; then
 
   if [[ $ForceReconfigure ]]; then
     printf "\n\n  BUT... to enable new qqX features, we need to take a few seconds to reconfigure the launcher"
-    printColor "\n\n  [enter] to continue   " 
+    printColor "\n\n  [enter] to continue   "
   else
     printf "\n\n  Unless changing the terminal size, the icon or similar, may be skipped ..."
-    printColor "\n\n  [enter] to skip   " 
+    printColor "\n\n  [enter] to skip   "
     printf "[r] to reconfigure \n\n"
   fi
   read -rp "  >  "  SkipMkLauncher
 
-  if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1 
+  if [[ $SkipMkLauncher == "r" || $ForceReconfigure ]]; then  SkipMkLauncher= ; else SkipMkLauncher=1
   fi
 
 fi
 
 if [[ ! $SkipMkLauncher ]]; then
 
-  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
-    source "$HOME/.qqX/qqX_term.conf" 
+  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then
+    source "$HOME/.qqX/qqX_term.conf"
     # $UserTerm and $CustomTerminalProfile, if present
-    if grep -sq 'UserTerm' "$HOME/.qqX/qqX_term.conf"; then 
+    if grep -sq 'UserTerm' "$HOME/.qqX/qqX_term.conf"; then
       printColor "\n\n  Terminal Emulator '%s' has been found in the qqX config files ..." "$UserTerm"
     fi
   fi
 
-  if grep -qs Exec "$XDG_GUI_desktop_Folder/qqX.desktop"; then 
+  if grep -qs Exec "$XDG_GUI_desktop_Folder/qqX.desktop"; then
     CurrentTerm="$(grep Exec "$XDG_GUI_desktop_Folder/qqX.desktop" | cut -d' ' -f1 | cut -d= -f2  2>/dev/null)"
     [[ $CurrentTerm ]] && printf "\n\n  The current qqX launcher is using '%s'" "$CurrentTerm"
   fi
 
   if [[ $UserTerm || $CustomTerminalProfile ]]; then
     # from an edit at the start of the installer (which also allows for overwrites of qqX_term.conf)
-    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi 
+    if [[ ! -d "$HOME/.qqX" ]]; then mkdir "$HOME/.qqX" ||  printColor "\n\n  Settings folder ERROR creating \n\n" ; fi
     if [[ ! $UserTerm ]]; then AddFound_UserTerm=1 ; else AddFound_UserTerm= ; fi
     {
       printf "\n  UserTerm=\"%s\"" "$UserTerm"
       printf "\n\n  CustomTerminalProfile=\"%s\"\n" "$CustomTerminalProfile"
     } > "$HOME/.qqX/qqX_term.conf"
 
-  elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+  elif [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then
     # empty or errored file, so remove it
     rm "$HOME/.qqX/qqX_term.conf"
   fi
 
   while true; do
-    if [[ "$(cat "/tmp/qqX.termlist" 2>/dev/null)"  ]]; then 
+    if [[ "$(cat "/tmp/qqX.termlist" 2>/dev/null)"  ]]; then
 
       mapfile -t TermChooseArr <<< "$(cat "/tmp/qqX.termlist" 2>/dev/null)"
-      UserTerm="${TermChooseArr[0]}" 
+      UserTerm="${TermChooseArr[0]}"
       printColor "\n\n  Found:"
       i=0 ; n=1
       while [[ "${TermChooseArr[i]}" ]]; do
@@ -665,7 +665,7 @@ if [[ ! $SkipMkLauncher ]]; then
           i="$((TermChoose-=1))"
           UserTerm="${TermChooseArr[i]}"
           break ;;
-        h) 
+        h)
           printf "\n\n\n  85%% of users are probably covered by \"gnome-terminal\" \"konsole\" \"mate-terminal\" "
           printf "\n\n  \"xfce4-terminal\" and over 95%% probably when \"qterminal\" and \"alacritty\" are added."
           printf "\n\n  For qqX purposes, alacritty works better in tiling window managers."
@@ -677,11 +677,11 @@ if [[ ! $SkipMkLauncher ]]; then
         *) break ;;
       esac
 
-    else break 
+    else break
     fi
   done
 
-  # The name of the terminal emulator is needed   (may also be manually specified at start of script)  
+  # The name of the terminal emulator is needed   (may also be manually specified at start of script)
   [[ ! $UserTerm ]] && source "$(pwd)/qqX.system/qqX_termfind"
 
   if [[ $AddFound_UserTerm && $UserTerm ]]; then
@@ -701,12 +701,12 @@ if [[ ! $SkipMkLauncher ]]; then
 
     printColor "\n\n  qqX standard window size is %s columns wide & %s lines high"   "$Term_Width"  "$Term_Height"
 
-    if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then  
+    if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then
       printf "\n\n  A stored terminal profile is being used: \n\n"
-      cat "$HOME/.qqX/qqX_term.conf" 
+      cat "$HOME/.qqX/qqX_term.conf"
     fi
 
-    if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+    if [[ ! -e "$HOME/.qqX/qqX_term.conf" ]]; then
       printf "\n\n  Use extra height (%s) if you have high numbers of Vm's"  "$Term_Taller"
       printf   "\n  You may also edit/create a 'CustomTerminalProfile' to store different values."
       printf   "\n  See the notes near the start of the 'system' folder's installer script."
@@ -735,8 +735,8 @@ if [[ ! $SkipMkLauncher ]]; then
       printf "   [t] extra height  [a] as host (auto)  or "
     fi
 
-  else  
-  
+  else
+
     print_terminal_notes
     printColor "\n  https://github.com/TuxVinyards/qqX/wiki "
     printf "\n\n  https://github.com/TuxVinyards/qqX/wiki/Translation \n\n"
@@ -748,7 +748,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   if [[ ! $UserTerm || $TerminalHeightChoice == "q" ]]; then
 
-    sleep 0.6 ; exit 
+    sleep 0.6 ; exit
 
   elif [[ $TerminalHeightChoice == "t" ]]; then
 
@@ -762,7 +762,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   elif [[ $TerminalHeightChoice == "a" ]]; then
 
-    printf "\n  Height selected =  Auto/Host " 
+    printf "\n  Height selected =  Auto/Host "
     MateTerminalProfile="$MateTerminalProfile_HostSize"
     GnomeTerminalProfile="$GnomeTerminalProfile_HostSize"
     XfceTerminalProfile="$XfceTerminalProfile_HostSize"
@@ -786,7 +786,7 @@ if [[ ! $SkipMkLauncher ]]; then
 
   SelectedTerminalProfile=
 
-  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then 
+  if [[ -e "$HOME/.qqX/qqX_term.conf" ]]; then
     # allows for zero entry profiles having been written
     GrepLine="$(eval grep -s  CustomTerminalProfile  "$HOME/.qqX/qqX_term.conf")"
     [[ $GrepLine ]] && eval "$GrepLine"
@@ -807,12 +807,12 @@ if [[ ! $SkipMkLauncher ]]; then
 
   printf "\n\n  Select Desktop icon/logo color "
   printColor   "\n\n  [enter] standard yellow ICON"
-  
+
   tput setaf 6
   printf  "   [b] alternative blue ICON"
   tput sgr0
 
-  printf "\n\n  Text color adjustments are found in the general settings file \n\n"   
+  printf "\n\n  Text color adjustments are found in the general settings file \n\n"
   read -rp "  >  "  IconSelect
 
 
@@ -821,11 +821,11 @@ if [[ ! $SkipMkLauncher ]]; then
   else  Icon_Var="std"; fi
 
 
-  ## RUN .desktop CREATOR  
+  ## RUN .desktop CREATOR
 
   if [[ ! $XDG_SESSION_DESKTOP ]] || [[ ! $XDG_CURRENT_DESKTOP ]] ; then
 
-    printColor "\n\n  XDG desktop not fully set up or not found." 
+    printColor "\n\n  XDG desktop not fully set up or not found."
     UserLand_Name="$(users)"
     [[ ! $WSL_Install ]] && No_XDG=1
 
@@ -851,19 +851,19 @@ if [[ ! $SkipMkLauncher ]]; then
     printColor "\n\n  ERROR:  The default XDG user desktop folder cannot be created or found\n\n  See https://www.freedesktop.org/wiki/ \n\n"
   fi
 
-  if [[ $No_XDG ]]; then 
+  if [[ $No_XDG ]]; then
 
     printColor "\n\n  An XDG desktop cannot be found or cannot be set up.  Type 'qqX' at the command line for starting.\n\n"
     sleep 3 ; exit 1
 
   else
 
-    ## Add Icon to links:  https://askubuntu.com/a/617311   https://people.gnome.org/~bmsmith/build/gosnautilus-203.html   
+    ## Add Icon to links:  https://askubuntu.com/a/617311   https://people.gnome.org/~bmsmith/build/gosnautilus-203.html
 
     #[Desktop Entry]
     #Type=Link
     #Name=qqX
-    #Icon=$HOME/.qqX/icons/qqX.std.logo.128.png     
+    #Icon=$HOME/.qqX/icons/qqX.std.logo.128.png
     #URL=/usr/bin/qqX
 
     # https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup  # $HOME/.icons ?
@@ -876,66 +876,66 @@ if [[ ! $SkipMkLauncher ]]; then
 
     # https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517222
 
-    # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774 
+    # & https://stackoverflow.com/questions/41516147/pass-filename-from-nautilus-to-shell-script#41517774
 
 
-     #  Remove any old launcher file & create a new one  
+     #  Remove any old launcher file & create a new one
     [[ -f "$XDG_GUI_desktop_PathName" ]]  && sudo rm "$XDG_GUI_desktop_PathName"
     #   Plus remove any from pre qqX 1.9
-    if [[ -f "$HOME/.local/share/applications/qqX.desktop" ]]; then 
+    if [[ -f "$HOME/.local/share/applications/qqX.desktop" ]]; then
       rm "$HOME/.local/share/applications/qqX.desktop"
       update-desktop-database "$HOME/.local/share/applications"
       printColor "\n\n  qqX desktop links have been moved, any pinned links may need re-pinning \n\n"
     fi
 
     #  NoDisplay: means don't show in the main menu  (Use =false)
-    #  Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )  
+    #  Use:  Terminal=false  (true means $TERM which is often a fallback mode 'xterm' )
 
     make_desktop_content()  {
 
       echo "[Desktop Entry]"
       echo "Type=Application"
       echo "Terminal=false"
-      echo "Name=qqX Virtual Machine Manager" 
+      echo "Name=qqX Virtual Machine Manager"
       echo "NoDisplay=false"
       echo "Comment=qqX - quickemu quickget X terminal project"
 
       # needs quotes  - plus REVIEW  -e  deprecation in other terminals
-      if [[ $CustomTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path %f" '"'  
-      elif [[ $UserTerm == "gnome-terminal" ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'" %f"'"'  
-      elif [[ $SelectedTerminalProfile ]]; then 
-        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  %f" '"'  
-      else  
-        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path %f" '"'  
+      if [[ $CustomTerminalProfile ]]; then
+        echo "Exec=$UserTerm $CustomTerminalProfile " '"' "$qqX_Std_File_Path %f" '"'
+      elif [[ $UserTerm == "gnome-terminal" ]]; then
+        echo "Exec=$UserTerm $SelectedTerminalProfile -- $qqX_Std_File_Path "'"'" %f"'"'
+      elif [[ $SelectedTerminalProfile ]]; then
+        echo "Exec=$UserTerm $SelectedTerminalProfile -e " '"' "$qqX_Std_File_Path  %f" '"'
+      else
+        echo "Exec=$UserTerm  -e " '"' "$qqX_Std_File_Path %f" '"'
       fi
 
       echo "Icon=$HOME/.qqX/icons/qqX.""$Icon_Var"".logo.128.png"
       echo "Categories=System;Emulator"
 
       # https://specifications.freedesktop.org/menu-spec/latest/apa.html#main-category-registry
-      # MimeType section used only for right click, open with, menu functions   # one line, or causes errors  
+      # MimeType section used only for right click, open with, menu functions   # one line, or causes errors
 
       printf "MimeType=application/x-qemu-disk;application/x-cd-image;application/vnd.efi.iso\n"
       echo "Keywords=qqX;qqx;qqX-Project;quickemu;quickget;qemu;kvm;KVM;qcow2;vm;VM;virt;;virtual-machine;emulator"
       echo "#"
       echo "#https://specifications.freedesktop.org/desktop-entry-spec/latest/"
 
-    }  
-    
+    }
+
     make_desktop_content | sudo tee "$XDG_GUI_desktop_PathName"  1>/dev/null
 
     sudo chmod a+rx  "$XDG_GUI_desktop_PathName"
 
-    # Useful:  
+    # Useful:
     # xdg-mime query filetype  "filename.ext"   # xdg-mime query default "video/x-matroska"  etc    See:  man xdg-mime >> examples
-    # desktop-file-validate  qqX.desktop 
+    # desktop-file-validate  qqX.desktop
 
-    # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html 
+    # See https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-1.0.1.html
 
-    # Important: 
-    sudo update-desktop-database  "$XDG_GUI_desktop_Folder" 
+    # Important:
+    sudo update-desktop-database  "$XDG_GUI_desktop_Folder"
 
     # https://wiki.archlinux.org/index.php/Desktop_entries#Installation
 
@@ -946,7 +946,7 @@ if [[ ! $SkipMkLauncher ]]; then
 fi
 
 ## Read the .desktop file for Start_qqX as maybe Skippping MkLauncher
-#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path" 
+#  Needs eg. Start_qqX="$UserTerm $CustomTerminalProfile -e  $qqX_Std_File_Path"
 Start_qqX=
 GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
 if [[ $GrepExecLine ]]; then GrepExecLine="${GrepExecLine/'Exec='/}" ; Start_qqX="${GrepExecLine/'%f'/}" ; fi
@@ -978,7 +978,7 @@ read -rp "  > "  End_Install
 # And https://superuser.com/questions/178587/how-do-i-detach-a-process-from-terminal-entirely
 # https://github.com/jinliu/kdotool   https://github.com/ReimuNotMoe/ydotool
 
-# Probably easier just to put a message up than mess around with dependencies ....   REVIEW 
+# Probably easier just to put a message up than mess around with dependencies ....   REVIEW
 printColor "\n\n  Auto-closure of this script may not happen in some desktop environments ... "
 
 # New terminal sessions shouldn't inherit any elevated permissions but some environments could vary, so reset sudo ...
@@ -986,10 +986,10 @@ sudo -k
 
 if [[ $End_Install == "q" ]]; then exit ; fi
 
-if [[ $Start_qqX ]]; then 
-  printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n" 
+if [[ $Start_qqX ]]; then
+  printf "\n\n  If this window stays open, then keep it open until qqX is no longer running.\n\n  [enter] to close \n\n"
   # for normal installations switch to $HOME as we are not doing devstarts ...
-  cd "$HOME" || printf "\n\n  ERROR switching to home folder %s ?? \n\n" "$HOME" 
+  cd "$HOME" || printf "\n\n  ERROR switching to home folder %s ?? \n\n" "$HOME"
   if [[ $UserTerm == "konsole" || "$(pgrep konsole)" ]]; then
     sleep 1
     eval "$Start_qqX"   &>/dev/null
@@ -997,11 +997,11 @@ if [[ $Start_qqX ]]; then
     exit
   else exec bash -c "$Start_qqX"  &>/dev/null
   fi
-else  
-  exit 
+else
+  exit
 fi
 
-#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
 # https://code.visualstudio.com/  (recommended)

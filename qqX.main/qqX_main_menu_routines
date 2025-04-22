@@ -3,20 +3,20 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 show_msg_pid_found() {
-      printColor "  WARNING:  QEMU may be running this machine elsewhere" 
+      printColor "  WARNING:  QEMU may be running this machine elsewhere"
       printf "\n\n  A .pid file '%s.pid' has been found in the Distro Folder "  "$VM_InstanceName"
       if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
       else printf " \n\n  but as no KVM activity has been detected, this file can probably be deleted."
@@ -34,26 +34,26 @@ vm_pid_kill_menu() {
 	if [[ $KillPID_Menu_Exited ]]; then  KillPID_Menu_Exited=
   elif [[ $BreakAtVerboseArgs ]]; then BreakAtVerboseArgs= ; return
   elif [[ $Mounted_ISO_Return ]]; then sleep 0.5 ; return
-  else  sleep 2 
+  else  sleep 2
   fi
-  
+
   # Qemu SHOULD write a .pid file while it is running & remove it when not  (Uses quickemu Var Names)
-  # But from ver 1.6.02 there is a theoretical possibility of users customising out the call line: 
-  # eg -pidfile ubuntu-22.04/ubuntu-22.04.pid etc being removed, so do belt & braces check for the PID  
+  # But from ver 1.6.02 there is a theoretical possibility of users customising out the call line:
+  # eg -pidfile ubuntu-22.04/ubuntu-22.04.pid etc being removed, so do belt & braces check for the PID
   InstancePID="$(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null)"
   [[ ! $InstancePID ]] && InstancePID="$(pgrep "${VM_InstanceName:0:15}")"
 
   SpicyPID="$(pgrep spicy)"
 
-  if [[ ! $InstancePID ]]; then 
+  if [[ ! $InstancePID ]]; then
     # if instance didn't boot but Spicy did, then close the Spicy connect dialog window
     [[ $SpicyPID ]]  && kill "$SpicyPID" 2>/dev/null &
   else
     [[ $UseCustomBootArgs ]] && printColor "  STARTING CUSTOM BOOT SEQUENCE:  \n"
-    sleep  "$P_Kill_WaitSecs"   
+    sleep  "$P_Kill_WaitSecs"
     printColor "\n  Quickemu instance %s on PID:  %s  %s"  "$VM_InstanceName"  "$InstancePID"  "$BootAlert"
     printColor  "\n\n  [k] force close the Quickemu instance   "
-    if [[ $SpicyPID ]]; then 
+    if [[ $SpicyPID ]]; then
       SpicyReStartCmd="$(ps --no-headers -o cmd "$SpicyPID")"
       printColor " [r] reload Spicy window (if closed)"
       printf "  -  ctrl-shift-F12 for mouse"
@@ -65,11 +65,11 @@ vm_pid_kill_menu() {
   # return to menu requires VM to be shutdown first
   # run a check every second (-t 1)
 
-  while true ; do 
+  while true ; do
 
     read -rp  "  >  " -t 1  KillPID_Menu
 
-    if [[ $KillPID_Menu == "k" ]]; then 
+    if [[ $KillPID_Menu == "k" ]]; then
 
       printf "\n\n"
       if [[ $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then
@@ -81,9 +81,9 @@ vm_pid_kill_menu() {
       tput cnorm
       break
 
-    elif [[ $KillPID_Menu == "r" ]]; then 
+    elif [[ $KillPID_Menu == "r" ]]; then
 
-      if [[ ! $(pgrep spicy) ]]; then 
+      if [[ ! $(pgrep spicy) ]]; then
         eval "$SpicyReStartCmd"
         sleep 2
         SpicyPID="$(pgrep spicy)"
@@ -91,9 +91,9 @@ vm_pid_kill_menu() {
 
     else
 
-      if [[ ! $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then 
-        tput cnorm 
-        break 
+      if [[ ! $( ps -p "$InstancePID" --no-headers 2>/dev/null) ]]; then
+        tput cnorm
+        break
       else
         #  Erase text and adjust cursor:   "\e[1A\r"  "\e[2K\r"  etc    See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
         printf "\r"
@@ -109,7 +109,7 @@ vm_pid_kill_menu() {
   refresh_and_load_quickemu_sources
   refresh_conf_vars_and_values
 
-}	
+}
 
 
 show_main_menu_header () {
@@ -117,9 +117,9 @@ show_main_menu_header () {
   [[ $InstancePID ]] && [[ ! $(cat "${VMDIR}/${VMNAME}.pid" 2>/dev/null) ]] && InstancePID=
 
   printf "\033c"
-  show_qqX_title_bar   
+  show_qqX_title_bar
   printf "\n"
-  printColor "    %s " "$VM_InstanceName" 
+  printColor "    %s " "$VM_InstanceName"
 
   #  Default_VM_Folder, as defined in settings.  Highlight if using non-default or current (pwd).
   #  See if using a Live ISO boot  (as in function_print_conf_array) or if is a new install without .qcow disk
@@ -130,7 +130,7 @@ show_main_menu_header () {
   if [[ $Mounted_ISO ]]; then Mounted_ISO_DisplayName="${Mounted_ISO##*/}" ; fi
 
   LiveBoot=
-  if  [[  ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)" 
+  if  [[  ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]]; then  BootAlert="(Drives CHANGED or NOT FOUND - Reload VM?)"
   elif  [[  ! -e "$MainDrive" ]]; then  BootAlert="(New: Std ISO Boot. Main Drive yet to be created)" ; LiveBoot=1
   elif  [[  ! $(du -b -t 1000000 "$MainDrive" 2>/dev/null) ]]; then
     if [[ ! -e "$IsoImg" ]]; then
@@ -142,16 +142,16 @@ show_main_menu_header () {
         BootAlert="(Live: ISO/IMG Boot. Distro Non-installed)"  ; LiveBoot=1 ; LiveBootMissing=
       fi
     fi
-  else  BootAlert= 
+  else  BootAlert=
   fi
 
   [[ $VM_Conf_Dir ]] && printf "  @   %s"  "$VM_Conf_Dir"
-  if [[ "$BootAlert" == *'ERROR'* ||  "$BootAlert" == *'NOT FOUND'* ]]; then printColor "   %s" "$BootAlert"  
+  if [[ "$BootAlert" == *'ERROR'* ||  "$BootAlert" == *'NOT FOUND'* ]]; then printColor "   %s" "$BootAlert"
   else printf "   %s" "$BootAlert"
-  fi 
+  fi
   printf "\n"
 
-  if [[ $Mounted_ISO ]]; then 
+  if [[ $Mounted_ISO ]]; then
     printf "\n  Additional "
     if [[ $BootStyle == "slow" ]]; then printf "(mounted & boot selectable)"
     else printf "(mounted, not bootable)"
@@ -163,11 +163,11 @@ show_main_menu_header () {
 
   # Note .conf won't exist at first load, at VM selector menu
 
-  if [[ ! $NewFileTuneUp ]] && [[ ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]] ; then 
+  if [[ ! $NewFileTuneUp ]] && [[ ! $NewFileTuneUp_JustDone ]] && [[ -e $VM_Conf_File ]] && [[ ! -e "$MainDrive" ]] && [[ ! -e "$IsoImg" ]] ; then
     printColor "\n    ERROR  Check .conf Drive & Iso Img settings against the VM folder contents \n"
   fi
 
-  if stat "$VM_Conf_Dir/$VM_Conf_File" 2>/dev/null | grep -q "symbolic" ; then 
+  if stat "$VM_Conf_Dir/$VM_Conf_File" 2>/dev/null | grep -q "symbolic" ; then
     printf "\n  Symbolically linked to real path %s \n" "$(realpath "$VM_Conf_Dir/$VM_InstanceName")"
   fi
 
@@ -179,7 +179,7 @@ show_main_menu_header () {
 check_disk_is_okay () {
 
   local PrintErrors=
-  for CheckArg in "$@" ; do 
+  for CheckArg in "$@" ; do
     if [[ $CheckArg == "PrintErrors" ]]; then PrintErrors=1 ; shift ; fi
   done
 
@@ -201,13 +201,13 @@ check_disk_is_okay () {
     else "$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk"  2>/dev/null ; fi
 
     # Note "Okay"  is also used as a flag  > caution if changing   # REVIEW  could also be flagged using:
-    # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)" 
-    case "$?" in 
+    # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)"
+    case "$?" in
       0) DiskChkStatus="Okay" ;;
       1) DiskChkStatus="Check not completed because of internal errors" ;;
-      2) DiskChkStatus="Check completed, image is corrupted" 
+      2) DiskChkStatus="Check completed, image is corrupted"
          DiskChkExitCode=2 ;;
-      3) DiskChkStatus="Check completed, image has leaked clusters, but is not corrupted" 
+      3) DiskChkStatus="Check completed, image has leaked clusters, but is not corrupted"
          DiskChkExitCode=3  ;;
      63) DiskChkStatus="Checks are not supported by the image format -- not qcow2 ??" ;;
     esac
@@ -242,8 +242,8 @@ check_if_disk_needs_a_cleanup  () {
     fi
   fi
   # bc's math library (-l) should refuse garbage, so if Qemu info layout changes then 'DiskDisparity' should theoretically be null.
-  # However, suppress error alerts as problems should show soon enough, and clearer, in other checks ... REVIEW 
-  [[ ! $DiskDisparity ]] && DiskDisparity=0  
+  # However, suppress error alerts as problems should show soon enough, and clearer, in other checks ... REVIEW
+  [[ ! $DiskDisparity ]] && DiskDisparity=0
 }
 
 
@@ -251,9 +251,9 @@ check_if_disk_needs_a_cleanup  () {
 
 filter_and_flag_qemu_errors () {
 
-  if [[ ! -e "$QemuErrorLog" ]]; then  printColor "\n\n  Internal ERROR:  QemuErrorLog not found.  A qqX re-start may be needed."  
-  
-  elif [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then 
+  if [[ ! -e "$QemuErrorLog" ]]; then  printColor "\n\n  Internal ERROR:  QemuErrorLog not found.  A qqX re-start may be needed."
+
+  elif [[ $(cat "$QemuErrorLog" 2>/dev/null) ]]; then
 
     QemuErrorAlert=1
     if [[ "${QemuErrorFilter[*]}" ]]; then
@@ -276,19 +276,19 @@ function_delete_Selected_VM () {
 
   if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
-    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n "
     sleep 2 ;  return
   fi
 
   if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
-    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
-    printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n " 
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n "
+    printColor "\n\n  Internal Params: VM Name / VM config file  NOT FOUND  \n\n "
     sleep 2 ;  return
   fi
 
   if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
 
-  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then
     printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
     printColor "\n\n  REMOVING LINKS ONLY - VM CONTENT REMAINS AT REALPATH \n"
     SelectedLinks=1
@@ -302,7 +302,7 @@ function_delete_Selected_VM () {
     if [[ $1 == "$(basename "${VM_Array[$i,1]}" .conf)" ]] && [[ $(pwd) != "${VM_Array[$i,0]}" ]] &&\
     stat "${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" | grep -q "symbolic"; then
 
-      LinkPathName="${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)" 
+      LinkPathName="${VM_Array[$i,0]}/$(basename "${VM_Array[$i,1]}" .conf)"
       TestPathName="$(stat -c %N "$LinkPathName" | cut -d '>' -f2 )"
       TestPathName="${TestPathName/" '"/}"
       TestPathName="${TestPathName/"'"/}"
@@ -326,10 +326,10 @@ function_delete_Selected_VM () {
   printColor "\n\n\n  Folder content: \n\n"
   ls "$1"
 
-  if [[ $TrashingAvailable ]]; then 
-    if [[ $SelectedLinks ]]; then  printColor "\n\n  [enter] safely move the links to the recoverable trash bin"  
-    else printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin" 
-    fi 
+  if [[ $TrashingAvailable ]]; then
+    if [[ $SelectedLinks ]]; then  printColor "\n\n  [enter] safely move the links to the recoverable trash bin"
+    else printColor "\n\n  [enter] safely move the folder & file to the recoverable trash bin"
+    fi
     printf "\n\n  [n] keep    [y] yes, PERMANENTLY, I have back-ups ..."
   else
     printColor "\n\n  [enter] use the file manager to move things the trash bin "
@@ -339,10 +339,10 @@ function_delete_Selected_VM () {
   printf "\n\n"
   read -rp "  >  "   Delete_VM_Option
 
-  if [[ $Delete_VM_Option == "y" ]]; then 
+  if [[ $Delete_VM_Option == "y" ]]; then
 
     printf "\n\n  Folder & .conf file being deleted ... "
-    rm -f -r "$1"  
+    rm -f -r "$1"
     rm -f "$2"
 
   else
@@ -356,7 +356,7 @@ function_delete_Selected_VM () {
 
   fi
 
-  printColor "\n\n  [enter] to return or continue \n\n" 
+  printColor "\n\n  [enter] to return or continue \n\n"
   read -rp "  > "
 
   if [[ $Delete_VM_Option != "n" ]]; then
@@ -370,7 +370,7 @@ function_delete_Selected_VM () {
     NewFileTuneUp=
     NewFileTuneUp_JustDone=
     cd "$Default_VM_Folder" || DefaultFolderError=1
-    Current_VM_Folder="$Default_VM_Folder" 
+    Current_VM_Folder="$Default_VM_Folder"
     refresh_sources_and_load_VM_arrays
   fi
   Delete_VM_Option=
@@ -378,12 +378,12 @@ function_delete_Selected_VM () {
 }
 
 
-function_rename_conf_dirnames () {  
+function_rename_conf_dirnames () {
 
   if [[ ! $1 ]]; then
-    # Normally: "${Mv_NewName}.conf"  "VM Old Name"  "$Mv_NewName"  And conf has been backed up.  
+    # Normally: "${Mv_NewName}.conf"  "VM Old Name"  "$Mv_NewName"  And conf has been backed up.
     printColor "\n\n  Conf Rename Internal Params: VM config file (NO PATH) must be given"
-    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n"
     sleep 2 ;  return
   fi
 
@@ -404,15 +404,15 @@ list_current_folder_instance_names () {
   for Name in "${Current_VM_FolderContent[@]}"; do [[ -d "$Name" ]] && Current_VM_Folder_Names+=("$Name"); done
 
   # printf "\n  Containing:   "  # set each title case by case
-  if [[ ! ${Current_VM_Folder_Names[*]} ]]; then printColor "  NONE FOUND \n\n" 
-  else 
-    printf "\n\n" 
-    print_quickget_and_folder_choices  "Current_VM_Folder_Names"  6 
+  if [[ ! ${Current_VM_Folder_Names[*]} ]]; then printColor "  NONE FOUND \n\n"
+  else
+    printf "\n\n"
+    print_quickget_and_folder_choices  "Current_VM_Folder_Names"  6
   fi
 }
 
 
-move_rename_Selected_VM () {  
+move_rename_Selected_VM () {
 
   printf "\033c"
   show_qqX_title_bar
@@ -420,14 +420,14 @@ move_rename_Selected_VM () {
   if [[ ! $1 ]] && [[ ! $2 ]]; then
     # Normally: VM_InstanceName="${VM_Conf_File/.conf}"
     printColor "\n\n  Move Rename Internal Params: VM Name & VM config file (NO PATH) must be given"
-    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n"
     sleep 2 ;  return
   fi
 
   if [[ ! -d "$1" ]] || [[ ! -e "$2" ]]; then
-    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n " 
-    printColor "\n\n  Move Rename Internal Params: VM Name / VM config file  NOT FOUND " 
-    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n" 
+    printColor "\n\n  Internal Params: VM Name & VM config file (NO PATH) must be given \n\n "
+    printColor "\n\n  Move Rename Internal Params: VM Name / VM config file  NOT FOUND "
+    printf "\n\n  Function to be called from main menu, where pwd == VM_Conf_Dir \n\n"
     sleep 2 ;  return
   fi
 
@@ -435,7 +435,7 @@ move_rename_Selected_VM () {
   Move_VM_Option=
   MvTargetIsLinked=
 
-  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then 
+  if stat "$1" 2>/dev/null | grep -q "symbolic" ; then
     printColor "\n\n  Symbolically linked to real path "; printf "%s " "$(realpath "$1")"
     printColor "\n\n  DELETE LINKS and REMAKE instead - VM CONTENT REMAINS AT REALPATH \n"
     MvTargetIsLinked=1
@@ -444,24 +444,24 @@ move_rename_Selected_VM () {
   printColor "\n\n  Distro Folder: %s  & file: %s  to be Renamed or Moved" "$1" "$2"
   printf  "\n\n  Renames VM's in Current Folder or Moves VM's and Renames if required. "
   printf "\n\n  Rewrites all the config internals as needed, avoiding manual tedium and errors ..."
-  printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder" 
+  printf "\n\n  Also allows Symbolic Link creation to VM with refs in another category folder"
   printf "\n\n"
   [[ ! $MvTargetIsLinked ]] && printColor "  [r] to rename  [m] to move  [ln] make symbolic links"
-  printf "  [b] to go back"   
+  printf "  [b] to go back"
   printf "\n\n"
   read -rp "  >  "   Move_VM_Option
 
-  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" || $Move_VM_Option == "ln" ]]; then 
+  if [[ $Move_VM_Option == "m" || $Move_VM_Option == "mv" || $Move_VM_Option == "ln" ]]; then
 
     if [[ $Move_VM_Option == "ln" ]]; then MakeLinksOnly=1 ; else MakeLinksOnly= ; fi
 
     printf "\n  Distro Folder '%s' & .conf file to be MOVED and edited or LINKED"  "$1"
-    printf "\n\n  For new preset group folders, edit the main settings" 
+    printf "\n\n  For new preset group folders, edit the main settings"
     printf "\n\n  Current Grouping Folder: '%s' \n" "$(pwd)"
     show_current_group_folder_list
 
     while true; do
-      
+
       printColor "\n\n  [number] select a group folder "
       printf " [b] to go back\n\n"
       read -rp  "  >  "  Move_FolderOption
@@ -473,16 +473,16 @@ move_rename_Selected_VM () {
           return
         ;;
 
-        [0-9]|[0-9][0-9]) 
-          Mv_NewConf_Dir="${VM_Folder_List[Move_FolderOption]}" 
-          if [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then  Move_FolderOption= 
-          else 
-            printf "\n\n  Selected: '%s' "  "$Mv_NewConf_Dir"  
+        [0-9]|[0-9][0-9])
+          Mv_NewConf_Dir="${VM_Folder_List[Move_FolderOption]}"
+          if [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then  Move_FolderOption=
+          else
+            printf "\n\n  Selected: '%s' "  "$Mv_NewConf_Dir"
           fi
           printColor "\n\n  [enter] to confirm " ; printf " [r] re-select \n\n"
           [[ $Move_FolderOption ]] && read -rp "  >  " Move_FolderOption
-          if [[ $Move_FolderOption == "r" ]]; then Move_FolderOption= 
-          elif [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then printf "\n  ERROR  Same Folder "; Move_FolderOption= 
+          if [[ $Move_FolderOption == "r" ]]; then Move_FolderOption=
+          elif [[ "$(pwd)" == "$Mv_NewConf_Dir" ]]; then printf "\n  ERROR  Same Folder "; Move_FolderOption=
           else break
           fi
         ;;
@@ -494,23 +494,23 @@ move_rename_Selected_VM () {
     Mv_OldFolderPath="$(realpath "$VM_InstanceName")"
     Mv_OldConfPath="$(realpath "${VM_InstanceName}.conf")"
 
-    # set mv to use 'r' as multi-purpose 
+    # set mv to use 'r' as multi-purpose
     Move_VM_Option="r"
 
-    if cd "$Mv_NewConf_Dir"; then 
+    if cd "$Mv_NewConf_Dir"; then
       printf "\n  Selected target folder '%s'\n"  "$Mv_NewConf_Dir"
-      Current_VM_Folder="$Mv_NewConf_Dir" 
-    else printColor "\n ERROR changing folder \n" ; Move_VM_Option= 
+      Current_VM_Folder="$Mv_NewConf_Dir"
+    else printColor "\n ERROR changing folder \n" ; Move_VM_Option=
     fi
 
   fi
 
-  if [[ $Move_VM_Option == "r" ]]; then  
-  
+  if [[ $Move_VM_Option == "r" ]]; then
+
     CurrentFolder="$(pwd)"
     show_current_group_folder_list
 
-    printf "\n\n  Currently Containing:   "  
+    printf "\n\n  Currently Containing:   "
     list_current_folder_instance_names
 
     while true; do
@@ -519,11 +519,11 @@ move_rename_Selected_VM () {
       Current_VM_Folder_NameError=
       printf "\n\n\n  Selected Distro '%s' & .conf file to be RE-NAMED and edited or Linked"  "$1"
       printColor "\n\n  Please give a new VM name" ; [[ $Mv_NewConf_Dir ]] && printf "  or [n] no-change  [ln] make link"
-      printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"   
-      read -rp "  >  "  Mv_NewName 
+      printf "\n\n  eg. tux-33-alpha  emu-44-mate  or [b] to go back \n\n"
+      read -rp "  >  "  Mv_NewName
 
-      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName" 
-      
+      [[ ! $Mv_NewName || $Mv_NewName == "n" || $Mv_NewName == "ln" ]] && Mv_NewName="$VM_InstanceName"
+
       for Name in "${Current_VM_Folder_Names[@]}"; do [[ $Mv_NewName == "$Name" ]] && Current_VM_Folder_NameError=1
       done
 
@@ -542,37 +542,37 @@ move_rename_Selected_VM () {
     printColor "\n\n  [enter] to make this happen  [b] to go back \n\n"
     read -rp "  >  "  Mv_NewName_Return
 
-    if [[ $Mv_NewName_Return ]]; then  
+    if [[ $Mv_NewName_Return ]]; then
       Mv_NewName_Return= ; Move_VM_Option= ; Mv_NewName= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
     fi
     if [[ $MakeLinksOnly ]]; then
-      if [[ $Mv_NewConf_Dir ]]; then 
+      if [[ $Mv_NewConf_Dir ]]; then
         ln -s "$Mv_OldFolderPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldFolderPath")" || MoveFail=1
         ln -s "$Mv_OldConfPath" "$Mv_NewConf_Dir/$(basename "$Mv_OldConfPath")" || MoveFail=1
       fi
     else
-      if [[ $Mv_NewConf_Dir ]]; then 
+      if [[ $Mv_NewConf_Dir ]]; then
         mv "$Mv_OldFolderPath" "$(basename "$Mv_OldFolderPath")" || MoveFail=1
         mv "$Mv_OldConfPath" "$(basename "$Mv_OldConfPath")" || MoveFail=1
-        set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")" 
+        set -- "$(basename "$Mv_OldFolderPath")" "$(basename "$Mv_OldConfPath")"
       fi
       if [[ $Mv_NewName != "$VM_InstanceName" ]]; then
-        if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then    
+        if [[ ! $MoveFail ]] && cp "$2" "$1/${2}.rename.old.txt" ; then
           mv "$1" "$Mv_NewName" || MoveFail=1
           mv "$2"  "${Mv_NewName}.conf" || MoveFail=1
         fi
         if [[ ! $MoveFail ]] ; then function_rename_conf_dirnames "${Mv_NewName}.conf"  "$1"  "$Mv_NewName" ; fi
       fi
     fi
-  
-  else  
+
+  else
 
     Move_VM_Option= ; Move_FolderOption= ; Move_VM_Option= ; Mv_NewConf_Dir= ; return
 
   fi
 
   if [[ $MoveFail ]]; then printColor "\n  Hmm. Something went wrong.  \n"  ; else printColor "\n  Success  '%s'\n"  "$(pwd)" ; fi
-  printf "\n  Now Containing:   " 
+  printf "\n  Now Containing:   "
   list_current_folder_instance_names
 
   ConfLine="$(grep -s 'macos_release=' "${Mv_NewName}.conf")"
@@ -580,7 +580,7 @@ move_rename_Selected_VM () {
     printColor "\n\n  MAC OS %s.conf file may need manually editing, if the release doesn't match: %s " "$Mv_NewName"  "$ConfLine"
   fi
 
-  printColor "\n\n  [enter] to return or continue \n\n" 
+  printColor "\n\n  [enter] to return or continue \n\n"
   read -rp "  > "
 
   if [[ ! $MoveFail && $Mv_NewConf_Dir ]]; then
@@ -623,7 +623,7 @@ move_rename_Selected_VM () {
   fi
 
   # Current behaviour, if moved, is to return to the VM selector and see the results of what we have done.
-  # Or return back to menu if just renamed, but via the main loop and the configs reloader  
+  # Or return back to menu if just renamed, but via the main loop and the configs reloader
 
   [[ $GeneralLoopCheck ]] && printf "\n\n Move Finish:" &&  dev_loop_check
 
@@ -633,45 +633,45 @@ read_x86_tiano_vars_list () {
 
   # current source list
   local String=
-  String="$(grep -A 20 -m 1 'ovmfs=' "$QE_SourcePath" | grep -s '"')" 
+  String="$(grep -A 20 -m 1 'ovmfs=' "$QE_SourcePath" | grep -s '"')"
   if [[ ! $String ]]; then  TianoVarsGrepError=1 ; return
   else TianoVarsGrepError=
   fi
   String="$(tr -cd '[:print:]' <<< "$String")"
   String="${String//'ovmfs=('/}"
   String="${String//','/' '}"
-  # shellcheck disable=SC1003 
+  # shellcheck disable=SC1003
   String="${String//'\'/' '}"
   String="$(tr -s '[= =]' <<< "$String")"
   # shellcheck disable=SC2206
   Tiano_x86_FilesList=($String)
   Tiano_x86_CodeList=()
   Tiano_x86_VarsList=()
-  i=0    
+  i=0
   while [[ "${Tiano_x86_FilesList[i]}" ]]; do Tiano_x86_CodeList+=("${Tiano_x86_FilesList[i]}"); ((i+=2)); done
-  i=1    
+  i=1
   while [[ "${Tiano_x86_FilesList[i]}" ]]; do Tiano_x86_VarsList+=("${Tiano_x86_FilesList[i]}"); ((i+=2)); done
 
 }
 
 
-refresh_tiano_vars () {  
+refresh_tiano_vars () {
 
   RtvBack= ; RtvArm=
   read_x86_tiano_vars_list
 
-  if [[ $RunRtvCheck || $RtvManualOnly ]]; then RtvText=1 ; else RtvText= 
+  if [[ $RunRtvCheck || $RtvManualOnly ]]; then RtvText=1 ; else RtvText=
   fi
 
   if [[ $RtvText ]]; then
 
-    if [[ $TianoVarsGrepError ]]; then 
+    if [[ $TianoVarsGrepError ]]; then
       printColor  "\n\n  ERROR finding Tiano Variables List in current Source Code ?? "
       printf "\n\n  %s \n\n" "$QE_SourcePath"
    else
       printColor "\n\n  In cases when distro boot sequences get stuck in unwanted loops or behaviours, this may help:"
       printf "\n\n  Backups will be made, in case you need to revert, as *.fd.old etc \n\n  Your *VMF_VARS.fd file(s) will be reinstalled."
-      if [[ "$VM_InstanceName" == *macos* ]]; then 
+      if [[ "$VM_InstanceName" == *macos* ]]; then
         printf "\n\n  MacOS refreshes require an internet connection. The small boot drive 'OpenCore.qcow2' is also needed."
         printf "\n\n  For security reasons, these Mac specific files should generally be updated at regular intervals...."
       fi
@@ -683,7 +683,7 @@ refresh_tiano_vars () {
         else
           printf  "\n\n  Using Folder '%s' >>  From variation placed in main settings" "$RtvArmFolder"
         fi
-      fi 
+      fi
       printColor  "\n\n  [enter] to continue"
     fi
     printf  "  [b] to go back "
@@ -697,7 +697,7 @@ refresh_tiano_vars () {
 
   else
 
-    if [[ $RtvArm ]]; then 
+    if [[ $RtvArm ]]; then
 
       AA_VarsList=("AAVMF_VARS.fd"  "AAVMF32_VARS.fd"  "AAVMF_VARS.ms.fd"  "AAVMF_VARS.snakeoil.fd")
       [[ $RtvText ]] && printf "\n\n  Checking: %s" "${AA_VarsList[*]}"
@@ -736,14 +736,14 @@ refresh_tiano_vars () {
 
       wget -t 3 -T 2 -a "$VM_Conf_Dir/$VM_InstanceName/rtv.log" "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" \
       -O "$VM_Conf_Dir/$VM_InstanceName/OpenCore.qcow2" || RtvMacGet="Fail"
-      [[ $RtvText ]] && grep -v '\.\.\.\.\.\.\.' "$VM_Conf_Dir/$VM_InstanceName/rtv.log" 
+      [[ $RtvText ]] && grep -v '\.\.\.\.\.\.\.' "$VM_Conf_Dir/$VM_InstanceName/rtv.log"
 
       echo "$RtvMacGet" > "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log"
       [[ $RtvText ]] && printColor "\n  Update:  %s" "$RtvMacGet"
 
     else
 
-      i=0 
+      i=0
       while [[ "${Tiano_x86_VarsList[i]}" ]]; do
 
         x86_VarPath="${Tiano_x86_VarsList[i]}"
@@ -752,11 +752,11 @@ refresh_tiano_vars () {
         x86_Var="${x86_Var//'"'/}"
 
         # For reasons unexplained, quickget 4.9.2 and previous go through the whole list from beginning to end,
-        # and selects the last available option, not the first. Whatever the rationale was, it's probably best to 
-        # leave things as they are. At least for now.  REVIEW 
-        # Quickemu should re-install the 'correct' vars file if the current one(s) is(are) removed.  
+        # and selects the last available option, not the first. Whatever the rationale was, it's probably best to
+        # leave things as they are. At least for now.  REVIEW
+        # Quickemu should re-install the 'correct' vars file if the current one(s) is(are) removed.
 
-        if [[ -e "$VM_Conf_Dir/$VM_InstanceName/$x86_Var" ]]; then 
+        if [[ -e "$VM_Conf_Dir/$VM_InstanceName/$x86_Var" ]]; then
           mv "$VM_Conf_Dir/$VM_InstanceName/$x86_Var" "$VM_Conf_Dir/$VM_InstanceName/${x86_Var}.old"
           [[ $RtvText ]] && printColor "\n\n  Reset '%s' >> Quickemu will now auto-update your VM on its next boot"  "$x86_Var"
         fi
@@ -772,7 +772,7 @@ refresh_tiano_vars () {
       printf "\n\n  [enter] to return \n\n "
       read -rp "  >  "
     fi
-    
+
   fi
 }
 
@@ -790,7 +790,7 @@ custom_boot_file () {
 
   clear_custom_boot_vars
 
-  if [[ $1 == "create" ]]; then 
+  if [[ $1 == "create" ]]; then
 
     printColor "\n\n  Utility to copy QEMU args list from the last qemu boot formula"
     printf "\n\n  Boot in 'Verbose mode' is sufficient. Actual boot is not required."
@@ -801,7 +801,7 @@ custom_boot_file () {
     fi
 
     CreateCustom=
-    printColor "\n\n\n  [enter] to proceed    [b] to go back   [w] view wiki  \n\n" 
+    printColor "\n\n\n  [enter] to proceed    [b] to go back   [w] view wiki  \n\n"
     read -rp "  >  "  CreateCustom
 
     if [[ $CreateCustom == "b" ]]; then return
@@ -814,13 +814,13 @@ custom_boot_file () {
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_List.txt" ]]; then
 
       printf "\n\n  Creating Custom Boot file \n\n"
-      cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" 
+      cp -f "$VM_InstanceName/Qemu_ShortArgs_List.txt"  "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
       sleep 1.5
 
-    fi     
+    fi
 
-  elif [[ $1 == "delete" ]]; then 
- 
+  elif [[ $1 == "delete" ]]; then
+
     printColor "\n\n  Utility to delete existing custom qemu boot formula"
     printf "\n\n  Full details are viewable online at \n\n  https://github.com/TuxVinyards/qqX/wiki/Custom-Qemu-boot-parameters"
 
@@ -829,7 +829,7 @@ custom_boot_file () {
     fi
 
     DeleteCustom=
-    printColor "\n\n\n  [enter] to proceed    [b] to go back   [w] view wiki  \n\n" 
+    printColor "\n\n\n  [enter] to proceed    [b] to go back   [w] view wiki  \n\n"
     read -rp "  >  "  DeleteCustom
 
     if [[ $DeleteCustom == "b" ]]; then return
@@ -840,12 +840,12 @@ custom_boot_file () {
       sleep 1
 
     elif [[ -e "$VM_InstanceName/Qemu_ShortArgs_Custom.txt" ]]; then
-     
+
       printf "\n\n  Deleting Custom Boot file, renaming as .old ...\n\n"
-      mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt" 
+      mv "$VM_InstanceName/Qemu_ShortArgs_Custom.txt"  "$VM_InstanceName/Qemu_ShortArgs_custom.old.txt"
       sleep 1.5
-        
-    fi     
+
+    fi
 
   else  printColor "\n\n  Internal ERROR:  parameter required for function custom_boot_file \n\n"
 
@@ -859,10 +859,10 @@ custom_boot_file () {
 
 iso_select_mount_and_boot () {
 
-  # to be run from main menu, on presumption of a VM having been selected, 
+  # to be run from main menu, on presumption of a VM having been selected,
   # the standard VM vars to be in place and set up
 
-  if [[ "$(pwd)" != "$VM_Conf_Dir" ]]; then 
+  if [[ "$(pwd)" != "$VM_Conf_Dir" ]]; then
     printColor "\n\n  ERROR: iso_select_mount_and_boot not running from correct folder \n\n"
 
   else
@@ -871,7 +871,7 @@ iso_select_mount_and_boot () {
     mapfile -t IsoList <<< "$(ls "$VM_InstanceName"/*.iso 2>/dev/null)"
     if [[ $SharedDrive ]]; then
       #https://stackoverflow.com/a/53091662/27611101
-      if [[ ${IsoList[0]} ]]; then 
+      if [[ ${IsoList[0]} ]]; then
         mapfile -t -O "${#IsoList[@]}" IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
       else
         mapfile -t IsoList <<< "$(ls "$(dirname "$SharedDrive")"/*.iso 2>/dev/null)"
@@ -897,9 +897,9 @@ iso_select_mount_and_boot () {
       printf "\n\n  The distro has not yet been installed to the disk."
     fi
 
-    if [[ ! ${IsoList[*]} ]]; then 
+    if [[ ! ${IsoList[*]} ]]; then
       printColor "\n\n  NONE FOUND:  An ISO formated disk image should be copied into the individual VM folder"
-    elif [[ ! ${IsoList[1]} ]]; then 
+    elif [[ ! ${IsoList[1]} ]]; then
       printColor "\n\n  Single ISO FOUND:  %s" "${IsoList[0]}"
     else
       printf "\n\n"
@@ -911,12 +911,12 @@ iso_select_mount_and_boot () {
     fi
 
     IsoSelect=
-    printf "\n\n" 
+    printf "\n\n"
     if [[ $LiveBoot ]] && [[ ${#IsoList[*]} -eq 1 ]]; then
       printColor "  [b] to go back"
     else
-      if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount " 
-      elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount " 
+      if [[ ${#IsoList[*]} -eq 1 ]]; then  printColor "  [m] to mount/unmount "
+      elif [[ ${#IsoList[*]} -gt 1 ]]; then  printColor "  [number] to select and mount/unmount "
       fi
       printf "  [b] to go back"
     fi
@@ -924,11 +924,11 @@ iso_select_mount_and_boot () {
     printf "\n\n"
     read -rp "  >  "  IsoSelect
 
-      if [[ $IsoSelect == "m" ]]; then  
+      if [[ $IsoSelect == "m" ]]; then
         if [[ ! $Mounted_ISO ]]; then [[ "${IsoList[0]}" ]] && Mounted_ISO="${IsoList[0]}" ; else Mounted_ISO= ; fi
-      elif [[ "$IsoSelect" == [1-9] || "$IsoSelect" == [1-9][0-9] ]]; then 
-        ((IsoSelect-=1)) 
-        if [[ ! $Mounted_ISO ]]; then [[ "${IsoList[IsoSelect]}" ]] && Mounted_ISO="${IsoList[IsoSelect]}" 
+      elif [[ "$IsoSelect" == [1-9] || "$IsoSelect" == [1-9][0-9] ]]; then
+        ((IsoSelect-=1))
+        if [[ ! $Mounted_ISO ]]; then [[ "${IsoList[IsoSelect]}" ]] && Mounted_ISO="${IsoList[IsoSelect]}"
         elif [[ $Mounted_ISO == "${IsoList[IsoSelect]}" ]]; then Mounted_ISO=
         elif [[ $Mounted_ISO != "${IsoList[IsoSelect]}" ]]; then [[ "${IsoList[IsoSelect]}" ]] && Mounted_ISO="${IsoList[IsoSelect]}"
         fi

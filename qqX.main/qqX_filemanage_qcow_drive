@@ -2,32 +2,32 @@
 
 ##  qqX component to be located in folder 'qqX.main'
 
-# NB Avoid use of "#!/usr/bin/env bash" in this script 
+# NB Avoid use of "#!/usr/bin/env bash" in this script
 # as it will mask process names & inhibit process controls.
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009
 
 #  MOUNTS and UNMOUNTS the Shared Drive, or other, if present, in the designated HOST File Manager
 #  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
 
 #  A CUSTOM VERSION for this file MAY BE CREATED, if wished, and placed next to this one
-#  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected 
+#  at/as "$qqX_CustomFolder/custom_filemanage_qcow_drive" which will be auto-detected
 #  and run by function 'qcow2_filemanagement_launcher' in the main qqX program in the disk maintenance script
 
 tput civis
 
-# Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking 
+# Avoid 'kworker' grep errors, make sure that all current processes have been statted properly before checking
 sleep 0.4
 
 # Sharded generic standalone running of qcow2 file management utility
@@ -47,7 +47,7 @@ fi
 if [[ $Trace_InputVars ]]; then echo "Input Path: $qqf_Input_Drivepath"  ; echo ; sleep "$Trace_InputVars"
 fi
 
-if [[ ! $(type -p "$FileManager") ]] ; then 
+if [[ ! $(type -p "$FileManager") ]] ; then
   printf "\n\n\n  ERROR:  File Manager '%s' NOT found.\n" "$FileManager" ; sleep 2
 fi
 
@@ -55,10 +55,10 @@ fi
 # New PID always goes on end of list but pgrep sub-shell creates another.
 
 # Note: kde/dolphin/konsole opens two PIDs - one for the terminal and one for the script
-# and gnome based terminals open just one and with a 'bash' nomination. 
+# and gnome based terminals open just one and with a 'bash' nomination.
 # Also see function 'multi_instance_checks' in 'UI_chrome_up' ...
 
-if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then 
+if pgrep -af qqX_filemanage | grep -q "$UserTerm" ; then
   ThisPID="$(pgrep -n "$UserTerm")"
     while [[ "$(pgrep -af qqX_filemanage)" ]] ; do
     ChkPID="$(pgrep -af qqX_filemanage | grep "$UserTerm" | cut -d' ' -f1 | head -n 1)"
@@ -80,18 +80,18 @@ show_nbd_help () {
   printf   "\n  the following commands can help give general user permissions:"
   printf "\n\n"
   # shellcheck disable=SC2016
-  echo '  sudo chown $USER:$USER "mounted-drive-name"' 
+  echo '  sudo chown $USER:$USER "mounted-drive-name"'
   echo '  chmod 775 "mounted-drive-name"'
 
   printColor "\n\n  Script name and location:  %s" "$0"
   printf "\n\n  Different distro NBD and file-manager behaviours may possibly occur."
-  printf "\n  View script for notes on creating Custom versions or for details of its functions" 
+  printf "\n  View script for notes on creating Custom versions or for details of its functions"
   [[ $TextEditor ]] && printf "\n\n  [H] View script in Text Editor"
   printf "\n"
 }
 
 check_sudo_nbd_active () {
-  # https://superuser.com/a/1183480/2243702  
+  # https://superuser.com/a/1183480/2243702
   if ! sudo -nv 2>/dev/null ; then sudo -v ; printf "\n"
   fi
   if ! lsmod | grep -q nbd ; then sudo modprobe nbd max_part=8 nbds_max=4
@@ -106,16 +106,16 @@ load_qf_defaults () {
   if [[ $SecondDrive ]]; then SecondPathName="$VM_Conf_Dir/$SecondDrive" ; fi
   if [[ -e "$SecondPathName" ]]; then  SecondAvailable=1
     if  [[ ! $(du -b -t 1000000 "$SecondPathName" 2>/dev/null) ]]; then Empty2nd=1 ; else Empty2nd= ; fi
-  else SecondAvailable= 
+  else SecondAvailable=
   fi
   SharedPathName="$SharedDrive"
   if [[ -e "$SharedPathName" ]]; then  SharedAvailable=1
     if  [[ ! $(du -b -t 1000000 "$SharedPathName" 2>/dev/null) ]]; then EmptyShared=1 ; else EmptyShared= ; fi
-  else SharedAvailable= 
+  else SharedAvailable=
   fi
   if [[ "$qqf_Input_Drivepath" ]]; then  InputAvailable=1
     if  [[ ! $(du -b -t 1000000 "$qqf_Input_Drivepath" 2>/dev/null) ]]; then EmptyInput=1 ; else EmptyInput= ; fi
-  else InputAvailable= 
+  else InputAvailable=
   fi
 
   if [[ $InputAvailable ]]; then
@@ -149,18 +149,18 @@ while true; do
   printf "\n\n  Any opening of new qqF windows will terminate other qqF instances that are running."
   printf "\n"
   printf "\n\n  Run option 'qqf' from the qqX menu if the VM is swapped.  Follow with [r] to refresh"
-  printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager." 
+  printf "\n\n  Mounting of the connected drives is to be carried out as standard in the file-manager."
   printf "\n"
 
-  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_CmdLineStart ]]; then 
+  if [[ ! $HideRefreshMsgs ]] && [[ $qqf_CmdLineStart ]]; then
     printColor "\n\n  qqF - Cmd Line Start  >  "
-    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
-    printf "\n\n  For spot input, use a right mouse click on the disk or at a new terminal type qqX \"/path/disk_name.qcow2\"" 
+    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."
+    printf "\n\n  For spot input, use a right mouse click on the disk or at a new terminal type qqX \"/path/disk_name.qcow2\""
     printf "\n"
   fi
-  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_CmdLineStart ]]; then 
+  if [[ ! $HideRefreshMsgs ]] && [[ $InputAvailable ]] && [[ ! $qqf_CmdLineStart ]]; then
     printColor "\n\n  qqF - Spot Input  >  "
-    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."  
+    printf "  Use option 'qqf' from a selected qqX VM menu to populate the VM drives."
     printf "\n"
   fi
 
@@ -188,18 +188,18 @@ while true; do
   if mount -fl | grep -q '/dev/nbd3'; then printf " Shared  "; SharedMountPoint="$(mount -fl | grep '/dev/nbd3' | awk '{print $3}')" ; fi
   if mount -fl | grep -q '/dev/nbd0'; then printf " Input   "; InputMountPoint="$(mount -fl | grep '/dev/nbd0' | awk '{print $3}')" ; fi
 
-  if [[ $MainConnected ]]; then     
+  if [[ $MainConnected ]]; then
     MainGreppedPathName="$(ps -ef | grep nbd1 | grep qcow | awk '{print $NF}')"
-    if [[ $MainGreppedPathName ]] && [[ "$MainGreppedPathName" != "$MainPathName" ]]; then 
+    if [[ $MainGreppedPathName ]] && [[ "$MainGreppedPathName" != "$MainPathName" ]]; then
       printf "\n\n  NOTE: Main connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$MainGreppedPathName")"
       MainCrossConnected=1
     else MainCrossConnected=
     fi
   else MainCrossConnected=
   fi
-  if [[ $SecondConnected ]]; then     
+  if [[ $SecondConnected ]]; then
     SecondGreppedPathName="$(ps -ef | grep nbd2 | grep qcow | awk '{print $NF}')"
-    if [[ $SecondGreppedPathName ]] && [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then 
+    if [[ $SecondGreppedPathName ]] && [[ "$SecondGreppedPathName" != "$SecondPathName" ]]; then
       printf "\n\n  NOTE: Second connects to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$SecondGreppedPathName")"
       SecondCrossConnected=1
     else SecondCrossConnected=
@@ -209,9 +209,9 @@ while true; do
   if [[ $qqf_Input_Drivepath ]] && [[ $TargetName != "Input Drive" ]]; then
     printf "\n\n  Input Drive: %s" "$qqf_Input_Drivepath"
   fi
-  if [[ $InputConnected ]]; then     
+  if [[ $InputConnected ]]; then
     InputGreppedPathName="$(ps -ef | grep nbd0 | grep qcow | awk '{print $NF}')"
-    if [[ $InputGreppedPathName ]] && [[ "$InputGreppedPathName" != "$qqf_Input_Drivepath" ]]; then 
+    if [[ $InputGreppedPathName ]] && [[ "$InputGreppedPathName" != "$qqf_Input_Drivepath" ]]; then
       printColor "\n\n  NOTE: The current connection for Input Drive is to %s" "$(awk -F "/" '{print $(NF-1)}' <<< "$InputGreppedPathName")"
       InputCrossConnected=1
     else InputCrossConnected=
@@ -224,56 +224,56 @@ while true; do
 
   printf "\n\n  See main utilities for general disk tools and for disk creation"
 
-  printColor "\n\n  Selected = %s " "$TargetName" 
+  printColor "\n\n  Selected = %s " "$TargetName"
 
   if [[ $TargetName != All* ]]; then
    if [[ $TargetAvailable ]]; then printf " '%s'"  "$TargetDrive" ; else printf "  UNAVAILABLE or NOT LINKED to this VM" ; fi
   fi
   if [[ $TargetName == "Main Drive" ]]; then
-    [[ $LiveBoot ]] && [[ -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)" 
+    [[ $LiveBoot ]] && [[ -e "$MainPathName" ]] && printf "  EMPTY DRIVE (live boot)"
     [[ $MainCrossConnected ]] && printf "\n\n  CAUTION: Cross Linkage potentials >  [enter] to disconnect ?"
   fi
   if [[ $TargetName == "Second Drive" ]]; then
-    [[ $Empty2nd ]] && [[ -e "$SecondPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+    [[ $Empty2nd ]] && [[ -e "$SecondPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)"
     [[ $SecondCrossConnected ]] && printf "\n\n  CAUTION: Cross Linkage potentials >  [enter] to disconnect ?"
   fi
   if [[ $TargetName == "Shared Drive" ]]; then
-    [[ $EmptyShared ]] && [[ -e "$SharedPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+    [[ $EmptyShared ]] && [[ -e "$SharedPathName" ]] && printf "  EMPTY DRIVE (needs partioning?)"
   fi
   if [[ $TargetName == "Input Drive" ]]; then
-    [[ $EmptyInput ]] && [[ -e "$qqf_Input_Drivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)" 
+    [[ $EmptyInput ]] && [[ -e "$qqf_Input_Drivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)"
   fi
 
-  printColor "\n\n\n  [enter] to change %s connections   or  [option] for different selection"  "$TargetName" 
+  printColor "\n\n\n  [enter] to change %s connections   or  [option] for different selection"  "$TargetName"
   printf "\n\n  [r] to refresh vars  [f] open drive in file-manager  [h] help   [q] to quit "
 
   printf "\n\n"
   read -rp "  >  " qf_DriveSelect
 
-  if   [[ $qf_DriveSelect == "1" ]]; then 
+  if   [[ $qf_DriveSelect == "1" ]]; then
     TargetDrive="$MainDrive" ; TargetPathName="$MainPathName" ; TargetName="Main Drive" ; TargetDevice="/dev/nbd1" ; TargetAvailable="$MainAvailable"
-  elif [[ $qf_DriveSelect == "2" ]]; then 
+  elif [[ $qf_DriveSelect == "2" ]]; then
     TargetDrive="$SecondDrive" ; TargetPathName="$SecondPathName" ; TargetName="Second Drive"; TargetDevice="/dev/nbd2" ; TargetAvailable="$SecondAvailable"
-  elif [[ $qf_DriveSelect == "3" ]]; then 
+  elif [[ $qf_DriveSelect == "3" ]]; then
     TargetDrive="$SharedDrive" ; TargetPathName="$SharedDrive" ; TargetName="Shared Drive"; TargetDevice="/dev/nbd3" ; TargetAvailable="$SharedAvailable"
-  elif [[ $qf_DriveSelect == "i" ]]; then 
-    TargetDrive="$qqf_Input_Drivepath" ; TargetPathName="$qqf_Input_Drivepath" 
+  elif [[ $qf_DriveSelect == "i" ]]; then
+    TargetDrive="$qqf_Input_Drivepath" ; TargetPathName="$qqf_Input_Drivepath"
     TargetName="Input Drive"; TargetDevice="/dev/nbd0" ; TargetAvailable="$InputAvailable"
   elif [[ $qf_DriveSelect == "A" ]]; then TargetName="All Drives"
   elif [[ $qf_DriveSelect == "a" ]]; then TargetName="All Non-Shared"
   elif [[ $qf_DriveSelect == "h" ]]; then ShowHelp=1
   elif [[ $qf_DriveSelect == "H" ]]; then (nohup &> /dev/null  "$TextEditor"  "$0" & ) || texteditor_not_found_message
-  elif [[ $qf_DriveSelect == "f" ]]; then 
+  elif [[ $qf_DriveSelect == "f" ]]; then
     (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
   elif [[ $qf_DriveSelect == "r" ]]; then
-    if [[ $qqf_Input_Drivepath ]]; then 
+    if [[ $qqf_Input_Drivepath ]]; then
       printf "\n qqf_Input_Drivepath=\"%s\" \n" "$qqf_Input_Drivepath" >> "/tmp/qqX_nbd_vars"
     fi
     source "/tmp/qqX_nbd_vars" ; load_qf_defaults ; HideRefreshMsgs=1
   elif [[ $qf_DriveSelect == "q" ]]; then exit directly
-  else 
+  else
 
-    printf "\n\n  %s: " "$TargetName" 
+    printf "\n\n  %s: " "$TargetName"
     printColor "\n\n  [c] connect  [d] disconnect current and unmount  [enter] [r] to reselect or return"
     printf "\n\n  Connected drives may be mounted as standard in the file-manager"
     printf "\n\n  External formats are not always readable using the ndb method ..."  # REVIEW  is a convertion possible ?
@@ -281,52 +281,52 @@ while true; do
     read -rp "  >  " qf_DriveSelect
     printf "\n\n"
 
-    if [[ $qf_DriveSelect ]] && [[ $qf_DriveSelect != "r" ]]; then 
+    if [[ $qf_DriveSelect ]] && [[ $qf_DriveSelect != "r" ]]; then
 
-      if [[ $qf_DriveSelect == "c" || $qf_DriveSelect == "d" ]]; then 
+      if [[ $qf_DriveSelect == "c" || $qf_DriveSelect == "d" ]]; then
         check_sudo_nbd_active
-        if [[ ! $(sudo modinfo -n nbd 2>/dev/null) ]] ; then 
+        if [[ ! $(sudo modinfo -n nbd 2>/dev/null) ]] ; then
           printf "\n\n  Kernel module WARNING: 'nbd' NOT found. But may be present. "
           printf "\n\n  Try 'modinfo -n nbd' at a terminal & Check your distro repositories for 'linux-modules' ...  "
         fi
         printf "checking mounts ... \n\n"
-        if [[ "$TargetName" == All* ]]; then  
+        if [[ "$TargetName" == All* ]]; then
           [[ $MainMountPoint ]] && umount "$MainMountPoint"
           [[ $SecondMountPoint ]] && umount "$SecondMountPoint"
           [[ $InputMountPoint ]] && umount "$InputMountPoint"
-          if [[ $TargetName == "All Drives" ]]; then  
+          if [[ $TargetName == "All Drives" ]]; then
             [[ $SharedMountPoint ]] && umount "$SharedMountPoint"
           fi
         else
-          TargetMountPoint="$(mount -fl | grep "$TargetDevice" | awk '{print $3}')" 
+          TargetMountPoint="$(mount -fl | grep "$TargetDevice" | awk '{print $3}')"
           [[ $TargetMountPoint ]] && umount "$TargetMountPoint"
         fi
       fi
 
       # Qcow2 mount is a more complex procedure > use File Manager to do it as much easier
-      # But drive must be un-mounted in order to connect, which happily is relatively easy 
+      # But drive must be un-mounted in order to connect, which happily is relatively easy
 
-      if [[ $qf_DriveSelect == "d" ]]; then 
+      if [[ $qf_DriveSelect == "d" ]]; then
         printf "qemu-nbd disconnecting \n\n"
-        if [[ "$TargetName" == All* ]]; then  
+        if [[ "$TargetName" == All* ]]; then
           sudo qemu-nbd -d "/dev/nbd0"
           sudo qemu-nbd -d "/dev/nbd1"
           sudo qemu-nbd -d "/dev/nbd2"
-          if [[ $TargetName == "All Drives" ]]; then  
+          if [[ $TargetName == "All Drives" ]]; then
             sudo qemu-nbd -d "/dev/nbd3"
           fi
         else
           sudo qemu-nbd -d "$TargetDevice"
         fi
 
-      elif [[ $qf_DriveSelect == "c" ]]; then 
-        printf "qemu-nbd connecting \n\n" 
+      elif [[ $qf_DriveSelect == "c" ]]; then
+        printf "qemu-nbd connecting \n\n"
 
-        if [[ "$TargetName" == All* ]]; then  
+        if [[ "$TargetName" == All* ]]; then
           [[ $InputAvailable ]] && sudo qemu-nbd -c "/dev/nbd0"  -f qcow2  "$qqf_Input_Drivepath"
           [[ $MainAvailable ]] && sudo qemu-nbd -c "/dev/nbd1"  -f qcow2  "$MainPathName"
           [[ $SecondAvailable ]] && sudo qemu-nbd -c "/dev/nbd2"  -f qcow2  "$SecondPathName"
-          if [[ $TargetName == "All Drives" ]]; then  
+          if [[ $TargetName == "All Drives" ]]; then
             [[ $SharedAvailable ]] && sudo qemu-nbd -c "/dev/nbd3"  -f qcow2  "$SharedPathName"
           fi
         else

@@ -3,17 +3,17 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 ## VM selector style
 Default_VM_SelectorStyle="A"
@@ -27,23 +27,23 @@ function_create_VM_folderList() {
   # Make sure that 'Default_VM_Folder' has a value and it exists
   [[ ! $Default_VM_Folder ]] && Default_VM_Folder="$Current_VM_Folder"
   if [[ ! -d "$Default_VM_Folder" ]]; then printf "\n\n  Settings:  Default Folder NOT found \n\n" ; sleep 1 ; DefaultFolderError=1 ; fi
-  
+
   # set and clear the folder array, current first but don't scan twice, and dont add if the folder is empty (from right click on non-conf files)
-  if [[ "$Current_VM_Folder" != "$Default_VM_Folder" ]] && [[ "$(ls "$Current_VM_Folder/"*.conf 2> /dev/null)" ]] ; then   
+  if [[ "$Current_VM_Folder" != "$Default_VM_Folder" ]] && [[ "$(ls "$Current_VM_Folder/"*.conf 2> /dev/null)" ]] ; then
     declare -ga VM_Folder_List=( "$Current_VM_Folder" "$Default_VM_Folder" )
   else  declare -ga VM_Folder_List=("$Default_VM_Folder")
   fi
   for xF in "${Extra_VM_Folder[@]}"; do
     ExtraExists="$(realpath -eq "/$xF")"
     if [[ $ExtraExists ]] ; then VM_Folder_List+=("$xF")
-    else 
-      ExtraFolderError="$xF Path ERROR or Folder Not Yet Created" 
+    else
+      ExtraFolderError="$xF Path ERROR or Folder Not Yet Created"
       VM_Folder_List+=("PATH ERROR: $xF")
     fi
   done
 }
 
-# Run the function & populate the list: 
+# Run the function & populate the list:
 function_create_VM_folderList
 
 # Record any set ExtraArgs in case of need to reset
@@ -82,7 +82,7 @@ function find_file_manager_browser()  {
     [[ $WebBrowser ]] && [[ ! $(type -p "$WebBrowser") ]] && WebBrowser=
     if [[ ! $WebBrowser ]]; then
       WebBrowser="$(xdg-settings get default-web-browser 2>/dev/null)"
-      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web= 
+      if [[ $WebBrowser ]]; then XDG_Web=1 ; else XDG_Web=
       fi
       WebBrowser="${WebBrowser/'.desktop'/}"
       if [[ "$WebBrowser" == *'firefox'* ]]; then WebBrowser="firefox"
@@ -126,10 +126,10 @@ find_texteditor
 
 # Set the original initial value of paths as found on start up. Check Once.
 OriginalPATH="$PATH"
-QE_SystemFilePath="$(type -p quickemu)"  
+QE_SystemFilePath="$(type -p quickemu)"
 QG_SystemFilePath="$(type -p quickget)"
 
-if [[ ! $QE_DevPath && $DevStart ]]; then QE_DevPath="$(realpath "./qqX.builtins/freespirit")" ; fi  
+if [[ ! $QE_DevPath && $DevStart ]]; then QE_DevPath="$(realpath "./qqX.builtins/freespirit")" ; fi
 
 function sort_qqX_builtin_settings {
 
@@ -143,31 +143,31 @@ function sort_qqX_builtin_settings {
   if [[ $CodingHotSwap ]]; then QE_SourceVersion="$CodingHotSwap" ; fi
   [[ ! $QE_SourceVersion ]] && QE_SourceVersion="freebird"
 
-  # simplfy checks and standardization, make all lower case, for now 
+  # simplfy checks and standardization, make all lower case, for now
   QE_SourceVersion="${QE_SourceVersion,,}"
 
-  if [[ $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then 
-    printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions" 
-    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4 
-  fi  
-
-  if [[ $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then 
-    printf "\n\n  ERROR - Dev Folder not found \n\n  Re-check Installation &/or Installation instructions" 
+  if [[ $QE_SourceVersion == "custom" ]] && [[ ! -d "$Default_VM_Folder/qqX.custom/QE.Custom" ]]; then
+    printf "\n\n  ERROR - Custom Folder not found \n\n  Re-check Installation &/or Installation instructions"
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4
-  fi  
+  fi
 
-  if [[ $QE_SourceVersion == "system" ]]; then 
-    if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then 
-      QE_SourceVersion="System" 
-      QE_SourcePath="$QE_SystemFilePath" 
-      QG_SourcePath="$QG_SystemFilePath" 
-    else  
+  if [[ $QE_SourceVersion == "dev" ]] && [[ ! -d "$QE_DevPath" ]]; then
+    printf "\n\n  ERROR - Dev Folder not found \n\n  Re-check Installation &/or Installation instructions"
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 4
+  fi
+
+  if [[ $QE_SourceVersion == "system" ]]; then
+    if [[ $QE_SystemFilePath && $QG_SystemFilePath ]]; then
+      QE_SourceVersion="System"
+      QE_SourcePath="$QE_SystemFilePath"
+      QG_SourcePath="$QG_SystemFilePath"
+    else
       QE_SourceVersion="Missing System Files"
       QE_SourcePath= ; QG_SourcePath= ; FreePath=
     fi
   fi
 
-  if [[ $QE_SourceVersion != "System" ]]; then 
+  if [[ $QE_SourceVersion != "System" ]]; then
 
     if [[ $QE_SourceVersion == "freebird" ]]; then
       QE_SourceVersion="FreeBird"
@@ -192,11 +192,11 @@ function sort_qqX_builtin_settings {
         QE_SourceVersion="FreeSpirit"
         FreePath="$qqX_BuiltinsFolder/freespirit"
         printf "\n\n  Dev path  '%s'  Not Found   >>  Using FreeSpirit \n\n"  "$QE_DevPath"
-        sleep 2 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1	
+        sleep 2 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1
       fi
     else
       printf "\n\n  Source Setting  '%s'  Not Recognised   >>  Using FreeBird \n\n"  "$QE_SourceVersion"
-      sleep 3 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1	
+      sleep 3 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1
       QE_SourceVersion="FreeBird"
       FreePath="$qqX_BuiltinsFolder/freebird"
     fi
@@ -208,21 +208,21 @@ function sort_qqX_builtin_settings {
 
   if [[ $FreePath ]]; then
     export PATH="${FreePath}:${qqX_LibraryFolder}:${OriginalPATH}"
-  else 
+  else
     export PATH="${qqX_LibraryFolder}:${OriginalPATH}"
   fi
 
   QE_VerNumber=
   QG_VerNumber=
 
-  if [[ $QE_SourcePath ]] && [[ ! -e "$QE_SourcePath" ]]; then 
-    printf "\n\n  ERROR - quickemu not found \n\n  Re-check Installation &/or Installation instructions" 
-    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
-  fi        
-  if [[ $QG_SourcePath ]] && [[ ! -e "$QG_SourcePath" ]]; then 
+  if [[ $QE_SourcePath ]] && [[ ! -e "$QE_SourcePath" ]]; then
+    printf "\n\n  ERROR - quickemu not found \n\n  Re-check Installation &/or Installation instructions"
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10
+  fi
+  if [[ $QG_SourcePath ]] && [[ ! -e "$QG_SourcePath" ]]; then
     printf "\n\n  ERROR - quickget not found \n\n  Re-check Installation &/or Installation instructions"
-    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10 
-  fi 
+    printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10
+  fi
 
   [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 2 :" &&  dev_loop_check
 
@@ -235,21 +235,21 @@ function find_quick_version_numbers {
   # To be run only after rerouting functions for quickemu & quickget are in place & code has been sourced.
   # But place early as emu and get may load initially out of sequence ...
 
-  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
+  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars'
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
 
   # QuickEMU also uses an internal variable '$VERSION' but this only works after the correct script has been sourced.
   QE_VerNumber="$("$QE_SourcePath" --version 2>/dev/null)"
 
-  # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number. 
-  # But the 'quickget' call goes to a qqX capture function of the same name, 
-  # and allows re-routes to custom versions that may work differently. 
+  # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number.
+  # But the 'quickget' call goes to a qqX capture function of the same name,
+  # and allows re-routes to custom versions that may work differently.
   QG_VerNumber="$("$QG_SourcePath" --version 2>/dev/null)"
 
-  # Release Quickemu 4.9.2 was still numbered 4.9.1  
+  # Release Quickemu 4.9.2 was still numbered 4.9.1
   # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
-  if grep -q -s 'echo 38 39' "$QG_SourcePath" ; then 
+  if grep -q -s 'echo 38 39' "$QG_SourcePath" ; then
     [[ $QG_VerNumber == "4.9.1" ]] && QG_VerNumber="4.9.2"
     [[ $QE_VerNumber == "4.9.1" ]] && QE_VerNumber="4.9.2"
   fi
@@ -324,18 +324,18 @@ path_diagnostics  pause
 function store_boot_style_defaults {
   [[ ! $BootStyle ]] && BootStyle="fast"
   [[ ! $BootStyleMsg ]] && BootStyleMsg="slow"
-  BootStyle_Default="$BootStyle"   
-  BootStyleMsg_Default="$BootStyleMsg"  
+  BootStyle_Default="$BootStyle"
+  BootStyleMsg_Default="$BootStyleMsg"
 }
 
 function reload_boot_style_defaults {
-  BootStyle="$BootStyle_Default"   
-  BootStyleMsg="$BootStyleMsg_Default"  
+  BootStyle="$BootStyle_Default"
+  BootStyleMsg="$BootStyleMsg_Default"
 }
 
 function clear_boot_style_vars {
-  BootStyle= ; BootStyle_Default=  
-  BootStyleMsg= ; BootStyleMsg_Default= 
+  BootStyle= ; BootStyle_Default=
+  BootStyleMsg= ; BootStyleMsg_Default=
 }
 
 store_boot_style_defaults

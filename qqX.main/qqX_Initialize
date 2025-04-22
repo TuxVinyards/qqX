@@ -3,26 +3,26 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 qqX_logo_plain() {
-  # early loader 
+  # early loader
   echo "  _    _   \/   "
   echo " (_|  (_|  /\ "
   echo "   |.   |.    "
 }
 
-if  [[ $NoClear ]]; then 
+if  [[ $NoClear ]]; then
 	printf () {
 		# shellcheck disable=SC2199
 		# checks for occurence of the clearing pattern within the parameter text, treating the text as a single string
@@ -41,7 +41,7 @@ if  [[ $NoClear ]]; then
       command printf "$@"
     fi
 	}
-else 
+else
 	printf () {
 		# shellcheck disable=SC2199
 		if [[ "$@" ==  '\033c'* ]]; then
@@ -57,7 +57,7 @@ fi
 # Usage needs to be loaded early on, so it can be shown if initial help is required
 show_CLI_usage () {
 
-  printf     "\n  Command line Usage:"  
+  printf     "\n  Command line Usage:"
   printf   "\n\n 'qqX' to start the distro/vm selector menu,"
   printf   "\n\n  qqX \"vm-name.conf\" or \"path/vm-name.conf\" to start a specific machine,"
   printf   "\n\n  qqX --version & qqX --help  as standard"
@@ -83,19 +83,19 @@ show_CLI_usage () {
 
 }
 
-#  Pick up the SETTINGS file 
+#  Pick up the SETTINGS file
 #  qqX version 1.7 starts on the removal of legacy 'qwrap' code lines and introduces a custom settings file
 
-if [[ ! -f "$HOME/.qqX/qqX_settings" ]]; then 
+if [[ ! -f "$HOME/.qqX/qqX_settings" ]]; then
   printf "\n\n  ERROR with settings file detection "
   printf "\n\n  Re-check Installation &/or Installation instructions \n\n" ; sleep 10 ; exit 1
 else
   qqX_SettingsFile="$HOME/.qqX/qqX_settings"
-  source "$qqX_SettingsFile" 
+  source "$qqX_SettingsFile"
   [[ -f "$HOME/.qqX/custom_settings" ]] && source "$HOME/.qqX/custom_settings"
 fi
 
-if [[ $AllowMoreLocale ]]; then 
+if [[ $AllowMoreLocale ]]; then
   # Use C.UTF-8  where possible as has more locale https://wiki.archlinux.org/title/Locale
   if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
   else export "LC_NUMERIC=C" ; export "LC_COLLATE=C" ; fi
@@ -117,7 +117,7 @@ if [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit ; fi
 [[ $1 == "--vm" || $1 == "-vm" ]] && shift
 # If starting from the main menu, this will be present from the .desktop launcher but will need removing.
 # On right click starts, the '%f' gets auto-replaced by a filename.
-[[ $1 == '%f' ]] && shift 
+[[ $1 == '%f' ]] && shift
 
 
 if [[ $Trace_InputVars ]]; then echo "2: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
@@ -134,52 +134,52 @@ if [[ -e "$1" ]]; then
   XDG_RealPathName="$(realpath "$1")"
   XDG_MimeType="$(mimetype "$XDG_RealPathName" 2>/dev/null)"
   Current_VM_Folder="$(dirname "$XDG_RealPathName")"
-  if [[ $Trace_InputVars ]]; then 
-    echo "RP $XDG_RealPathName" ; echo "MT $XDG_MimeType" ; echo "CF  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars" 
+  if [[ $Trace_InputVars ]]; then
+    echo "RP $XDG_RealPathName" ; echo "MT $XDG_MimeType" ; echo "CF  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars"
   fi
 
-  if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then 
+  if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then
 
     XDG_MimeType_is_QCOW=1
-    # is a right-click start on a qcow2 disk (flag is set for later)  
+    # is a right-click start on a qcow2 disk (flag is set for later)
     QCOW_Input_Dir="$(dirname "$XDG_RealPathName")"
-    QCOW_Input_DiskName="$(basename "$XDG_RealPathName")"  
+    QCOW_Input_DiskName="$(basename "$XDG_RealPathName")"
     QCOW_Input_Conf_Dir="$(dirname "$QCOW_Input_Dir")"
     QCOW_Input_VM_Dir_Name="$(basename "$QCOW_Input_Dir")"
 
     if grep -qs "disk_img="'"'"$QCOW_Input_VM_Dir_Name/$QCOW_Input_DiskName" "$QCOW_Input_Dir.conf" ; then
       XDG_Input_NON_qqX= ; XDG_Input_VM_qqX=1
-    else 
-      XDG_Input_NON_qqX=1 ; XDG_Input_VM_qqX= 
+    else
+      XDG_Input_NON_qqX=1 ; XDG_Input_VM_qqX=
     fi
     # .desktop starts tend to open in the $HOME folder even if right clicking somewhwere else
     #  standard right-click open-with actions will use the current folder
     if [[ $XDG_Input_NON_qqX ]]; then
-      cd "$QCOW_Input_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+      cd "$QCOW_Input_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found "
       Current_VM_Folder="$QCOW_Input_Dir"
     else
-      cd "$QCOW_Input_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found " 
+      cd "$QCOW_Input_Conf_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found "
       Current_VM_Folder="$QCOW_Input_Conf_Dir"
     fi
-    if [[ $Trace_InputVars ]]; then 
-      echo "In D $QCOW_Input_Dir  Conf D $QCOW_Input_Conf_Dir"  
-      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName " 
-      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName " 
-      echo "VM_qqX = $XDG_Input_VM_qqX  NON_qqX = $XDG_Input_NON_qqX " 
-      echo "pwd  $(pwd)" 
+    if [[ $Trace_InputVars ]]; then
+      echo "In D $QCOW_Input_Dir  Conf D $QCOW_Input_Conf_Dir"
+      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName "
+      echo "VDN  $QCOW_Input_VM_Dir_Name  N  $QCOW_Input_DiskName "
+      echo "VM_qqX = $XDG_Input_VM_qqX  NON_qqX = $XDG_Input_NON_qqX "
+      echo "pwd  $(pwd)"
       echo; sleep "$Trace_InputVars"
     fi
 
-  elif [[ "$XDG_RealPathName" == *'.iso' ]]; then 
+  elif [[ "$XDG_RealPathName" == *'.iso' ]]; then
     XDG_FileType_Recognised=1
     XDG_ISO_Name="$1"
-    if [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'application/vnd.efi.iso' ]]; then 
+    if [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'application/vnd.efi.iso' ]]; then
       XDG_MimeType_is_ISO=1 ; XDG_MimeType_Recognised=1
     fi
 
-  elif [[ "$XDG_MimeType" == *'text/plain' ]] || [[ $XDG_RealPathName == *'.conf' ]] ; then 
-      # NB .conf files may also be mime sym-links 
-    if [[ $XDG_RealPathName == *'.conf' ]] && grep -qs 'guest_os' "$XDG_RealPathName" ; then 
+  elif [[ "$XDG_MimeType" == *'text/plain' ]] || [[ $XDG_RealPathName == *'.conf' ]] ; then
+      # NB .conf files may also be mime sym-links
+    if [[ $XDG_RealPathName == *'.conf' ]] && grep -qs 'guest_os' "$XDG_RealPathName" ; then
       # then is a conf file open-with and appears to conform to standard quickemu .conf layout
       # (also see api mouse script for qcow checks)
       XDG_Input_NON_qqX=
@@ -187,58 +187,58 @@ if [[ -e "$1" ]]; then
       VM_Conf_Dir="$(dirname "$XDG_RealPathName")"
       VM_Conf_File="$(basename "$XDG_RealPathName")"
       VM_InstanceName="${VM_Conf_File/'.conf'/}"
-      if [[ $Trace_InputVars ]]; then 
-        echo "R: $XDG_RealPathName"  ; echo 
-        echo "D: $VM_Conf_Dir"  ; echo 
-        echo "C: $VM_Conf_File"  ; echo 
+      if [[ $Trace_InputVars ]]; then
+        echo "R: $XDG_RealPathName"  ; echo
+        echo "D: $VM_Conf_Dir"  ; echo
+        echo "C: $VM_Conf_File"  ; echo
         echo "N: $VM_InstanceName"  ; echo  ; sleep "$Trace_InputVars"
       fi
       shift $#
       if [[ $VM_InstanceName ]]; then
         # set to General VM folder, where the .conf files are ... and flag to run the VM selector
-        cd "$VM_Conf_Dir"  || printf "\n\n XDG .desktop starter  >  VM Folder not found " 
+        cd "$VM_Conf_Dir"  || printf "\n\n XDG .desktop starter  >  VM Folder not found "
         Current_VM_Folder="$VM_Conf_Dir"
       fi
     else
-      XDG_MimeType_is_QCOW=  
+      XDG_MimeType_is_QCOW=
       QCOW_Input_Conf_Dir=
       echo
       qqX_logo_plain
       echo; echo " $XDG_RealPathName"; echo
       echo " qqX has been associated to open .conf (text) files via the file properties 'open-with' option."
-      echo; echo; echo "<<" 
+      echo; echo; echo "<<"
       head -n 20 "$XDG_RealPathName"
       echo ">>" ; echo
       FileLines="$(grep -c ^ "$XDG_RealPathName")"
-      printf "\n This current file is plain text only. " 
+      printf "\n This current file is plain text only. "
       [[ $FileLines -gt 20 ]] && printf " File length %s lines \n"  "$FileLines"  &&  TextAll="[a] view full text & quit   "
       echo
       echo " [enter] to run qqX   $TextAll [q]  quit"
       echo
       read -rp " >  "   TextOpener
-      echo  
-      if [[ $TextOpener == "a" ]]; then  cat "$XDG_RealPathName"; echo; echo " [enter] to quit  "; echo; read -rp " >  "; exit 
+      echo
+      if [[ $TextOpener == "a" ]]; then  cat "$XDG_RealPathName"; echo; echo " [enter] to quit  "; echo; read -rp " >  "; exit
       elif [[ $TextOpener == "q" ]]; then exit
       else VM_InstanceName= ; XDG_MimeType_Recognised=1
       fi
     fi
-  
+
   else
 
     XDG_StartVariant=1
     XDG_MimeType_Recognised=
     XDG_FileType_Recognised=
-    XDG_MimeType_is_QCOW=  
+    XDG_MimeType_is_QCOW=
     # set to $HOME folder and flag to run the VM selector
-    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found " 
+    cd "$HOME"  || printf "\n\n XDG .desktop starter  >  HOME Folder not found "
     Current_VM_Folder="$HOME"
-    
+
   fi
 
   if [[ $Trace_InputVars ]]; then echo "3: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 else  Current_VM_Folder="$(pwd)"
-  
+
 fi
 
 # establishes a non-volatile transfer variable and flags qqX main loops to trigger 'input_and_mouse_tidy' script

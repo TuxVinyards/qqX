@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-##  qqX - quickemu quickget X terminal project   
+##  qqX - quickemu quickget X terminal project
 
 #   Helper file for qqX settings file updates
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
-# 	Otherwise:  
+# 	Otherwise:
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,19 +22,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses 
+# https://www.gnu.org/licenses
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
 
 
 function  update_old_settings_file_with_new_options {
 
-  Old_SettingsFile="$1" 
+  Old_SettingsFile="$1"
   Template_SettingsFile="$2"
   Old_SettingsFileFolder="$3"
-  
-  ## USAGE: presumes this file to be run from a qqX release folder ... 
+
+  ## USAGE: presumes this file to be run from a qqX release folder ...
   [[ ! $Template_SettingsFile ]] &&  Template_SettingsFile="qqX_settings"
 
   # presumes standard installation placement
@@ -43,12 +43,12 @@ function  update_old_settings_file_with_new_options {
 
   # *and* presumes that a valid settings file has been found before this routine is called
 
-  ## DEV Array output - Set =1  file or screen or both 
+  ## DEV Array output - Set =1  file or screen or both
   DevSetUpdArrOutputScrn= ; DevSetUpdArrOutputFile=
 
   ##
 
-  ## 1: OLD FILE  
+  ## 1: OLD FILE
 
   #  The VM & Extra Folder lists are of unknown length & number so store as separate to add later.
 
@@ -70,22 +70,22 @@ function  update_old_settings_file_with_new_options {
   for i in "${!GrepArr_OLD_OneLine_Settings[@]}"; do
 
     case "${GrepArr_OLD_OneLine_Settings[i]}" in
-     
-      *'VM_Array['*)  
-        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_VM_Arrays_File" 
-        unset "GrepArr_OLD_OneLine_Settings[i]"  
+
+      *'VM_Array['*)
+        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_VM_Arrays_File"
+        unset "GrepArr_OLD_OneLine_Settings[i]"
         ;;
-      
-      *'Extra_VM_Folder+='*)  
-        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_XF_Arrays_File"  
-        unset "GrepArr_OLD_OneLine_Settings[i]"  
+
+      *'Extra_VM_Folder+='*)
+        printf "%s\n\n" "${GrepArr_OLD_OneLine_Settings[i]}" >> "$Grep_OLD_XF_Arrays_File"
+        unset "GrepArr_OLD_OneLine_Settings[i]"
         ;;
 
       *) true ;;
-      
+
     esac
 
-  done	
+  done
 
   #  Re-index as sections have been removed
   GrepArr_OLD_OneLine_Settings=("${GrepArr_OLD_OneLine_Settings[@]}")
@@ -106,14 +106,14 @@ function  update_old_settings_file_with_new_options {
   if [[ $DevSetUpdArrOutputFile ]]; then  declare -p GrepArr_OLD_BaseNameSettings > "/tmp/qDevSet_OldBaseNameArr.txt" ; fi
 
 
-  ## 2: NEW FILE OUTPUT 
+  ## 2: NEW FILE OUTPUT
 
   ## A. Make a backup to the installer folder (& check that it is a faithful copy)
   # Dev: move to trash to stop clutter.
-  
+
   D_Stamp=".""$(date +%a.%d.%b.%G.%H.%M)"
 
-  if [[ -d ".git" ]] && [[ $(type -p gio 2>/dev/null) ]]; then 
+  if [[ -d ".git" ]] && [[ $(type -p gio 2>/dev/null) ]]; then
 
     gio trash "$Old_SettingsFileFolder/$Old_SettingsFile"
     printColor "\n\n\n  Starting Update: "
@@ -121,12 +121,12 @@ function  update_old_settings_file_with_new_options {
 
   else
 
-    cp "$Old_SettingsFileFolder/$Old_SettingsFile" "$(pwd)/qqX_settings.$D_Stamp.old.txt" 
+    cp "$Old_SettingsFileFolder/$Old_SettingsFile" "$(pwd)/qqX_settings.$D_Stamp.old.txt"
 
     ChkSumOld="$(md5sum "$Old_SettingsFileFolder/$Old_SettingsFile" 2>/dev/null | head -c 32)"
     ChkSumBackup="$(md5sum "$(pwd)/qqX_settings.$D_Stamp.old.txt" 2>/dev/null | head -c 32)"
 
-    if [[ $ChkSumOld != "$ChkSumBackup" ]]; then 
+    if [[ $ChkSumOld != "$ChkSumBackup" ]]; then
       printColor "\n\n  ERROR:  unable to make a backup of the settings file."
       printf "\n\n  Aborting update.  Please check at https://github.com/TuxVinyards/qqX/issues"
       printf "\n\n\n  [enter] to exit ... \n\n"
@@ -139,7 +139,7 @@ function  update_old_settings_file_with_new_options {
   fi
 
   ## B. create new composite file, in place of the old
-  TargetNew="$Old_SettingsFileFolder/$Old_SettingsFile" 
+  TargetNew="$Old_SettingsFileFolder/$Old_SettingsFile"
   printf "" > "$TargetNew"
 
 
@@ -152,7 +152,7 @@ function  update_old_settings_file_with_new_options {
   VM_Old_TxDone=
   XF_Old_TxDone=
 
-  if [[ $DevSetUpdArrOutputFile ]]; then 
+  if [[ $DevSetUpdArrOutputFile ]]; then
     echo > "/tmp/qDevSet_Match_NewOld.txt"
     echo > "/tmp/qDevSet_No_Match.txt"
     echo > "/tmp/qDevSet_CopyOver.txt"
@@ -165,52 +165,52 @@ function  update_old_settings_file_with_new_options {
     # read -rp "  >  "
   fi
 
-  ## MAIN LOOP: 
+  ## MAIN LOOP:
 
-  for i in "${!GrepArr_NEW[@]}"; do 
+  for i in "${!GrepArr_NEW[@]}"; do
 
     MatchNewOld=
     SkipCopy=
 
     if [[ $DevSetUpdArrOutputScrn ]]; then  echo; echo "i = $i"; fi
-    if [[ $DevSetUpdArrOutputFile ]]; then  echo "i = $i" >> "/tmp/qDevSet_iVals.txt" ; fi 
+    if [[ $DevSetUpdArrOutputFile ]]; then  echo "i = $i" >> "/tmp/qDevSet_iVals.txt" ; fi
 
     case "${GrepArr_NEW[i]}" in
 
       #  Detect array zones and copy the *stored* customised block to the new file instead
       #  one set only avoid accumulating more new ones (also the line spaces between the extra statements)
 
-      *'Extra_VM_Folder+='*)  
+      *'Extra_VM_Folder+='*)
         if [[ $XF_Old_TxDone ]]; then
           SkipCopy=1 ; SkipLineSpace=1
         else
           if grep -q 'Extra_VM_Folder+=' "$Grep_OLD_XF_Arrays_File" ; then
-            cat "$Grep_OLD_XF_Arrays_File" >> "$TargetNew" 
+            cat "$Grep_OLD_XF_Arrays_File" >> "$TargetNew"
             XF_Old_TxDone=1
           fi
         fi
         ;;
-      
-      *'# ADD here'*) 
+
+      *'# ADD here'*)
 
         if [[ ! $VM_Old_TxDone ]]; then
           printf "%s\n\n" "${GrepArr_NEW[i]}" >> "$TargetNew"
-          SkipCopy=1 
+          SkipCopy=1
           if grep -q 'VM_Array' "$Grep_OLD_VM_Arrays_File" ; then
-            cat "$Grep_OLD_VM_Arrays_File" >> "$TargetNew" 
+            cat "$Grep_OLD_VM_Arrays_File" >> "$TargetNew"
             VM_Old_TxDone=1
           fi
         fi
         ;;
-      
+
     esac
-    
+
     [[ $SkipLineSpace ]] && SkipCopy=1  && SkipLineSpace=
 
     # One Array set only, avoid accumulating 'new' ones each time
-    [[ $XF_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'xtra_VM_Folder+='* ]]  && SkipCopy=1 && SkipLineSpace=1 
+    [[ $XF_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'xtra_VM_Folder+='* ]]  && SkipCopy=1 && SkipLineSpace=1
     [[ $VM_Old_TxDone ]] && [[ "${GrepArr_NEW[i]}" == *'M_Array['* ]]  && SkipCopy=1 && SkipLineSpace=1
-    
+
 
     if [[ ! $SkipCopy ]] && [[ ! $SkipLineSpace ]] ; then
 
@@ -222,20 +222,20 @@ function  update_old_settings_file_with_new_options {
 
         for n in "${!GrepArr_OLD_BaseNameSettings[@]}" ; do
 
-          if [[ $DevSetUpdArrOutputScrn ]]; then  
-            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}" 
+          if [[ $DevSetUpdArrOutputScrn ]]; then
+            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}"
           fi
-          if [[ $DevSetUpdArrOutputFile ]]; then  
-            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}" >> "/tmp/qDevSet_ProposedMatch.txt" 
-          fi 
+          if [[ $DevSetUpdArrOutputFile ]]; then
+            printf "Match Test- '%s' - '%s'\n" "$ProposedNew_BaseNameSetting" "${GrepArr_OLD_BaseNameSettings[n]}" >> "/tmp/qDevSet_ProposedMatch.txt"
+          fi
 
           if [[ $ProposedNew_BaseNameSetting == "${GrepArr_OLD_BaseNameSettings[n]}" ]] ; then
             MatchNewOld=1
             echo "${GrepArr_OLD_OneLine_Settings[n]}" >> "$TargetNew"
             if [[ $DevSetUpdArrOutputScrn ]]; then  echo "MatchNewOld > Copy Old - ${GrepArr_OLD_OneLine_Settings[n]}"; fi
-            if [[ $DevSetUpdArrOutputFile ]]; then  echo "MatchNewOld > Copy Old - ${GrepArr_OLD_OneLine_Settings[n]}" >> "/tmp/qDevSet_Match_NewOld.txt" ; fi 
+            if [[ $DevSetUpdArrOutputFile ]]; then  echo "MatchNewOld > Copy Old - ${GrepArr_OLD_OneLine_Settings[n]}" >> "/tmp/qDevSet_Match_NewOld.txt" ; fi
             break
-          fi 
+          fi
         done
 
       fi
@@ -258,7 +258,7 @@ function  update_old_settings_file_with_new_options {
 
   [[ $DevSetUpdArrOutputScrn ]] && printf "\n\n"
   printf "  The settings file has now been updated. \n  All recognised original settings have been transferred. \n\n"
-  
+
 }
 
 # vim:tabstop=2:shiftwidth=2:expandtab
