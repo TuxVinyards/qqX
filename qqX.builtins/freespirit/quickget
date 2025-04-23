@@ -1867,6 +1867,7 @@ function get_fedora() {
     local URL=""
     local VARIANT=""
     case ${EDITION} in
+        KDE) if [[ $RELEASE -ge 42 ]]; then VARIANT="${EDITION}"; else VARIANT="Spins"; fi ;;
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
@@ -3667,7 +3668,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.8.03"
+        echo "FS 4.9.8.03b"
         exit 0;;
     --help|-help|--h|-h)
         help_message
