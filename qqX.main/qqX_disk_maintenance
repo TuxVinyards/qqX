@@ -3,11 +3,11 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
@@ -18,10 +18,10 @@
 
 drives_and_snapshots() {
 
-  #  @ 2023/08  with adding of second and shared drives,  
-  #  also start accessing qemu-img directly instead of going round the houses with with quickemu calls 
+  #  @ 2023/08  with adding of second and shared drives,
+  #  also start accessing qemu-img directly instead of going round the houses with with quickemu calls
   #  Omitting $1 will give simple lists, otherwise $1 may be given either as 'info' or 'select'
-  #  Or $1 as 'info_current' to avoid the 'refresh_conf_vars_and_values' call 
+  #  Or $1 as 'info_current' to avoid the 'refresh_conf_vars_and_values' call
   #  $2 "as_disk_util" is for disk utility to hide the message to use the disk utility
 
   [[ $1 == "as_disk_util" ]] && printColor "\n\n  Internal ERROR: disk uitilty needs two args \n\n"  && sleep 100
@@ -40,24 +40,24 @@ drives_and_snapshots() {
 
     printColor "\n  Second Drive: \n\n"
 
-    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    if ! "$QEMU_IMG" snapshot -l "$SecondDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n"
     else
-      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo 
-      else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo 
+      if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SecondDrive"; echo
+      else "$QEMU_IMG" snapshot -l "$SecondDrive"; echo
       fi
     fi
 
-    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo 
-    else check_disk_is_okay "$SecondDrive" 
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SecondDrive" ; echo
+    else check_disk_is_okay "$SecondDrive"
     fi
 
     check_if_disk_needs_a_cleanup  "$SecondDrive"
 
     printf "  Health Status:  %s"  "$DiskChkStatus"
-    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " 
+    if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] && printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] && printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -66,7 +66,7 @@ drives_and_snapshots() {
 
     printColor "\n  Shared Drive: \n\n"
 
-    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    if ! "$QEMU_IMG" snapshot -l "$SharedDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n"
     else
       if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$SharedDrive"; echo
       else "$QEMU_IMG" snapshot -l "$SharedDrive"; echo
@@ -81,7 +81,7 @@ drives_and_snapshots() {
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
     elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -96,7 +96,7 @@ drives_and_snapshots() {
     else printColor "\n  One Main Drive: \n\n"
     fi
 
-    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n" 
+    if ! "$QEMU_IMG" snapshot -l "$MainDrive" | grep -s -q 'Snapshot list:' ; then printf "  No Snaphots \n\n"
     else
       if [[ $1 == "info" ]]; then "$QEMU_IMG" info "$MainDrive"; echo
       else "$QEMU_IMG" snapshot -l "$MainDrive"; echo
@@ -111,9 +111,9 @@ drives_and_snapshots() {
 
     printf "  Health Status:  %s"  "$DiskChkStatus"
     if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors "
-    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs" 
+    elif [[ $2 != "as_disk_util" ]]; then printColor "\n\n  See qqX [disk] utility for repairs"
     fi
-    [[ $DiskDisparity == "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
+    [[ $DiskDisparity -ge "1" ]] && [[ $MainMenuChoice != "disk" ]] &&  printColor "\n\n  DISK may need a clean up  >  [disk] repair utils "
     printf "\n\n"
 
   fi
@@ -121,7 +121,7 @@ drives_and_snapshots() {
   if [[ $1 == "select" ]] && [[ ! $Selected_DrivePreset ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
 
     printColor "\n  SELECT:  [enter]  MAIN DRIVE (or back to main menu)"
-    
+
     [[ $SecondDriveArgs ]] && printColor "   [2]  Second Drive"
     [[ $SharedDriveArgs ]] && printColor "   [3]  Shared Drive"
     [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "  (scroll to view)"
@@ -132,15 +132,15 @@ drives_and_snapshots() {
 
     case "$Selected_Drive" in
 
-      2)  Selected_Drive="$SecondDrive" 
+      2)  Selected_Drive="$SecondDrive"
           Selected_DriveName="Second Drive"
       ;;
 
-      3)  Selected_Drive="$SharedDrive" 
+      3)  Selected_Drive="$SharedDrive"
           Selected_DriveName="Shared Drive"
       ;;
 
-      *)  Selected_Drive="$MainDrive" 
+      *)  Selected_Drive="$MainDrive"
           Selected_DriveName="Main Drive"
       ;;
 
@@ -148,7 +148,7 @@ drives_and_snapshots() {
 
   else
 
-    Selected_Drive="$MainDrive" 
+    Selected_Drive="$MainDrive"
     Selected_DriveName="Main Drive"
 
   fi
@@ -156,7 +156,7 @@ drives_and_snapshots() {
   if [[ $1 == "select" ]] && [[ -e "$Selected_Drive" ]] ; then
 
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
-   
+
     "$QEMU_IMG" info "$Selected_Drive"
     check_disk_is_okay "$Selected_Drive"
     Selected_DriveSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
@@ -165,7 +165,7 @@ drives_and_snapshots() {
 
       printf "\n\n  Health Status:  %s  (%s)"  "$DiskChkStatus"  "$Selected_DriveName"
       if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
-      printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere." 
+      printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere."
 
     fi
 
@@ -186,7 +186,7 @@ function manage_and_repair_disks {
   else
 
     printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
-    check_disk_is_okay  "$Selected_Drive" 
+    check_disk_is_okay  "$Selected_Drive"
 
     if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n\n  Status:  %s"  "$DiskChkStatus" ; fi
 
@@ -201,10 +201,10 @@ function manage_and_repair_disks {
 
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size appear to be lower than the contents ..."
-      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
-      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
-      check_if_disk_needs_a_cleanup  "$Selected_Drive" 
-      [[ $DiskDisparity == "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
+      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress"
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations"
+      check_if_disk_needs_a_cleanup  "$Selected_Drive"
+      [[ $DiskDisparity -ge "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
 
     fi
 
@@ -212,13 +212,13 @@ function manage_and_repair_disks {
 
       printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
       [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
-      
+
     fi
 
-    # Check there is disk free space to make a backup  
+    # Check there is disk free space to make a backup
 
     if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
-    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}"; DiskSize_GiB_OnDisk="${DiskSize_GiB_OnDisk//' '/}" 
+    else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}"; DiskSize_GiB_OnDisk="${DiskSize_GiB_OnDisk//' '/}"
     fi
 
     DiskFreeGiB_OnHost="$(df -H --output=avail . | tail -n 1)"
@@ -237,29 +237,29 @@ function manage_and_repair_disks {
       else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
       fi
     fi
-    
-    printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere." 
+
+    printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere."
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  Snapshots will retained in the backups ...  [b] back to main menu " 
+    printf "\n\n  Snapshots will retained in the backups ...  [b] back to main menu "
 
   fi
 
   printf "\n"
   DiskManage=
   DiskStorageChanges=
-  
-  while true; do 
+
+  while true; do
     printf "\n"
     read -rp "  >  "  DiskManage
     [[ $DiskManage ]] && break
   done
-  printf "\n\n"	
+  printf "\n\n"
 
   # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-convert
 
   # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-check
-  
+
   # REVIEW   qemu's differential 'bitmap' tracking  https://lwn.net/Articles/837053/
 
   if [[ $DiskManage == "b" ]]; then  return
@@ -268,7 +268,7 @@ function manage_and_repair_disks {
     if [[ $DiskManage == "rz" ]]; then
       printf "  This will resize the external envelope. Internal partitions may require additional treatment."
       printf "\n\n  For main drive partitions, follow up with the [iso] utility > 'gparted' is recommended."
-      printf "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing " 
+      printf "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing "
       printColor "\n\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 "
       printf "  [b] to go back"
       printf "\n\n"
@@ -280,10 +280,10 @@ function manage_and_repair_disks {
 
     DiskDate="$(date +%b%d.%H.%M)"
     DiskBackup="${Selected_Drive}.$DiskDate.OLD.qcow2"
-    
+
     printf  "\n\n  Original drive: %s " "$Selected_Drive"
 
-    if mv "$Selected_Drive" "$DiskBackup" ; then 
+    if mv "$Selected_Drive" "$DiskBackup" ; then
       printColor "\n\n  Safely moved to back up as: %s " "$DiskBackup"
     else
       printColor "\n\n  ERROR moving drive to backup - Cancelling process"
@@ -293,7 +293,7 @@ function manage_and_repair_disks {
     printf "\n\n  Backups may be easily renamed and reused as previously, using the file manager"
     DiskStorageChanges=1
 
-    if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then 
+    if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then
       printf "" > "$Qemu_IMG_ErrorLog"
       DU_BackUpSize="$(du "$DiskBackup" | cut -f 1)"
 
@@ -313,25 +313,25 @@ function manage_and_repair_disks {
 
       dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
       printColor "\n  Attemping repair .... \n\n"
-      "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
+      "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
 
-    else 
+    else
       printf "\n  Processing >  monitor the hard drive activity light ... \n\n"
-      "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive" 
+      "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive"
 
     fi
 
     if [[ -e  "$DiskBackup" ]] && [[ -e "$Selected_Drive" ]]; then
 
-      [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
-      [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog" 
+      [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
+      [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
       # option 'rd' is basically 'convert' process only  (all options do this as standard)
-      if [[ $DiskManage == "rz" || $DiskManage == "rd" ]]; then 
+      if [[ $DiskManage == "rz" || $DiskManage == "rd" ]]; then
         [[ $DiskManage == "rz" ]] && "$QEMU_IMG" resize -f qcow2 "$Selected_Drive" "+${ResizePlus}G" 2> "$Qemu_IMG_ErrorLog"
         if [[ $DiskManage == "rd" ]]; then
           SnapTitle="$(date +%b%d.%H.%M)"
-          "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
-        fi 
+          "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive"
+        fi
         "$QEMU_IMG" info "$Selected_Drive"
         printColor "\n\n  Drive Updated ..."
         if [[ $DiskManage == "rd" ]]; then
@@ -346,7 +346,7 @@ function manage_and_repair_disks {
       fi
       DiskManage="b"
 
-    else 
+    else
 
       printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
       printf "\n\n  Check the VM folder with a file manager. The backup may be renamed and reused as previously"
@@ -354,7 +354,7 @@ function manage_and_repair_disks {
     fi
 
     printf "\n\n  [enter] to return to menu \n\n "
-    read -rp "  >  " 
+    read -rp "  >  "
 
   fi
 }
@@ -363,10 +363,10 @@ function qqX_snapshot_delete {
 
   # NB qqX prefix to avoid cross-linking with the quickemu one
 
-  printColor "\n\n qqX Snapshot Delete function "  
+  printColor "\n\n qqX Snapshot Delete function "
   printf "\n\n %s  (reselection & cancel prompts are given before starting)" "$Selected_DriveName"
 
-  # Create range-selectable array 
+  # Create range-selectable array
   SnapListString="$("$QEMU_IMG" info "$Selected_Drive" | grep '[0-9][0-9]:')"
 
   # turns the multiline string into raw array with one whole line for each entry making each array element
@@ -378,8 +378,8 @@ function qqX_snapshot_delete {
 
   printColor "\n\n ID   Array  Name \n\n"
   while [[ "${SnapListArrRaw[i]}" ]]; do
-    IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}" 
-    # prints the first two elements of each snapshot info line 
+    IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
+    # prints the first two elements of each snapshot info line
     printf "%2d    %2d    %s \n"  "${SnapListArrSeparated[0]}"  "$i"  "${SnapListArrSeparated[1]}"
     ((i+=1))
   done
@@ -394,10 +394,10 @@ function qqX_snapshot_delete {
   SnapDeleteStart=
   SnapDeleteEnd=
   SnapDeleteConfirm=
-  
+
   printf "\n\n"
   read -rp " >  "  SnapDeleteStart
-  
+
   if [[ $SnapDeleteStart ]]; then
 
       SpecialSnapName="$SnapDeleteStart"
@@ -414,7 +414,7 @@ function qqX_snapshot_delete {
       printColor "\n [enter] for an individual snapshot or to correct an error \n\n Or ARRAY [number] for end of range (inclusive) \n\n"
       read -rp " >  "  SnapDeleteEnd
 
-      if [[ $SnapDeleteEnd ]]; then 
+      if [[ $SnapDeleteEnd ]]; then
 
         SnapDeleteEnd="$(tr -cd "[:digit:]" <<< "$SnapDeleteEnd")"
 
@@ -431,16 +431,16 @@ function qqX_snapshot_delete {
 
         printColor "\n\n ID   Array  Name \n\n"
         while true; do
-          IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}" 
-          # prints the first two elements of each snapshot info line 
+          IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
+          # prints the first two elements of each snapshot info line
           printf "%2d    %2d    %s \n"  "${SnapListArrSeparated[0]}"  "$i"  "${SnapListArrSeparated[1]}"
           [[ $i == "$SnapDeleteEnd" ]] && break
           ((i+=1))
         done
 
-      else         
-        printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart" 
-        printf "\n\n  %s \n" "${SnapListArrRaw[SnapDeleteStart]}" 
+      else
+        printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart"
+        printf "\n\n  %s \n" "${SnapListArrRaw[SnapDeleteStart]}"
         SnapDeleteEnd="$SnapDeleteStart"
       fi
 
@@ -452,8 +452,8 @@ function qqX_snapshot_delete {
 
     if [[ $SnapDeleteConfirm == "b" ]]; then  printf "\n\n Deletion schedule has been CANCELLED"
     else
-       if [[ $SpecialSnapName ]]; then  
-        "$QEMU_IMG" snapshot -q -d "$SpecialSnapName" "$Selected_Drive" 
+       if [[ $SpecialSnapName ]]; then
+        "$QEMU_IMG" snapshot -q -d "$SpecialSnapName" "$Selected_Drive"
        else
          SnapDeleteRangeCounter=$SnapDeleteStart
          while [[ $SnapDeleteRangeCounter -le $SnapDeleteEnd ]]; do
@@ -465,22 +465,22 @@ function qqX_snapshot_delete {
             exit 1
           else
             printColor "\n\n Deleting SnapShot %2d   %2d  %s \n\n"  "${SnapListArrSeparated[0]}"  "$SnapDeleteRangeCounter"  "${SnapListArrSeparated[1]}"
-            "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive" 
+            "$QEMU_IMG" snapshot -q -d "$SnapName" "$Selected_Drive"
           fi
           ((SnapDeleteRangeCounter+=1))
         done
       fi
-      "$QEMU_IMG" info "$Selected_Drive" 
+      "$QEMU_IMG" info "$Selected_Drive"
       Selected_Drive_NewSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
       if [[ "$Selected_Drive_NewSize" == *GiB* ]] && [[ "$Selected_DriveSize" == *GiB* ]]; then
         SelDrvOld="${Selected_DriveSize//'GiB'/}"
         SelDrvNew="${Selected_Drive_NewSize//'GiB'/}"
         SelDrv_SpaceSaved="$(bc <<< "$SelDrvOld - $SelDrvNew ") GiB"
       fi
-      check_if_disk_needs_a_cleanup  "$Selected_Drive" 
-      if [[ $DiskDisparity == "1" ]]; then
-        printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress" 
-      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations" 
+      check_if_disk_needs_a_cleanup  "$Selected_Drive"
+      if [[ $DiskDisparity -ge "1" ]]; then
+        printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress"
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations"
         printf "\n\n  Try the main menu Disk Utility for a clean up ....\n"
       fi
       printColor "\n\n Initial Disk Size: %s  -  Space Saved: %s \n"  "$Selected_DriveSize"  "$SelDrv_SpaceSaved"
@@ -496,7 +496,7 @@ function qqX_snapshot_delete {
 
   fi
 
-  #  REVIEW  see if tiano core bios can be set to select 'misc device' instead of 'windows boot manager' 
+  #  REVIEW  see if tiano core bios can be set to select 'misc device' instead of 'windows boot manager'
   #  as this can cause problems when rebooting on updates
   #  https://github.com/tianocore/tianocore.github.io/wiki/UEFI-application
   #  https://github.com/theopolis/uefi-firmware-parser
@@ -508,7 +508,7 @@ drive_chown_notes () {
   printf   "\n  the following commands can help give general user permissions:"
   printf "\n\n"
   # shellcheck disable=SC2016
-  echo '  sudo chown $USER:$USER "mounted-drive-name"' 
+  echo '  sudo chown $USER:$USER "mounted-drive-name"'
   echo '  chmod 775 "mounted-drive-name"'
 }
 
@@ -520,13 +520,13 @@ function create_new_drives {
   [[ $MainMenuChoice == "2c" ]] && MainMenuChoice="2"
   [[ $MainMenuChoice == "3c" ]] && MainMenuChoice="3"
 
-  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDrive ]] ; then 
-     
+  if [[ $MainMenuChoice == "3" ]] && [[ $SharedDrive ]] ; then
+
     printColor "\n\n  ERROR:  A shared drive appears to already have been set up. Check VM conf and general settings."
     printf "\n\n  Shared drive is set as '%s'" "$SharedDrive"
-    if [[ -e "$SharedDrive" ]]; then 
-      printf "  and has been found." 
-      check_disk_is_okay "$SharedDrive" 
+    if [[ -e "$SharedDrive" ]]; then
+      printf "  and has been found."
+      check_disk_is_okay "$SharedDrive"
       printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
     else printf "  but cannot be found."
     fi
@@ -534,13 +534,13 @@ function create_new_drives {
     drive_chown_notes
     printf "\n"
 
-  elif [[ $MainMenuChoice == "2" ]] && [[ "$SecondDrive" ]] ; then 
-  
+  elif [[ $MainMenuChoice == "2" ]] && [[ "$SecondDrive" ]] ; then
+
     printColor "\n\n  ERROR:  A second appears to already have been set up. Check VM conf and general settings."
     printf "\n\n  Second drive is set as '%s'" "$SecondDrive"
-    if [[ -e "$SecondDrive" ]]; then 
-      printf "  and has been found." 
-      check_disk_is_okay "$SecondDrive" 
+    if [[ -e "$SecondDrive" ]]; then
+      printf "  and has been found."
+      check_disk_is_okay "$SecondDrive"
       printf "\n\n  Drive Health Status:  %s"  "$DiskChkStatus"
     else printf "  but cannot be found."
     fi
@@ -551,13 +551,13 @@ function create_new_drives {
   else
 
     [[ $MainMenuChoice == "2" ]] && printColor "\n\n  Create a SECOND virtual hard-drive for this VM instance:"
-    
+
     [[ $MainMenuChoice == "3" ]] && printColor "\n\n  Create a SHARED virtual hard-drive for this VM instance:"
-    
-    printf "\n\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that" 
+
+    printf "\n\n\n  Suggest 32G or higher, especially if expecting to create snapshots. Note that"
     printf "\n\n  qcow2 disks auto-compress & will normally occupy much less of your hard drive "
     printf "\n\n  than that allocated.  An empty disk only takes up 70Mb when formatted."
-    printf "\n\n  It is easier make them larger now than to resize later ... " 
+    printf "\n\n  It is easier make them larger now than to resize later ... "
     printColor "\n\n\n  [enter] create 64G   [integer] create int G   [b] go back \n\n"
     read -rp "  >  "  SecondDriveCreateSize
 
@@ -565,7 +565,7 @@ function create_new_drives {
 
     [[ $SecondDriveCreateSize ]]  &&  SecondDriveCreateSize="$(tr -cd "[:digit:]" <<< "$SecondDriveCreateSize")"
 
-    if [[ $SecondDriveCreateSize ]]; then 
+    if [[ $SecondDriveCreateSize ]]; then
 
       if [[ $MainMenuChoice == "2" ]] && grep -s -q SecondDrive "$VM_Conf_File" ; then
 
@@ -574,15 +574,15 @@ function create_new_drives {
 
       elif [[ $MainMenuChoice == "3" ]] && [[ ! -d "$Default_VM_Folder" ]]; then
 
-          printf "\n\n  Default_VM_Folder not present. Edit the main settings file first. \n\n"  
+          printf "\n\n  Default_VM_Folder not present. Edit the main settings file first. \n\n"
 
       else
-          
+
         if [[ $MainMenuChoice == "2" ]]; then
 
           printf "\n\n  A Storage Drive will be created in the VM's folder \n\n  %s"  "$VM_InstanceName"
 
-        elif [[ $MainMenuChoice == "3" ]]; then 
+        elif [[ $MainMenuChoice == "3" ]]; then
 
           printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
           printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$qqX_SettingsFile"
@@ -595,23 +595,23 @@ function create_new_drives {
 
         if [[ $NewDriveCreate != "b" ]]; then
 
-          if [[ $MainMenuChoice == "2" ]]; then 
+          if [[ $MainMenuChoice == "2" ]]; then
 
             printf "SecondDrive=\"%s/storage.qcow2\"" "$VM_InstanceName"  >> "$VM_Conf_File"
             "$QEMU_IMG"  create -q -f qcow2 "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" "${SecondDriveCreateSize}G"
             [[ -e "$VM_Conf_Dir/$VM_InstanceName/storage.qcow2" ]] && DriveCreated=2
-        
+
           elif [[ $MainMenuChoice == "3" ]]; then
 
             [[ ! -d "$Default_VM_Folder/SharedDrive" ]] && mkdir "$Default_VM_Folder/SharedDrive"
             "$QEMU_IMG"  create -q -f qcow2 "$Default_VM_Folder/SharedDrive/shared.qcow2" "${SecondDriveCreateSize}G"
             [[ -e "$Default_VM_Folder/SharedDrive//shared.qcow2" ]] && DriveCreated=3
 
-            #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options  
+            #  https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options
             #  Make sure sed command works in --posix  if testing on gnu sed ...
             #  Also note here:
             #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
-            #  sed -i only works in GNU sed  ... 
+            #  sed -i only works in GNU sed  ...
 
             if [[ "$(sed --version | head -n 1)" == *'GNU'* ]] && [[ $(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' | grep -c 'SharedDrive') == 1 ]]; then
 
@@ -621,7 +621,7 @@ function create_new_drives {
               eval cp "$qqX_SettingsFile"  "/tmp/qqX_settings.$(date +%s).old"     # REVIEW add awk version?
               eval sed -i \'"$SharedDriveSettingsLine" c\ SharedDrive=\""$Default_VM_Folder"/SharedDrive/shared.qcow2\"\'  "$qqX_SettingsFile"
 
-            else 
+            else
 
               printColor "\n\n  A drive has been created but the settings file will need to be edited manually \n\n  Here: \n\n"
               grep -B 3 'SharedDrive=' "$qqX_SettingsFile"
@@ -648,12 +648,12 @@ function create_new_drives {
       fi
 
     fi
-      
+
   fi
 
   printf "\n\n  [enter] to return \n\n"
   read -rp "  >  "
-  
+
 }
 
 function_delete_SecondDrive () {
@@ -662,7 +662,7 @@ function_delete_SecondDrive () {
 
   if [[ $(type -p gio 2>/dev/null) ]]; then TrashingAvailable=1 ; else TrashingAvailable= ; fi
 
-  if [[ ! -e "$SecondDrive" ]]; then 
+  if [[ ! -e "$SecondDrive" ]]; then
 
     printf "\n\n  ERROR  a Second Drive  cannot be found"
 
@@ -670,8 +670,8 @@ function_delete_SecondDrive () {
 
     printColor "\n\n  Drive '%s' to be deleted and config amended?" "$SecondDrive"
 
-    if [[ $TrashingAvailable ]]; then 
-      printColor "\n\n  [enter] safely move the drive to the recoverable trash bin"  
+    if [[ $TrashingAvailable ]]; then
+      printColor "\n\n  [enter] safely move the drive to the recoverable trash bin"
       printf "\n\n  [n] keep   [y] yes, PERMANENTLY, I have back-ups ..."
     else
       printColor "\n\n  [enter] use the file manager to move things the trash bin "
@@ -681,7 +681,7 @@ function_delete_SecondDrive () {
     printf "\n\n"
     read -rp "  >  "   DeleteSecond
 
-    if [[ $DeleteSecond == "y" ]]; then 
+    if [[ $DeleteSecond == "y" ]]; then
 
       printf "\n\n  Second Drive being deleted ... "
       rm -f "$SecondDrive"
@@ -707,8 +707,8 @@ function_delete_SecondDrive () {
     fi
 
   fi
-  
-  printColor "\n\n  [enter] to return or continue \n\n" 
+
+  printColor "\n\n  [enter] to return or continue \n\n"
   read -rp "  > "
 
 }
@@ -735,7 +735,7 @@ qcow2_filemanagement_launcher () {
   if [[ $Trace_InputVars ]]; then echo "qqf_Input_Drivepath: $qqf_Input_Drivepath"  ; echo  ;  read -rp "  [enter] to continue  >  "
   fi
 
-  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then 
+  if [[ ! -e "$XDG_GUI_desktop_Folder/qqX.desktop" ]]; then
     printColor "\n\n  ERROR: qqX.desktop file cannot be located. Probable NON-FHS or NON-STANDARD installation problem."
     printf "\n\n  [enter] to return \n\n"
     read -rp "  >  "
@@ -746,7 +746,7 @@ qcow2_filemanagement_launcher () {
   # Read the .desktop file for Terminal_Start instruction
   # Eg. Exec=mate-terminal  --geometry=145x50 --hide-menubar --title=qqX  -e  " /usr/bin/qqX  XDG %f "
   GrepExecLine="$(grep -s Exec "$XDG_GUI_desktop_Folder/qqX.desktop")"
-  if [[ $GrepExecLine ]]; then 
+  if [[ $GrepExecLine ]]; then
     GrepExecLine="${GrepExecLine/'Exec='/}"
     if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then
       Terminal_Start="$(cut -d '/' -f 1 <<< "$GrepExecLine")"
@@ -763,7 +763,7 @@ qcow2_filemanagement_launcher () {
   local UserTerm=
   UserTerm="$(cut -d' ' -f1 <<< "$Terminal_Start")"
 
-  if [[ $qqf_StandaloneInfo ]]; then 
+  if [[ $qqf_StandaloneInfo ]]; then
   printColor "\n\n  This option will set/reset the necessary VM variables of a QF instance."
   printf "\n\n  Use [qf] to open QF in a new terminal, or open by typing 'qqX --qqf' at the cmd prompt."
   printColor "\n\n  [enter] to return  [k] to skip"
@@ -793,21 +793,21 @@ qcow2_filemanagement_launcher () {
       printf "\n"
     } > "/tmp/qqX_nbd_vars"
   fi
-  
+
   if [[ $Trace_InputVars ]]; then echo; cat "/tmp/qqX_nbd_vars"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
-  if [[ $qqf_StandaloneInfo ]]; then 
+  if [[ $qqf_StandaloneInfo ]]; then
     return
-  elif [[ $qqf_SetVars ]]; then 
+  elif [[ $qqf_SetVars ]]; then
     return
-  elif [[ $qqf_Input_Drivepath ]]; then 
-    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+  elif [[ $qqf_Input_Drivepath ]]; then
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then
       eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" "$qqf_Input_Drivepath"  >/dev/null 2>&1 &
     else
       eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" "$qqf_Input_Drivepath" >/dev/null 2>&1 &
     fi
   else
-    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then 
+    if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then
       eval "$Terminal_Start" "$qqX_CustomFolder/custom_filemanage_qcow_drive" >/dev/null 2>&1 &
     else
       eval "$Terminal_Start" "$qqX_MainFolder/qqX_filemanage_qcow_drive" >/dev/null 2>&1 &
@@ -819,7 +819,7 @@ qcow2_filemanagement_launcher () {
 function check_vm_nbd_boot_connected {
 
   local qf_Launch=
-  while pgrep -a qemu-nbd | grep -qi "$VM_InstanceName" || pgrep -a qemu-nbd | grep -q '/dev/nbd3' ; do  
+  while pgrep -a qemu-nbd | grep -qi "$VM_InstanceName" || pgrep -a qemu-nbd | grep -q '/dev/nbd3' ; do
     printf "\n  ERROR - The VM needs to be disconnected from its NBD mounts"
     if pgrep -a bash | grep -q 'qqX_filemanage' ; then printf "\n\n  Switch tabs to the qcow2 file manager"
     else printf "\n\n  [qf] Start the qcow2 file manager"

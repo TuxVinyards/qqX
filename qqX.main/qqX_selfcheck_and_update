@@ -3,12 +3,12 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
-# 	Otherwise:  
+# 	Otherwise:
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,37 +20,37 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses  
+# https://www.gnu.org/licenses
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
 
 
-##  qqX - quickemu quickget X terminal project   
+##  qqX - quickemu quickget X terminal project
 
-#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+#  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg
 #  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
 
 #  Updated 2024/04 to work with changes to fedora 40 and github
 
-#  Make sure shell is set during session to decimal separator of dot 
-#  If LC_ALL=C changes too much, just set the numeric.  
-#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings) 
+#  Make sure shell is set during session to decimal separator of dot
+#  If LC_ALL=C changes too much, just set the numeric.
+#  This may upset some input/output filters ....    CAUTION   (see notes in the main settings)
 
-#  See locale setting discussion:  https://unix.stackexchange.com/a/149129 
+#  See locale setting discussion:  https://unix.stackexchange.com/a/149129
 #  Also  https://unix.stackexchange.com/questions/62316/why-is-there-no-euro-english-locale?rq=1
-#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm   
+#  &   http://www.unicode.org/L2/L2001/01102-POSIX15897.htm
 
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 
-# 'check_for_qqX_updates' runs once only, at qqX start-up in the background, 
+# 'check_for_qqX_updates' runs once only, at qqX start-up in the background,
 #  and a transfer file is used to move the variables to the foreground
 
 # clear foreground vars:
@@ -66,9 +66,9 @@ qqX_Latest_ReleaseFile="/tmp/latest-qqX"
 check_for_qqX_updates() {
 
   # Quietly do a check for new releases and return required vars if update available
-  # API method first, general release page second ... (?)  
+  # API method first, general release page second ... (?)
   # Fix API version for consistency. Better to briefly drop to non-sha than get garbled data.
-  # Using fv --full only detects beta releases 
+  # Using fv --full only detects beta releases
 
   curl --header "X-GitHub-Api-Version:2022-11-28" --disable -sLf -m 12 --retry 4 \
   -o "${qqX_Latest_ReleaseFile}" "https://api.github.com/repos/TuxVinyards/qqX/releases/latest"
@@ -91,7 +91,7 @@ check_for_qqX_updates() {
     fi
   else
     # function 'download_new_release' will react to whether 'qqX_Latest_SecureTarBall_Addr' is available
-    if [[ $Hide_qqX_BetaUpdates ]]; then 
+    if [[ $Hide_qqX_BetaUpdates ]]; then
       qqX_Latest_ReleaseNumber="$(curl -qsf -m 12 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M )"
     else qqX_Latest_ReleaseNumber="$(curl -qsf -m 12 --retry 3  "https://github.com/TuxVinyards/qqX/tags" | grep 's/tag' | fv -M --full)"
     fi
@@ -106,23 +106,23 @@ check_for_qqX_updates() {
       else qqX_Latest_ReleaseType="release"
       fi
       #  If currently using beta:
-      if [[ $qqX_Current_ReleaseType == "beta" ]]; then 
+      if [[ $qqX_Current_ReleaseType == "beta" ]]; then
         Hide_qqX_BetaUpdates=
         # flag up about beta notifications if transitioning from beta to release:
         [[ $qqX_Latest_ReleaseType == "release" ]] && BetaTxReleasePoint=1
       fi
-      # Using TRANSFER FILE for all needed variables,  as check runs in background ...  NB 
-      { printf "\n\n qqX_UpdateAvail=\"1\""   
-        printf "\n\n qqX_Latest_ReleaseNumber=\"%s\""  "$qqX_Latest_ReleaseNumber" 
-        printf "\n\n qqX_Latest_SecureTarBall_Addr=\"%s\""  "$qqX_Latest_SecureTarBall_Addr" 
-        printf "\n\n qqX_Latest_SecureTarSha_Addr=\"%s\""  "$qqX_Latest_SecureTarSha_Addr" 
-        printf "\n\n qqX_Latest_ReleaseType=\"%s\""  "$qqX_Latest_ReleaseType" 
+      # Using TRANSFER FILE for all needed variables,  as check runs in background ...  NB
+      { printf "\n\n qqX_UpdateAvail=\"1\""
+        printf "\n\n qqX_Latest_ReleaseNumber=\"%s\""  "$qqX_Latest_ReleaseNumber"
+        printf "\n\n qqX_Latest_SecureTarBall_Addr=\"%s\""  "$qqX_Latest_SecureTarBall_Addr"
+        printf "\n\n qqX_Latest_SecureTarSha_Addr=\"%s\""  "$qqX_Latest_SecureTarSha_Addr"
+        printf "\n\n qqX_Latest_ReleaseType=\"%s\""  "$qqX_Latest_ReleaseType"
       } > "$qqX_Upd_VarsTmpFile"
     fi
-  fi 
+  fi
 }
 
-# Runs in the background. qqX will run this once. 
+# Runs in the background. qqX will run this once.
 function find_latest_qemu_version {
   printf "" > "/tmp/latest-qemu.txt"
   { floatversion --full -M "$(curl --disable -sLf --retry 3 --max-time 8 "https://github.com/qemu/qemu/tags" | grep -s 'Link--primary')" 2>/dev/null; } > "/tmp/latest-qemu.txt"
@@ -133,14 +133,14 @@ function download_new_release {
 
     printf "\033c \n\n"
     qqX_logo_printf_title  "qqX updater"
-    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest" 
+    printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
 
-    if [[ ! $qqX_UpdateAvail ]] ; then 
+    if [[ ! $qqX_UpdateAvail ]] ; then
       printColor "\n\n  No new release found ...."
-    else 
+    else
       if [[ ! $qqX_Latest_SecureTarBall_Addr ]]; then
         printf "\n\n  Only Non-SHA checked download available (?)\n"
-      else 
+      else
         printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
         AboutRelease="$(tr ',' '\n' < "${qqX_Latest_ReleaseFile}" | grep -sA 12 'body')"
         AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
@@ -164,18 +164,18 @@ function download_new_release {
         [[ $Specified_Updates_Location ]] && printf "\n\n  [s] Specified folder:  %s"  "$Specified_Updates_Location"
         [[ -d "$HOME/Downloads" ]] && printf "\n\n  [d] Downloads folder:  %s"  "$HOME/Downloads"
 
-        if [[ $(pwd) == "$Default_VM_Folder" ]]; then 
+        if [[ $(pwd) == "$Default_VM_Folder" ]]; then
           printColor "\n\n  [enter] Current/Default folder:"
-          printf "  %s "  "$Default_VM_Folder" 
+          printf "  %s "  "$Default_VM_Folder"
         else
-          # not to confuse with '$Current_VM_Folder' 
-          printf "\n\n  [c] Current folder:    %s "  "$(pwd)"  
+          # not to confuse with '$Current_VM_Folder'
+          printf "\n\n  [c] Current folder:    %s "  "$(pwd)"
           printColor "\n\n  [enter] Default VM folder:"
           printf "  %s"  "$Default_VM_Folder"
-        fi 
+        fi
         printf "\n\n"
       fi
-      [[ $WebBrowser ]] && printf "  [w] popup qqX web pages with browser" 
+      [[ $WebBrowser ]] && printf "  [w] popup qqX web pages with browser"
       printf "   or [b] to go back \n\n"
       read -rp "  >  "  qqX_LatestTarBall_Folder
       printf "\n\n"
@@ -199,13 +199,13 @@ function download_new_release {
       # make sure each DOWNLOAD is clean
       [[ -d "$qqX_LatestTarBall_Folder" ]] && rm -r "$qqX_LatestTarBall_Folder" 2>/dev/null
       sleep 0.5; mkdir -p "$qqX_LatestTarBall_Folder" ; sleep 0.5
-      # record where to come back to, when done and not to confuse with '$Current_VM_Folder' 
+      # record where to come back to, when done and not to confuse with '$Current_VM_Folder'
       ReturnFolder="$(pwd)"
       # MOVE to download folder and keep things contained
       cd "$qqX_LatestTarBall_Folder"  || printColor "\n\n  ERROR  making or changing to qqX.releases folder ??"
 
       if [[ $(pwd) != "$qqX_LatestTarBall_Folder" ]]; then
-        # if we are not in the right folder, we need to exit 
+        # if we are not in the right folder, we need to exit
         printf "\n\n  [enter] to return \n\n"
         read -rp "  >  "
       else
@@ -232,7 +232,7 @@ function download_new_release {
           printColor "\n\n  Using standard NON sha256-checked \n\n"
           dlCount="1"
           while [[ $dlCount -le "3" ]]; do
-            qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_Latest_ReleaseNumber}.tar.gz" 
+            qqX_Latest_NonSecure_TarBall="https://github.com/TuxVinyards/qqX/archive/refs/tags/${qqX_Latest_ReleaseNumber}.tar.gz"
             eval curl --disable -Lf -m 20 -o "$qqX_LatestTarBall_Folder/qqX-${qqX_Latest_ReleaseNumber}.tar.gz" "$qqX_Latest_NonSecure_TarBall"
             echo
             if [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
@@ -251,19 +251,19 @@ function download_new_release {
 
         printColor "  File download target %s"  "$qqX_LatestTarBall_Folder"
 
-        if [[ $BetaTxReleasePoint ]]; then 
+        if [[ $BetaTxReleasePoint ]]; then
           printf "\n\n\n  Moving from beta to release ... "
           printf   "\n\n  See the general settings file for more details \n"
         fi
 
         printf "\n\n  Use the installer script to quickly refresh and add new features to your settings file."
         printf "\n\n  All option settings, locations and preferences will be kept."
-        printf "\n\n\n  " 
+        printf "\n\n\n  "
         [[ -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]] && printf "[enter] to run the installer script   "
         printf "[r] to return to main menu \n\n"
         read -rp "  >  "  qqX_UpdateExit
 
-        if [[ $qqX_UpdateExit != "r" ]] && [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then 
+        if [[ $qqX_UpdateExit != "r" ]] && [[ ! -e "qqX-${qqX_Latest_ReleaseNumber}.tar.gz" ]]; then
           printColor "\n\n  ERROR: Download folder/file not found ??"
           printf "\n\n  [enter] to close and retry \n\n"
           read -rp "  >  "
@@ -277,7 +277,7 @@ function download_new_release {
             cp -r "qqX-${qqX_Latest_ReleaseNumber}"/* .
           fi
           sleep 0.5
-          if [[ ! -e "qqX_setup_and_install" ]] ; then 
+          if [[ ! -e "qqX_setup_and_install" ]] ; then
             printColor "\n\n  ERROR extracting the download files ??"
             printf "\n\n  [enter] to close and retry \n\n"
             read -rp "  >  "
@@ -286,7 +286,7 @@ function download_new_release {
         fi
         if [[ $qqX_UpdateExit != "r" ]]; then
           # start the SYSTEM installer (use the posix installer for initial or manual installs)
-          exec  bash -c "$qqX_LatestTarBall_Folder/qqX.system/qqX_system_install  Upgrade" 
+          exec  bash -c "$qqX_LatestTarBall_Folder/qqX.system/qqX_system_install  Upgrade"
         fi
       fi
 

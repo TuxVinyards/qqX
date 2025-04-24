@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-##  qqX - quickemu quickget X terminal project   
+##  qqX - quickemu quickget X terminal project
 
 #   Helper file for qqX settings file updates
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
-# 	Otherwise:  
+# 	Otherwise:
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses 
+# https://www.gnu.org/licenses
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
 
 
 ##  Older code from 'ffX project' (c)  Alex Genovese  Refactored @ 03/2024
@@ -40,28 +40,28 @@ if [[ ! $UserTerm ]]; then
 
   echo "  Checking ...."; echo
 
-  ## Almost all terminal emulators have 'term' as part of the name. 
+  ## Almost all terminal emulators have 'term' as part of the name.
   #  Check here for the notable exception:
   UserTerm="$(pgrep -li  "konsole" )"
 
   TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
-  if [[ $TermWordChk ]]; then 
+  if [[ $TermWordChk ]]; then
     printf "\n  Terminal might be \'%s\' \n\n" "$(basename "$TermWordChk")"
     [[ ! $UserTerm ]] && UserTerm="$(basename "$TermWordChk")"
   else
-    printf "\n  Terminal might be: \n\n" 
+    printf "\n  Terminal might be: \n\n"
     pgrep -a term
     printf "\n\n"
   fi
 
   if [[ $UserTerm ]]; then
-    printColor "\n\n  UserTerm is %s ? " "$UserTerm" 
-    printf "\n\n  Is this correct?  [enter] yes  [n] no, possibly not \n\n" 
+    printColor "\n\n  UserTerm is %s ? " "$UserTerm"
+    printf "\n\n  Is this correct?  [enter] yes  [n] no, possibly not \n\n"
     read -rp "   >  "   FirstTermChk
     echo
     if [[ $FirstTermChk == "n" ]]; then UserTerm=; else UserTerm_Found=1; fi
   fi
-  
+
 fi
 
 if [[ $WSL_Install ]]; then
@@ -69,26 +69,26 @@ if [[ $WSL_Install ]]; then
   # add basic suggestion
   [[ $(type -p "gnome-terminal") ]] && UserTerm="gnome-terminal"
 
-elif [[ ! $UserTerm ]]; then 
+elif [[ ! $UserTerm ]]; then
 
   echo "  Checking ...."; echo
-  # Scan for processes with 'term' as part of the name  (& ignore lines with scriptname ) 
-  # https://stackoverflow.com/questions/35006457/choosing-between-0-and-bash-source & http://mywiki.wooledge.org/BashFAQ/001  
+  # Scan for processes with 'term' as part of the name  (& ignore lines with scriptname )
+  # https://stackoverflow.com/questions/35006457/choosing-between-0-and-bash-source & http://mywiki.wooledge.org/BashFAQ/001
 
   TermGrep=()
-  
+
   while IFS= read -r Line; do
     [[ "$Line" == *"qqX_termfind"* ]] && continue
-    TermGrep+=("$Line") 
+    TermGrep+=("$Line")
   done  <  <(pgrep -li "term")
-  
-  TermCount="${#TermGrep[*]}" 
+
+  TermCount="${#TermGrep[*]}"
 
   if [[ "$TermCount" -eq 1 ]]; then
-   
+
     UserTerm_PID="${TermGrep[0]}"
     UserTerm_PID="$(echo "$UserTerm_PID" | tr -cd '[:digit:]')"
- 
+
   elif [[ "$TermCount" -gt 1 ]]; then
 
     printf "\n  %s\n\n" "${TermGrep[@]}"
@@ -113,7 +113,7 @@ elif [[ ! $UserTerm ]]; then
      fi
   fi
 
-  if [[ $UserTerm ]] && [[ ! $(type -p "$UserTerm") ]]; then UserTerm= 
+  if [[ $UserTerm ]] && [[ ! $(type -p "$UserTerm") ]]; then UserTerm=
   fi
 
   if [[ ! $UserTerm ]]; then
@@ -126,9 +126,9 @@ fi
 
 while [[ ! $UserTerm_Found ]]; do
 
-  if [[ ! $UserTerm ]]; then 
+  if [[ ! $UserTerm ]]; then
 
-    if [[ ! $WSL_Install ]]; then 
+    if [[ ! $WSL_Install ]]; then
 
       PID_Term_ProbeArr=()
       echo
@@ -162,9 +162,9 @@ while [[ ! $UserTerm_Found ]]; do
         GrandParentPID="$(grep -i -e "PPid:" "/proc/${GrandParentPID:-$PPID}/status")"
         GrandParentPID="$(echo "$GrandParentPID" | tr -cd '[:digit:]')"
         #  See  http://mywiki.wooledge.org/BashFAQ/073
-        
+
         [[ $TermFind_ReRun ]] && echo "  *******************************" && echo
-        
+
         if [[ "$GrandParentPID" -gt 1 ]]; then
 
           if [[ $TermFind_ReRun ]]; then
@@ -180,20 +180,20 @@ while [[ ! $UserTerm_Found ]]; do
           UserTerm="$GrandParent_Name"
           PID_Term_ProbeArr+=("$UserTerm")
           [[ $TermFind_ReRun ]] && echo "  GrandParent_Name is $GrandParent_Name"; echo
-          
+
         fi
-        
+
       done
 
       TermWordChk="$(pgrep -a term | grep qqX | awk '{print $2}')"
-      if [[ $TermWordChk ]]; then  printf "\n  Terminal might also be \'%s\' \n" "$(basename "$TermWordChk")" 
+      if [[ $TermWordChk ]]; then  printf "\n  Terminal might also be \'%s\' \n" "$(basename "$TermWordChk")"
       fi
 
     fi
 
     if [[ $TermFind_ReRun || $WSL_Install ]]; then
 
-      if [[ $ErrorPID ]] && [[ ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID= 
+      if [[ $ErrorPID ]] && [[ ! $WSL_Install ]]; then  echo "  PID not found ...." ; echo ; ErrorPID=
       fi
 
       echo
@@ -243,7 +243,7 @@ while [[ ! $UserTerm_Found ]]; do
         [[ $ProcessName == "bash" ]] || [[ $ProcessName == "dash" ]] || [[ $ProcessName == "sh" ]] && ProcessShellpoint="$i"  &&  ((ProcessShellpoint+=1))
         ((i+=1))
       done
-      
+
       if [[ $ProcessShellpoint ]]; then  UserTerm="${PID_Term_ProbeArr[$ProcessShellpoint]}"; else  UserTerm="${PID_Term_ProbeArr[0]}"; fi
       # Usually either the first one or the one after the first occurance of 'sh'
       ProbTerm=" Probably"
@@ -252,7 +252,7 @@ while [[ ! $UserTerm_Found ]]; do
 
     TermFind_ReRun=1
     GrandParentPID=
-    
+
   fi
 
   # Add any modifiers here, if needed
@@ -262,7 +262,7 @@ while [[ ! $UserTerm_Found ]]; do
     echColor " $ProbTerm UserTerm is $UserTerm" ; echo
     [[ $UserTerm == "gnome-terminal" ]] && echo "  Note: 'gnome-terminal' is also used by various desktops, such as Mint Cinnamon, Budgie and Ubuntu ..." && echo
     echo "  Is this correct?  [enter] yes, probably ...   [n] no, I am still not sure " ; echo
-    read -rp "  >  "   
+    read -rp "  >  "
     echo
     if [[ $REPLY == "n" ]]; then UserTerm= ; UserTerm_Found= ; else  UserTerm_Found=1 ; fi
   fi

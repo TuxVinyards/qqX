@@ -3,17 +3,17 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 #  GENERAL COLOR & THEMING   (see settings)
 
@@ -28,12 +28,12 @@
 # non-color ECHO TRAP, mainly designed to capture the technical output that quickemu doesn't send to log file
 printf "\n"  > "/tmp/qqX_echo_output.log"
 
-echo () { 
+echo () {
 
   if [[ $UseCustomBootArgs ]]; then
-    command echo "$@" >>  "/tmp/qqX_echo_output.log" ; 
-  else 
-    command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ; 
+    command echo "$@" >>  "/tmp/qqX_echo_output.log" ;
+  else
+    command echo "$@" | tee -a  "/tmp/qqX_echo_output.log" ;
   fi
 
 }
@@ -55,7 +55,7 @@ echColor () {
 			tput sgr0
 		else
 			tput setaf "$X_Shade"
-			echo "$@"          			
+			echo "$@"
 			tput sgr0
 		fi
 	else
@@ -69,7 +69,7 @@ echColor () {
 # General default title:
 qqX_title="[quickemu quickget X terminal project] - $qqX_Version "
 
-## qqX chrome up  
+## qqX chrome up
 
 qqX_logo() {
   # not for use during vm boot sequences
@@ -79,7 +79,7 @@ qqX_logo() {
 }
 
 qqX_logo_plain() {
-  # early loader 
+  # early loader
   echo "  _    _   \/   "
   echo " (_|  (_|  /\ "
   echo "   |.   |.    "
@@ -112,7 +112,7 @@ qqX_logo_printf_title() {
 
 
 function exit {
-  
+
   # trap to keep terminal open if started by mouse click  -t secs
   # or to stop sourced quickemu quitting as 'normal' procedure   (tput resets any hidden cursors)
   # https://unix.stackexchange.com/questions/220330/hide-and-unhide-cursor-with-tput
@@ -124,19 +124,19 @@ function exit {
   elif [[ $1 ]] && [[ ! $NoExit ]]; then
     printf "\n\n"
     printColor "  ERROR :  [i] ignore & continue  [q] quit  \n\n"
-    read -rp  "  >  "  
+    read -rp  "  >  "
     ExitTrap=
-    printf "\n\n  Confirm:  [Enter] to quit  [r] to return and retry something else \n\n"  
+    printf "\n\n  Confirm:  [Enter] to quit  [r] to return and retry something else \n\n"
     read -rp "  >  "  ExitTrap
-    if [[ ! $ExitTrap ]]; then 
+    if [[ ! $ExitTrap ]]; then
       tput cnorm
       command exit "$@"
     else
       return 0
     fi
 
-   elif [[ ! $disk_img ]]; then 
-    # don't exit on quickemu error no disk defined, this is handled by qqX  REVIEW  
+   elif [[ ! $disk_img ]]; then
+    # don't exit on quickemu error no disk defined, this is handled by qqX  REVIEW
     return
 
   fi
@@ -176,11 +176,11 @@ file_manager_not_found_message () {
 show_qqX_title_bar() {
 
   if [[ ! $LatestQEMU ]] && grep -qsE ^'[0-9]' "/tmp/latest-qemu.txt"; then  LatestQEMU="$(cat "/tmp/latest-qemu.txt")"; fi
-  
+
   qqX_logo_printf_title  "$qqX_title" ;  printf "\n"
   printf "\n\n  Currently wrapping:  QEMU %s" "$QEMU_VER_LONG"
-  if [[ $LatestQEMU ]]; then 
-    if [[ $QEMU_VER_LONG == "$LatestQEMU" ]]; then  printf "  (latest)   " 
+  if [[ $LatestQEMU ]]; then
+    if [[ $QEMU_VER_LONG == "$LatestQEMU" ]]; then  printf "  (latest)   "
     else printf "  (latest: %s)   " "$LatestQEMU"
     fi
   else printf "   "
@@ -189,11 +189,11 @@ show_qqX_title_bar() {
 
   [[ $VerboseArgs ]] && printColor  "  (Verbose Args)"
 
-  if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
-    printf "\n\n  Using Code: %s " "$QE_SourcePath" 
-    [[ $CodingHotSwap ]] && CodingHotSwapShow= 
+  if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then
+    printf "\n\n  Using Code: %s " "$QE_SourcePath"
+    [[ $CodingHotSwap ]] && CodingHotSwapShow=
   fi
-  
+
   PWD_Folder="$(pwd)"
   HideFolderTitleBar=
 
@@ -201,14 +201,14 @@ show_qqX_title_bar() {
     [[ $TF ==  "$PWD_Folder" ]] || [[ $PWD_Folder ==  "$Default_VM_Folder" ]] &&  HideFolderTitleBar=1
   done
 
-  if [[ ! $Current_VM_Folder ]]; then 
+  if [[ ! $Current_VM_Folder ]]; then
     Current_VM_Folder="$Default_VM_Folder"
     cd "$Default_VM_Folder" || printf "\n\n  ChromeUp ERROR sorting Current Folder"
   fi
 
-  if [[ ! $HideFolderTitleBar ]]; then  
+  if [[ ! $HideFolderTitleBar ]]; then
     printf "\n\n  Default Folder: %s   Current Folder: %s \n"  "$Default_VM_Folder" "$Current_VM_Folder"
-  else  
+  else
     printf "\n"
   fi
 
@@ -218,29 +218,29 @@ function show_qqX_general_help {
 
   HelpSelect=
 
-  while true; do 
+  while true; do
 
     if [[ $1 ]]; then  HelpSelect="$1" ; shift ; fi
 
-    printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"  
+    printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"
     printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
     printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
 
     cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
 
     printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation   Release Notes:  https://github.com/TuxVinyards/qqX#release-notes"
-    printColor  "\n\n  [w] Online: qqX WIKI PAGES    Offline: [f] FreeBird notes  [c] command line & mouse notes  [enter] to RETURN"  
+    printColor  "\n\n  [w] Online: qqX WIKI PAGES    Offline: [f] FreeBird notes  [c] command line & mouse notes  [enter] to RETURN"
     printf "\n\n"
     [[ ! $HelpSelect ]] && read -rp "  >  "  HelpSelect
 
-    if [[ $HelpSelect == "c" ]]; then   
-      show_CLI_usage  
+    if [[ $HelpSelect == "c" ]]; then
+      show_CLI_usage
       printf "\n"
       read -rp  "   >  " HelpSelect
 
-    elif [[ $HelpSelect == "f" ]]; then   
+    elif [[ $HelpSelect == "f" ]]; then
       printf "\n  Hot-Swappable from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
-      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 '# FreeBird or FreeSpirit are recommended'| tr '#' ' ' 
+      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 '# FreeBird or FreeSpirit are recommended'| tr '#' ' '
       if [[ -e "$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" ]]; then
         printf "\n\n  Custom =   Default_VM_Folder > qqX.custom  > %s " "$("$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" --version)"
       fi
@@ -255,7 +255,7 @@ function show_qqX_general_help {
       printf "\n  Opening Browser ... \n"
       (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help"  & ) || web_browser_not_found_message
       sleep 1
-    else  
+    else
       HelpSelect=
       break
     fi
@@ -275,7 +275,7 @@ function multi_instance_checks {
   AnotherQQ=
 
   # Make sure that all current processes have been statted properly before moving on.
-  # pgrep -an is not reliable and pgrep sub-shell creates another pid too. 
+  # pgrep -an is not reliable and pgrep sub-shell creates another pid too.
   # BUT new PID always goes on end of list so check for this until no 'kworker' grep errors
   sleep 0.2
   i=0
@@ -288,26 +288,26 @@ function multi_instance_checks {
       CurrentQQ="$(awk '{print $1}' <<< "$CurrentQQ_FullLine")"
       break
     fi
-    if [[ $i -gt 25 ]]; then 
+    if [[ $i -gt 25 ]]; then
       printColor "\n\n ERROR statting current PID > restart required"
-      printf "\n\n\n  [enter] to close \n\n" 
+      printf "\n\n\n  [enter] to close \n\n"
       read -rp "  >  "
     fi
   done
 
   # All qqX, exactly, will exclude 'qqX_copy_over' but doesn't make reading the parameters and variants too easy
-  # Also pgrep -aAxi qqX, with x, doesn't count itself ..... but -afi does .... REVIEW 
+  # Also pgrep -aAxi qqX, with x, doesn't count itself ..... but -afi does .... REVIEW
   # Note: needs -i ignore case, so that CLI starts using 'qqx' (lower) get counted
 
   AnotherQQ="$(pgrep -aAi qqX 2>/dev/null)"
 
   # Also Note: CL launched running of qcow2 file management happens before this script is called. See qqX start.
-  # Running CL instances will show up with 'pgrep -aAxi qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar. 
+  # Running CL instances will show up with 'pgrep -aAxi qqX' as 'pid /bin/bash /usr/bin/qqX --qqf' or similar.
   # With pgrep -afi qqX_filemanage as: pid /bin/bash /usr/share/qqX/qqX.main/qqX_filemanage_qcow_drive --qqf
 
   if [[ $ShowProcesses ]]; then
-    echo 
-    echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"  
+    echo
+    echo; echo "CurrentQQ  $CurrentQQ"; echo; echo "LastField  $CurrentQQ_LastField"
     echo; echo "AnotherQQ:"; echo; echo "$AnotherQQ"; echo
     echo; echo "QF_exit_to_Main = $QF_exit_to_Main"; echo
     read -rp " >  "
@@ -320,25 +320,25 @@ function multi_instance_checks {
     esac
   fi
 
-  if [[ $AnotherQQ ]]; then 
+  if [[ $AnotherQQ ]]; then
     OtherQQ_MainArr=()
     OtherQQ_F_Arr=()
     mapfile -t AnotherQQ_Arr <<< "$AnotherQQ"
     for QQ in "${AnotherQQ_Arr[@]}"; do
       if [[ "$QQ" != *"$CurrentQQ"* ]]; then
-        if [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage'* ]]; then 
+        if [[ "$QQ" == *'--qqf'* ]] || [[ "$QQ" == *'qqX_filemanage'* ]]; then
           OtherQQ_F_Arr+=("$(awk '{print $1}' <<< "$QQ")")
-        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then 
+        elif [[ "$QQ" != *'qqX_copy_over'* ]]; then
           OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
-        elif [[ $QF_exit_to_Main ]] && [[ "$QQ" != *'qqX_copy_over'* ]]; then  
+        elif [[ $QF_exit_to_Main ]] && [[ "$QQ" != *'qqX_copy_over'* ]]; then
           OtherQQ_MainArr+=("$(awk '{print $1}' <<< "$QQ")")
         fi
       fi
     done
-    # Starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist. 
+    # Starting Main via the .qcow2 route needs to counted too. And only 1 QF instance should exist.
     # .qcow2 remains when 'exit to main' but changes to 'filemanage' when switching to QF
     # while elif [[ "$QQ" == *'.qcow2'* ]]; gets included in [[ "$QQ" != *'qqX_copy_over'* ]]
-    if [[ $ShowProcesses ]]; then 
+    if [[ $ShowProcesses ]]; then
       echo; declare -p AnotherQQ_Arr; echo
       echo; declare -p OtherQQ_MainArr; echo
       echo; declare -p OtherQQ_F_Arr; echo
@@ -346,7 +346,7 @@ function multi_instance_checks {
     fi
   fi
 
-  if [[ $AnotherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then 
+  if [[ $AnotherQQ ]] && [[ $CurrentQQ_mode == "main" ]] && [[ "${#OtherQQ_MainArr[@]}" -ge 1 ]]; then
 
     tput sc
     qqX_logo_printf_title  "CAUTION: more than one instance of qqX appears to be running "
@@ -361,7 +361,7 @@ function multi_instance_checks {
 
     [[ $MultiQuit == "q" ]] && exit directly
 
-    if [[ $MultiQuit == "k" ]]; then 
+    if [[ $MultiQuit == "k" ]]; then
       if [[ $(pgrep kvm 2>/dev/null) ]]; then printColor "\n\n  CAUTION: Check for distros that may be running. Force closing can corrupt VM file systems ...."
       else
         printf "\n\n  Killing desktop started instances will close the terminal windows."
@@ -382,12 +382,12 @@ function multi_instance_checks {
     fi
 
     tput rc ; tput ed  #  clear back the last lines to sc (set cursor)
-    
+
   fi
 
   if [[ "$(pgrep quickgui 2>/dev/null)" ]] ; then
 
-    printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running " 
+    printColor "\n\n  WARNING: an instance of QUICKGUI appears to be running "
     printf "\n\n  Both this program and qqX do have an amount of cross-link protection, however note that:"
     printf "\n\n  Stopping an instance shown as running in QuickGUI may stop an instance started in qqX. \n\n"
     read -rp "  [q] to quit    [enter] to continue  > "   MultiQuit

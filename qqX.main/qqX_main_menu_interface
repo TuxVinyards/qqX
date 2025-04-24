@@ -3,36 +3,36 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009
 
 
-## Check for Custom Main Menu 
+## Check for Custom Main Menu
 
-if [[ -e "$Default_VM_Folder/qqX.custom/custom_main_menu" ]]; then 
+if [[ -e "$Default_VM_Folder/qqX.custom/custom_main_menu" ]]; then
 
   #  CAUTION  creating a custom main menu may put you out-of-sync with any qqX updates
   #  Changes here are different to VM selector styles which don't change the underlying code
 
   #  First stage work only. Expect further modularization, possibly with language options (?).
 
-  source "$Default_VM_Folder/qqX.custom/custom_main_menu" 
+  source "$Default_VM_Folder/qqX.custom/custom_main_menu"
 
 else
 
   function main_menu_interface {
 
     # Default to off as can cause confusion when running certain distro installers as to which drive is being used.
-    if [[ $LiveBoot ]] && [[ ! $SharedDrive_Mount ]]; then 
+    if [[ $LiveBoot ]] && [[ ! $SharedDrive_Mount ]]; then
       SharedDrive_Conf="no-shared"
       set_drive_paths
     fi
@@ -46,20 +46,20 @@ else
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
       # force verbose boot on Windows NEW INSTALLS
-      if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
-        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev. 
+      if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then
+        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev.
         VerboseArgs=1
         printColor "   >> Windows install: Verbose mode enabled << \n\n"
         [[ $WebBrowser ]] && printColor "  [qW]"
         printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
       else
         printf "   [bm] > "
-        if [[ $BootStyle == "fast" ]]; then 
+        if [[ $BootStyle == "fast" ]]; then
           printf " fastboot"
           if [[ $Mounted_ISO ]]; then printf "  (toggle to enable ISO boot)"
           else printf "  (toggle)"
           fi
-        else  
+        else
           printColor " boot menu enabled"
           printf "  (toggle)"
         fi
@@ -84,7 +84,7 @@ else
       if [[ $BootStyle == "fast" ]]; then printf "   [bm] boot menu > allow guest efi/bios"
       else printf "   [fb] use fast boot menu "
       fi
-      printf  "\n\n  [tune] config tune-up wizard   [disk]  resize or repair existing drives   [rtv] reset Tiano VMF Vars" 
+      printf  "\n\n  [tune] config tune-up wizard   [disk]  resize or repair existing drives   [rtv] reset Tiano VMF Vars"
 
       printColor "\n\n  ----------------------------------------------------------------------------"
       printf "\n\n  [FS] Switch to FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] "
@@ -96,8 +96,8 @@ else
       if [[ -e "$QemuArgsCustomFile" ]]; then printf "\n\n  [cd]  delete the custom boot file "
       else printf "\n\n  [cc]  create a custom boot file "
       fi
-      if [[ $VerboseArgs ]]; then printf  "  [v] hide verbose boot"	
-      else  printf  "  [v] show verbose boot args"	
+      if [[ $VerboseArgs ]]; then printf  "  [v] hide verbose boot"
+      else  printf  "  [v] show verbose boot args"
       fi
       printf  "   [xa]  view or edit extra qemu args  "
 
@@ -110,8 +110,8 @@ else
     printf "\n"
 
     if [[ ! $ShowUtilsMenu ]]; then
-    
-      if [[ -e "$QemuArgsCustomFile" ]]; then 
+
+      if [[ -e "$QemuArgsCustomFile" ]]; then
 
         #QEMU_Default_SystemType= #QEMU_Default_MachineType=  in the general settings file BUT if not present then = 'qemu-system-x86_64'
         MenuCustomSystem="$(grep 'qemu-system' "$QemuArgsCustomFile" | grep -v '#' )"
@@ -120,7 +120,7 @@ else
         MenuCustomSystemBaseName="$(tr -cd '[:graph:]' <<<"$MenuCustomSystemBaseName")"
 
         if [[ $QEMU_Default_SystemType == "$MenuCustomSystemBaseName" ]]; then ShowDefault_Hybrid=1 ; else ShowDefault_Hybrid= ; fi
-      
+
         if [[ $ShowDefault_Hybrid ]] ; then ShowCustomBootStyle= ; else ShowCustomBootStyle=1 ; fi
 
         [[ $ForceCustomBootStyle == "hide" ]] && ShowCustomBootStyle=  && ShowDefault_Hybrid=1
@@ -131,15 +131,15 @@ else
       else
 
         #[[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]] &&  printColor "\n\n  Warning:  Custom boot file removed or name has changed?  Re/Select [vm] to refresh \n"
-        if [[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]]; then   
+        if [[ $ShowCustomBootStyle || $ShowDefault_Hybrid ]]; then
           SettingsFileAdjusted=1
-          refresh_sources_and_load_VM_arrays 
+          refresh_sources_and_load_VM_arrays
         fi
 
       fi
 
       print_kvm_status_warnings
-      
+
       if [[ $ShowCustomBootStyle ]] ; then
 
         # NB  "$QemuArgsCustomFile" may exist BUT [c] $UseCustomBootArgs remains menu selectable
@@ -149,28 +149,28 @@ else
 
       else
 
-        if [[ $ShowDefault_Hybrid ]]; then 
-          printColor "\n\n  [c]   start VM using custom args" 
+        if [[ $ShowDefault_Hybrid ]]; then
+          printColor "\n\n  [c]   start VM using custom args"
           printf "      [ce] edit custom args file    [qd] open Qemu docs in browser"
         fi
 
         printColor  "\n\n  [d]   start with SDL display"
-        
-        if [[ $guest_os == "windows" ]]; then  printColor "   (size as set in Windows)" 
-        elif [[ $guest_os == "macos" ]] && [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then  printColor " (size determined by MacOS with this QE version)" 
-        elif [[ "$SDL_ScreenSize_Cmd" == *screenpct* ]]; then printColor " (%s%%)    [df]  97%% "  "$SDL_ScreenPercent"  
-        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]] && [[ $guest_os == "macos" || $guest_os == "windows" ]]; then printColor " (%s) "  "$SDL_ScreenSize" 
-        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  97%% "  "$SDL_ScreenSize"  
+
+        if [[ $guest_os == "windows" ]]; then  printColor "   (size as set in Windows)"
+        elif [[ $guest_os == "macos" ]] && [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then  printColor " (size determined by MacOS with this QE version)"
+        elif [[ "$SDL_ScreenSize_Cmd" == *screenpct* ]]; then printColor " (%s%%)    [df]  97%% "  "$SDL_ScreenPercent"
+        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]] && [[ $guest_os == "macos" || $guest_os == "windows" ]]; then printColor " (%s) "  "$SDL_ScreenSize"
+        elif [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then printColor " (%s)     [df]  97%% "  "$SDL_ScreenSize"
         elif [[ $SDL_ScreenSize_Error ]]; then printf " (%s%% %s > see settings)"  "$SDL_ScreenPercent"  "$SDL_ScreenSize_Error"
         fi
 
-        if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) " 
+        if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) "
         else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
 
         printColor "\n\n  [g]   start with GTK display          "
 
-        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"  
-        else printColor "[gl] ON > toggle-off" ; fi   
+        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"
+        else printColor "[gl] ON > toggle-off" ; fi
 
         [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
 
@@ -182,7 +182,7 @@ else
 
     [[ $DriveLocationError ]] &&  printColor "\n\n  %s"  "$DriveLocationError"
 
-    if [[ $ConfSettingsAdjusted || $SettingsFileAdjusted ]]; then 
+    if [[ $ConfSettingsAdjusted || $SettingsFileAdjusted ]]; then
 
       if [[ $SelectArrayError ]]; then printColor "\n\n  Settings Error = %s"  "$SelectArrayError" ; SelectArrayError=
       elif [[ $DefaultFolderError ]]; then printColor "\n\n  Settings Error = Default Folder NOT found" ; DefaultFolderError=
@@ -201,46 +201,46 @@ else
       SyncDateOld="$(cat "$VM_InstanceName/rtv.date.txt" 2>/dev/null)"
       LastRtvUpd="$((SyncDateNow - SyncDateOld))"
 
-      if [[ $RtvManualOnly ]]; then 
+      if [[ $RtvManualOnly ]]; then
 
-        if [[ "$VM_InstanceName" == *macos* ]]; then 
+        if [[ "$VM_InstanceName" == *macos* ]]; then
           [[ ! $RtvMacosRmdOff ]] && [[ $LastRtvUpd -gt 2592000 ]] && printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
-        elif [[ ! $RtvStdRmdOff ]] && [[ $LastRtvUpd -gt 10368000 ]]; then  
+        elif [[ ! $RtvStdRmdOff ]] && [[ $LastRtvUpd -gt 10368000 ]]; then
           printColor "\n\n  [rtv]  run Tiano update - last run %d days ago"  "$((LastRtvUpd/86400))"
-        fi  
-        
-        #  Reminders @ older than 120 days std vars or 30 for mac as has binaries (in epoch seconds)  
-        #  Auto-updates: do all at 30 days.  Status message for std vars probably OTT, not needed (?)   REVIEW 
+        fi
+
+        #  Reminders @ older than 120 days std vars or 30 for mac as has binaries (in epoch seconds)
+        #  Auto-updates: do all at 30 days.  Status message for std vars probably OTT, not needed (?)   REVIEW
 
       elif [[ $LastRtvUpd -gt 2592000 ]]; then
 
-         if [[ "$VM_InstanceName" == *macos* ]]; then 
+         if [[ "$VM_InstanceName" == *macos* ]]; then
           printf "\n\n  Tiano Core Security Updates .....  "
           refresh_tiano_vars &
-          wait "$!" 
+          wait "$!"
           RtvMacGet="$(cat "$VM_Conf_Dir/$VM_InstanceName/rtv.status.log" 2>/dev/null)"
           [[ $RtvMacGet == "Okay" ]] && printf "All Good"
           [[ $RtvMacGet == "Fail" ]] && printColor "\n\n  Failed to update. See rtv logs in the VM folder ...."
         else  refresh_tiano_vars &
-        fi 
+        fi
 
       fi
 
     else  date +%s > "$VM_Conf_Dir/$VM_InstanceName/rtv.date.txt"  2>/dev/null
-        
+
     fi
 
-    dev_loop_check 
+    dev_loop_check
 
     if [[ "$VM_InstanceName" == *macos* && "$VM_InstanceName" == *sonoma* ]]; then
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
     fi
 
     # use du with -L on instance menus as are individual totals only and some instances can be symbolically linked
-    
+
     InstanceQcow2_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep qcow2 | awk '{print $1}' 2>/dev/null)"
 
-    if [[ $InstanceQcow2_Sizes ]]; then  
+    if [[ $InstanceQcow2_Sizes ]]; then
       InstanceQcow2_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceQcow2_Sizes" 2>/dev/null)"
       InstanceQcow2_Sizes="$(paste -sd+  <<< "$InstanceQcow2_Sizes" | bc -l  2>/dev/null)"
       InstanceQcow2_Sizes="$(bc <<< "scale=1; $InstanceQcow2_Sizes/1000000")"
@@ -251,7 +251,7 @@ else
 
     InstanceISO_Sizes="$(du -a -L -t 30M "$VM_InstanceName" | grep -e 'iso' -e 'img' | awk '{print $1}' 2>/dev/null)"
 
-    if [[ $InstanceISO_Sizes ]]; then  
+    if [[ $InstanceISO_Sizes ]]; then
       InstanceISO_SizesCount="$(grep -Ec ^'[1-9]' <<< "$InstanceISO_Sizes" 2>/dev/null)"
       InstanceISO_Sizes="$(paste -sd+  <<< "$InstanceISO_Sizes" | bc -l  2>/dev/null)"
       InstanceISO_Sizes="$(bc <<< "scale=2; $InstanceISO_Sizes/1000000")"
@@ -261,28 +261,28 @@ else
     fi
 
     printf  "\n\n  [gt]  quickget a new distro   [i]  VM drives info details   "
-    printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount" 
+    printf "Disks: %s (%s)  "  "${InstanceQcow2_Sizes}G" "$InstanceQcow2_SizesCount"
     printf "ISO's: %s (%s)  "  "${InstanceISO_Sizes}G" "$InstanceISO_SizesCount"
     [[ $(ls "$VM_InstanceName"/*.OLD.qcow2 2>/dev/null) ]] && printColor "(backup disk present)"
 
     printf  "\n\n"
     filter_and_flag_qemu_errors
 
-    if [[ $QemuErrorAlert ]]; then 
+    if [[ $QemuErrorAlert ]]; then
       printColor "  [ql]  show qemu error log"
-    elif [[ $FileManager ]]; then 
+    elif [[ $FileManager ]]; then
       if [[ $(type -p "$FileManager") ]]; then
         if [[ $LiveBootMissing ]]; then  printColor "  [f]   open VM folder"
         else printf "  [f]   open VM folder"
         fi
         printf "    [qf] | [qqf]  open qcow2"
         printf " in file manager"
-      else  printColor "  [set]  ERROR file manager not found" 
+      else  printColor "  [set]  ERROR file manager not found"
       fi
     fi
 
-    if [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]]; then 
-      # @ feb 2025 note that 'ubuntustudio-dvd' is now in the standard cdimages repo and has no dvd suffix  REVIEW 
+    if [[ "$VM_InstanceName" == *'daily'* || "$VM_InstanceName" == "ubuntustudio-dvd" ]] && [[ $(ls "$VM_InstanceName/"*devel.iso 2>/dev/null) ]]; then
+      # @ feb 2025 note that 'ubuntustudio-dvd' is now in the standard cdimages repo and has no dvd suffix  REVIEW
       # record d/l data for daily-live alerts
 
       LastZsync=
@@ -294,7 +294,7 @@ else
         New_Zsync_SHA="$(curl -sf --max-time 3 "$Zsync_SHA_URL" | grep -s amd64 | cut -d' ' -f1 &)"
       fi
 
-      #  Live VMs where zsync updates the iso file.   
+      #  Live VMs where zsync updates the iso file.
       if [[ "$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")" ]]; then
         SyncDateNow="$(date +%s)"
         SyncDateOld="$(tr -cd '[:digit:]' 2>/dev/null < "$VM_InstanceName/zsync.date.txt")"
@@ -302,29 +302,29 @@ else
         printf "\n\n"
         if [[ $LastZsync -gt 259200 ]]; then  printf "  [z]   daily-live - last zsync over %d hrs ago"  "$((LastZsync/3600))"
         else  printf "  [z]   daily-live - last zsync %d hrs ago"  "$((LastZsync/3600))"
-        fi  #  older than 3 days (in epoch seconds)  REVIEW  
+        fi  #  older than 3 days (in epoch seconds)  REVIEW
         if [[ $LastZsync -gt 864000 ]]; then printColor "  (out-of-date)"  # 10 days  (NB esp. important at change of url naming at xx.04 etc)
-        elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then 
+        elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then
           Curr_Zsync_SHA="$(awk '{print $1}' "$VM_InstanceName/dl-sha.txt")"
           if [[ ${Curr_Zsync_SHA// /} == "${New_Zsync_SHA// /}"  ]]; then printf "  (up-to-date)"; else printColor "  (update available)"
           fi
         else
-          # if check is not yet available 
+          # if check is not yet available
           printf "  (refresh to check)"
         fi
       else  date +%s > "$VM_InstanceName/zsync.date.txt"
       fi
 
-      ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget 
+      ##  ZSYNC   See  functions 'get_ubuntu' & 'list_csv' in quickget
 
-        # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names 
+        # qqX: NB only the iso gets dubbed with 'devel' suffix, otherwise VMs they keep their names
         # eg  'ubuntu-mate-daily-live' 'ubuntustudio-dvd' 'ubuntu-daily-canary'
         # An actual 'ubuntu-devel' release or folder doesn't seem to ever get created or offered.
         # Presume release=devel (@2023/07) has now been superseded, or was merely intended as an indicative name only ...
         # Also note that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-        # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism? 
+        # but Zsync can now give these files root protection so this removal may not work ...   REVIEW  Add a qqX copying mechanism?
 
-      # Sort out the quickget / function_quick_get_wrap  call & the var/flags   
+      # Sort out the quickget / function_quick_get_wrap  call & the var/flags
       # Expect these to need updating from time to time ...
 
       # @ feb 2025 improve for ubuntu variants, for daily-live, and for renamed instances
@@ -345,42 +345,42 @@ else
       Zsync_Release_Name="${Zsync_RecordedName,,}"
       Zsync_Release_Name="${Zsync_Release_Name/"${Zsync_OS_Name}-"/}"
       Zsync_Updatable_ISO=1
-      # zero main menu flag that sets only if updater run from main 
+      # zero main menu flag that sets only if updater run from main
       MainMenuZsync=
 
-    else 
+    else
 
       Zsync_Updatable_ISO=
       Zsync_OS_Name=
       Zsync_Release_Name=
 
     fi
-    
+
     printf  "\n\n  [set] open settings file in text editor  [tx] translate settings in browser  [conf] view or edit .conf file"
     printf  "\n\n"
 
-    if [[ $qqX_UpdaterPID ]] && [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then
-      source "$qqX_Upd_VarsTmpFile" ; qqX_UpdaterPID= 
-    fi
+    if [[ $(cat "$qqX_Upd_VarsTmpFile" 2>/dev/null) ]]; then source "$qqX_Upd_VarsTmpFile"; fi
 
     check_if_disk_needs_a_cleanup
 
     if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  printColor "  DISK.QCOW2 ERROR  %s  \n\n  [disk] repair utils "  "$DiskChkStatus"
-    elif [[ $DiskDisparity == "1" ]]; then  printColor "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
+    elif [[ $DiskDisparity -ge "4" ]]; then  printColor "  DISK.QCOW2 could benefit from a clean up  > [disk] repair utils \n\n"
+    elif [[ $DiskDisparity -ge "3" ]]; then  printColor "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
+    elif [[ $DiskDisparity -ge "2" ]]; then  printf "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_Latest_ReleaseType" "$qqX_Latest_ReleaseNumber"
     fi
 
-    if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then 
+    if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then
       printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
     fi
 
-    if  grep -qs 'os_homepage' "$QG_SourcePath" &&  ! grep -qs -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
+    if  grep -qs 'os_homepage' "$QG_SourcePath" &&  ! grep -qs -e 'echo 33 34 35 36' "$QG_SourcePath" ; then
       # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
       if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
-        VM_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")" 
+        VM_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")"
       elif [[ $(cat "$VM_InstanceName/QemuVirtHardwareRecord.txt" 2>/dev/null) ]]; then
         VM_RecordedName="$(grep -sm1 -e '-name' "$VM_InstanceName/QemuVirtHardwareRecord.txt" | cut -d'=' -f2)"
-      else  VM_RecordedName="$VM_InstanceName" 
+      else  VM_RecordedName="$VM_InstanceName"
       fi
       VM_RecordedName="${VM_RecordedName,,}"
       mapfile -t VM_RecordedNameArr <<< "$(tr '-' '\n' <<< "$VM_RecordedName")"
@@ -404,14 +404,14 @@ else
     fi
 
     printf  "  [enter] refresh   "
-    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  " 
+    [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
     printf " [h] show help & info  [q] quit \n\n"
 
     path_diagnostics
 
     if [[ $MainMenuChoicePreset ]]; then
-      printf "  >  %s \n" "$MainMenuChoicePreset" 
-      MainMenuChoice="$MainMenuChoicePreset" 
+      printf "  >  %s \n" "$MainMenuChoicePreset"
+      MainMenuChoice="$MainMenuChoicePreset"
       MainMenuChoicePreset=
     fi
     [[ ! $MainMenuChoice ]] &&  read -rp "  >  "  MainMenuChoice

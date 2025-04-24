@@ -3,23 +3,23 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 
-function quickemu {      
+function quickemu {
 
   # Any calls to quickemu become re-routed to this function instead.
-  # Do a first check for amy qwrap internal commands   REVIEW 
+  # Do a first check for amy qwrap internal commands   REVIEW
 
   local FirstParamCount=0
   IFS=' '  read -ra FirstParamsArray <<< "$*"
@@ -28,8 +28,8 @@ function quickemu {
   while [[ "${FirstParamsArray[$FirstParamCount]}" ]]; do
     for FirstParam in "${FirstParamsArray[@]}"; do
       case "$FirstParam" in
-        --vm_boot)  
-            VM_ExecBoot=1 
+        --vm_boot)
+            VM_ExecBoot=1
             unset "FirstParamsArray[$FirstParamCount]"
             set -- "${FirstParamsArray[@]}"
             # no other cases applicable, move on.
@@ -38,24 +38,24 @@ function quickemu {
         --menu_bypass)
             # used for msr functions below
             unset "FirstParamsArray[$FirstParamCount]"
-            set -- "${FirstParamsArray[@]}"          
+            set -- "${FirstParamsArray[@]}"
             shift ;;
-        --toggle_msr_defaults)  
-            toggle_msr_defaults 
-            exit directly ;; 
-        --select_msr_config)  
-            select_msr_config 
-            exit directly ;; 
-        --msrs_conflict_check_resolver)  
-            msrs_conflict_check_resolver 
-            exit directly ;; 
+        --toggle_msr_defaults)
+            toggle_msr_defaults
+            exit directly ;;
+        --select_msr_config)
+            select_msr_config
+            exit directly ;;
+        --msrs_conflict_check_resolver)
+            msrs_conflict_check_resolver
+            exit directly ;;
       esac
       ((FirstParamCount+=1))
     done
   done
 
   ## Run the code, by sourcing the sections  - first read the cased instructions, then do the actions
-  #  These bits are basically the remaining sections of the original quickemu code. 
+  #  These bits are basically the remaining sections of the original quickemu code.
   #  The earlier original code sections are all functions that have now been loaded, as is, or modified
 
   if [[ ! -e "/tmp/qmod-case-temp" ]] || [[ ! -e "/tmp/qmod-actions-temp" ]] || [[ ! -e "/tmp/qmod-boot-temp" ]]; then
@@ -65,21 +65,21 @@ function quickemu {
   else
 
     # keep running quickemu 'case' checks for matches:
-    while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done  
+    while [[ $1 ]]; do source "/tmp/qmod-case-temp" ; done
     shift  $#
 
-    # if no more matches, remove any leftover params not cleared due to trapped exit re-route 
-    # & if not yet given, decide on action   
+    # if no more matches, remove any leftover params not cleared due to trapped exit re-route
+    # & if not yet given, decide on action
     #  https://unix.stackexchange.com/questions/18981/how-to-unset-the-positional-parameters
 
-    # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp" 
+    # Quickemu normally 'SOURCES-IN' the .conf file at the start of "/tmp/qmod-actions-temp"
     # BUT from qqX ver. 1.5 this happens at the end of qqX function 'VM_loader_selector_and_menu'
-    # So, some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'   
+    # So, some setting confirmations and overides can be placed here, others go into the modded function 'vm_boot'
 
-    gl="$qqX_GL_Mode"  
+    gl="$qqX_GL_Mode"
     fixed_iso="$Mounted_ISO"
     [[ $guest_os == "macos" ]] && [[ ! $cpu_cores ]] && cpu_cores=8
-    source "/tmp/qmod-actions-temp" 
+    source "/tmp/qmod-actions-temp"
 
     if [[ $VM_ExecBoot ]]; then
 
@@ -89,8 +89,8 @@ function quickemu {
       Mounted_ISO_Return=
 
       if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
-        printColor "  Press 'esc' when 'Start boot Option' appears ..." 
-        printf " to access the BIOS or boot an ISO, " 
+        printColor "  Press 'esc' when 'Start boot Option' appears ..."
+        printf " to access the BIOS or boot an ISO, "
         printf "\n\n  Mounted ISO: Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. "
         printf "\n\n  A 'live boot' ISO such as from https://gparted.org/download.php is normally required for disk management."
         printColor "\n\n  Current ISO/DVD: '%s'" "$Mounted_ISO_DisplayName"
@@ -99,9 +99,9 @@ function quickemu {
         read -rp "  >  "  Mounted_ISO_Return
 
       elif [[ ! $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
-        printColor "  Press 'esc' when 'Start boot Option' appears ..." 
-        printf " to access the BIOS " 
-        if [[ $img ]]; then 
+        printColor "  Press 'esc' when 'Start boot Option' appears ..."
+        printf " to access the BIOS "
+        if [[ $img ]]; then
           printf "\n\n  A 'live boot' ISO may be usable for disk management"
           printf "\n\n  BUT this appears to be an 'IMG' based distro which may need special booting."
         else
@@ -125,7 +125,7 @@ function quickemu {
 
       fi
 
-      if [[ $BootStyle == "fast" ]] && [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then 
+      if [[ $BootStyle == "fast" ]] && [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then
         printf "  [enter] to continue \n\n"
         read -rp "  >  "
       fi
@@ -139,7 +139,7 @@ function quickemu {
         [[ $GeneralLoopCheck ]] && printf "\n\n pre drives_and_snapshots :" &&  dev_loop_check
         drives_and_snapshots  "info_current"
         printf "\n"
-        if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then  
+        if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then
           printColor "  DISK.QCOW2 ERROR  %s  \n\n  Return and run [disk] repair utils \n\n"  "$DiskChkStatus"
           read -rp "  >  "
           BreakAtVerboseArgs=1
@@ -147,10 +147,10 @@ function quickemu {
           return
         fi
         [[ $GeneralLoopCheck ]] && printf "\n\n pre-sourcing qmod-boot :" &&  dev_loop_check && printf "\n\n"
-        source "/tmp/qmod-boot-temp" 
+        source "/tmp/qmod-boot-temp"
         VM_ExecBoot=
         if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then
-          printColor "\n\n  Press 'esc' when 'Start boot Option' appears" 
+          printColor "\n\n  Press 'esc' when 'Start boot Option' appears"
           printf "\n\n  Select 'Boot manager' and select 'QEMU DVD-ROM' from the list. \n\n"
         fi
         if [[ $BreakAtVerboseArgs ]]; then

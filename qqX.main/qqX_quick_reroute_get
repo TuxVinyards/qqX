@@ -3,30 +3,30 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009 
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009
 
-# Find the right version for the standard 'quickget' call 
+# Find the right version for the standard 'quickget' call
 # which is only used in simple API wrapping mode, for now ...
 
 function quickget {
 
   # To be run after rerouting functions for quickemu & quickget are in place & code has been sourced.
-  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars' 
+  # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars'
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
-  
+
   eval command '"$QG_SourcePath"' " $*"
-  
+
 }
 
 QGW_OS_Array=()
@@ -42,7 +42,7 @@ load_QGW_OS_Array () {
 
 print_quickget_and_folder_choices () {
 
-  # listing function, originally for use inside 'function_quick_get_wrap'  
+  # listing function, originally for use inside 'function_quick_get_wrap'
   # adapted with $2 EITHER as number per line OR for alpha zooming filter
   # and for use for listing target folder selections for installing or moving VM's
 
@@ -53,7 +53,7 @@ print_quickget_and_folder_choices () {
   if [[ "$2" == [1-9] ]]; then QGW_List_NewLinePoint="$2"; else QGW_List_NewLinePoint="7"; fi
   # default QGW_List_NewLinePoint = 7  but some functions may reduce this to as low as 2 or 3
 
-  if [[ $Force_GetList_NewLinePoint ]] && [[ $Force_GetList_NewLinePoint -lt "$QGW_List_NewLinePoint" || $Force_GetList_NewLinePoint -gt "7" ]] ; then 
+  if [[ $Force_GetList_NewLinePoint ]] && [[ $Force_GetList_NewLinePoint -lt "$QGW_List_NewLinePoint" || $Force_GetList_NewLinePoint -gt "7" ]] ; then
     QGW_List_NewLinePoint="$Force_GetList_NewLinePoint"
   fi
 
@@ -71,8 +71,8 @@ print_quickget_and_folder_choices () {
   # adjust display spacing, if needed
   i=0
   while [[ $i -le "$QGW_List_ArrNum_Last" ]] ; do
-    for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do    
-      if [[ "${#QGW_List_Arr_Item}" -gt "$QGW_List_Arr_ItemLength" ]]; then 
+    for QGW_List_Arr_Item in "${QGW_List_ArrName[@]}" ; do
+      if [[ "${#QGW_List_Arr_Item}" -gt "$QGW_List_Arr_ItemLength" ]]; then
         ((QGW_List_NewLinePoint-=1)); ((QGW_List_Arr_ItemLength+=5)) ; break
       fi
       ((i+=1))
@@ -162,10 +162,10 @@ function_test_iso_url () {
       [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
       while true ; do
         [[ $ShowQGetLists ]] && echo "Secs: $SECONDS"
-        if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then 
+        if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then
           DL_Url="$(awk '{print $2 $3}' < "/tmp/qmod-dl-url")"
           break
-        elif [[ "$SECONDS" -ge 20 ]]; then 
+        elif [[ "$SECONDS" -ge 20 ]]; then
           [[ $DataPID ]] && kill "$DataPID" &>/dev/null
           break
         fi
@@ -174,19 +174,19 @@ function_test_iso_url () {
       [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
     fi
 
-    if [[ ! $DL_Url ]]; then  
+    if [[ ! $DL_Url ]]; then
       printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
       iso_get_message
-    else  
+    else
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
       curl --disable -sLf --retry 2 --retry-max-time 3 --retry-delay 1 --max-time 8 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
-      if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
+      if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
         printf "  twice ........ \n\n"
         curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 2 --max-time 16 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
       fi
-      if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then 
+      if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
         [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
         DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
@@ -197,7 +197,7 @@ function_test_iso_url () {
       else
         printColor "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
       fi
-      if [[ $DL_PotentialSize ]]; then 
+      if [[ $DL_PotentialSize ]]; then
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  reported size: %s " "$DL_HumanSize"
         printf "\n"
@@ -207,7 +207,7 @@ function_test_iso_url () {
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
       else
-        if [[ $DL_PotentialOkay ]]; then printf "  but reported size not available ?? " ; else printf "  Reported size not available ..." ; fi 
+        if [[ $DL_PotentialOkay ]]; then printf "  but reported size not available ?? " ; else printf "  Reported size not available ..." ; fi
         [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
@@ -255,7 +255,7 @@ function check_new_vm_folder_name {
   if [[ $(ls -h "$QWG_Conf_Dir/$SelectedChkNewName" 2>/dev/null) ]]; then
     [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
   fi
-  # Quickget tends to hyphenate the names, so alert here too 
+  # Quickget tends to hyphenate the names, so alert here too
   if [[ $HyphenatedNewname && $(ls -h "$QWG_Conf_Dir/$HyphenatedNewname" 2>/dev/null) ]]; then
     [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=1
   fi
@@ -266,7 +266,7 @@ function check_new_vm_folder_name {
   SimilarVMs+="$(echo; ls -1 "$QWG_Conf_Dir/${SelectedChkNewName}"*.conf 2>/dev/null )"
 
   # first dash separated section match
-  if [[ "$SelectedChkNewName" == *'-'* ]]; then 
+  if [[ "$SelectedChkNewName" == *'-'* ]]; then
     SimilarVM_ShorterCheck="$(cut -d '-' -f1 <<< "$SelectedChkNewName")"
     SimilarVMs+=" $(echo; ls -1 "$QWG_Conf_Dir/${SimilarVM_ShorterCheck}"*.conf 2>/dev/null )"
   fi
@@ -283,17 +283,17 @@ function check_new_vm_folder_name {
 
   if [[ $SimilarVMs ]]; then
     mapfile -t  SimilarVM_Arr  <<< "$SimilarVMs"
-    for Item in "${SimilarVM_Arr[@]}" ; do  
+    for Item in "${SimilarVM_Arr[@]}" ; do
       TrimmedItem="$(basename "$Item")"
       [[ $TrimmedItem ]] && SimilarVM_Arr_Display+=("$TrimmedItem")
     done
   fi
 
   # Alert if found
-  if [[ ${SimilarVM_Arr_Display[*]} ]]; then  
+  if [[ ${SimilarVM_Arr_Display[*]} ]]; then
     for DailyCheckVM in "${SimilarVM_Arr_Display[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
-    [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW 
-    printColor "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
+    [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW
+    printf "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
     print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
     printf "\n\n  names-may-get-hyphenated or slightlymodified during download ... \n"
   fi
@@ -306,10 +306,10 @@ function show_QWG_header {
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
   printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
-  if [[ $InternetUp ]]; then  
+  if [[ $InternetUp ]]; then
     printf "(internet is working)  [R] to re-check \n\n"
-  else 
-    printf "(internet is needed for some menu items as well as downloads) \n\n" 
+  else
+    printf "(internet is needed for some menu items as well as downloads) \n\n"
   fi
 }
 
@@ -317,26 +317,26 @@ function show_hot_swap_line {
     printColor "               Using %s:  " "$QE_SourceVersion"
     printf "[FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]"
     printf "  [H] help on different versions\n"
-  if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then 
-    printf "\n               Code Source: %s " "$QE_SourcePath" 
+  if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then
+    printf "\n               Code Source: %s " "$QE_SourcePath"
     [[ $CodingHotSwap ]] && CodingHotSwapShow=
   elif [[ $QE_SourceVersion != "FreeSpirit" ]]; then
-    printf "\n               FreeSpirit usually has the latest fixes and additions ...." 
+    printf "\n               FreeSpirit usually has the latest fixes and additions ...."
   fi
   printf "\n\n"
 }
 
 function refresh_QWG_selector {
-  SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays 
+  SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
   clear_main_gt_start_vars
-  show_QWG_header ; show_hot_swap_line 
-  print_quickget_and_folder_choices  "QGW_OS_Array" 
-  QGW_List_NumSelected= 
+  show_QWG_header ; show_hot_swap_line
+  print_quickget_and_folder_choices  "QGW_OS_Array"
+  QGW_List_NumSelected=
 }
 
 function clear_main_gt_start_vars {
 
-  # Main vars, other clearances will need less, 
+  # Main vars, other clearances will need less,
   # Zsync needs special treatment, as does QGW_List_NumSelected_Next
   QGW_List_NumSelected=
   QGW_VerifiedList_NumSelected=
@@ -350,18 +350,18 @@ function clear_main_gt_start_vars {
   QGW_DownloadSelection=
   QGW_Download_BadLink=
   if [[ $MainMenuZsync ]]; then
-    Current_VM_Folder="$(pwd)" 
+    Current_VM_Folder="$(pwd)"
   else
-    QWG_Conf_Dir="$Default_VM_Folder" 
+    QWG_Conf_Dir="$Default_VM_Folder"
     cd "$QWG_Conf_Dir" || { printColor "  ERROR changing to the General VM Location"; sleep 3; }
-    Current_VM_Folder="$QWG_Conf_Dir" 
+    Current_VM_Folder="$QWG_Conf_Dir"
   fi
 }
 
 test_internet_is_up () {
 
-  #printColor  "               Checking connections ... \n\n" 
-  printf  "\n  Checking connections ...  \n\n" ; sleep 1 
+  #printColor  "               Checking connections ... \n\n"
+  printf  "\n  Checking connections ...  \n\n" ; sleep 1
   if   curl --disable -L -I -s -o /dev/null --max-time 2 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
   elif curl --disable -L -I -s -o /dev/null --max-time 3 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
   elif curl --disable -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
@@ -385,12 +385,12 @@ function_quick_get_wrap ()  {
 
   InternetUp=
   show_QWG_header
-  QGW_List_NumSelected= 
+  QGW_List_NumSelected=
   GT_Exit=
   dev_loop_check ; [[ $GeneralLoopCheck ]] && echo
   clear_main_gt_start_vars
 
-  while [[ ! $InternetUp ]]; do  
+  while [[ ! $InternetUp ]]; do
     Test_Internet=
     tput sc
     test_internet_is_up
@@ -401,12 +401,12 @@ function_quick_get_wrap ()  {
       echo
     fi
     tput rc ; tput ed  #  clear back the last lines to sc (set cursor)
-    [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="B"  && break   
-    [[ $Test_Internet == "i" ]] && break   
+    [[ $Test_Internet == "b" ]] &&  QGW_List_NumSelected="B"  && break
+    [[ $Test_Internet == "i" ]] && break
     show_QWG_header
   done
 
-  if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then  
+  if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]] ; then
 
     QGW_OS_Arr_NameSelected="$Zsync_OS_Name"
     QGW_Release_Arr_NameSelected="$Zsync_Release_Name"
@@ -428,7 +428,7 @@ function_quick_get_wrap ()  {
     while true ; do
 
       printColor "\n\n  [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH  [E] exit quickget "
-      printf "\n\n" 
+      printf "\n\n"
 
       [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
       QGW_VerifiedList_NumSelected=
@@ -437,28 +437,28 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
 
-      elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break 
+      elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
 
-      elif [[ $QGW_List_NumSelected == "Q" ]]; then  exit maybe  # hidden 
+      elif [[ $QGW_List_NumSelected == "Q" ]]; then  exit maybe  # hidden
 
-      elif [[ ${QGW_List_NumSelected^^} == "FS" ]] ; then  
-        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays 
-      elif [[ ${QGW_List_NumSelected^^} == "FB" ]] ; then  
-        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays 
-      elif [[ ${QGW_List_NumSelected^^} == "HB" ]] ; then  
-        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays 
-      elif [[ "${QGW_List_NumSelected,,}" == ech* ]] ; then  
-        CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ "${QGW_List_NumSelected,,}" == sys* ]] ; then  
-        CodingHotSwap="System" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ "${QGW_List_NumSelected,,}" == cust* ]] ; then  
-        CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
-      elif [[ "${QGW_List_NumSelected,,}" == dev* ]] ; then  
-        CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays  
+      elif [[ ${QGW_List_NumSelected^^} == "FS" ]] ; then
+        CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ ${QGW_List_NumSelected^^} == "FB" ]] ; then
+        CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ ${QGW_List_NumSelected^^} == "HB" ]] ; then
+        CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ "${QGW_List_NumSelected,,}" == ech* ]] ; then
+        CodingHotSwap="Echo" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ "${QGW_List_NumSelected,,}" == sys* ]] ; then
+        CodingHotSwap="System" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ "${QGW_List_NumSelected,,}" == cust* ]] ; then
+        CodingHotSwap="Custom" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
+      elif [[ "${QGW_List_NumSelected,,}" == dev* ]] ; then
+        CodingHotSwap="Dev" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays
 
       elif [[ $QGW_List_NumSelected == "R"  ]] ; then  test_internet_is_up ; refresh_QWG_selector
 
-      elif [[ "$QGW_List_NumSelected" == [a-z] ]]; then 
+      elif [[ "$QGW_List_NumSelected" == [a-z] ]]; then
 
         print_quickget_and_folder_choices  "QGW_OS_Array" "$QGW_List_NumSelected"
 
@@ -487,13 +487,13 @@ function_quick_get_wrap ()  {
           done
         fi
         i= ; S=
-        
+
       else
 
         # clean up and zero any unrecognised values eg. XYZ ... should only be integers left at this point
         QGW_List_NumSelected="$(tr -cd "[:digit:]" <<< "$QGW_List_NumSelected")"
 
-        if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then 
+        if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then
 
           printColor "\n\n  Request Not Recognised \n\n"
           sleep 1.5
@@ -528,7 +528,7 @@ function_quick_get_wrap ()  {
           elif [[ ${QGW_OS_Arr_NameSelected:0:3} == "kde" ]]; then
             QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameSelected#???}"
             QGW_OS_Arr_NameDisplay="kde ${QGW_OS_Arr_NameDisplay}"
-          else 
+          else
             QGW_OS_Arr_NameDisplay="$QGW_OS_Arr_NameSelected"
           fi
 
@@ -553,8 +553,8 @@ function_quick_get_wrap ()  {
             QGW_OS_HomePage="$("$QG_SourcePath" -4 "$QGW_OS_Arr_NameSelected")"
             QGW_OS_HomePage="$(tr -cd "[:print:]" <<< "$QGW_OS_HomePage")"
 
-          elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then 
-            # 4.9.2 onwards seems to be okay  REVIEW  
+          elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then
+            # 4.9.2 onwards seems to be okay  REVIEW
             if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
             else
               # first listing, some may have two
@@ -574,27 +574,27 @@ function_quick_get_wrap ()  {
           else printf "\n\n  Not available, see webpage for more details \n\n"
           fi
 
-          if [[ "$QGW_OS_Arr_NameSelected" == "macos"* ]]; then 
+          if [[ "$QGW_OS_Arr_NameSelected" == "macos"* ]]; then
             printColor "\n  [W] A Mac OS installation walk-thru is available via the qqX wiki \n"
           fi
 
           QGW_OS_HomePage_Working=
-          if [[ $QGW_OS_HomePage ]]; then 
+          if [[ $QGW_OS_HomePage ]]; then
             printf "\n  Checking Distro Home Page ...."
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
               if curl --disable -sLf --retry 3 --retry-max-time 2 --retry-delay 0 --max-time 6 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working)"; QGW_OS_HomePage_Working=1
               elif curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output /dev/null "$QGW_OS_HomePage" ; then  printf " (working, slowly ...)"; QGW_OS_HomePage_Working=1
-              else 
+              else
                 [[ "$QGW_OS_Arr_NameSelected" == "windows"* ]] && printf "\n\n  Microsoft download limiter: access appears blocked to this IP address. Try later or try router reboot ... ?"
-                printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... " 
+                printf "\n\n  Downloads might work but HOME PAGE LINK APPEARS BROKEN OR SITE IS DOWN ... "
               fi
             } >> "/tmp/qmod-dl-homepage-report.txt"
           fi
           show_distro_homepage_check_results
           break
-      
+
         fi
 
       fi
@@ -605,24 +605,24 @@ function_quick_get_wrap ()  {
       if [[ $CodingHotSwapShow || $GT_Help ]]; then
         show_QWG_header ; show_hot_swap_line
         # different versions have different distro selections
-        load_QGW_OS_Array ; print_quickget_and_folder_choices  "QGW_OS_Array" 
-        GT_Help= 
+        load_QGW_OS_Array ; print_quickget_and_folder_choices  "QGW_OS_Array"
+        GT_Help=
       fi
 
       # End point of main OS selection loop
       QGW_List_NumSelected=
 
       [[ $GeneralLoopCheck ]] && printf "\n\n End of Quickget first loop, stage 2:" &&  dev_loop_check
-      
+
     done
 
 
-    if [[ $GT_Exit ]]; then 
+    if [[ $GT_Exit ]]; then
       Zsync_OS_Name=
       Zsync_Release_Name=
       QGW_List_NumSelected_Next=
       clear_main_gt_start_vars
-      return 
+      return
     fi
 
     printf "\n\n  Checking releases ... \n\n\n"
@@ -667,15 +667,15 @@ function_quick_get_wrap ()  {
 
     [[ $ShowQGetLists ]] && { echo "Raw RE "; echo "$QGW_ReleasesEditions_ListRaw"; echo; }
 
-    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Languages'* ]]; then 
+    if [[ "$QGW_ReleasesEditions_ListRaw" == *'Languages'* ]]; then
       # is Windows (has its own internal array)
       QGW_Releases_ListRaw="$(grep -B 10  Languages  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Languages)"
-    elif [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then 
+    elif [[ "$QGW_ReleasesEditions_ListRaw" == *'Editions'* ]]; then
       QGW_Releases_ListRaw="$(grep -B 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw" | grep -v Editions)"
       # also get editions full list for later > some releases have different editions available
       QGW_Editions_FullListRaw="$(grep -A 10  Editions  <<< "$QGW_ReleasesEditions_ListRaw")"
       QGW_Editions_FullList="$(cut -f2- <<< "$QGW_Editions_FullListRaw"| tr ' ' '\n')"
-      # try to make sure the list is not just empty space 
+      # try to make sure the list is not just empty space
       QGW_Editions_FullList="$(grep -E ^'[[:graph:]]' <<< "$QGW_Editions_FullList" )"
       mapfile -t QGW_FullEditions_Array <<< "$QGW_Editions_FullList"
       QGW_Editions_FullListString="${QGW_FullEditions_Array[*]}"
@@ -685,7 +685,7 @@ function_quick_get_wrap ()  {
     else
       QGW_Releases_ListRaw="$QGW_ReleasesEditions_ListRaw"
     fi
-    
+
     [[ $ShowQGetLists ]] && { echo "Raw R "; echo "$QGW_Releases_ListRaw"; echo; }
     [[ $ShowQGetLists ]] && { echo "Raw E "; echo "$QGW_Editions_FullListRaw"; echo; }
     [[ $ShowQGetLists ]] && { echo "List E "; echo "$QGW_Editions_FullList"; echo; }
@@ -694,7 +694,7 @@ function_quick_get_wrap ()  {
     QGW_Releases_ListRaw="$(cut -f2- <<< "$QGW_Releases_ListRaw" | tr ' ' '\n' )"
     [[ $ShowQGetLists ]] && { echo "List R raw"; echo "$QGW_Releases_ListRaw"; echo; }
 
-    # try to make sure the list is not just empty space 
+    # try to make sure the list is not just empty space
     QGW_Releases_List="$(grep -E ^'[[:graph:]]' <<< "$QGW_Releases_ListRaw" )"
     [[ $ShowQGetLists ]] && { echo "List R "; echo "$QGW_Releases_List"; echo; }
 
@@ -714,19 +714,19 @@ function_quick_get_wrap ()  {
 
         printColor "  QuickGet or internet ERROR, no releases found "
         printf "\n\n  Linux ISO's: Try downloading directly from the distro's Web Pages .... \n"
-    
-      elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then  
+
+      elif [[ ${#QGW_Releases_Array[@]} -eq 1 ]] ; then
 
         printf "  One Release only:  %s " "${QGW_Releases_Array[0]}"
-        printf "\n\n  Editions choice may be be possible." 
+        printf "\n\n  Editions choice may be be possible."
         printColor "\n\n  [enter] to continue"
 
       else
 
         print_quickget_and_folder_choices  "QGW_Releases_Array"
-        printColor "\n\n\n  Give LIST number of Release"   
+        printColor "\n\n\n  Give LIST number of Release"
 
-      fi  
+      fi
 
       [[ $QGW_VerifiedList_NumSelected ]] && QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
 
@@ -740,36 +740,36 @@ function_quick_get_wrap ()  {
       else QGW_List_NumSelected_Previous="${#QGW_OS_Array[@]}"
       fi
 
-      printf "\n\n  [s] scroll to next listing  [p] to previous  [r] reload/refresh/retry \n\n"  
+      printf "\n\n  [s] scroll to next listing  [p] to previous  [r] reload/refresh/retry \n\n"
 
       if [[ $WebBrowser ]]; then
         [[ $QGW_OS_HomePage ]] && printf "  [w] to open listed page with web browser"
         printf "  [W] qqX wiki"
       fi
 
-      printf "  [b] back to main menu \n\n"   
-      read -rp "  >  "  QGW_List_NumSelected  
+      printf "  [b] back to main menu \n\n"
+      read -rp "  >  "  QGW_List_NumSelected
       printf "\n\n"
-    
-      if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "r" || $QGW_List_NumSelected == "b" ]]; then 
-        
+
+      if [[ $QGW_List_NumSelected == "s" || $QGW_List_NumSelected == "p" || $QGW_List_NumSelected == "r" || $QGW_List_NumSelected == "b" ]]; then
+
         [[ $QGW_List_NumSelected == "p" ]] && QGW_List_NumSelected_Next="$QGW_List_NumSelected_Previous"
         [[ $QGW_List_NumSelected == "r" ]] && QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         [[ $QGW_List_NumSelected == "b" ]] && QGW_List_NumSelected_Next=
-        QGW_List_NumSelected= 
+        QGW_List_NumSelected=
         QGW_OS_Arr_NumSelected=
         QGW_OS_Arr_NameSelected=
         GT_Exit=1
         function_quick_get_wrap
         break
 
-      elif [[ $QGW_List_NumSelected == "w" ||  $QGW_List_NumSelected == "W" ]]; then 
+      elif [[ $QGW_List_NumSelected == "w" ||  $QGW_List_NumSelected == "W" ]]; then
 
         printf "  Opening Browser ... \n\n"
-        if [[ $QGW_List_NumSelected == "w" && $QGW_OS_HomePage_Working ]]; then 
+        if [[ $QGW_List_NumSelected == "w" && $QGW_OS_HomePage_Working ]]; then
           (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
         else
-          (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message 
+          (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message
         fi
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"
@@ -777,14 +777,14 @@ function_quick_get_wrap ()  {
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
         sleep 1
 
-      elif [[ $QGW_List_NumSelected ]]; then 
+      elif [[ $QGW_List_NumSelected ]]; then
 
         [[ $QGW_List_NumSelected -gt "${#QGW_Releases_Array[@]}" ]] && QGW_List_NumSelected="${#QGW_Releases_Array[@]}"
         QGW_Release_Arr_NumSelected=$((QGW_List_NumSelected-1))
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[QGW_Release_Arr_NumSelected]}"
         break
 
-      else 
+      else
 
         QGW_Release_Arr_NameSelected="${QGW_Releases_Array[0]}"
         break
@@ -818,16 +818,16 @@ function_quick_get_wrap ()  {
       printf "\n\n"
       if [[ $QGW_Release_Arr_NameSelected == "8"  ||  $QGW_Release_Arr_NameSelected == "10-ltsc" ]]; then
         printf "\n\n  WARNING:  Outdated code. This release can no longer be downloaded"
-        printColor "\n\n  [b] back to main menu \n\n"  
+        printColor "\n\n  [b] back to main menu \n\n"
       else
         print_quickget_and_folder_choices  "QGW_WinLangs_Array"
-        printColor "\n\n  Give LIST number of Language   [b] back to main menu \n\n"  
+        printColor "\n\n  Give LIST number of Language   [b] back to main menu \n\n"
       fi
-      read -rp "  >  "  QGW_List_NumSelected 
+      read -rp "  >  "  QGW_List_NumSelected
 
-      printf "\n"  
+      printf "\n"
 
-      if [[ $QGW_List_NumSelected == "b" ]]; then  
+      if [[ $QGW_List_NumSelected == "b" ]]; then
         QGW_List_NumSelected=
         QGW_List_NumSelected_Next=
         QGW_OS_Arr_NameSelected=
@@ -846,7 +846,7 @@ function_quick_get_wrap ()  {
 
     else
 
-      while true; do 
+      while true; do
 
         [[ ! $QGW_OS_Arr_NameSelected || ! $QGW_Release_Arr_NameSelected ]] && break
         printColor  "  OS / Release   =   %s  %s "  "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected"
@@ -863,7 +863,7 @@ function_quick_get_wrap ()  {
           # if NO editions function is present in the code for that distro, then no editions are available
           # quickget will auto-start as no editions are available, so only check for data if a named function is present
           QGW_EditionsFunction=1
-          # Check the editions list specific to the selected release     
+          # Check the editions list specific to the selected release
           # running checks in the background (&) means that we can stop the process if it hangs (as with releases check)
           printf "" > "/tmp/quickget-editions-data.txt"
           quickget "$QGW_OS_Arr_NameSelected" "$QGW_Release_Arr_NameSelected" > "/tmp/quickget-editions-data.txt" &
@@ -904,56 +904,56 @@ function_quick_get_wrap ()  {
         fi
 
         if [[ ! ${QGW_Editions_Array[*]} ]]; then
-          if [[ $QGW_EditionsFunction && "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          if [[ $QGW_EditionsFunction && "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then
             printf "  Further selection not available in this release"
             printColor "\n\n  Full list (%s), all Releases: \n\n" "$QGW_Editions_FullListTotal"
             printf "  %s"  "$QGW_Editions_FullListString"
-            printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
-          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
-            printColor "  No editions to select in any of the releases ..."
+            printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n"
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then
+            printf "  NO EDITIONS to select in any of the releases ..."
             printColor "\n\n  [enter] to continue   "
-            printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n" 
-          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then 
+            printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n"
+          elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then
             printf "  This distro is single release option only .... "
-            printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n" 
+            printColor "\n\n  [enter] to continue   [r] return to view web page   [b] back to main menu \n\n"
           fi
-          read -rp "  >  "  QGW_List_NumSelected 
+          read -rp "  >  "  QGW_List_NumSelected
 
         elif [[ ${#QGW_Editions_Array[@]} -eq 1 ]] ; then
           printf "  One edition found: %s \n\n" "${QGW_Editions_Array[0]}"
           QGW_Edition_Arr_NameSelected="${QGW_Editions_Array[0]}"
-          if [[ "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          if [[ "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then
             printColor "\n\n  Full list (%s), all Releases: \n\n" "$QGW_Editions_FullListTotal"
             printf "  %s"  "$QGW_Editions_FullListString"
-            printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
+            printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n"
           else
-            printColor "  [enter] to continue   [b] to go back \n\n" 
+            printColor "  [enter] to continue   [b] to go back \n\n"
           fi
-          read -rp "  >  "  QGW_List_NumSelected   
+          read -rp "  >  "  QGW_List_NumSelected
 
         else
           print_quickget_and_folder_choices  "QGW_Editions_Array"
-          if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then 
+          if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]]; then
             printColor "\n\n  Full list (%s), all Releases: \n\n" "$QGW_Editions_FullListTotal"
             printf "  %s"  "$QGW_Editions_FullListString"
-            printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n" 
-          else  
-            printColor "\n\n  Give LIST number of Edition   [r] return to releases menu to view web page    [b] back to main menu \n\n" 
+            printColor "\n\n  Give LIST number of Edition   [r] choose a different release or return to view web page   [b] back to main menu \n\n"
+          else
+            printColor "\n\n  Give LIST number of Edition   [r] return to releases menu to view web page    [b] back to main menu \n\n"
           fi
-          read -rp "  >  "  QGW_List_NumSelected   
+          read -rp "  >  "  QGW_List_NumSelected
 
-        fi 
+        fi
 
         printf "\n\n"
 
-        if [[ $QGW_List_NumSelected == "r" ]]; then  
+        if [[ $QGW_List_NumSelected == "r" ]]; then
           QGW_List_NumSelected=
           QGW_Release_Arr_NumSelected=
           QGW_Release_Arr_NameSelected=
           printf "  Reselecting Release: \n\n\n"
           choose_QGW_release
 
-        elif [[ $QGW_List_NumSelected == "b" ]]; then  
+        elif [[ $QGW_List_NumSelected == "b" ]]; then
           QGW_List_NumSelected=
           QGW_List_NumSelected_Next=
           QGW_OS_Arr_NameSelected=
@@ -963,7 +963,7 @@ function_quick_get_wrap ()  {
           QGW_Edition_Arr_NameSelected=
           function_quick_get_wrap
           return
-        
+
         elif [[ ${#QGW_Editions_Array[@]} -le 1 ]] ; then  break
 
         elif [[ "$QGW_List_NumSelected" == [0-9] || "$QGW_List_NumSelected" == [0-9][0-9] ]]; then
@@ -994,16 +994,16 @@ function_quick_get_wrap ()  {
       QWG_NewVM_Name="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}"
     else
       QWG_NewVM_Name="${QGW_OS_Arr_NameSelected}"
-    fi 
+    fi
 
     printColor "  Selected:  %s "  "$QWG_NewVM_Name"
 
     # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
 
-    if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then 
+    if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then
       printf "\n\n  Microsoft servers may not report back accurately, may block repeat attempts or may need manual download ... "
       show_distro_homepage_check_results
-    elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then 
+    elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then
       printf "\n\n  Apples servers may not report back accurately, but the download may still work ... "
       show_distro_homepage_check_results
     else
@@ -1022,7 +1022,7 @@ function_quick_get_wrap ()  {
         elif [[ $LastZsync -lt 1036800 ]]; then # 12 days
           printColor "\n\n  May take a short while to compare & synchronize"
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
-        else 
+        else
           printColor "\n\n  May take a while to compare & synchronize"
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
         fi
@@ -1032,25 +1032,25 @@ function_quick_get_wrap ()  {
         ZsyncDownload=1
       fi
 
-    elif [[ "$QGW_DownloadSelection" == *'ubuntu'* ]] && [[ "$QGW_DownloadSelection" == *'daily'* ]]; then 
+    elif [[ "$QGW_DownloadSelection" == *'ubuntu'* ]] && [[ "$QGW_DownloadSelection" == *'daily'* ]]; then
       printColor "\n\n  ** may download with some kind of NAMING variance ** "
       ZsyncDownload=1
 
     else  ZsyncDownload=
     fi
 
-    if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then 
+    if [[ $MainMenuZsync ]] && [[ $Zsync_Updatable_ISO && $Zsync_OS_Name ]]; then
         QWG_Conf_Dir="$VM_Conf_Dir"
         ZsyncDownload=1
     else
       QWG_Conf_Dir="$Default_VM_Folder"
     fi
- 
-    # GET READY to start download 
+
+    # GET READY to start download
     # clear any accidental double pressing of the enter key to avoid any auto-starts
-    read -r -t 0.2	
-    read -r -t 0.1	
-    read -r -t 0.1	
+    read -r -t 0.2
+    read -r -t 0.1
+    read -r -t 0.1
     QGW_OverWriteAllow=
     QGW_DownloadStart=
     printf "\n\n"
@@ -1058,8 +1058,8 @@ function_quick_get_wrap ()  {
     while true ; do
 
       dev_loop_check
-      
-      if [[ $MainMenuZsync ]]; then  
+
+      if [[ $MainMenuZsync ]]; then
         QGW_OverWriteAlert=1
       elif [[ ! $QGW_Download_BadLink ]]; then
         show_current_group_folder_list
@@ -1078,7 +1078,7 @@ function_quick_get_wrap ()  {
         check_new_vm_folder_name  "$QWG_NewVM_Name"
       fi
 
-      if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then  
+      if [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] || [[ "${#QGW_Editions_Array[@]}" -gt 1 ]]; then
         printf "\n\n"
         [[ "${#QGW_Releases_Array[@]}" -gt 1 ]] && printf "  [r] reselect release, view distro web pages   or "
         [[ "${#QGW_Editions_Array[@]}" -gt 1 ]] && printf "  [e] reselect edition, release or view distro web pages,   or "
@@ -1090,7 +1090,7 @@ function_quick_get_wrap ()  {
 
       else
 
-        if [[ $QGW_OverWriteAlert ]];then  
+        if [[ $QGW_OverWriteAlert ]];then
           [[ ! $MainMenuZsync ]] && printColor "\n\n  Files are present. Resume download or overwrite? "
           if [[ "$(ls -oh "$QWG_Conf_Dir/$QWG_NewVM_Name" 2>/dev/null)" ]]; then
             printColor "\n\n  Folder: %s \n\n" "$QWG_NewVM_Name"
@@ -1105,10 +1105,10 @@ function_quick_get_wrap ()  {
           if [[ $DL_PotentialSize && $DL_FileName ]]; then
             DL_SizeAlready="$(du -b "$QWG_Conf_Dir/$QWG_NewVM_Name/$DL_FileName" 2>/dev/null | awk '{print $1}' | tr -cd '[:digit:]')"
             [[ ! $DL_SizeAlready ]] && DL_SizeAlready="0"
-            if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then 
+            if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then
               DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
               DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
-            else 
+            else
               printf "\n\n  Detection of sizes not fully possible"
               if [[ $DL_PotentialSize ]]; then printf ": \n\n  Potential size  %s  \n" "$DL_PotentialSize" ; else printf "\n"
               fi
@@ -1119,18 +1119,18 @@ function_quick_get_wrap ()  {
           else printf "\n  Percent downloaded not known"
           fi
           printf  "\n\n  [enter] Start the download  "
-          if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  " 
-          else 
+          if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  "
+          else
             if [[ $MainMenuZsync ]]; then  printf "> Zsync     "  ; else printf "> resume     "
             fi
           fi
 
-        else 
+        else
           if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
             printColor "\n\n  WARNING Source Version '%s' :  Stopping and Restarting of partly completed downloads requires the Freebird/FreeSpirit builtins." "$QE_SourceVersion"
           fi
           if [[ "${#VM_Folder_List[*]}" -gt 1 ]]; then  printf  "\n\n  [enter] Start the download  "
-          else printColor  "\n\n  [enter] Start the download  " 
+          else printColor  "\n\n  [enter] Start the download  "
           fi
 
         fi
@@ -1144,7 +1144,7 @@ function_quick_get_wrap ()  {
         fi
 
       fi
-      
+
       printf " [h] help  [b] back to main menu \n\n\n"
       read -rp "  >  " QGW_DownloadStart
       printf "\n"
@@ -1154,9 +1154,9 @@ function_quick_get_wrap ()  {
         b)
           clear_main_gt_start_vars
           QGW_List_NumSelected_Next=
-          if [[ $MainMenuZsync ]]; then 
-            MainMenuZsync= 
-          else 
+          if [[ $MainMenuZsync ]]; then
+            MainMenuZsync=
+          else
             Zsync_OS_Name=
             Zsync_Release_Name=
             function_quick_get_wrap
@@ -1197,15 +1197,15 @@ function_quick_get_wrap ()  {
           break
         ;;
 
-        [0-9]|[0-9][0-9]) 
+        [0-9]|[0-9][0-9])
           QWG_Conf_Dir="${VM_Folder_List[QGW_DownloadStart]}"
         ;;
 
-        h)  
+        h)
           printf     "  Once the download and initial setup up has finished, "
-          printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running.\n" 
+          printf "\n\n  the new folder and .conf file may be easily moved and/or edited before running.\n"
 
-          printf "\n\n  For new preset folders, edit the main settings.\n" 
+          printf "\n\n  For new preset folders, edit the main settings.\n"
 
           printf "\n\n  Part downloads can usually be re-started, if stopped."
           printf "\n\n  Zsync Iso Updates may leave residual rcksum files, if stopped, and may need removing."
@@ -1217,23 +1217,23 @@ function_quick_get_wrap ()  {
           printf "\n\n"
         ;;
 
-        w) 
+        w)
           printf "  Opening Browser ... \n\n"
           (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
           sleep 1
         ;;
 
         *)
-          if [[ $QGW_Download_BadLink ]]; then  
+          if [[ $QGW_Download_BadLink ]]; then
             QGW_BadLink_ReTest=1 ; function_test_iso_url
           else
-            if [[ $QGW_OverWriteAlert ]] && [[ ! $MainMenuZsync ]]; then 
+            if [[ $QGW_OverWriteAlert ]] && [[ ! $MainMenuZsync ]]; then
               printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
               printf "\n\n  [enter] to go back" ; printColor "   [yes] to confirm \n\n"
               read -rp "  >  "  ISO_OvWr
               printf "\n\n"
-              if [[ $ISO_OvWr ]]; then QGW_OverWriteAllow=1 ; QGW_DownloadStart="start" ; break ; fi  
-            else 
+              if [[ $ISO_OvWr ]]; then QGW_OverWriteAllow=1 ; QGW_DownloadStart="start" ; break ; fi
+            else
               QGW_DownloadStart="start" ; break
             fi
           fi
@@ -1242,13 +1242,13 @@ function_quick_get_wrap ()  {
       esac
 
       if [[ ! $QWG_Conf_Dir ]] || [[ ! -d "$QWG_Conf_Dir" ]]; then
-        QWG_Conf_Dir="$Default_VM_Folder" 
-        printf "\n  Using %s for now.  \n\n  Selected Download Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder" 
-        QWG_Conf_Dir="$Default_VM_Folder" 
+        QWG_Conf_Dir="$Default_VM_Folder"
+        printf "\n  Using %s for now.  \n\n  Selected Download Folder not found.  Reselect or Move Later ... \n\n"  "$Default_VM_Folder"
+        QWG_Conf_Dir="$Default_VM_Folder"
       fi
-      
+
       cd "$QWG_Conf_Dir" || printColor "  ERROR changing to New VM Location"
-      Current_VM_Folder="$QWG_Conf_Dir" 
+      Current_VM_Folder="$QWG_Conf_Dir"
 
     done
 
@@ -1266,22 +1266,22 @@ function_quick_get_wrap ()  {
   dev_loop_check
 
   [[ $GT_Exit ]] && return
-  
+
   if [[ $QGW_DownloadStart == "start" ]]; then
 
     QGW_DownloadStart=
     QGW_DownloadStopped=
     QGW_List_NumSelected_Next=
     QGW_List_NumSelected_Previous=
-   
+
     if [[ $ZsyncDownload ]]; then
-      # printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."  
+      # printf "  If stopped, Zsync Iso Updates may leave residual rcksum files that qqX will remove."
       printf "\n\n  To resume stopped downloads, any \".iso.part\" files should be retained."
       # https://bugs.launchpad.net/ubuntu/+source/zsync/+bug/477551
 
       # @ feb 2025 rcksum files no longer seem to be present.
       # The source at https://github.com/cph6/zsync/tree/master/c remains quite old
-      # BUT, for example, https://git.launchpad.net/ubuntu/+source/zsync/commit/?h=applied/ubuntu/plucky 
+      # BUT, for example, https://git.launchpad.net/ubuntu/+source/zsync/commit/?h=applied/ubuntu/plucky
       # shows that zsync is being actively maintained by Debian and Ubuntu ....
       # There is also reference to zsync-curl as a repo but this now appears to have been abandoned.
 
@@ -1296,7 +1296,7 @@ function_quick_get_wrap ()  {
       printf "  Once a download and initial setup up has finished, the new folder and .conf file may be easily moved"
       printf "\n\n  and/or edited before running. Part downloads can usually be re-started."
     fi
-    
+
     function show_rcksum_progress {
 
       RckFile="$(ls "$VM_Conf_Dir/"rcksum* 2> /dev/null)"
@@ -1304,16 +1304,16 @@ function_quick_get_wrap ()  {
         RckDone="$(du -a "$RckFile" 2> /dev/null)"
         RckDone="${RckDone/"$RckFile"/}"
         # gives some kind of rough indication that work is in progress  (percentages don't seem to be possible)
-        printf "\n\n  Comparing images >    %s "  "$RckDone" 
+        printf "\n\n  Comparing images >    %s "  "$RckDone"
         sleep 2
         printf "\e[2K\r"
       done
     }
-    
+
     # clear any accidental initial double pressing of the enter key
-		read -r -t 0.2  
-		read -r -t 0.2  
-		read -r -t 0.2 
+		read -r -t 0.2
+		read -r -t 0.2
+		read -r -t 0.2
 
     printf "\n\n  May take a moment to start, if servers are slow:"
     printColor "\n\n  Use [c] to STOP ALL current downloads, [d] to delete "
@@ -1322,38 +1322,38 @@ function_quick_get_wrap ()  {
     # stop flashing cursor
     tput civis
 
-    #  Although quickget will run as a background process, quickget will then go on to run aria2 etc 
+    #  Although quickget will run as a background process, quickget will then go on to run aria2 etc
     #  but as even further into the background. The download programs will grab the cursor in order to report progress
     #  and as this will compete with read & keyboard input we are limited to using [enter] ....
 
-    #  quickget will also run a python3 command for macrecovery for MacOS 
+    #  quickget will also run a python3 command for macrecovery for MacOS
     #  eg 26102 pts/1    S+     0:11 python3 /usr/bin/macrecovery --board-id Mac-00BE6ED71E35EB86 --mlb 00000000000000000 --os-type default --basename Recover
-   
-    # QUICKGET RUNS FIRST, in the background, THEN quickget starts a separate downloader  eg curl, 
-    # so processes can be difficult to track at this point. 
+
+    # QUICKGET RUNS FIRST, in the background, THEN quickget starts a separate downloader  eg curl,
+    # so processes can be difficult to track at this point.
 
     # qqX ver 1.11 adds an output file into the freespirit code to see if an output folder has been produced
-    # as the Quickget final name output can vary from expected. 
+    # as the Quickget final name output can vary from expected.
     printf "" > "/tmp/qe_new_vm_name.txt"
-  
+
     printf "\n\n\n\n\n"
     printf "\e[3A\r"
-    #  make line spaces then move the cursor up from the bottom     
-    # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc 
+    #  make line spaces then move the cursor up from the bottom
+    # See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797   "\e[1A\r"  "\e[2K\r"  etc
 
     function run_distro_download {
 
-      quickget "$QGW_DownloadSelection" &  
+      quickget "$QGW_DownloadSelection" &
       qGetPid="$!"
 
       # zsync:
       # @ feb 2025 rcksum files no longer seem to be present. See notes at function 'show_rcksum_progress' > REVIEW removal?
       if [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]]; then  show_rcksum_progress &
-      elif [[ $ZsyncDownload || $MainMenuZsync ]]; then 
-        printf "\n  Zsync is a multi-stage process >  monitor the hard drive activity light ... \n\n" 
+      elif [[ $ZsyncDownload || $MainMenuZsync ]]; then
+        printf "\n  Zsync is a multi-stage process >  monitor the hard drive activity light ... \n\n"
       fi
 
-      # WAIT HERE for finish, or  key to stop  
+      # WAIT HERE for finish, or  key to stop
 
       PidStop=
       while true; do
@@ -1367,32 +1367,32 @@ function_quick_get_wrap ()  {
       done
 
       # return cursor to normal
-      tput cnorm 
+      tput cnorm
 
       # kill background quickget job, if cancelled and still running
-      [[ $qGetPid ]] && kill "$qGetPid" 2>/dev/null 
+      [[ $qGetPid ]] && kill "$qGetPid" 2>/dev/null
 
       # removing the old rcksum files not only tidies up but also stops the background monitor process
       [[ $(ls "$VM_Conf_Dir/"rcksum* 2>/dev/null) ]] && remove_old_rcksum_files
-      
+
       # check macOS particularities ...
-      # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW  
+      # '/usr/bin/macrecovery' now deprecated and has been replaced with chunkcheck  REVIEW
       P3_Arr=()
       mapfile -t  P3_Arr <<< "$(pgrep python3)"
       for P3_PID in "${P3_Arr[@]}" ; do
-        P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2>/dev/null)" 
-        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then 
+        P3_MacOS_Cmd="$(ps --no-headers -o cmd "$P3_PID" 2>/dev/null)"
+        if [[ "$P3_MacOS_Cmd" == *'macrecovery'* || "$P3_MacOS_Cmd" == *'chunkcheck'* ]]; then
           kill "$P3_PID" 2>/dev/null
-          printColor "\n\nStopped \n\n" 
+          printColor "\n\nStopped \n\n"
           QGW_DownloadStopped=1
           break
         fi
-      done   
+      done
 
       # tidy up other possible background processes started by quickget ...
       if [[ $(pgrep aria2) || $(pgrep curl) || $(pgrep wget) || $(pgrep zsync) ]]; then
-        # The use of aria2 and wget has been dropped since april 2024 (?) REVIEW 
-        while true; do 
+        # The use of aria2 and wget has been dropped since april 2024 (?) REVIEW
+        while true; do
           pkill aria2  2>/dev/null
           pkill curl   2>/dev/null
           pkill wget   2>/dev/null
@@ -1409,22 +1409,22 @@ function_quick_get_wrap ()  {
 
     RunDL=1
     while true ; do
-      if [[ $RunDL ]]; then 
+      if [[ $RunDL ]]; then
         run_distro_download
       else
         ResumeDL=
         # qqX mods to quickget will output a finalized folder name to "/tmp/qe_new_vm_name.txt"
-        # but this may need to contain more than just the principle download item 
+        # but this may need to contain more than just the principle download item
         # so determining whether the download is fully complete can be problematic.
         DL_SizeAlready=
         DL_PercentageDone=
         QWG_FinalName="$(cut -d'"' -f2 < /tmp/qe_new_vm_name.txt 2>/dev/null | tr -cd '[:print:]')"
         if [[ $DL_PotentialSize && $QWG_FinalName && $DL_FileName ]] && [[ "$DL_FileName" == *'.iso' || "$DL_FileName" == *'.img' ]]; then
           DL_SizeAlready="$(du -b "$QWG_Conf_Dir/$QWG_FinalName/$DL_FileName" 2>/dev/null | awk '{print $1}' | tr -cd '[:digit:]')"
-          if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then 
+          if [[ $DL_PotentialSize -ge 1 && $DL_SizeAlready -ge 1 ]]; then
             DL_PercentageDone="$(bc <<< "scale=4; $DL_SizeAlready/$DL_PotentialSize*100")"
             DL_PercentageDone="$(bc <<< "scale=2; $DL_PercentageDone/1")"
-          else 
+          else
               printf "\n\n  Detection of sizes not fully possible"
               if [[ $DL_PotentialSize ]]; then printf ": \n\n  Potential size  %s  \n" "$DL_PotentialSize" ; else printf "\n"
               fi
@@ -1437,12 +1437,12 @@ function_quick_get_wrap ()  {
         printColor "  Completed (or Stopped):  [c] to conclude  [r] to resume, retry or re-check \n\n"
         # clear any accidental double pressing of the enter key if instance was slow to close
         # also gives pause needed to give different processes time to output their summaries & finish up
-        read -r -t 0.2  
-        read -r -t 0.1	
-        read -r -t 0.1	
+        read -r -t 0.2
+        read -r -t 0.1
+        read -r -t 0.1
         read -rp "  >  " ResumeDL
         printf "\n\n"
-        if [[ $ResumeDL == "r" ]]; then 
+        if [[ $ResumeDL == "r" ]]; then
           RunDL=1; QGW_DownloadStopped=
           printf "  Resume process starting  >  [c] to stop  [d] to delete "
           printf "\n\n  May take a moment if servers are slow .... \n\n"
@@ -1458,21 +1458,21 @@ function_quick_get_wrap ()  {
   New_VM_Conf_File=
   QGW_FolderDelete=
 
-  # STANDARD DOWNLOAD folder check the theoretical name ... 
+  # STANDARD DOWNLOAD folder check the theoretical name ...
   if [[ ! $ZsyncDownload ]]; then
-    if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then 
+    if [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}" ]]; then
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}-${QGW_Edition_Arr_NameSelected}"
-    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then 
+    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}" ]]; then
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}"
-    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}" ]]; then 
+    elif [[ -d "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}" ]]; then
       New_VM_InstanceName="${QGW_OS_Arr_NameSelected}"
     fi
-    #  file check  .conf 
-    if [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then 
+    #  file check  .conf
+    if [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf" ]]; then
       New_VM_Conf_File="${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}-${QGW_Release_Arr_NameSelected}.conf"
-    elif [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}.conf" ]]; then 
+    elif [[ -f "${QWG_Conf_Dir}/${QGW_OS_Arr_NameSelected}.conf" ]]; then
       New_VM_Conf_File="${QGW_OS_Arr_NameSelected}.conf"
-    elif [[ -f "${QWG_Conf_Dir}/${New_VM_InstanceName}.conf" ]]; then 
+    elif [[ -f "${QWG_Conf_Dir}/${New_VM_InstanceName}.conf" ]]; then
       New_VM_Conf_File="${New_VM_InstanceName}.conf"
     fi
     if [[ -d "$New_VM_InstanceName" ]]; then
@@ -1480,7 +1480,7 @@ function_quick_get_wrap ()  {
       fi
     elif [[ ! -d "$New_VM_InstanceName" ]]; then
       # Quickget final name output can vary from expected. qqX ver 1.11 adds an output into the freespirit code
-      if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
+      if grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then
         source "/tmp/qe_new_vm_name.txt"
         New_VM_Conf_File="${New_VM_InstanceName}.conf"
         QGW_DownloadStopped=
@@ -1508,10 +1508,10 @@ function_quick_get_wrap ()  {
       printf "%s\n" "$Zsync_SHA" > "$QWG_Conf_Dir/$ZsyncDL_Name/dl-sha.txt"
       date +%s 2>/dev/null  > "$QWG_Conf_Dir/$ZsyncDL_Name/zsync.date.txt"
     fi
-    LastZsync="0" 
+    LastZsync="0"
   fi
   if  [[ $ZsyncDownload ]]; then
-    if [[ $QGW_DownloadStopped ]]; then 
+    if [[ $QGW_DownloadStopped ]]; then
       printf "\n  Download Stopped > Residual files may be present"
       printf "\n\n  Removal of any residual files & folders has to be completed manually"
       if [[ $Zsync_Updatable_ISO ]]; then
@@ -1520,16 +1520,16 @@ function_quick_get_wrap ()  {
         printf "\n\n  Part downloads can usually be re-started if the folder is retained."
         printf "\n\n  Dev downloads usually undergo some kind of NAMING variance"
       fi
-    else  
-      if [[ ! $Zsync_Updatable_ISO ]]; then 
-        printf   "\n  End of Quickget processes ..." 
-        printf "\n\n  as Dev downloads usually undergo some kind of NAMING variance" 
+    else
+      if [[ ! $Zsync_Updatable_ISO ]]; then
+        printf   "\n  End of Quickget processes ..."
+        printf "\n\n  as Dev downloads usually undergo some kind of NAMING variance"
         printf "\n\n  checking of files & folders should to be completed manually"
       fi
     fi
-        
+
     # Note (@2023/07) that quickget includes code to remove 'zs.old' files, which may or may not have been needed,
-    # but Zsync can now give these files root protection so this removal may not work ...   
+    # but Zsync can now give these files root protection so this removal may not work ...
     # REVIEW Deletion and re-download may be the simpler way to go.  Zsync has a lot of code to keep maintained ...
     printf "\n\n"
 
@@ -1537,7 +1537,7 @@ function_quick_get_wrap ()  {
 
   # STANDARD
   if [[ -d "$New_VM_InstanceName" ]]; then
-  
+
     printColor "  Folder:  %s "  "$New_VM_InstanceName"
 
     if [[ -e "$New_VM_Conf_File" ]]; then printColor "\n .conf file created:  %s "  "$(basename "$New_VM_Conf_File")"
@@ -1545,19 +1545,19 @@ function_quick_get_wrap ()  {
     elif [[ ! -e $New_VM_Conf_File ]] || [[ $QGW_DownloadStopped ]]; then
 
       if [[ $QGW_DownloadStopped ]]; then
-        # post 1.11.05 this section may not be needed ... REVIEW 
+        # post 1.11.05 this section may not be needed ... REVIEW
         printf "\n\n  Download Stopped > Residual files are present"
         printf "\n\n  Linux part downloads can usually be re-started if the folder is retained."
       fi
-      [[ ! $New_VM_Conf_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >" 
+      [[ ! $New_VM_Conf_File ]] && printf "\n\n  As there is no .conf file, there may have been an ERROR >"
 
       New_VM_Folder_Contents="$(ls "$New_VM_InstanceName" 2>/dev/null)"
       printColor "\n\n  Folder contents:"
       if [[ $New_VM_Folder_Contents ]]; then  printf "\n\n%s " "$New_VM_Folder_Contents"
       else  printf "  None found"
       fi
-      printColor "\n\n  [d] delete the folder" 
-      [[ $New_VM_Conf_File ]] && printColor " and .conf" 
+      printColor "\n\n  [d] delete the folder"
+      [[ $New_VM_Conf_File ]] && printColor " and .conf"
       printf "  [enter] to retain & continue "
       printf "\n\n\n"
       read -rp "  >  "    QGW_FolderDelete
@@ -1567,15 +1567,15 @@ function_quick_get_wrap ()  {
         [[ -d "$New_VM_InstanceName" ]] && rm -f -r "$New_VM_InstanceName"
         [[ -e "$New_VM_Conf_File" ]] && rm -f "$New_VM_Conf_File"
         sleep 1
-      else  
+      else
         printf  "\n\n Folder/file retained \n\n"
         sleep 1
       fi
       cd "$Default_VM_Folder" || DefaultFolderError=1
-      Current_VM_Folder="$Default_VM_Folder" 
+      Current_VM_Folder="$Default_VM_Folder"
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
       clear_main_gt_start_vars
-      QGW_List_NumSelected_Next= 
+      QGW_List_NumSelected_Next=
       #refresh_sources_and_load_VM_arrays
       function_quick_get_wrap
       return
@@ -1592,16 +1592,16 @@ function_quick_get_wrap ()  {
     fi
 
     if [[ $QGW_DownloadStopped ]]; then
-      # post 1.11.05 this section may not be needed ... REVIEW 
+      # post 1.11.05 this section may not be needed ... REVIEW
       printf "\n\n  Download Stopped > there may have been an ERROR "
       printColor "\n\n  [enter] to cancel & return \n\n"
-      read -rp "  >  "  
+      read -rp "  >  "
       sleep 0.5
       cd "$Default_VM_Folder" || DefaultFolderError=1
-      Current_VM_Folder="$Default_VM_Folder" 
+      Current_VM_Folder="$Default_VM_Folder"
       New_VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
       clear_main_gt_start_vars
-      QGW_List_NumSelected_Next= 
+      QGW_List_NumSelected_Next=
       refresh_sources_and_load_VM_arrays
       return
     fi
@@ -1610,22 +1610,22 @@ function_quick_get_wrap ()  {
 
   if [[ -e $New_VM_Conf_File ]] && [[ ! $QGW_DownloadStopped ]]; then
     printf "\n\n  Tuning up .... \n"
-    VM_InstanceName="$New_VM_InstanceName"   
+    VM_InstanceName="$New_VM_InstanceName"
     VM_Conf_Dir="$QWG_Conf_Dir"
     VM_Conf_File="$(basename "$New_VM_Conf_File")"
     refresh_sources_and_load_VM_arrays
     NewFileTuneUp=1
     cp "/tmp/qmod-dl-url" "$VM_Conf_Dir/$VM_InstanceName/dl-url.txt"
-    function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"  
+    function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"
     # make sure values have been read, and at the least basic in case the tune up utility gets skipped
     refresh_conf_vars_and_values
     NewFileTuneUp=
     NewFileTuneUp_JustDone=1
   elif [[ $QGW_FolderDelete == "d" ]]; then  sleep 1
-  else  
+  else
     [[ $Zsync_Updatable_ISO ]] && printf "\e[3A\r"
-    if [[ ! $MainMenuZsync ]] && [[ ! $ZsyncDownload ]]; then 
-      printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > " 
+    if [[ ! $MainMenuZsync ]] && [[ ! $ZsyncDownload ]]; then
+      printColor "\n\n  [enter] to continue or return \n\n" ; read -rp "  > "
     fi
     printf "\n\n"
     return
@@ -1633,7 +1633,7 @@ function_quick_get_wrap ()  {
 
   if [[ $VM_Conf_Dir ]]; then cd "$VM_Conf_Dir"  || function_conf_error  "Working Directory NOT FOUND ,"
   fi
-  Current_VM_Folder="$VM_Conf_Dir" 
+  Current_VM_Folder="$VM_Conf_Dir"
   clear_main_gt_start_vars
   QGW_List_NumSelected_Next=
   SettingsFileAdjusted=1

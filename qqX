@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# NB Avoid use of "#!/usr/bin/env bash" in this script 
+# NB Avoid use of "#!/usr/bin/env bash" in this script
 # as it will mask process names & inhibit process controls.
 
 # qqX - quickemu quickget X terminal project  https://github.com/TuxVinyards/qqX
-# A text based Virtual Machine Manager for use with the 'quickemu' project  
-# https://github.com/quickemu-project/quickemu  
+# A text based Virtual Machine Manager for use with the 'quickemu' project
+# https://github.com/quickemu-project/quickemu
 
 # This script may be run directly from the folder but will need the settings file installing first.
 # See notes in the Setup & Install script.
 
 # Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,19 +24,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses 
+# https://www.gnu.org/licenses
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS.
 
 # https://www.shellcheck.net/wiki  ShellCheck global disables:
 # SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # Whilst SC1090,SC2024, SC154 become unfortunately necessary due to file sourcing of modules
 
 # shellcheck disable=SC2242
-# shellcheck disable=SC1090 
+# shellcheck disable=SC1090
 # shellcheck disable=SC2034
-# shellcheck disable=SC2154 
+# shellcheck disable=SC2154
 
 # Beta version notation changes @ 24/11 with intro of 'floatversion' and improved sorting abilities
 # Suffixes more closely follow 'semantic versioning' x.x.xx-suffix > major.minor.point and with optional as -beta.01 etc
@@ -54,24 +54,24 @@ if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; ex
 else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
 fi
 
-# Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking 
+# Avoid 'kworker' grep errors, try to make sure that all processes have been statted properly before checking
 sleep 0.4
 
 # Check name is okay. qqX but also lc qqx symlink.
-if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi   
-  
+if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi
+
 # DEV Start is used as flag to show which source is being used. Check if starting qqX directly from a source folder
 # i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present
 if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
-# DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,        
+# DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,
 # where timed pauses are given. Some diagnostics require enter key to continue ...
 NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=        ### DEV ###
 
 function dev_loop_check {
   if [[ $GeneralLoopCheck ]]; then
     echo; echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
-    echo "pwd: $(pwd)   Current_VM_Folder = $Current_VM_Folder"  
+    echo "pwd: $(pwd)   Current_VM_Folder = $Current_VM_Folder"
     echo "BootStyle = $BootStyle   BootStyleMsg = $BootStyleMsg    BootStyle_Default = $BootStyle_Default   BootStyleMsg_Default = $BootStyleMsg_Default"
     echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
     echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
@@ -111,7 +111,7 @@ function path_diagnostics {
 tput civis
 System_qqX_Path="$(type -p qqX)"
 
-# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'  
+# Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'
 # Using caps (type -P) will show aliases and qqX re-routes
 # BUT 'QE_SystemFilePath' should be probed at the start of qqX, and before any builtins or re-routes happen,
 # otherwise finding the filepath gets a bit complex ...
@@ -131,14 +131,14 @@ qqX_CustomFolder="$(dirname "$qqX_MainFolder")""/qqX.custom"
 
 # qqF standalone  > CL launched running of qcow2 file management utility (using main qqX to refresh the nbd vars)
 # early launch following the location of 'qqX_MainFolder' (and guessed filemanager)
-if [[ $1 == "--qqf" ]]; then 
+if [[ $1 == "--qqf" ]]; then
   { printf "\n qqX_MainFolder=\"%s\"" "$qqX_MainFolder"
     printf "\n qqX_CustomFolder=\"%s\"" "$qqX_CustomFolder"
     printf "\n FileManager=\"%s\"" "xdg-open"
-  } > "/tmp/qqX_nbd_vars"  
-  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then  
-    "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit 
-  else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit 
+  } > "/tmp/qqX_nbd_vars"
+  if [[ -e "$qqX_CustomFolder/custom_filemanage_qcow_drive" ]]; then
+    "$qqX_CustomFolder/custom_filemanage_qcow_drive" --qqf ; exit
+  else "$qqX_MainFolder/qqX_filemanage_qcow_drive" --qqf ; exit
   fi
 fi
 
@@ -160,7 +160,7 @@ Extra_QE_Params=
 ConfClearanceLog="/tmp/qqX_ConfClearance_Log.txt"
 [[ ! -e "$ConfClearanceLog" ]] && printf "" > "$ConfClearanceLog"
 
-# LOAD qqX main  
+# LOAD qqX main
 source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
@@ -189,21 +189,21 @@ source "$qqX_MainFolder/qqX_main_menu_actions"
 
 function main_menu {
   while true ; do
-    MainMenuChoice= 
+    MainMenuChoice=
     SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
     if [[ $KillPID_Menu_Exited ]] ; then
-      KillPID_Menu_Exited=  ;  UseCustomBootArgs=  
-      if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then 
+      KillPID_Menu_Exited=  ;  UseCustomBootArgs=
+      if [[ $InstancePID ]] && [[ $( ps -p "$InstancePID" --no-headers ) ]] && [[ $(cat "${VMDIR}/${VMNAME}.pid" 2> /dev/null) ]]; then
         printf "\n\n  %s is still running ..." "$VM_InstanceName" ; vm_pid_kill_menu ; continue
-      else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName" 
+      else  InstancePID= ;  printf "\n    %s   >   is now shut down  >  select restart or manage \n" "$VM_InstanceName"
       fi
     fi
     main_menu_interface
     main_menu_actions
     [[ $VM_Renamed ]] || [[ ! $VM_InstanceName ]] && return
   done
-} 
+}
 
 #find_quick_version_numbers
 tput civis
@@ -213,12 +213,12 @@ printf "\n  Running initial checks .... \n"
 
 # Once only, at the start.
 if [[ ! $Disable_qqX_upd_Checks ]]; then
-  check_for_qqX_updates &   
+  check_for_qqX_updates &
   qqX_UpdaterPID="$!"
   find_latest_qemu_version &
 fi
 
-#  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize' 
+#  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize'
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
 [[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
@@ -236,18 +236,18 @@ tput civis
 while true ; do
   [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, start:" &&  dev_loop_check
 
-  # Where 'ByPass_VM_Array_Selector' implies run the loader section only 
+  # Where 'ByPass_VM_Array_Selector' implies run the loader section only
   # eg. for XDG and .conf clicked starts where we already have made the name decision and selection ...
   # as the VM array must still be loaded for reselecting later if needed
 
-  if [[ ! $VM_InstanceName ]] || [[ $ByPass_VM_Array_Selector ]]; then 
-    VM_loader_selector_and_menu 
+  if [[ ! $VM_InstanceName ]] || [[ $ByPass_VM_Array_Selector ]]; then
+    VM_loader_selector_and_menu
     [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, VM selector:" &&  dev_loop_check
-  else  
-    # PWD should now be the conf directory but make sure we are actually there.  
+  else
+    # PWD should now be the conf directory but make sure we are actually there.
     # Could happen if tune up follows a download that was started in a different folder to the target new one.
     # Otherwise, go to the VM Selector.
-    if [[ -d "$VM_Conf_Dir" ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then 
+    if [[ -d "$VM_Conf_Dir" ]] && [[ -d "$VM_Conf_Dir/$VM_InstanceName" ]]; then
       cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder "
       Current_VM_Folder="$VM_Conf_Dir"
       reload_boot_style_defaults
@@ -259,7 +259,7 @@ while true ; do
     else
       VM_InstanceName=
     fi
-  fi   
+  fi
 done
 tput  cnorm
 
@@ -268,45 +268,45 @@ tput  cnorm
 
 ##########################################
 
-## CODING STYLE 
+## CODING STYLE
 
 #  A more modern, more Bash orientated, style of coding is used for qqX than that used for quickemu:
 
-#  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.  
+#  VARIABLES should normally tend towards 'CamelCase' & FUNCTIONS should tend towards 'snake_case'.
 #  Aim for clarity and contextual identity. Emphasis or separation underscoring & caps should be added where needed.
 
 #  Modern editors, such as VS Code or Sublime have auto-suggesting which enables longer & more helpful VariableNames.
 #  Also Shellcheck will not continuity follow all-caps variables either, even if SC2154 is enabled ...
 #  https://en.wikipedia.org/wiki/Camel_case   https://en.wikipedia.org/wiki/Snake_case
 
-#  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text. 
-#  Some of quickemu's variables can be very ambiguous eg. '$VERSION' but in some places have to be used. 
+#  Variables {don't} need to be braced unless using string manipulations or needing to stop vars from merging with other text.
+#  Some of quickemu's variables can be very ambiguous eg. '$VERSION' but in some places have to be used.
 #  Except for the .conf file, where they are lowercase, they are generally CAPS and very brief ...
 
 #  BRACKETS:  if [[ $Foo ]] && [[ ! $Bar ]] ...   Posix Style is not needed:  if [ -n ${FOO} ] && [ -z ${bar} ] ....
 
 #  The [[ double bracket ]] system is now the standard method in the Bash Manual.
-#  See  https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b  
-#  Plus https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031 
+#  See  https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b
+#  Plus https://ss64.com/bash/test.html  And (older article) http://mywiki.wooledge.org/BashFAQ/031
 
 #  COMMENTS: Add clarification or explanation to code, especially if the origin or meaning could be difficult to follow.
 
-#  Add links to any how-to's that you used.  If you needed to check, then others may do also. 
+#  Add links to any how-to's that you used.  If you needed to check, then others may do also.
 #  Let others follow what you are/were thinking at the time & give Bash beginners a chance too.
 #  It makes it easier for everyone, especially later on.
 
-#  SPACE:  Give your code some room to breathe. But also keep your code tight enough to view on smaller screens.    
-#  Place it into clear logic blocks. Make it easy to follow & easy to see what is happening.  
+#  SPACE:  Give your code some room to breathe. But also keep your code tight enough to view on smaller screens.
+#  Place it into clear logic blocks. Make it easy to follow & easy to see what is happening.
 
 #  SED, AWK and REGEX:  Commands can very easily finish up as lines of indecipherable hieroglyphics.
-#  If you must use them, keep things very simple & explain the sections.  
+#  If you must use them, keep things very simple & explain the sections.
 #  Where possible use Bash's string manipulations instead.   See: http://mywiki.wooledge.org/BashFAQ/100
 
 #  ECHO: Beyond basic one-liners, the use of printf should generally be preferred.  See https://ss64.com/bash/printf.html
 #  However & specifically, echo within the vm boot control section of the qqX script *must* be avoided
-#  as an echo trap is used to tee quickemu screen output to the qqX boot log.  
+#  as an echo trap is used to tee quickemu screen output to the qqX boot log.
 
-#  All code should be SHELLCHECK linted & disables avoided where possible.  
+#  All code should be SHELLCHECK linted & disables avoided where possible.
 #  The VS Code shellcheck extension works well if set to 'check-on-save'.
 
 
@@ -316,4 +316,4 @@ tput  cnorm
 
 # vim:tabstop=2:shiftwidth=2:expandtab
 
-## 
+##

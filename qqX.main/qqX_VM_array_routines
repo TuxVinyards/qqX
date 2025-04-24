@@ -3,35 +3,35 @@
 ##  helper file for 'qqX_VM_array_and_Select' to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 # For notes on custom vm menus > edit > find > "Custom styles" in 'qqX.main/qqX_VM_selector_styles'
 
 add_unlisted_vm_to_vm_array () {
 
-  ## Adds to VM array & lists, if submitted item has not been already listed 
+  ## Adds to VM array & lists, if submitted item has not been already listed
   #  where $1 is 'VM_Path' and  $2 is 'VM_Conf_File' to be tested against the existing list (non-sparse)
 
   if [[ $1 ]]; then
 
     # make sure that a $1 has been sent & that the calling array splitter hasn't sent an empty value
     TestFolderFile="$1/$2"
-    [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return 
+    [[ ! -e $TestFolderFile && $2 != "empty" ]] && function_conf_error  "VM_array_add_confs: File Not Found" && return
 
-    if [[ ! ${VM_Array[0,0]} ]]; then 
-      New_VM_ElementCount=0  
-    else 
-      New_VM_ElementCount="$((${#VM_Array[@]} / 2))" 
+    if [[ ! ${VM_Array[0,0]} ]]; then
+      New_VM_ElementCount=0
+    else
+      New_VM_ElementCount="$((${#VM_Array[@]} / 2))"
       local i=0
       while [[ ${VM_Array[$i,0]} ]]; do
         ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
@@ -42,10 +42,10 @@ add_unlisted_vm_to_vm_array () {
     fi
 
     # if it's the first entry, or at the end there is no match found in the array, then add it
-    VM_Array["$New_VM_ElementCount",0]="$1" 
-    VM_Array["$New_VM_ElementCount",1]="$2" 
+    VM_Array["$New_VM_ElementCount",0]="$1"
+    VM_Array["$New_VM_ElementCount",1]="$2"
   fi
-  
+
 }
 
 scan_folders_list_and_add_VMs () {
@@ -54,21 +54,21 @@ scan_folders_list_and_add_VMs () {
   #  Adds via calls to ** 'add_unlisted_vm_to_vm_array' **
 
   #  If the general settings file has populated or part-populated the VM array, then ${VM_Array[0,0]} will be present
-  #  Starts by checking for the settings file for array entry errors.  
+  #  Starts by checking for the settings file for array entry errors.
   #  Count will be low at this point, just the manual entries in the settings file.
 
   VM_SettingsError=
-  VM_ElementCount="${#VM_Array[@]}" 
+  VM_ElementCount="${#VM_Array[@]}"
 
-  if [[ $VM_ElementCount ]]; then 
+  if [[ $VM_ElementCount ]]; then
 
     while true ; do
 
       # Settings file checking loop. Runs until either settings file reads correctly or the user quits.
 
       # CHECK 1
-      # Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039  
-      [[ "$(( VM_ElementCount % 2 ))" == "1" ]] &&  VM_SettingsError=1 
+      # Use 'modulo' to detect odd/even   See: https://stackoverflow.com/a/15660039
+      [[ "$(( VM_ElementCount % 2 ))" == "1" ]] &&  VM_SettingsError=1
 
       # CHECK 2
       if [[ ! $VM_SettingsError ]]; then
@@ -80,12 +80,12 @@ scan_folders_list_and_add_VMs () {
         VM_PairsCount=0
         while [[ ${VM_Array[$i,0]} ]]; do
           ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
-          if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then  
+          if [[ -d "${VM_Array[$i,0]}" && -f "$ArrFolderFile"  ]]; then
             [[ $VM_PairsCount -eq  "$VM_ElementCount" ]] &&  break
-            # else carry on interating the array 
-            ((i+=1))  
-            ((VM_PairsCount+=2))  
-          else  
+            # else carry on interating the array
+            ((i+=1))
+            ((VM_PairsCount+=2))
+          else
             VM_SettingsError=1
             printf "\n\n  Array Element(s) Not Found "
             printf "\n\n  Folder:  %s " "${VM_Array[$i,0]}"
@@ -98,9 +98,9 @@ scan_folders_list_and_add_VMs () {
 
       # CHECK 3
       # If empty array elements were present, the pairs counter won't have incremented fully
-      # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly. 
+      # & in associative arrays, unlike indexed ones, are not possible (@2023) to test for directly.
 
-      if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then  
+      if [[ $VM_PairsCount != "$VM_ElementCount" ]]; then
         VM_SettingsError=1
         printf "\n\n  Empty Array Element(s) Found "
       fi
@@ -120,7 +120,7 @@ scan_folders_list_and_add_VMs () {
       fi
 
     done
-    
+
   fi
 
   # Scan rest of list & ADD new found .conf files / distros to the VM array, if they are not yet listed:
@@ -128,20 +128,20 @@ scan_folders_list_and_add_VMs () {
   while [[ ${VM_Folder_List[i]} ]]; do
 
     FolderPathName="${VM_Folder_List[i]}"
-    Folder_Conf_String="$(ls "$FolderPathName/"*.conf 2> /dev/null)"      # list all .confs in the folder  
+    Folder_Conf_String="$(ls "$FolderPathName/"*.conf 2> /dev/null)"      # list all .confs in the folder
     Folder_Conf_String=${Folder_Conf_String//"$FolderPathName/"/}         # remove all paths, one from each entry in the string
     [[ ! $Folder_Conf_String ]] && Folder_Conf_String="empty"             # add dummy value for when new extra folders are added
-    mapfile -t  Folder_Conf_Array  <<< "$Folder_Conf_String"              # convert the line separated string to an array   
+    mapfile -t  Folder_Conf_Array  <<< "$Folder_Conf_String"              # convert the line separated string to an array
 
-    if [[ ${Folder_Conf_Array[0]} ]]; then 
+    if [[ ${Folder_Conf_Array[0]} ]]; then
 
       if [[ ${Folder_Conf_Array[0]} == "empty" ]]; then
-        add_unlisted_vm_to_vm_array  "$FolderPathName" "empty" 
+        add_unlisted_vm_to_vm_array  "$FolderPathName" "empty"
       else
-        for TestFile in "${Folder_Conf_Array[@]}"; do 
-          # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]} 
+        for TestFile in "${Folder_Conf_Array[@]}"; do
+          # calls adding function, one by one, if the .conf file appears to be valid, & builds the ${VM_Array[*,*]}
           if grep -q -s 'guest_os=' "$FolderPathName/$TestFile"; then
-            add_unlisted_vm_to_vm_array  "$FolderPathName" "$TestFile" 
+            add_unlisted_vm_to_vm_array  "$FolderPathName" "$TestFile"
           fi
         done
       fi
@@ -167,16 +167,16 @@ scan_folders_list_and_add_VMs () {
 scan_VM_Array_for_sizes () {
 
   # human set for report
-  printf "" > "/tmp/qqX.Sizes.qcow.txt"  
-  printf "" > "/tmp/qqX.Sizes.qcow.F.txt"  
-  printf "" > "/tmp/qqX.Sizes.iso.txt"  
-  printf "" > "/tmp/qqX.Sizes.iso.F.txt"  
+  printf "" > "/tmp/qqX.Sizes.qcow.txt"
+  printf "" > "/tmp/qqX.Sizes.qcow.F.txt"
+  printf "" > "/tmp/qqX.Sizes.iso.txt"
+  printf "" > "/tmp/qqX.Sizes.iso.F.txt"
   local i=0
   ArrFolderPath=
   while [[ ${VM_Array[$i,0]} ]]; do
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    if [[ $ArrFolderPath && -e "$ArrFolderFile" ]] && [[ $ArrFolderPath != "${VM_Array[$i,0]}" ]]; then 
+    if [[ $ArrFolderPath && -e "$ArrFolderFile" ]] && [[ $ArrFolderPath != "${VM_Array[$i,0]}" ]]; then
       printf "\n" >> "/tmp/qqX.Sizes.qcow.F.txt" ; printf "\n" >> "/tmp/qqX.Sizes.iso.F.txt"
     fi
     du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "\n%-6s %s", $1, $2 }'\
@@ -193,7 +193,7 @@ scan_VM_Array_for_sizes () {
     du -d 4 -t 100M -h -a "$ArrFolder" 2>/dev/null | grep qcow | awk '{ printf "\n%-6s %s", $1, $2 }'\
     | tee -a "/tmp/qqX.Sizes.qcow.txt" -a "/tmp/qqX.Sizes.qcow.F.txt" &> /dev/null
     du -d 4 -t 30M -h -a "$ArrFolder" 2>/dev/null | grep -e 'iso' -e 'img' | awk '{ printf "%-6s %s\n", $1, $2 }'\
-    | tee -a "/tmp/qqX.Sizes.iso.txt" -a "/tmp/qqX.Sizes.iso.F.txt" &> /dev/null 
+    | tee -a "/tmp/qqX.Sizes.iso.txt" -a "/tmp/qqX.Sizes.iso.F.txt" &> /dev/null
   fi
 
   BackUpQcowPresent="$(grep -cs '.OLD.qcow2' "/tmp/qqX.Sizes.qcow.txt")"
@@ -201,24 +201,24 @@ scan_VM_Array_for_sizes () {
 
   # machine set for calcs
   # both cases avoid using du with -L otherwise symbolically linked instances will cause double counts when totalling storage
-  printf "" > "/tmp/qqX.Sizes.qcow.K.txt"  
-  printf "" > "/tmp/qqX.Sizes.iso.K.txt"  
+  printf "" > "/tmp/qqX.Sizes.qcow.K.txt"
+  printf "" > "/tmp/qqX.Sizes.iso.K.txt"
   i=0
   while [[ ${VM_Array[$i,0]} ]]; do
     ArrFolderFile="${VM_Array[$i,0]}/${VM_Array[$i,1]}"
     ArrFolder="${ArrFolderFile/'.conf'/}"
-    du -d 4 -t 100M -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 
-    du -d 4 -t 30M -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 
+    du -d 4 -t 100M -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt"
+    du -d 4 -t 30M -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt"
     ((i+=1))
   done
 
   if [[ $SharedDrive ]]; then
     ArrFolder="$(dirname "$SharedDrive")"
-    du -d 4 -t 100M -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt" 
-    du -d 4 -t 30M -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt" 
+    du -d 4 -t 100M -a "$ArrFolder" 2>/dev/null | sort -nr | grep qcow >> "/tmp/qqX.Sizes.qcow.K.txt"
+    du -d 4 -t 30M -a "$ArrFolder" 2>/dev/null | sort -nr | grep -e 'iso' -e 'img' >> "/tmp/qqX.Sizes.iso.K.txt"
   fi
 
-  if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null ) ]]; then  
+  if [[ $(cat "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null ) ]]; then
     TotalQcow2_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.qcow.K.txt" 2>/dev/null)"
     TotalQcow2_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.qcow.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
     TotalQcow2_Sizes="$(bc <<< "scale=2; $TotalQcow2_Sizes/1000000")"
@@ -227,7 +227,7 @@ scan_VM_Array_for_sizes () {
     TotalQcow2_SizesCount="0"
   fi
 
-  if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null ) ]]; then  
+  if [[ $(cat "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null ) ]]; then
     Total_ISO_SizesCount="$(grep -Ec ^'[1-9]' "/tmp/qqX.Sizes.iso.K.txt" 2>/dev/null)"
     Total_ISO_Sizes="$(grep -E ^'[1-9]' < "/tmp/qqX.Sizes.iso.K.txt" | awk '{print $1}' | paste -sd+ | bc -l  2>/dev/null)"
     Total_ISO_Sizes="$(bc <<< "scale=2; $Total_ISO_Sizes/1000000")"
@@ -245,12 +245,12 @@ show_VM_Array_sizes_text () {
   for SSArrChk in "${SizesScanArr[@]}"; do
     SSArrChk_Disk="$(awk '{print $2}' <<< "$SSArrChk")"
     check_if_disk_needs_a_cleanup "$SSArrChk_Disk"
-    [[ $DiskDisparity == "1" ]] && printf "SIZE DISPARITY: %s \n\n" "$SSArrChk_Disk"  >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
+    [[ $DiskDisparity -ge "1" ]] && printf "SIZE DISPARITY: %s \n\n" "$SSArrChk_Disk"  >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
   done
   [[ ! $(cat "/tmp/qqX.Sizes.Disparity.qcow.txt") ]] &&  printf "No disk size disparity problems found \n\n"   >> "/tmp/qqX.Sizes.Disparity.qcow.txt"
 
   printf "\nDisk by Size: \n\n" > "/tmp/qqX.SizesTotals.txt"
-  { 
+  {
     if [[ $(cat "/tmp/qqX.Sizes.qcow.txt") ]]; then  sort -hr "/tmp/qqX.Sizes.qcow.txt"
     else printf "\nNo distros have yet been installed to disk"
     fi
@@ -267,15 +267,15 @@ show_VM_Array_sizes_text () {
     fi
     printf "\nTotal Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
     printf "\n\n\nDisk by Folder: \n"
-    if [[ "$(cat "/tmp/qqX.Sizes.qcow.F.txt" 2>/dev/null)" ]]; then 
+    if [[ "$(cat "/tmp/qqX.Sizes.qcow.F.txt" 2>/dev/null)" ]]; then
       cat -s "/tmp/qqX.Sizes.qcow.F.txt" ; printf "\n\n"
     fi
-    printf "\nISO by Folder: \n" 
+    printf "\nISO by Folder: \n"
     cat -s "/tmp/qqX.Sizes.iso.F.txt"
-    printf "\n\n" 
+    printf "\n\n"
     printf "Total Storage:  Drives %s (%s)  ISO's %s (%s)" "${TotalQcow2_Sizes}G" "$TotalQcow2_SizesCount" "${Total_ISO_Sizes}G" "$Total_ISO_SizesCount"
-    printf "\n\n" 
-  }>> "/tmp/qqX.SizesTotals.txt" 
+    printf "\n\n"
+  }>> "/tmp/qqX.SizesTotals.txt"
 
   sleep 0.5
   (nohup &> /dev/null  "$TextEditor" "/tmp/qqX.SizesTotals.txt" & ) || texteditor_not_found_message
@@ -284,10 +284,10 @@ show_VM_Array_sizes_text () {
 
 VM_check_and_load () {
 
-  #  Routines to find and set up 'VM_InstanceName' 
+  #  Routines to find and set up 'VM_InstanceName'
   #  VM_Conf_Dir and VM_Conf_File are expected to be present at this point
 
-  if  [[ $VM_Renamed || ! $ByPass_VM_Array_Selector ]] && [[ ! $SelectArrayError ]]; then  
+  if  [[ $VM_Renamed || ! $ByPass_VM_Array_Selector ]] && [[ ! $SelectArrayError ]]; then
 
     [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 2:" &&  dev_loop_check
 
@@ -298,18 +298,18 @@ VM_check_and_load () {
     ! cd "$VM_Conf_Dir"  &&  printColor "\n\n  ERROR  .conf  folder switching \n\n" && sleep 5 && exit 1
     Current_VM_Folder="$VM_Conf_Dir"
 
-    if [[ ! $IgnoreFolderCheck ]] && [[ $VM_Conf_File != "empty" ]] && [[ ! -e "$VM_Conf_File" ]]; then  
+    if [[ ! $IgnoreFolderCheck ]] && [[ $VM_Conf_File != "empty" ]] && [[ ! -e "$VM_Conf_File" ]]; then
       function_conf_error  ".conf file" && SelectArrayError=1
     fi
 
-    # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder 
+    # Set Instance Name, following Quickemu pattern which sets the same name to the .conf file and to the main folder
     VM_InstanceName="${VM_Conf_File/.conf}"
 
     # Check that the dir contains the right files  &&  grep .conf for right content
     if [[ $IgnoreFolderCheck || $VM_Conf_File == "empty" ]]; then IgnoreFolderCheck=
     elif [[ ! $(ls "$VM_InstanceName"/*.qcow2 2>/dev/null) ]]; then
-      if [[ $(ls "$VM_InstanceName"/*.iso 2>/dev/null) || $(ls "$VM_InstanceName"/*.img 2>/dev/null) ]]; then 
-        SelectArrayError=1; function_conf_error  "new" 
+      if [[ $(ls "$VM_InstanceName"/*.iso 2>/dev/null) || $(ls "$VM_InstanceName"/*.img 2>/dev/null) ]]; then
+        SelectArrayError=1; function_conf_error  "new"
       else
         SelectArrayError=1; function_conf_error  "folder"
       fi
@@ -318,28 +318,28 @@ VM_check_and_load () {
     if [[ ! $SelectArrayError ]]; then
       ! grep -q -s 'guest_os=' "$VM_Conf_File" && function_conf_error  ".conf file"   && SelectArrayError=1
     fi
-    
+
     if [[ ! $SelectArrayError ]]; then
       # Check KVM parameter settings of new selection & advise accordingly
       KVM_MSR_selector=
       find_kvm_msr_default_and_status
-      if [[ $Verbose_MSR_dialog ]] || [[ ! $Verbose_MSR_dialog ]] && [[ "$VM_InstanceName" == *windows* || "$VM_InstanceName" == *macos* ]]; then 
+      if [[ $Verbose_MSR_dialog ]] || [[ ! $Verbose_MSR_dialog ]] && [[ "$VM_InstanceName" == *windows* || "$VM_InstanceName" == *macos* ]]; then
         msrs_conflict_check_resolver
       fi
     fi
 
-  fi  
-  
-  if [[ $SelectArrayError || $SettingsFileAdjusted ]] && [[ ! $NewFileTuneUp_JustDone ]]; then 
-  
-    VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=  
+  fi
+
+  if [[ $SelectArrayError || $SettingsFileAdjusted ]] && [[ ! $NewFileTuneUp_JustDone ]]; then
+
+    VM_Conf_Dir= ; VM_Conf_File= ; VM_InstanceName=
     # reload if the editor was called, or called due to settings error > zero vars triggers the main qqX loop
 
   else
 
     [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 3:" &&  dev_loop_check
 
-    # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+    # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file
     # otherwise any items specified in the previous config, but not in the new one, will remain.
     refresh_conf_vars_and_values
 
@@ -364,18 +364,18 @@ VM_check_and_load () {
 
 refresh_sources_and_load_VM_arrays() {
 
-  # VM folder list should be compiled from the perspective of the Default Folder. 
+  # VM folder list should be compiled from the perspective of the Default Folder.
   # If not already there, make sure this is the case.
   local RefreshCallFolder=
   local RefreshCall_VM_Folder=
   RefreshCallFolder="$(pwd)"
   RefreshCall_VM_Folder="$Current_VM_Folder"
   cd "$Default_VM_Folder" || printf "\n\n  ERROR changing to Default_VM_Folder to rebase the refresh"
-  Current_VM_Folder="$Default_VM_Folder" 
+  Current_VM_Folder="$Default_VM_Folder"
 
-  # clear any previously declared settings-based arrays 
+  # clear any previously declared settings-based arrays
   Extra_VM_Folder=()
-  VM_Array=()   
+  VM_Array=()
   QemuErrorFilter=()
   clear_boot_style_vars
 
@@ -389,9 +389,9 @@ refresh_sources_and_load_VM_arrays() {
   ForceCustomBootStyle=
 
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
-  source "$qqX_SettingsFile" 
+  source "$qqX_SettingsFile"
 
-  [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap" 
+  [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap"
   refresh_and_load_quickemu_sources
   store_boot_style_defaults
   find_file_manager_browser
@@ -399,11 +399,11 @@ refresh_sources_and_load_VM_arrays() {
 
   Current_VM_Folder="$Default_VM_Folder"
 
-  function_create_VM_folderList  
+  function_create_VM_folderList
   scan_folders_list_and_add_VMs
   scan_VM_Array_for_sizes
 
-  cd "$RefreshCallFolder" || printColor "\n\n  ERROR returning to Original Location following the Array refresh" 
+  cd "$RefreshCallFolder" || printColor "\n\n  ERROR returning to Original Location following the Array refresh"
   Current_VM_Folder="$RefreshCall_VM_Folder"
 
   refresh_conf_vars_and_values

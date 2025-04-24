@@ -3,17 +3,17 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 function  main_menu_actions {
 
@@ -21,7 +21,7 @@ function  main_menu_actions {
 
     show_qqX_general_help
 
-  elif [[ $MainMenuChoice == "tx" ]]; then 
+  elif [[ $MainMenuChoice == "tx" ]]; then
 
     printf "\n\n  Google Chrome or Microsoft Edge are Recommended"
     printf "\n\n  For General notes on translation see: \n\n  https://github.com/TuxVinyards/qqX/wiki/Translation"
@@ -36,25 +36,25 @@ function  main_menu_actions {
       TxSetCode= ; return
     fi
 
-  elif [[ $MainMenuChoice == "w" ]]; then 
+  elif [[ $MainMenuChoice == "w" ]]; then
 
     printf "\n\n  HomePage = %s" "$DistroHomePage"
     printColor "\n\n  [enter] to load in browser  [b] to go back \n\n"
     read -rp "  >  "  LoadHomePage
     if [[ ! $LoadHomePage ]]; then
       printf "\n  Opening Browser ... \n\n"
-      (nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & ) || web_browser_not_found_message 
+      (nohup &> /dev/null  "$WebBrowser"  "$DistroHomePage"  & ) || web_browser_not_found_message
       sleep 1
     else
       LoadHomePage= ; return
     fi
 
-  elif [[ $MainMenuChoice == "del" ]]; then 
+  elif [[ $MainMenuChoice == "del" ]]; then
 
     function_delete_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
 
-  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "rn" || $MainMenuChoice == "ln" ]]; then 
+  elif [[ $MainMenuChoice == "mv" || $MainMenuChoice == "rn" || $MainMenuChoice == "ln" ]]; then
 
     move_rename_Selected_VM  "$VM_InstanceName"  "$VM_Conf_File"
     return
@@ -63,13 +63,13 @@ function  main_menu_actions {
 
     AddHW_Record=
 
-    if [[ -e "$QemuArgsFile" ]]; then 
+    if [[ -e "$QemuArgsFile" ]]; then
 
       printf "\033c"
       if [[ -e "$QemuVirtHardwareRecord" ]]; then printf "\n\n  Existing Record: \n\n"; cat "$QemuVirtHardwareRecord"; fi
       printf "\n\n  Current Args / Qemu Virtual Hardware \n\n"
       cat "$QemuArgsFile"
-      
+
       if [[ -e "$QemuVirtHardwareRecord" ]]; then printColor "  Copy Current Args onto the end of existing record list?\n\n"
       else printColor "  Create new Virtual Hardware Record using Current Args?\n\n"
       fi
@@ -83,7 +83,7 @@ function  main_menu_actions {
       printf "\n\n  No Args log found. The virtual machine launch process must be run first. \n\n"
       printf "\n\n  The 'VerboseArgs' option may be used, which will allow checking.  \n\n"
 
-    fi 
+    fi
 
   elif [[ $MainMenuChoice == "u" ]] ; then
 
@@ -91,17 +91,17 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "set" ]] ; then  qqX_edit_settings
 
-  elif [[ $MainMenuChoice == "tmc" ]] ; then  
+  elif [[ $MainMenuChoice == "tmc" ]] ; then
 
     find_texteditor
     if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
     else
-      if [[  -e  "$HOME/.qqX/qqX_term.conf" ]]; then 
+      if [[  -e  "$HOME/.qqX/qqX_term.conf" ]]; then
         printColor "\n\n  Follow up by running the latest release installer for changes to the Terminal config to take effect"
         printf  "\n\n  [enter] to edit or view \n\n"
         read -rp "  >  "
         (nohup &> /dev/null   "$TextEditor" "$HOME/.qqX/qqX_term.conf"  & )  || texteditor_not_found_message
-      else  
+      else
         printColor "\n\n  Read the installer notes and run the latest release installer to create a Terminal config ..."
         printf  "\n\n  [enter] to return \n\n"
         read -rp "  >  "
@@ -110,7 +110,7 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "rtv" ]] ; then RunRtvCheck=1 ; refresh_tiano_vars ; RunRtvCheck=
 
-  elif [[ ${MainMenuChoice^^} == "FS" ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays 
+  elif [[ ${MainMenuChoice^^} == "FS" ]] ; then  CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
   elif [[ ${MainMenuChoice^^} == "FB" ]] ; then  CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
   elif [[ ${MainMenuChoice^^} == "HB" ]] ; then  CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
   elif [[ "${MainMenuChoice,,}" == ech* ]] ; then  CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; refresh_sources_and_load_VM_arrays
@@ -122,10 +122,10 @@ function  main_menu_actions {
 
     QL_LogView=
     printf "\n\n"
-    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then  
+    if [[ $(cat "$QemuErrorLog" 2>/dev/null) ]] ; then
       cat "$QemuErrorLog"
       printf "\n\n  This log gets cleared when you run the VM, or it can be cleared now.  For permanent adjustments, see notes in the main settings."
-    else  printf "  No qemu errors were present on the last VM load ...  ?? " 
+    else  printf "  No qemu errors were present on the last VM load ...  ?? "
     fi
 
     #  Avoid any "[W] permanent" type option because it could overwrite something manually placed in the .conf file
@@ -146,11 +146,11 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
 
-  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanagement_launcher  
+  elif [[ $MainMenuChoice == "qf" ]] ; then  qcow2_filemanagement_launcher
 
   elif [[ $MainMenuChoice == "dl" ]] ; then  download_new_release ; return
 
-  elif [[ $MainMenuChoice == "conf" ]] ; then  qqX_edit_settings  conf 
+  elif [[ $MainMenuChoice == "conf" ]] ; then  qqX_edit_settings  conf
 
   elif [[ $MainMenuChoice == "ce" ]] ; then qqX_edit_settings  custom
 
@@ -160,29 +160,29 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "iso" ]] ; then iso_select_mount_and_boot
 
-  elif [[ $MainMenuChoice == "fb" || $MainMenuChoice == "bm" ]] ; then 
-  
+  elif [[ $MainMenuChoice == "fb" || $MainMenuChoice == "bm" ]] ; then
+
     if [[ $BootStyle == "fast" ]]; then  BootStyle="slow" ; BootStyleMsg="slow"
     elif [[ $BootStyle == "slow" ]]; then  BootStyle="fast" ; BootStyleMsg="fast"
     fi
 
-  elif [[ $MainMenuChoice == "qd" ]] ; then 
+  elif [[ $MainMenuChoice == "qd" ]] ; then
     printf "\n  Opening Browser ... \n\n"
     (nohup &> /dev/null  "$WebBrowser"  "https://qemu.readthedocs.io"  & ) || web_browser_not_found_message
     sleep 1
-  elif [[ $MainMenuChoice == "qw" ]] ; then 
+  elif [[ $MainMenuChoice == "qw" ]] ; then
     printf "\n  Opening Browser ... \n\n"
     (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message
     sleep 1
-  elif [[ $MainMenuChoice == "qW" ]] ; then 
+  elif [[ $MainMenuChoice == "qW" ]] ; then
     printf "\n  Opening Browser ... \n\n"
     (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Windows-OS"  & ) || web_browser_not_found_message
     sleep 1
-    
-  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" 
 
-  elif [[ $MainMenuChoice == "gt" ]] ; then  
-  
+  elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File"
+
+  elif [[ $MainMenuChoice == "gt" ]] ; then
+
     # also see "vm" option
     source "$ConfClearanceLog"
     # no need to reload the arrays
@@ -197,24 +197,24 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "z" ]] ; then
 
-    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then 
+    if [[ $Zsync_Updatable_ISO && $Zsync_OS_Name && $Zsync_Release_Name ]]; then
       printf "\n\n  Updating the live boot development iso with any changes"
       # check name can be found for updates
       if ! grep -qs "  ${Zsync_OS_Name})" "$QG_SourcePath" ; then
         printColor "\n\n  Naming ERROR  >  Can't find '%s' as a Quickget listed distro?  Try a re-install? \n\n\n" "$Zsync_OS_Name"
       else
-        if [[ $LastZsync -lt 360000 ]]; then 
+        if [[ $LastZsync -lt 360000 ]]; then
           printColor "\n\n  Normally only takes a few moments to compare & synchronize"
           printf " - Last updated only %d hrs ago"  "$((LastZsync/3600))"
         fi
-        if [[ $LastZsync -gt 2000000 ]]; then 
+        if [[ $LastZsync -gt 2000000 ]]; then
           printColor "\n\n  May take a while to compare & synchronize"
           printColor " - last updated over %d days ago"  "$((LastZsync/86400))"
           printf "\n\n  Deletion and re-download can sometimes be quicker ...."
         fi
         printf "\n\n  [enter] to continue "
         if [[ $LastZsync -gt 3600000 ]]; then printColor "  (out-of-date)"
-        elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then 
+        elif [[ $New_Zsync_SHA ]] && [[ $(cat "$VM_InstanceName/dl-sha.txt") ]]; then
           Curr_Zsync_SHA="$(awk '{print $1}' "$VM_InstanceName/dl-sha.txt")"
           if [[ ${Curr_Zsync_SHA// /} == "${New_Zsync_SHA// /}" ]]; then printf "  (up-to-date)"; else printf "  (update available)"
           fi
@@ -222,10 +222,10 @@ function  main_menu_actions {
       fi
       printf "  [b] to go back \n\n"
       read -rp "  >  "  ZsyncRemind
-      if [[ $ZsyncRemind ]]; then ZsyncRemind= 
+      if [[ $ZsyncRemind ]]; then ZsyncRemind=
       else MainMenuZsync=1 ; function_quick_get_wrap ; refresh_conf_vars_and_values
       fi
-    else  
+    else
       printColor "\n\n  %s is not being recognised as Zsync updatable Release"   "$VM_InstanceName"
       printf "\n\n  Note: only daily-live iso's are zsync updateable ..."
       printf "\n\n  [enter] to return \n\n"
@@ -237,39 +237,39 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "gl" ]] ; then
 
     if [[ $qqX_GL_Mode == "on" ]] ; then qqX_GL_Mode="off"
-    elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on" 
+    elif [[ $qqX_GL_Mode == "off" ]] ; then qqX_GL_Mode="on"
     fi
 
-  elif [[ $MainMenuChoice == "C" ]] ; then 
+  elif [[ $MainMenuChoice == "C" ]] ; then
 
     if [[ $ShowCustomBootStyle ]]; then  ForceCustomBootStyle="hide" ; else  ForceCustomBootStyle="show" ; fi
     MainMenuChoice=
-  
-  elif [[ $MainMenuChoice == "c" ]] ; then 
+
+  elif [[ $MainMenuChoice == "c" ]] ; then
 
     printf "\n\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then  show_msg_pid_found
     else
       UseCustomBootArgs=1
-      eval quickemu "-vm $VM_Conf_File --vm_boot" 
+      eval quickemu "-vm $VM_Conf_File --vm_boot"
       vm_pid_kill_menu
     fi
 
-  elif [[ $MainMenuChoice == "g" ]] ; then 
+  elif [[ $MainMenuChoice == "g" ]] ; then
 
     printf "\n\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
     else
       check_vm_nbd_boot_connected || return
-      eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk" 
+      eval quickemu "-vm $VM_Conf_File --vm_boot --display gtk"
       vm_pid_kill_menu
     fi
-        
-  elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then 
 
-    printf "\n\n" 
+  elif [[ $MainMenuChoice == "d" ]] || [[ $MainMenuChoice == "df" ]] ; then
+
+    printf "\n\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
-    elif ! grep -sqi sdl <<< "$(qemu-system-x86_64 -display help)" ; then 
+    elif ! grep -sqi sdl <<< "$(qemu-system-x86_64 -display help)" ; then
       printColor "\n\n  SDL cannot be found:"
       printf "\n\n  OpenSUSE distros lack -official- support for 'qemu-ui-sdl' "
       printf "\n\n  This may apply to others ??  Community tweaks might be available."
@@ -277,65 +277,66 @@ function  main_menu_actions {
       read -rp "  >  "
     else
       check_vm_nbd_boot_connected || return
-      if [[ $MainMenuChoice == "df"  ]]; then  
+      if [[ $MainMenuChoice == "df"  ]]; then
         if [[ "$SDL_ScreenSize_Cmd" == *width* ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScreenSize_Cmd97  $Extra_QE_Params"
-        else eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 97  $Extra_QE_Params" 
+        else eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl --screenpct 97  $Extra_QE_Params"
         fi
-      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScreenSize_Cmd $Extra_QE_Params" 
+      else  eval quickemu "-vm $VM_Conf_File --vm_boot --display sdl $SDL_ScreenSize_Cmd $Extra_QE_Params"
       fi
       [[ $InstancePID ]] && printf "\n  SDL: Use guest based display resize. Avoid resizing with the host mouse ...\n\n"
       vm_pid_kill_menu
     fi
-        
+
   elif  [[ $MainMenuChoice == "s" ]] || [[ $MainMenuChoice == "sf" ]] ; then
 
     printf "\n\n"
     if [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]]; then show_msg_pid_found
     else
-      check_vm_nbd_boot_connected || return 
+      check_vm_nbd_boot_connected || return
       if [[ $HeadlessCmd ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot $HeadlessCmd  $Extra_QE_Params"
       elif [[ $MainMenuChoice == "sf" ]]; then  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice --fullscreen  $Extra_QE_Params"
       else  eval quickemu "-vm $VM_Conf_File --vm_boot --display spice  $Extra_QE_Params"
       fi
       #  headless only runs in Spice
-      #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3 
+      #  https://qemu.readthedocs.io/en/latest/system/invocation.html#hxtool-3
       [[ $P_Kill_WaitSecs  -gt 1 ]] && P_Kill_WaitSecs="$(bc <<< "scale=0; ($P_Kill_WaitSecs+1.5)/2" 2>/dev/null)"
       vm_pid_kill_menu
     fi
-      
+
   elif  [[ $MainMenuChoice == "q" ]] ; then
 
     printf "\n\n" ; MainMenuChoice=
-    exit directly	
+    exit directly
 
   elif  [[ $MainMenuChoice == "i" ]] ; then
 
     drives_and_snapshots  info
 
-    if [[ $LiveBoot ]]; then 
+    if [[ $LiveBoot ]]; then
       printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
-      printf   "\n  The VIRTUAL Disk Size should normally be larger than the actual size occupied."
-      printf "\n\n  Deleting snapshots will reduce the data that needs storing and increase sizing accuracy. "
-      printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress." 
-      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations ..." 
+      printf   "\n  VIRTUAL DISK SIZE is normally larger than the actual size occupied but both the CoW and snapshot "
+      printf "\n\n  processes can sometimes make the envelope size appear to be lower than the contents."
+      printf "\n\n  Deleting snapshots will reduce Disk Size even if host reported sizes may not always reflect this."
+      printf "\n\n  FILE LENGTH greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress."
+      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations ..."
       printColor "\n\n  Use the qqX disk utility to resize and to tidy."
     fi
-    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then 
-      [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "  
+    if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
+      [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "
       printf "\n\n  [enter] to return to menu \n\n"
     else printColor "\n\n  [enter] to return to menu \n\n"
     fi
-    read -rp "  >  "  
+    read -rp "  >  "
 
   elif  [[ $MainMenuChoice == "disk" ]] ; then
-    
+
     DiskManage=
     while true; do
       manage_and_repair_disks
       if [[ $DiskManage == "b" ]]; then
-        DiskManage= 
+        DiskManage=
         break
       fi
     done
@@ -344,27 +345,27 @@ function  main_menu_actions {
 
     drives_and_snapshots
 
-    if [[ $SharedDriveArgs && $SecondDriveArgs ]]; then 
+    if [[ $SharedDriveArgs && $SecondDriveArgs ]]; then
       printColor "\n\n  Scroll to View " ; printf "\n\n  [enter] to return to menu \n\n"
     else printColor "  [enter] to return to menu \n\n"
     fi
-    read -rp "  >  "  
+    read -rp "  >  "
 
   elif  [[ $MainMenuChoice == "sc" ]] ; then
 
     drives_and_snapshots  select
 
     printColor "\n\n  [enter] Create snap with date.time title "
-    printf "  [text input] Create with text descriptor   [b] back to main menu " 
+    printf "  [text input] Create with text descriptor   [b] back to main menu "
     SnapTitle= ; scReturn=
     printf "\n\n"
     read -rp "  >  "  SnapTitle
-    printf "\n\n"	
+    printf "\n\n"
     [[ ! $SnapTitle ]] && SnapTitle="$(date +%b%d.%H.%M)"
-    if [[ $SnapTitle != "b" ]]; then 
+    if [[ $SnapTitle != "b" ]]; then
       # remove spaces, make title dot separated, as easier to IFS
       SnapTitle="${SnapTitle// /.}"
-      "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive" 
+      "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive"
       "$QEMU_IMG" info "$Selected_Drive"
       DiskStorageChanges=1
       printColor "\n\n  Drive Updated ..."
@@ -377,9 +378,9 @@ function  main_menu_actions {
 
   elif  [[ $MainMenuChoice == "sd" ]] ; then
 
-    drives_and_snapshots  select 
+    drives_and_snapshots  select
     qqX_snapshot_delete
-          
+
   elif  [[ $MainMenuChoice == "sa" ]] ; then
 
     drives_and_snapshots select
@@ -388,17 +389,17 @@ function  main_menu_actions {
     printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
     printf "\n\n"
     read -rp "  >  "  SnapNumber
-    printf "\n\n"	
+    printf "\n\n"
 
     if [[ $SnapNumber ]]; then
-    
-      "$QEMU_IMG" snapshot -q -a "$SnapNumber" "$Selected_Drive" 
+
+      "$QEMU_IMG" snapshot -q -a "$SnapNumber" "$Selected_Drive"
 
       printf "\n\n  May take a moment .... \n\n"
       printColor "\n\n  Snapshot %s has been applied. \n\n"  "$SnapNumber "
 
     fi
-  
+
   elif [[ $MainMenuChoice == "2c" || $MainMenuChoice == "3c" ]] ; then
 
     create_new_drives
@@ -409,31 +410,31 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "3m" ]]; then
 
-    if [[ ! -e $SharedDrive ]]; then  
+    if [[ ! -e $SharedDrive ]]; then
       printColor "\n\n  ERROR: A Shared drive has not been set up or created"
-    else 
-      if [[ $SharedDrive_Mount || $SharedDriveArgs ]]; then 
+    else
+      if [[ $SharedDrive_Mount || $SharedDriveArgs ]]; then
         SharedDrive_Mount=
         SharedDrive_Conf="no-shared"
         printColor "\n\n  The Shared drive has been UN mounted"
-      else 
+      else
         SharedDrive_Conf=
         SharedDrive_Mount=1
         printColor "\n\n  The Shared drive has been mounted"
-        if [[ $LiveBoot ]]; then 
-          printf "\n\n  CAUTION: if intending to install from a Live ISO," 
+        if [[ $LiveBoot ]]; then
+          printf "\n\n  CAUTION: if intending to install from a Live ISO,"
           printf "\n\n  certain distro installers may not be clear about which drive is being used."
         fi
       fi
       set_drive_paths
     fi
-    printf "\n\n  [enter] to return \n\n" 
+    printf "\n\n  [enter] to return \n\n"
     read -rp "  >  "
-    
+
   elif [[ $MainMenuChoice == "v" ]] ; then
 
     if [[ $VerboseArgs ]]; then VerboseArgs= ; else VerboseArgs=1 ; fi
-  
+
   elif [[ $MainMenuChoice == "vm" ]] ; then
 
     # also see "gt" option
@@ -472,9 +473,9 @@ function  main_menu_actions {
       printf "\n\n  Is this correct y/n ? \n\n"
       read -rp "  >  "  MenuXA_Correct
     fi
-    
-    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 2 
-    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1.5 
+
+    if [[ $MenuXA_Correct == "n" ]]; then printColor "\n\n  Ignoring the entered Qemu Args \n\n" ; sleep 2
+    elif [[ $MenuXA == "r" ]]; then printColor "\n\n  Resetting \n\n" ; ExtraArgs="$ExtraSetArgs" ; sleep 1.5
     elif [[ $MenuXA ]]; then  ExtraArgs="$ExtraArgs $MenuXA" ; printColor "\n\n  Added \n\n" ; sleep 1.5
     else  printColor "\n\n  NOT changed \n\n" ; sleep 1.5
     fi

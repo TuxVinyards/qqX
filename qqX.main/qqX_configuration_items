@@ -3,17 +3,17 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 
 custom_conf_notes () {
@@ -21,7 +21,7 @@ custom_conf_notes () {
   printColor "\n\n  qqX .conf reminders:"
 
   printf "
-  
+
     #!/usr/bin/qqX --vm                (for qqX direct start)
 
     Custom_SDL_ScreenPercent=\"xx\"      (integer from 25 to 99)
@@ -46,13 +46,13 @@ custom_conf_notes () {
     tpm=\"on\"          secureboot=\"off\"
     gl=\"off\"          (scaleable SDL, easier restarts) (?)
 
-    Early 2025 Insider betas are now requesting Secure Boot. 
+    Early 2025 Insider betas are now requesting Secure Boot.
     Tests are showing seemingly successful outcomes when set to \"on\"
 
-    Difficult booting: 
+    Difficult booting:
     boot=\"legacy\"  &  gl=\"off\"  may help ...
 
-    highlight then shift-ctrl-c  to copy ...  
+    highlight then shift-ctrl-c  to copy ...
   \n"
 }
 
@@ -61,13 +61,13 @@ function check_screen_percentage_and_output {
   SDL_ScreenSize_Error=
   SDL_ScreenSize_Cmd=
   HeadlessCmd=
-  
-  #  Function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file  
-  #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"  
+
+  #  Function 'refresh_conf_vars_and_values' should clear all existing .conf vars before sourcing a new conf file
+  #  Note that 'gl' is a quickemu internal variable which quickemu defaults to "on"
   #  From quickemu 4.8 onwards, the value " --screenpct xx"  may be used on SDL, where xx is a value from 25 to 99  & Linux VM's only.
   #  But check the source to see if the case option exists, don't rely on the version number as formats change or could be a custom version.
 
-  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl" 
+  if [[ $gl == "off" || $gl == "on" ]]; then  qqX_GL_Mode="$gl"
   else
     if [[ $SetGL_DefaultAsOff ]]; then qqX_GL_Mode="off" ; else qqX_GL_Mode="on" ; fi
   fi
@@ -77,27 +77,27 @@ function check_screen_percentage_and_output {
   [[ $Custom_SDL_ScreenPercent ]] && SDL_ScreenPercent="$Custom_SDL_ScreenPercent"
   [[ $Default_SDL_ScreenPercent ]] && [[ ! $SDL_ScreenPercent ]] && SDL_ScreenPercent="$Default_SDL_ScreenPercent"
 
-  if [[ $SDL_ScreenPercent ]]; then 
+  if [[ $SDL_ScreenPercent ]]; then
 
     SDL_ScreenPercent="$(tr -cd "[:digit:]" <<< "$SDL_ScreenPercent")"
     [[ SDL_ScreenPercent -lt 25 ]] && SDL_ScreenPercent="25"
     [[ SDL_ScreenPercent -gt 97 ]] && SDL_ScreenPercent="97"
 
-    if  grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then  
+    if  grep -q -s -e 'screenpct' "/tmp/qmod-case-temp" ; then
       SDL_ScreenSize_Cmd=" --screenpct  $SDL_ScreenPercent"
     else
-      if [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then 
+      if [[ ! $QE_495_Script ]] && [[ ! $QE_496_Script ]]; then
         printColor "\n\n  WARNING:  SDL_ScreenPercent needs quickemu 4.8+ \n\n "
         SDL_ScreenSize_Error="> not possible with this qe-version"
       fi
-    fi 
+    fi
 
   fi
 
-  xRes= 
-  yRes= 
-  Mon_xRes= 
-  Mon_yRes= 
+  xRes=
+  yRes=
+  Mon_xRes=
+  Mon_yRes=
   SDL_ScreenSize=
   MacScreenRes=
   SDL_ScreenSize_Cmd97=
@@ -105,8 +105,8 @@ function check_screen_percentage_and_output {
   if [[ $QE_495_Script || $QE_496_Script ]] && [[ $XDG_SESSION_TYPE == "x11" || $XDG_SESSION_TYPE == "wayland" ]]; then
 
     if [[ $PhysicalMonitor ]]; then
-      Mon_xRes="$(cut -d 'x' -f 1 <<< "$PhysicalMonitor")" 
-      Mon_yRes="$(cut -d 'x' -f 2 <<< "$PhysicalMonitor")" 
+      Mon_xRes="$(cut -d 'x' -f 1 <<< "$PhysicalMonitor")"
+      Mon_yRes="$(cut -d 'x' -f 2 <<< "$PhysicalMonitor")"
     else
       Mon_xRes=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
       Mon_yRes=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
@@ -115,7 +115,7 @@ function check_screen_percentage_and_output {
     Mon_xRes="$(tr -cd "[:digit:]" <<< "$Mon_xRes")"
     Mon_yRes="$(tr -cd "[:digit:]" <<< "$Mon_yRes")"
 
-    if [[ ! $Mon_xRes || ! $Mon_yRes ]]; then 
+    if [[ ! $Mon_xRes || ! $Mon_yRes ]]; then
       if [[ $PhysicalMonitor ]]; then printColor "\n\n  ERROR: check monitor size in general settings \n\n "
       else printColor "\n\n  ERROR: xrandr detection > set manually in general settings \n\n "
       fi
@@ -127,26 +127,26 @@ function check_screen_percentage_and_output {
     [[ $Default_SDL_ScreenSize ]] && [[ ! $SDL_ScreenSize ]] && SDL_ScreenSize="$Default_SDL_ScreenSize"
 
     # MacOS REVIEW  # ? 1360 x 768  ? 1920 x 1080 (max ovmf)  ? 1280 x 720  (max default qxl)
-    # The newer variable SDL_ScreenSize is functionally identical to MacScreenRes 
+    # The newer variable SDL_ScreenSize is functionally identical to MacScreenRes
     # but MacScreenRes has been left in place to emphasise that size options are more limited if used with Mac.
     # Sonoma default is 2560 x 1440 low res. In other words 1280 x 720 at x2 Hi-DPI res.
     # Mac seems to be able to use 1280 and then takes control of the outcome itself, once set up.
     # Unless it's Sequoia where it needs to be specified in the conf file:
-    if [[ $guest_os == "macos" ]]; then 
+    if [[ $guest_os == "macos" ]]; then
       if [[ $MacScreenRes ]] && [[ ! $Custom_SDL_ScreenSize ]]; then
         SDL_ScreenSize="$MacScreenRes"
       else xRes=1280 && yRes=720
       fi
     fi
 
-    if [[ $SDL_ScreenSize ]]; then 
-    
-      xRes="$(cut -d 'x' -f 1 <<< "$SDL_ScreenSize")" 
-      yRes="$(cut -d 'x' -f 2 <<< "$SDL_ScreenSize")" 
+    if [[ $SDL_ScreenSize ]]; then
+
+      xRes="$(cut -d 'x' -f 1 <<< "$SDL_ScreenSize")"
+      yRes="$(cut -d 'x' -f 2 <<< "$SDL_ScreenSize")"
       xRes="$(tr -cd "[:digit:]" <<< "$xRes")"
       yRes="$(tr -cd "[:digit:]" <<< "$yRes")"
 
-      if [[ ! $xRes || ! $yRes ]]; then 
+      if [[ ! $xRes || ! $yRes ]]; then
         printColor "\n\n  ERROR: check specified sizes in settings \n\n "
         SDL_ScreenSize_Error="> display size error"
       fi
@@ -162,9 +162,9 @@ function check_screen_percentage_and_output {
       xRes=1152 && yRes=648
     fi
 
-    SDL_ScreenSize_Cmd=" --width $xRes --height $yRes" 
-    
-    # Windows and Mac REVIEW 
+    SDL_ScreenSize_Cmd=" --width $xRes --height $yRes"
+
+    # Windows and Mac REVIEW
 
     if [[ $guest_os == "windows" || $guest_os == "macos" ]]; then
       SDL_ScreenSize_Cmd97=
@@ -176,41 +176,41 @@ function check_screen_percentage_and_output {
 
   fi
 
-  [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay= 
+  [[ $HeadlessDisplay != "true" ]] && HeadlessDisplay=
   [[ $HeadlessDisplay ]] && HeadlessCmd=" --display  none"
 
-}  
+}
 
 function set_drive_paths {
 
   #  For a SECOND/SHARED DRIVE (idea from @gnudoc on the quickemu Discord channel)  do "qemu-img create -f qcow2 disk2.qcow2 40G"  or as required
-  #  Set  ExtraArgs=" -device virtio-blk-pci,drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=/vm_folder/disk2.qcow2"  
-  #  Edit path & boot a VM.  Use 'Disks'  Gparted or similar to find, format and mount.  
+  #  Set  ExtraArgs=" -device virtio-blk-pci,drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=/vm_folder/disk2.qcow2"
+  #  Edit path & boot a VM.  Use 'Disks'  Gparted or similar to find, format and mount.
   #  The function needs to be run everytime a different VM is selected to allow for individual VM settings or requirements.
 
-  #  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release" 
+  #  Older versions of MacOS require a non pci set up. See quickemu script "Qemu optimisations based on the macOS release"
   #  Any OS older than and including 10.13 Mojave 2018 should have a flag in the .conf file > MacLegacyDrive="true"
   #  See https://en.wikipedia.org/wiki/MacOS_version_history
 
 
   #  SECOND DRIVE and .conf file
-  #  Drive path to be individually set in the .conf file on a per VM basis.   
+  #  Drive path to be individually set in the .conf file on a per VM basis.
 
-  #  NOTE: From qqX ver 1.5 onwards, this function now gets called by 'refresh_conf_vars_and_values' 
+  #  NOTE: From qqX ver 1.5 onwards, this function now gets called by 'refresh_conf_vars_and_values'
   #  which will have already sourced the .conf file and its variables
 
-  if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2" 
-        
+  if [[ $MacLegacyDrive == "true" ]]; then  BusType="ide-hd,bus=ahci.2"
+
   else BusType="virtio-blk-pci"; fi
 
-  #  SECOND DRIVE 
-  #  Drive path to be individually set in the .conf file on a per VM basis.  
+  #  SECOND DRIVE
+  #  Drive path to be individually set in the .conf file on a per VM basis.
 
   if [[ -e "$SecondDrive" ]]; then
 
-    SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"  
+    SecondDriveArgs=" -device ${BusType},drive=SecondDrive -drive id=SecondDrive,if=none,format=qcow2,file=$SecondDrive"
 
-  elif [[ $SecondDrive ]]; then 
+  elif [[ $SecondDrive ]]; then
 
     # whilst the conf entry exists the above test didn't find it
     DriveLocationError="ERROR SecondDrive NOT found (.conf file)"
@@ -224,54 +224,54 @@ function set_drive_paths {
       eval "$(grep -s 'SharedDrive=' "$qqX_SettingsFile" | grep -v '#' )"
   fi
 
-  if [[ $SharedDrive ]]; then 
+  if [[ $SharedDrive ]]; then
 
     # if not toggled from the main menu, then read the .conf file
     [[ ! $SharedDrive_Mount ]] && eval "$(grep -s SharedDrive_Conf "$VM_Conf_File" | grep -v '#')"
 
-    if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then 
+    if [[ $MacLegacyDrive ]] || [[ $SharedDrive_Conf ==  "no-shared" ]]; then
       SharedDriveArgs=
     elif [[ -e "$SharedDrive" ]]; then
       [[ ! $BusType ]] && BusType="virtio-blk-pci"
-      SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"  
-    elif [[ $SharedDrive ]]; then 
+      SharedDriveArgs=" -device ${BusType},drive=SharedDrive -drive id=SharedDrive,if=none,format=qcow2,file=$SharedDrive"
+    elif [[ $SharedDrive ]]; then
       DriveLocationError="ERROR SharedDrive NOT found (main settings)"
     fi
 
   fi
 
-}  
+}
 
 
 #  MAIN DRIVE & BOOT
-# 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file 
+# 'refresh_conf_vars_and_values' from qqX ver 1.5 will source the quickemu .conf file
 #  everytime a different VM is selected or the .conf file is reconfigured
 #  NB Quickemu uses vars:  'disk_img' for  main .qcow2  &  either a bootable 'iso=' or 'img=' for first time or Live boots
-#  Error handling for this function is also actioned by 'show_main_menu_header' 
+#  Error handling for this function is also actioned by 'show_main_menu_header'
 
 function read_main_drive_and_img_iso_conf_vars {
 
   MainDrive=
   IsoImg=
 
-  if [[ $Trace_InputVars ]]; then 
-    echo "QE Conf Var 'disk_img': $disk_img"  ; echo 
-    echo "QE Conf Var 'img': $img"  ; echo 
-    echo "QE Conf Var 'iso': $iso"  ; echo 
+  if [[ $Trace_InputVars ]]; then
+    echo "QE Conf Var 'disk_img': $disk_img"  ; echo
+    echo "QE Conf Var 'img': $img"  ; echo
+    echo "QE Conf Var 'iso': $iso"  ; echo
     sleep "$Trace_InputVars"
   fi
 
-  if [[ ! $IgnoreConfigErrors ]]; then 
+  if [[ ! $IgnoreConfigErrors ]]; then
     [[ $disk_img ]] && [[ ! -d  "$(dirname "$disk_img")" ]] && function_conf_error  folder  "disk_img:  $(dirname "$disk_img")"
     [[ $img ]] && [[ ! -d  "$(dirname "$img")" ]] && function_conf_error  folder  "img:  $(dirname "$img")"
-    [[ $iso ]] && [[ ! -d  "$(dirname "$iso")" ]] && function_conf_error  folder  "iso:  $(dirname "$iso")" 
+    [[ $iso ]] && [[ ! -d  "$(dirname "$iso")" ]] && function_conf_error  folder  "iso:  $(dirname "$iso")"
   fi
-  
+
   [[ -e "$disk_img" ]] && MainDrive="$disk_img"
   [[ -e "$img" ]] && IsoImg="$img"
   [[ -e "$iso" ]] && IsoImg="$iso"
 
-}  
+}
 
 
 function_conf_error () {
@@ -280,114 +280,114 @@ function_conf_error () {
   NewSetupFlag=
 
   # clear any accidental initial double pressing of the enter key occuring while experiencing the error
-  read -r -t 0.1  
-  read -r -t 0.1  
-  read -r -t 0.1  
+  read -r -t 0.1
+  read -r -t 0.1
+  read -r -t 0.1
 
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
-  printf "\n\n  qqX Settings, VM folder & conf file(s)"  
+  printf "\n\n  qqX Settings, VM folder & conf file(s)"
 
-  if [[ $1 == "No VMs" ]] ; then 
-    printColor "\n\n  No VMs - Probably time to welcome you to qqX and invite you to get some distros." 
-    printf "\n\n  The settings file and locations can usually be left till later ..." 
-  elif [[ $1 ]] ; then 
+  if [[ $1 == "No VMs" ]] ; then
+    printColor "\n\n  No VMs - Probably time to welcome you to qqX and invite you to get some distros."
+    printf "\n\n  The settings file and locations can usually be left till later ..."
+  elif [[ $1 ]] ; then
     printf "\n\n  Check %s settings, LOCATION & CONTENT ... "  "$1"
-  else 
-    printf "\n\n  Check the settings and re-run this script ... " 
+  else
+    printf "\n\n  Check the settings and re-run this script ... "
   fi
 
  [[ $GeneralLoopCheck ]] && echo
   dev_loop_check
 
   printf "\n\n  Settings file:  %s \n\n" "$qqX_SettingsFile"
-  
-  if [[ "$1" == *'COMMAND'* ]]; then 
-  
+
+  if [[ "$1" == *'COMMAND'* ]]; then
+
     printColor "\n\n  [q] to quit "
     printf "  [enter] to view/edit settings file \n\n"
 
-  elif [[ $1 == "new" ]]; then 
+  elif [[ $1 == "new" ]]; then
 
-    printColor "\n  Starting NEW VIRTUAL MACHINE: \n\n"    #  REVIEW   
+    printColor "\n  Starting NEW VIRTUAL MACHINE: \n\n"    #  REVIEW
     cat "$VM_Conf_File"
     NewSetupFlag=1
     IgnoreFolderCheck=1
-    SelectArrayError=  
+    SelectArrayError=
 
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     printColor "\n\n  [c] continue  (with current settings) looks okay "
-    printf "\\n\n  [d] delete   [e] to edit qqX general settings   [q] to quit \n\n"  
-    
-  elif [[ $1 == "folder" ]] ; then 
+    printf "\\n\n  [d] delete   [e] to edit qqX general settings   [q] to quit \n\n"
+
+  elif [[ $1 == "folder" ]] ; then
 
     FolderConfigFlag=1
     printf "\n  Folder config ERROR:"
     [[ $2 ]] && printf "  '%s'"  "$2"
     printf "\n\n  Check the folder path with the file manager. Check for spellings. Check upper/lower case."
     printf "\n\n  Esp. check for spaces that may have been true-typed into semi-invisibility ... "
-    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings " 
+    printColor "\n\n\n  [enter] to edit the .conf file   [e]  edit qqX general settings "
     printf "\n\n  [c] ignore and continue"
     [[ $FileManager ]] && printf "   [f] open group folder in file-manager"
-    printf "   [q] to quit \n\n"   
+    printf "   [q] to quit \n\n"
 
-  elif [[ $1 == "qqX_SettingsFile" ]] ; then 
+  elif [[ $1 == "qqX_SettingsFile" ]] ; then
 
     printf "\n  INTERNAL ERROR: "
     printColor "\n\n\n  Settings file not found: %s"  "$qqX_SettingsFile"
-    printf "\n\n  [c] ignore and continue   [q] to quit \n\n"   
-    
-  else   
+    printf "\n\n  [c] ignore and continue   [q] to quit \n\n"
+
+  else
 
     # includes "$1" = ".conf file"
-    printColor "\n\n  [Enter] to edit qqX general settings"  
+    printColor "\n\n  [Enter] to edit qqX general settings"
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
     printf "  [c] ignore and continue "
-    printf "  [q] to quit \n\n"  
+    printf "  [q] to quit \n\n"
 
-  fi   
+  fi
 
   read -rp "  >  "   ErrorMenuSelect
-  
 
-  if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit 
 
-  elif [[ $ErrorMenuSelect == "f" ]]; then (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message 
+  if [[ $ErrorMenuSelect == "q" ]]; then  printf "\n\n"; command exit
 
-  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File" 
+  elif [[ $ErrorMenuSelect == "f" ]]; then (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir" & ) || file_manager_not_found_message
 
-  elif [[ $ErrorMenuSelect == "c" || $ErrorMenuSelect == "d" || $ErrorMenuSelect == "e" || $ErrorMenuSelect == "gt" ]]; then  
-  
+  elif [[ $ErrorMenuSelect == "tune" ]]; then  function_config_tune_up  "$VM_Conf_Dir/$VM_Conf_File"
+
+  elif [[ $ErrorMenuSelect == "c" || $ErrorMenuSelect == "d" || $ErrorMenuSelect == "e" || $ErrorMenuSelect == "gt" ]]; then
+
     IgnoreFolderCheck=1 ; IgnoreConfigErrors=1
 
     if [[ $ErrorMenuSelect == "c" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; FolderConfigFlag= ; return 0
 
     elif [[ $ErrorMenuSelect == "d" ]]; then  SelectArrayError= ; IgnoreSecondCheckNew=1 ; MainMenuChoicePreset="del" ; return 0
 
-    elif [[ $ErrorMenuSelect == "e" ]]; then 
+    elif [[ $ErrorMenuSelect == "e" ]]; then
 
       if [[ $NewSetupFlag || $FolderConfigFlag ]]; then VM_InstanceName= ; qqX_edit_settings ; else qqX_edit_settings  "conf" ; fi
 
-    elif [[ $ErrorMenuSelect == "gt" ]]; then 
+    elif [[ $ErrorMenuSelect == "gt" ]]; then
 
       VM_Selection=
-      VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= 
+      VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File=
       cd "$Default_VM_Folder" || DefaultFolderError=1
-      Current_VM_Folder="$Default_VM_Folder" 
-      function_quick_get_wrap 
+      Current_VM_Folder="$Default_VM_Folder"
+      function_quick_get_wrap
       return 0
 
     fi
- 
-  else  
-  
-    if [[ $NewSetupFlag || $FolderConfigFlag ]]; then 
+
+  else
+
+    if [[ $NewSetupFlag || $FolderConfigFlag ]]; then
       NewSetupFlag=
       FolderConfigFlag=
-      qqX_edit_settings  "conf" 
+      qqX_edit_settings  "conf"
     else  qqX_edit_settings
     fi
-    
+
   fi
 
 }
@@ -396,20 +396,20 @@ qqX_edit_settings() {
 
   if [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]]; then texteditor_not_found_message
   else
-    # Run the editor: 
+    # Run the editor:
     if [[ $1 == "conf" ]]; then
 
       printf "\n\n"
       cat "$VM_Conf_Dir/$VM_Conf_File"
       printf "\n\n"
-      
+
       while true ; do
         printColor "\n  [enter] to edit   [n] conf notes  [d] conf defaults list   [t] config tune-up wizard   [b] go back"
         printf "\n\n"
         read -rp "  >  "   ConfEdit_Select
         if [[ $ConfEdit_Select == "n" ]] ; then  custom_conf_notes
         elif [[ $ConfEdit_Select == "d" ]] ; then
-          printColor "\n\n  Standard Quickemu hard-coded defaults: \n"  
+          printColor "\n\n  Standard Quickemu hard-coded defaults: \n"
           grep -s -B 200 ACCESS "/tmp/qmod-qe-all-vars-temp" | grep -v -e ACCESS -e MAIN -e Lowercase
         elif [[ $ConfEdit_Select == "t" ]] ; then   function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File" ; break
         elif [[ $ConfEdit_Select == "b" ]] ; then  break
@@ -424,7 +424,7 @@ qqX_edit_settings() {
           break
         fi
       done
-      
+
     elif [[ $1 == "custom" ]]; then
 
       (nohup &> /dev/null   "$TextEditor" "$QemuArgsCustomFile"  & )  || texteditor_not_found_message
@@ -435,10 +435,10 @@ qqX_edit_settings() {
       ConfSettingsAdjusted=1
       refresh_conf_vars_and_values
 
-    else 
+    else
 
       (nohup &> /dev/null   "$TextEditor" "$qqX_SettingsFile" )  || texteditor_not_found_message
-      if [[ $DefaultFolderError ]]; then 
+      if [[ $DefaultFolderError ]]; then
         printColor "\n\n  A qqX restart is required ...."
         printf "\n\n  [enter] to close \n\n"
         read -rp "  >  "
@@ -453,7 +453,7 @@ qqX_edit_settings() {
     # Note, app opening commands can throw a complaint if 'xapps' has not not been installed.
     # https://askubuntu.com/questions/1396739/failed-to-load-module-xapp-gtk3-module
 
-    # NB  don't set to run the editor in the background, as the web browser does, as qqX needs to take the new settings 
+    # NB  don't set to run the editor in the background, as the web browser does, as qqX needs to take the new settings
 
   fi
 
@@ -466,7 +466,7 @@ function refresh_logfile_locations {
     QemuArgsCustomFile="$VM_Conf_Dir/$VM_InstanceName/Qemu_ShortArgs_Custom.txt"
     QemuVirtHardwareRecord="$VM_Conf_Dir/$VM_InstanceName/QemuVirtHardwareRecord.txt"
 
-    # Qemu_IMG log > eg. for disk repair functions 
+    # Qemu_IMG log > eg. for disk repair functions
     Qemu_IMG_ErrorLog="$VM_InstanceName/${VM_InstanceName}.qemu.IMG.error.log"
     if [[ $(cat "$Qemu_IMG_ErrorLog" 2>/dev/null) ]]; then printf "\n\n" ; cat "$Qemu_IMG_ErrorLog" ; fi
 
@@ -479,18 +479,18 @@ function refresh_logfile_locations {
 
 function alert_on_new {
     # test for 'new' - will have have an iso/img but not a main drive, yet (but also double check if 'just done')
-    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then  
-      if [[ $IgnoreSecondCheckNew || $VM_Renamed ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi  
+    if [[ -e "$IsoImg" &&  ! -e "$MainDrive" ]] && [[ ! $NewFileTuneUp_JustDone ]]; then
+      if [[ $IgnoreSecondCheckNew || $VM_Renamed ]]; then IgnoreSecondCheckNew= ; else  function_conf_error "new" ; fi
     fi
 }
 
 function refresh_conf_vars_and_values {
 
-  # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file 
+  # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file
   # otherwise any items specified in any previous config, but not in the new one, will remain.
   # Needed from qqX ver 1.5 onwards
 
-  # A blank clearance will have been created at first session start.  
+  # A blank clearance will have been created at first session start.
 
   if [[ -e $VM_Conf_File ]]; then
 
@@ -517,7 +517,7 @@ function refresh_conf_vars_and_values {
     ACCESS=
     QemuArgsCustomFile=
     QemuErrorLog=
-    #reload_boot_style_defaults  # REVIEW  
+    #reload_boot_style_defaults  # REVIEW
     # left off as if active then utils menu bm function reverts to defaults after booting once ...
     # at ver 1.12.01 has been placed into qqX main loop so switching vm is clean
 
@@ -547,12 +547,12 @@ function refresh_conf_vars_and_values {
     source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
-    # check any menu values that are based on the file .conf 
+    # check any menu values that are based on the file .conf
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
     set_drive_paths
     check_disk_is_okay
-    
+
     refresh_logfile_locations
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check

@@ -3,32 +3,32 @@
 ## VM Selector Menu to be located in folder 'qqX.main' along with 'qqX_VM_array_routines'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154   
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 # For notes on custom vm menus > edit > find > "Custom styles" in 'qqX.main/qqX_VM_selector_styles'
 
 
-VM_loader_selector_and_menu () {  
+VM_loader_selector_and_menu () {
 
   ShowUtilsMenu=
   ShowCustomBootStyle=
   ShowDefault_Hybrid=
   ForceCustomBootStyle=
 
-  # LOADER 
+  # LOADER
 
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
-    # just clear the flag, may be bypassed if array present and nothing new added, or if settings not changed ... 
+    # just clear the flag, may be bypassed if array present and nothing new added, or if settings not changed ...
     ByPass_VM_Array_Loader=
     [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM loader:" &&  dev_loop_check
   else
@@ -38,7 +38,7 @@ VM_loader_selector_and_menu () {
 
   # SELECTOR
 
-  if [[ $ByPass_VM_Array_Selector ]] ; then  
+  if [[ $ByPass_VM_Array_Selector ]] ; then
   
     VM_check_and_load
     [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM array selector :" &&  dev_loop_check
@@ -68,7 +68,7 @@ VM_loader_selector_and_menu () {
         printf "\033c"
         show_qqX_title_bar
 
-        if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="$Default_VM_SelectorStyle" ; fi  
+        if ! type -t "print_selector_array_${VM_SelectorStyle}_style" 1>/dev/null ; then VM_SelectorStyle="$Default_VM_SelectorStyle" ; fi
 
         for Style in {A..Z} ; do
           if type -t "print_selector_array_${Style}_style" 1>/dev/null ; then LastSelectStyleAvailable="$Style" ; else break; fi
@@ -87,11 +87,11 @@ VM_loader_selector_and_menu () {
       
         dev_loop_check
 
-        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER " 
+        [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER "
         [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
         [[ $SelectArrayError ]] && printf "\n\n  ERROR: VM ARRAY / VM .CONF %s " "$SelectArrayError"
 
-        if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then 
+        if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError ]]; then
 
           printf "\n\n  Settings file: %s" "$qqX_SettingsFile"
           printf "\n\n  [enter] to edit settings file   [c] ignore, re-check and continue   [q] to quit "
@@ -105,7 +105,7 @@ VM_loader_selector_and_menu () {
           fi
           printf "   [A-%s] change menu style %s"  "$LastSelectStyleAvailable"  "$VM_SelectorStyle"
 
-          if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then 
+          if [[ $ZsyncDistrosFound || $LiveDistrosFound ]]; then
             printf "   ("
             [[ $LiveDistrosFound ]] && printf "L=LiveISO"
             [[ $LiveDistrosFound && $ZsyncDistrosFound ]] && printf ") & ("
@@ -125,7 +125,7 @@ VM_loader_selector_and_menu () {
 
           [[ $qqX_UpdateAvail ]] &&  printColor "\n\n  [dl] >> view new qqX update details: %s %s <<" "$qqX_Latest_ReleaseType" "$qqX_Latest_ReleaseNumber"
 
-          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]] && [[ ! $VM_Selection_Overide ]]; then 
+          if [[ $MenuStylePreviewed ]] && [[ ! $SettingsFileAdjusted ]] && [[ ! $VM_Selection_Overide ]]; then
             printColor "\n\n  Preview only - use [set] for menu permanency, [r] to return to default " ; MenuStylePreviewed=
           elif [[ $SettingsFileAdjusted ]]; then printColor "\n\n  ARRAYS have been RELOADED and settings REFRESHED ...."; SettingsFileAdjusted=
           fi
@@ -153,27 +153,27 @@ VM_loader_selector_and_menu () {
 
       #
 
-      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError || $VM_Selection == "c" ]]; then 
+      if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError || $VM_Selection == "c" ]]; then
             
         ExtraFolderError=
         VM_InstanceName=
-        [[ $VM_Selection != "c" ]] && qqX_edit_settings 
+        [[ $VM_Selection != "c" ]] && qqX_edit_settings
         VM_Selection=
         return
 
       elif [[ $VM_Selection == "fd" ]]; then  FD_help_notes
 
-      elif [[ "$VM_Selection" == fd* ]]; then 
+      elif [[ "$VM_Selection" == fd* ]]; then
 
         if [[  "$VM_Selection" == 'fd c '*  ]]; then  FD_Phrase="${VM_Selection/'fd c '/}"
         elif [[  "$VM_Selection" == 'fd s '*  ]]; then  FD_Start="${VM_Selection/'fd s '/}"
         else  FD_help_notes
         fi
 
-      elif [[ "$VM_Selection" == [A-Z] ]]; then 
+      elif [[ "$VM_Selection" == [A-Z] ]]; then
       
         # NB different to VM_selector_menu_refresh
-        VM_SelectorStyle="$VM_Selection" 
+        VM_SelectorStyle="$VM_Selection"
         ByPass_VM_Array_Loader=1
         MenuStylePreviewed=1
         ListTitleFolderOld=
@@ -187,22 +187,22 @@ VM_loader_selector_and_menu () {
 
       elif [[ $VM_Selection == "r" ]]; then  VM_selector_menu_refresh ; return
 
-      elif [[ ${VM_Selection^^} == "FS" ]] ; then  
+      elif [[ ${VM_Selection^^} == "FS" ]] ; then
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ ${VM_Selection^^} == "FB" ]] ; then  
+      elif [[ ${VM_Selection^^} == "FB" ]] ; then
         CodingHotSwap="FreeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ ${VM_Selection^^} == "HB" ]] ; then  
+      elif [[ ${VM_Selection^^} == "HB" ]] ; then
         CodingHotSwap="HomeBird" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ "${VM_Selection,,}" == ech* ]] ; then  
+      elif [[ "${VM_Selection,,}" == ech* ]] ; then
         CodingHotSwap="Echo" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ "${VM_Selection,,}" == sys* ]] ; then  
+      elif [[ "${VM_Selection,,}" == sys* ]] ; then
         CodingHotSwap="System" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ "${VM_Selection}" == cust* ]] ; then  
+      elif [[ "${VM_Selection}" == cust* ]] ; then
         CodingHotSwap="Custom" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
-      elif [[ "${VM_Selection,,}" == dev* ]] ; then  
+      elif [[ "${VM_Selection,,}" == dev* ]] ; then
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
 
-      elif [[ $VM_Selection == "q" ]]; then echo ; exit directly 
+      elif [[ $VM_Selection == "q" ]]; then echo ; exit directly
 
       elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
 
@@ -211,13 +211,13 @@ VM_loader_selector_and_menu () {
       elif [[ $VM_Selection == "set" ]];then
 
         VM_Selection=
-        qqX_edit_settings 
+        qqX_edit_settings
         return
 
       elif [[ $VM_Selection == "sz" ]];then
 
         VM_Selection=
-        show_VM_Array_sizes_text 
+        show_VM_Array_sizes_text
 
       elif [[ $VM_Selection == "h" || $VM_Selection == "f" ]];then
 
@@ -227,20 +227,20 @@ VM_loader_selector_and_menu () {
       elif [[ $VM_Selection == "gt" || $VM_Selection == "GT" ]]; then
 
         VM_Selection=
-        function_quick_get_wrap 
+        function_quick_get_wrap
         ByPass_VM_Array_Loader=
         return
 
       elif [[ $VM_Selection == [0-9] || $VM_Selection == [0-9][0-9] || $VM_Selection == [0-9][0-9][0-9] ]]; then
 
-        if [[ $VM_Selection -gt $VM_Array_LastIndex ]]; then  
+        if [[ $VM_Selection -gt $VM_Array_LastIndex ]]; then
           printColor "\n\n  Request '%s' Not Recognised \n\n"  "$VM_Selection"
           sleep 1
           # clear any pressing of the enter key occuring during error message pause
-          read -r -t 0.1  
-          read -r -t 0.1  
-          read -r -t 0.1  
-          read -r -t 0.1	
+          read -r -t 0.1
+          read -r -t 0.1
+          read -r -t 0.1
+          read -r -t 0.1
           VM_Conf_Dir=
           VM_Conf_File=
           VM_Selection=
@@ -252,20 +252,20 @@ VM_loader_selector_and_menu () {
           return
         fi
 
-      elif [[ $VM_Selection ]]; then 
+      elif [[ $VM_Selection ]]; then
 
         printColor "\n\n  Request '%s' Not Recognised \n\n"  "$VM_Selection"
         sleep 1
         # clear any pressing of the enter key occuring during error message pause
-        read -r -t 0.1  
-        read -r -t 0.1  
-        read -r -t 0.1  
-        read -r -t 0.1	
+        read -r -t 0.1
+        read -r -t 0.1
+        read -r -t 0.1
+        read -r -t 0.1
         VM_Conf_Dir=
         VM_Conf_File=
         VM_Selection=
 
-      else  
+      else
 
         sleep 0.1   # gives background scans a little more time, if using the faster [enter] selection
         VM_Conf_Dir="${VM_Array[0,0]}"
@@ -307,4 +307,4 @@ VM_selector_menu_refresh () {
 
 # vim:tabstop=2:shiftwidth=2:expandtab
 
-## 
+##

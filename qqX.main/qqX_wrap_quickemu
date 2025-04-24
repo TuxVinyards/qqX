@@ -3,29 +3,29 @@
 ##  qqX component to be located in folder 'qqX.main'
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154
 
 
 ##  ADD-IN of ORIGINAL quickemu functions & the needed variables
 
-#   Technically, this script absorbs rather than wraps. 
+#   Technically, this script absorbs rather than wraps.
 #   The original code remains basically as is but some calls get re-routed via new functions ....
 
 
 function system_code_check_and_warn {
 
   if [[ $CodingHotSwap == "System" && ! $QE_SystemFilePath ]]; then
-    printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH " 
+    printColor "\n\n  A standard plain Quickemu System Version has not been installed, or has NOT been LOCATED in \$PATH "
     printf "\n\n  See https://github.com/quickemu-project/quickemu for more details"
     printf "\n  Official Quickemu packages will install to /usr/bin, as loose files"
     printf "\n\n  'Echo' is an older plain Quickemu version that is supplied as a built-in."
@@ -37,13 +37,13 @@ function system_code_check_and_warn {
     CodingHotSwap="FreeBird"
 
   elif [[ $CodingHotSwap == "Custom" && ! -d "$Default_VM_Folder/qqX.custom/QE.Custom"  ]]; then
-    printColor "\n\n  Custom files should be located as detailed in the general settings file." 
+    printColor "\n\n  Custom files should be located as detailed in the general settings file."
     printf "\n\n  [enter] to continue with FreeBird and/or set/re-select\n\n"
     read -rp "  >  "
     CodingHotSwap="FreeBird"
 
   elif [[ $CodingHotSwap == "Dev" && ! $QE_DevPath ]]; then
-    printColor "\n\n  Dev path not present: This should be given in the general settings file." 
+    printColor "\n\n  Dev path not present: This should be given in the general settings file."
     printf "\n\n  Alternatively, if started from a development or download folder, "
     printf "\n  the current folder's FreeSpirit builtins will be auto-selected ...."
     printf "\n\n  [enter] to continue with FreeSpirit and/or set/re-select\n\n"
@@ -75,14 +75,14 @@ function find_quickemu_source_functions_and_vars {
   fi
 
   QE_496_Script= ; QE_495_Script=
-  if grep -q 'LOOP in {1..5}' "$QE_SourcePath" ; then QE_496_Script="true" 
-  elif grep -q 'configure_storage' "$QE_SourcePath" ; then QE_495_Script="true" 
+  if grep -q 'LOOP in {1..5}' "$QE_SourcePath" ; then QE_496_Script="true"
+  elif grep -q 'configure_storage' "$QE_SourcePath" ; then QE_495_Script="true"
   fi
 
-  # Ignore first bits, bash check & locale preamble etc.  
-  # QE starts into setting out the functions almost straight away.  
+  # Ignore first bits, bash check & locale preamble etc.
+  # QE starts into setting out the functions almost straight away.
   grep -m 1 -A 3000 'function' "$QE_SourcePath" | grep -B 3000 '### MAIN' | head -n -1  > "/tmp/qmod-functions-temp"
-  source "/tmp/qmod-functions-temp" 
+  source "/tmp/qmod-functions-temp"
 
   ## Quickemu Variables (set & clear)
   #  have to be cleared before every call to quickemu as the base code is normally set to be run once & exit
@@ -91,7 +91,7 @@ function find_quickemu_source_functions_and_vars {
 
   grep -B 300 'LAUNCHER=' "/tmp/qmod-qe-all-vars-temp" | head -n -2  > "/tmp/qmod-qe-rw-vars-temp"
   grep -A 300 'VERSION=' "/tmp/qmod-qe-all-vars-temp" | tail -n +2  >> "/tmp/qmod-qe-rw-vars-temp"
-   
+
   # BUT don't source as this yet as it is only a repeat of qe-rw-vars-temp
   # with QEMU_IMG checker which has been replaced (at the start of qqX)
   # and the 3 strangely & unexplainedly read-only vars which need special treatment ...
@@ -100,15 +100,15 @@ function find_quickemu_source_functions_and_vars {
 
   source  "/tmp/qmod-qe-rw-vars-temp"
 
-  # Separate the re-writeable vars  # NB not all vars are listed by the quickemu script ...  
+  # Separate the re-writeable vars  # NB not all vars are listed by the quickemu script ...
   # Also NB the quickemu variables QEMU= etc for qemu versioning get carried out separately by qqX so that machine switching can happen
 
 }
 
 find_quickemu_source_functions_and_vars
 
-# Vars are now all r/w. Except 3 readonly that get adjusted here. 
-# As a function so they can be cleared & re-loaded later 
+# Vars are now all r/w. Except 3 readonly that get adjusted here.
+# As a function so they can be cleared & re-loaded later
 # BUT in qqX ver 1.5 becomes moved to after a VM launch to avoid prior conflict with conf var overwrites ...
 
 function load_quickemu_special_vars {
@@ -133,16 +133,16 @@ function  load_mod_quickemu_boot {
 # add-in CUSTOM VARS here, as replacement values, using same method as for the final boot section
 # no indent on 'cat' & EOV lines or it fails:
 
-cat << 'EOV' >> "/tmp/qmod-function-vm_boot-interim-temp" 
+cat << 'EOV' >> "/tmp/qmod-function-vm_boot-interim-temp"
 
     # Overide specified quickemu defaults,  though not all may be done here.
     # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
     # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
-    [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType" 
+    [[ $QEMU_Default_MachineType ]] &&  MACHINE_TYPE="$QEMU_Default_MachineType"
 
-    if [[ $QEMU_Default_SystemType ]] && [[ ! $UseCustomBootArgs ]]; then 
-      printf "\nQEMU_SystemType =  %s   QEMU_MachineType =  %s \n\n" "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile" 
+    if [[ $QEMU_Default_SystemType ]] && [[ ! $UseCustomBootArgs ]]; then
+      printf "\nQEMU_SystemType =  %s   QEMU_MachineType =  %s \n\n" "$QEMU_Default_SystemType" "$QEMU_Default_MachineType"  | tee -a "$QemuArgsFile"
     fi
 
 EOV
@@ -164,15 +164,15 @@ printf "\n\n   if true; then \n\n"  >> "/tmp/qmod-function-vm_boot-new-temp"
 
 cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
-    # Show all the compiled qemu & swmtp arguments as a human readable list 
+    # Show all the compiled qemu & swmtp arguments as a human readable list
     # both to a log file and to screen   (Args & Args/HW record are defined after the VM selection or re-selection)
 
     # @2023/08  in qqX, the quickemu screen output now gets logged
 
-    # @2023 the quickemu .sh file gets to be more readable in version 4.8 here:  
+    # @2023 the quickemu .sh file gets to be more readable in version 4.8 here:
     # https://github.com/quickemu-project/quickemu/pull/707
 
-    # BUT  sed -i only seems to work in GNU sed  >  fix errored fix here ....  REVIEW 
+    # BUT  sed -i only seems to work in GNU sed  >  fix errored fix here ....  REVIEW
     #  https://stackoverflow.com/questions/6537490/insert-a-line-at-specific-line-number-with-sed-or-awk#6537587
 
 
@@ -187,9 +187,9 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
     [[ "$(sed --version | head -n 1)" == *'GNU'* ]] && sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
 
-    { printf   "\n  # This file may be used as the basis for a qqX Custom Boot File" 
-      printf "\n\n  # Comments and blank lines may be safely used & will be ignored." 
-      printf "\n\n  %s \n" "$QEMU" 
+    { printf   "\n  # This file may be used as the basis for a qqX Custom Boot File"
+      printf "\n\n  # Comments and blank lines may be safely used & will be ignored."
+      printf "\n\n  %s \n" "$QEMU"
     }  > "$QemuArgsShortFile"
 
     printf   "\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
@@ -205,22 +205,22 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     # from QEMU 8.2  See https://github.com/quickemu-project/quickemu/pull/890  was just a build BUG ... but add this in case
     if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then  NoSmartcardSupport= ; else NoSmartcardSupport=1 ; fi
 
-    declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt" 
+    declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_RAW_Array.txt"
 
     while [[ "${args[i]}" ]]; do
 
-      # fixes for quickemu deprecated code, to be updated from time to time REVIEW 
+      # fixes for quickemu deprecated code, to be updated from time to time REVIEW
 
       if [[ $FixArgs_hpet ]] && [[ "${args[i]}" == '-no-hpet' ]]; then args[i]="-machine hpet=off" ; fi
 
-      if [[ $FixArgs_smartcard ]] && [[ "${args[i]}" == *ccid* ]] && [[ $NoSmartcardSupport ]]; then 
+      if [[ $FixArgs_smartcard ]] && [[ "${args[i]}" == *ccid* ]] && [[ $NoSmartcardSupport ]]; then
 
-        args[i]=" " ;  args[i-1]=" " 
-          
+        args[i]=" " ;  args[i-1]=" "
+
       else
 
-        a="${args[i]}"        
-        
+        a="${args[i]}"
+
         if [[ "$a" == *'(c)'* ]]; then
           a="${a//(/'\('}"
           a="${a//)/"\)"}"
@@ -234,7 +234,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
         args[i]=" $a"   # add extra space
 
       fi
-      
+
       # add quotes - REVIEW ?? should be quoted, theoretically, but runs counter to quickemu
       # if [[ "$a" != -* ]]; then [[ "$a" != \'* ]] && args[i]='"'"$a"'"' ; fi
 
@@ -243,43 +243,43 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
     done
 
 
-    declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt" 
+    declare -p args > "$VM_Conf_Dir/$VM_InstanceName/Qemu_args_Array.txt"
 
-    if [[ $ExtraArgs ]]; then 
+    if [[ $ExtraArgs ]]; then
       printf "\n\n  ExtraArgs: %s "  "$ExtraArgs"  >> "$QemuArgsFile"
       printf "\n\n %s "  "$ExtraArgs"  >> "$QemuArgsShortFile"
     fi
 
-    if [[ $SharedDriveArgs ]]; then 
+    if [[ $SharedDriveArgs ]]; then
       printf "\n\n  SharedDriveArgs: \n %s "  "$SharedDriveArgs"  >> "$QemuArgsFile"
       printf "\n\n %s "  "$SharedDriveArgs"  >> "$QemuArgsShortFile"
     fi
 
-    if [[ $SecondDriveArgs ]]; then 
+    if [[ $SecondDriveArgs ]]; then
       printf "\n\n  SecondDriveArgs: \n %s "  "$SecondDriveArgs"  >> "$QemuArgsFile"
-      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile" 
+      printf "\n\n %s "  "$SecondDriveArgs"  >> "$QemuArgsShortFile"
     fi
 
-    if [[ $NoSmartcardSupport ]]; then  { 
+    if [[ $NoSmartcardSupport ]]; then  {
       printf "\n\n  Smart Card QEMU 8.2 build bug *quick* fix: "
-      printf "\n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details" 
+      printf "\n\n  ignore empty chardev & device lines after smartpass, as not actually present, see args array file for details"
       } | tee -a "$QemuArgsFile" &> /dev/null
     fi
 
     if [[ $BootStyle == "slow" ]]; then BootStyleCmd=" -boot menu=on " ; else BootStyleCmd=" -boot menu=off " ; fi
     printf "\n\n %s " "$BootStyleCmd" | tee -a "$QemuArgsFile" -a "$QemuArgsShortFile" &> /dev/null
 
-    if [[ $secureboot == "on" ]]; then 
+    if [[ $secureboot == "on" ]]; then
       printf "\n\n  Secure Boot:  Set \n\n\n" >> "$QemuArgsFile"
       printf "\n\n  # Secure Boot:  Set \n\n\n" >> "$QemuArgsShortFile"
-    else    
+    else
       printf "\n\n  Secure Boot:  Not Set \n\n\n" >> "$QemuArgsFile"
       printf "\n\n  # Secure Boot:  Not Set \n\n\n" >> "$QemuArgsShortFile"
     fi
 
 
-    if [[ $VerboseArgs ]]; then 
-      # hold the launch till we have checked the config 
+    if [[ $VerboseArgs ]]; then
+      # hold the launch till we have checked the config
       BreakAtVerboseArgs=
       if [[ $UseCustomBootArgs ]]; then cat "$QemuArgsCustomFile" ; else cat "$QemuArgsFile" ; fi
       printColor "  [enter] to continue  [b] to go back \n\n"
@@ -306,7 +306,7 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
 
       [[ $UseCustomBootArgs ]] && printf "\n\n\nHOWEVER ignoring the above standard boot & using the following CUSTOM BOOT sequence instead: \n\n"  && cat "$QemuArgsCustomFile"
       printf "\n\n\n\n"
-    
+
     } >> "$QemuArgsFile"
 
     ##  Make sure we have a record of the virtual hardware that Qemu creates. Especially useful for Windows builds.
@@ -325,15 +325,15 @@ cat << 'EOF' >> "/tmp/qmod-function-vm_boot-new-temp"
       eval "$QemuCustomBootCommand" 2> "$QemuErrorLog"  &
 
     else
-            
+
       ## call QEMU  (with any extras, if present)
       # https://qemu.readthedocs.io/en/latest/system/invocation.html  '-D'  for errors is problematic, use log file
-      eval "$QEMU"  "${args[*]}" "$BootStyleCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &  
+      eval "$QEMU"  "${args[*]}" "$BootStyleCmd" "$ExtraArgs"  "$SharedDriveArgs"  "$SecondDriveArgs" 2> "$QemuErrorLog" &
 
     fi
 
   fi
-  
+
 }
 
 EOF
@@ -350,10 +350,10 @@ load_mod_quickemu_boot
 
 function load_quickemu_cases_and_actions {
 
-  ## Add in the standard parameter cases 
+  ## Add in the standard parameter cases
   grep -A 1000 '# Take command line arguments' "$QE_SourcePath" > "/tmp/qmod-endof-file-temp"
 
-  # note ' case' with space, otherwise grep can pick up the word "Lowercase" 
+  # note ' case' with space, otherwise grep can pick up the word "Lowercase"
   grep -A 1000 -m 1 ' case' "/tmp/qmod-endof-file-temp" | grep -B 1000 -m 1 'esac' > "/tmp/qmod-case-temp"
 
   ##  Add in the standard actions ( also where quickemu sources in the .conf file )
@@ -361,9 +361,9 @@ function load_quickemu_cases_and_actions {
   # Quickemu normally sources in the .conf file at the start of "/tmp/qmod-actions-temp"  (see function 'quickemu')
   # BUT from qqX ver. 1.5 this happens at the end of 'VM_loader_selector_and_menu'
 
-  if [[ $QE_495_Script ]]; then 
+  if [[ $QE_495_Script ]]; then
     grep -A 1000 -m 1 'esac' "/tmp/qmod-endof-file-temp" | tail -n +4 | grep -B 1000 '# Check if vm is already run' | head -n -1 > "/tmp/qmod-actions-conf-source-temp"
-  elif [[ $QE_496_Script ]]; then 
+  elif [[ $QE_496_Script ]]; then
     grep -A 1000 -m 1 'esac' "/tmp/qmod-endof-file-temp" | tail -n +4 | grep -B 1000 'LOOP in {1..5}' | head -n -7  > "/tmp/qmod-actions-conf-source-temp"
   else
     grep -A 1000 -m 1 'esac' "/tmp/qmod-endof-file-temp" | tail -n +4 | grep -B 1000 'vm_boot' | head -n -2 > "/tmp/qmod-actions-conf-source-temp"
@@ -371,9 +371,9 @@ function load_quickemu_cases_and_actions {
 
   grep -v 'source' "/tmp/qmod-actions-conf-source-temp" > "/tmp/qmod-actions-temp"
 
-  if [[ $QE_495_Script ]]; then 
+  if [[ $QE_495_Script ]]; then
     grep -A 200 '# Check if vm is already run' "/tmp/qmod-endof-file-temp"  > "/tmp/qmod-boot-temp"
-  elif [[ $QE_496_Script ]]; then 
+  elif [[ $QE_496_Script ]]; then
     grep -A 200 'fileshare_param_check' "/tmp/qmod-endof-file-temp" | tail -n +2   > "/tmp/qmod-boot-temp"
   else
     grep -A 200 'VM_UP} -eq 0' "/tmp/qmod-endof-file-temp" > "/tmp/qmod-boot-temp"
@@ -394,7 +394,7 @@ function refresh_and_load_quickemu_sources {
   find_quick_version_numbers
   qemu_version_check
   clear_custom_boot_vars
-  
+
 }
 
 
