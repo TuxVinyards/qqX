@@ -359,9 +359,7 @@ else
     printf  "\n\n  [set] open settings file in text editor  [tx] translate settings in browser  [conf] view or edit .conf file"
     printf  "\n\n"
 
-    if [[ $qqX_UpdaterPID ]] && [[ $( ps -p "$qqX_UpdaterPID" --no-headers 2>/dev/null) ]]; then
-      source "$qqX_Upd_VarsTmpFile" ; qqX_UpdaterPID=
-    fi
+    if [[ $(cat "$qqX_Upd_VarsTmpFile" 2>/dev/null) ]]; then source "$qqX_Upd_VarsTmpFile"; fi
 
     check_if_disk_needs_a_cleanup
 
