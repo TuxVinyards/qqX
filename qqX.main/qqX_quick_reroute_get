@@ -293,7 +293,7 @@ function check_new_vm_folder_name {
   if [[ ${SimilarVM_Arr_Display[*]} ]]; then
     for DailyCheckVM in "${SimilarVM_Arr_Display[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
     [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW
-    printColor "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
+    printf "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
     print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
     printf "\n\n  names-may-get-hyphenated or slightlymodified during download ... \n"
   fi
@@ -910,7 +910,7 @@ function_quick_get_wrap ()  {
             printf "  %s"  "$QGW_Editions_FullListString"
             printColor "\n\n  [enter] to continue   [r] choose a different release or return to view web page   [b] back to main menu \n\n"
           elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -gt 1 ]]; then
-            printColor "  No editions to select in any of the releases ..."
+            printf "  NO EDITIONS to select in any of the releases ..."
             printColor "\n\n  [enter] to continue   "
             printf "[r] choose a different release anyway ... or return to view web page  [b] back to main menu \n\n"
           elif [[ ! "${QGW_FullEditions_Array[*]}" && "${#QGW_Releases_Array[@]}" -eq 1 ]]; then
