@@ -91,6 +91,7 @@ show_nbd_help () {
 }
 
 check_sudo_nbd_active () {
+  printf "\n\n"; printf "\e[3A\r"
   # https://superuser.com/a/1183480/2243702
   if ! sudo -nv 2>/dev/null ; then sudo -v ; printf "\n"
   fi
