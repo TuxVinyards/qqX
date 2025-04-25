@@ -18,11 +18,11 @@
 
 - And has an easy [installation](#how-to-install)
 
-## [Latest release 1.12.04](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.05](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Updates Quickget with a slew of distro fixes
+- Updates Quickget with yet more distro fixes (extending those in 1.2.04)
 
-- Upgrades floatversion to 1.4.01
+- Adds a few tweaks and UI improvements
 
 1.12.03 reworks the update downloader plus adds other improvements and fixes
 
@@ -182,7 +182,7 @@ This issue with the **Windows installer sequence** recently came to the fore, al
 
 Although qqX tests had shown Windows to both download and run, this long standing Quickemu problem had unfortunately been simmering on the issue lists since back in October ....
 
-The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.  
+The issue also highlighted a couple of UI glitches that need sorting. A false disk tidy alert and unclear messaging on use of list number for the Iso Boot selection.
 
 Also see the new [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
 
@@ -204,11 +204,11 @@ The prompt `[fd] find distro` will  automatically appear for those with 12 distr
 
 - See [commits](https://github.com/TuxVinyards/qqX/commits/main/) list for details
 
-@ April 17 [1.12.04](https://github.com/TuxVinyards/qqX/releases/latest)
+@ April 17
 
-- Upgrades floatversion to 1.4.01
+ 1.12.04 Upgrades floatversion to 1.4.01
 
-Updates Quickget with distro fixes for:
+And updates Quickget with downstream distro fixes for:
 
 - AntiX
 - Freedos
@@ -217,6 +217,17 @@ Updates Quickget with distro fixes for:
 - Oracle
 - Parrot Sec
 - PC Linux
+
+@ Apr 25 [1.12.05](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- A few tweaks and UI improvements
+- Upstream fix Bazzite
+
+Plus downsteam fixes for :
+
+- Fedora 42 KDE
+- VanillaOS
+- VX
 
 ## Reliability
 
