@@ -496,7 +496,7 @@ function_quick_get_wrap ()  {
         if [[ ! $QGW_List_NumSelected ]] || [[ $QGW_List_NumSelected -gt "${#QGW_OS_Array[@]}" ]]; then
 
           printColor "\n\n  Request Not Recognised \n\n"
-          sleep 1.5
+          sleep 0.5
           refresh_QWG_selector
 
         else
