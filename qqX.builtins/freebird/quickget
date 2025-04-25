@@ -110,7 +110,7 @@ function os_info() {
         ubuntu-server)    INFO="Ubuntu Server|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
         ubuntustudio)     INFO="Ubuntu Studio|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
         ubuntu-unity)     INFO="Ubuntu Unity|-|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
-        vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
+        vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Immutable Gnome DE based on Debian Sid and DistroBox. Designed to be a reliable and productive operating system for your daily work.";;
         void)             INFO="Void Linux|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
         vxlinux)          INFO="VX Linux|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
         windows)          INFO="Windows|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
@@ -517,7 +517,6 @@ function os_support() {
     ubuntustudio \
     vanillaos \
     void \
-    vxlinux \
     windows \
     windows-server \
     xubuntu \
@@ -593,7 +592,7 @@ function releases_bazzite() {
 }
 
 function editions_bazzite() {
-    echo gnome kde
+    echo gnome plasma deck-gnome deck-plasma
 }
 
 function releases_biglinux() {
@@ -1117,8 +1116,7 @@ function releases_ubuntu-server() {
 }
 
 function releases_vanillaos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
+    floatversion -qs -M 3 "$(web_pipe "https://github.com/Vanilla-OS/live-iso/tags" | grep -s 'Link--primary')"
 }
 
 function releases_void() {
@@ -1131,6 +1129,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
+    # apr 2025 de-listed as unmaintained
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | sort -u | cut -d'/' -f 3)
 }
@@ -1668,8 +1667,10 @@ function get_bazzite() {
     local ISO=""
     local URL="https://download.bazzite.gg"
     case ${EDITION} in
-        gnome) ISO="bazzite-gnome-stable.iso";;
-        kde)  ISO="bazzite-stable.iso";;
+        gnome) ISO="bazzite-gnome-stable-amd64.iso";;
+        plasma)  ISO="bazzite-stable-amd64.iso";;
+        deck-gnome)  ISO="bazzite-deck-gnome-stable-amd64.iso";;
+        deck-plasma)  ISO="bazzite-deck-stable-amd64.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -3668,7 +3669,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FB 4.9.8.03b"
+        echo "FB 4.9.8.04"
         exit 0;;
     --help|-help|--h|-h)
         help_message
