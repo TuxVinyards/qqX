@@ -110,7 +110,7 @@ function os_info() {
         ubuntu-server)    INFO="Ubuntu Server|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
         ubuntustudio)     INFO="Ubuntu Studio|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
         ubuntu-unity)     INFO="Ubuntu Unity|-|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
-        vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
+        vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Immutable Gnome DE based on Debian Sid and DistroBox. Designed to be a reliable and productive operating system for your daily work.";;
         void)             INFO="Void Linux|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
         vxlinux)          INFO="VX Linux|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
         windows)          INFO="Windows|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
@@ -517,7 +517,6 @@ function os_support() {
     ubuntustudio \
     vanillaos \
     void \
-    vxlinux \
     windows \
     windows-server \
     xubuntu \
@@ -533,7 +532,7 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    floatversion -M 5 -qs "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" 2>/dev/null)" 
+    floatversion -M 5 -qs "$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" 2>/dev/null)"
 }
 
 function releases_android() {
@@ -593,7 +592,7 @@ function releases_bazzite() {
 }
 
 function editions_bazzite() {
-    echo gnome kde
+    echo gnome plasma deck-gnome deck-plasma
 }
 
 function releases_biglinux() {
@@ -726,7 +725,7 @@ function releases_fedora() {
 
 function editions_fedora() {
     if [[ -z ${RELEASE} ]]; then
-        web_pipe_json "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]" | paste -s -d' ' 
+        web_pipe_json "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]" | paste -s -d' '
     else
         web_pipe_json "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]" | paste -s -d' '
     fi
@@ -909,11 +908,11 @@ function releases_opensuse() {
 
 function releases_oraclelinux() {
     #echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
-    floatversion -qs -M 5  "$(web_pipe "https://yum.oracle.com/oracle-linux-isos.html" | grep -s -e '<td><strong>')" 
+    floatversion -qs -M 5  "$(web_pipe "https://yum.oracle.com/oracle-linux-isos.html" | grep -s -e '<td><strong>')"
 }
 
 function releases_parrotsec() {
-  floatversion -qs -M 3  "$(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -s href)" 
+  floatversion -qs -M 3  "$(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -s href)"
 }
 
 function editions_parrotsec() {
@@ -1117,8 +1116,7 @@ function releases_ubuntu-server() {
 }
 
 function releases_vanillaos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
+    floatversion -qs -M 3 "$(web_pipe "https://github.com/Vanilla-OS/live-iso/tags" | grep -s 'Link--primary')"
 }
 
 function releases_void() {
@@ -1131,6 +1129,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
+    # apr 2025 de-listed as unmaintained
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | sort -u | cut -d'/' -f 3)
 }
@@ -1252,7 +1251,7 @@ function web_get() {
     #  Allow qqX or any external process to pick up the FINALIZED NAME
     # - avoids overwrites eg windows 'unattended'
     # - external proc should clear this file before starting so the grep test will function
-    if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then 
+    if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then
         printf "\n New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
     fi
 
@@ -1270,7 +1269,7 @@ function web_get() {
             echo ; exit
         else
             echo "ERROR! Failed to download ${URL} with curl."
-            rm -f "${DIR}/${FILE}" 
+            rm -f "${DIR}/${FILE}"
         fi
     fi
 }
@@ -1668,8 +1667,10 @@ function get_bazzite() {
     local ISO=""
     local URL="https://download.bazzite.gg"
     case ${EDITION} in
-        gnome) ISO="bazzite-gnome-stable.iso";;
-        kde)  ISO="bazzite-stable.iso";;
+        gnome) ISO="bazzite-gnome-stable-amd64.iso";;
+        plasma)  ISO="bazzite-stable-amd64.iso";;
+        deck-gnome)  ISO="bazzite-deck-gnome-stable-amd64.iso";;
+        deck-plasma)  ISO="bazzite-deck-stable-amd64.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -2355,7 +2356,7 @@ function get_pclinuxos() {
     local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
     echo "${URL}/${ISO} ${HASH}"
 }
-    
+
 function get_peppermint() {
     local HASH=""
     local ISO=""
@@ -3240,16 +3241,16 @@ function download_windows_workstation() {
     esac
 
     # Make log for dev analysis
-    { echo; date; echo; echo "$url"; echo 
+    { echo; date; echo; echo "$url"; echo
     } >  "/tmp/qe_win_dl_log.txt"
 
-    { echo "I18N Lang: $I18N"; echo 
+    { echo "I18N Lang: $I18N"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
     session_id="$(uuidgen)"
 
-    { echo "$user_agent"; echo; uuidparse "$session_id"; echo 
+    { echo "$user_agent"; echo; uuidparse "$session_id"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     # Get product edition ID for latest release of given Windows version
@@ -3263,7 +3264,7 @@ function download_windows_workstation() {
         return $?
     }
 
-    # Copyright (C) 2024 GPL3 Alex Genovese 
+    # Copyright (C) 2024 GPL3 Alex Genovese
     # https://github.com/TuxVinyards/qqX
     # Slow down the 'bot' behaviour, make it seem more human, so the anti-ddos routines don't block us:
     local RndNum=
@@ -3280,7 +3281,7 @@ function download_windows_workstation() {
     product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
     echo "$product_edition_id"
 
-    { echo "product_edition_id:"; echo; echo "$product_edition_id"; echo 
+    { echo "product_edition_id:"; echo; echo "$product_edition_id"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo " - Permit Session ID: $session_id"
@@ -3297,7 +3298,7 @@ function download_windows_workstation() {
 
     local profile="606624d44113"
 
-    { echo "profile:"; echo; echo "$profile"; echo 
+    { echo "profile:"; echo; echo "$profile"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo -n " - Getting language SKU ID: "
@@ -3307,15 +3308,15 @@ function download_windows_workstation() {
         return $?
     }
     # capture 'cmd' for the log file
-    language_skuid_table_cmd="$(echo --disable -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" 
+    language_skuid_table_cmd="$(echo --disable -sf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
 
     { echo; date; echo "language_skuid_table_json - FULL "; echo; echo "$language_skuid_table_json"; echo ; echo "End of Page"; echo
     } >  "/tmp/qe_win_dl_lang_table full.txt"
 
-    { echo "language_skuid_table_cmd:"; echo; echo "curl $language_skuid_table_cmd"; echo 
+    { echo "language_skuid_table_cmd:"; echo; echo "curl $language_skuid_table_cmd"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
-    { echo "language_skuid_table_json:"; echo; echo "$language_skuid_table_json"; echo 
+    { echo "language_skuid_table_json:"; echo; echo "$language_skuid_table_json"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     sku_id="$(echo "${language_skuid_table_json}" | jq -r '.Skus[] | select(.LocalizedLanguage=="'"${I18N}"'" or .Language=="'"${I18N}"'").Id')"
@@ -3324,11 +3325,11 @@ function download_windows_workstation() {
     RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )"
     echo " - And a few human seconds here .... " ; sleep "$RndNum"
 
-    { echo "sku_id:"; echo; echo "$sku_id"; echo 
+    { echo "sku_id:"; echo; echo "$sku_id"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     echo " - Getting ISO download link..."
-    
+
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
@@ -3339,10 +3340,10 @@ function download_windows_workstation() {
     RndNum="$( (tr -cd '5-8' | head -c 1) < /dev/urandom )"
     echo " - And some more, hopefully successful, human seconds before we start .... " ; sleep "$RndNum"
 
-    { echo "iso_download_link_cmd:"; echo; echo "curl $iso_download_link_cmd"; echo 
+    { echo "iso_download_link_cmd:"; echo; echo "curl $iso_download_link_cmd"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
-    { echo "iso_download_link_json:"; echo; echo "$iso_download_link_json"; echo 
+    { echo "iso_download_link_json:"; echo; echo "$iso_download_link_json"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     local failed=0
@@ -3364,7 +3365,7 @@ function download_windows_workstation() {
 
     if [ "${failed}" -eq 1 ]; then
         echo "   RETRY in an hour's time ...." ; echo
-        echo "   Or ... continue with the VM creation process, then:" 
+        echo "   Or ... continue with the VM creation process, then:"
         echo "   Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
         echo "   Save the downloaded ISO to: $(realpath "${VM_PATH}")"
         echo "   Update the config file to reference the downloaded ISO"; echo
@@ -3373,8 +3374,8 @@ function download_windows_workstation() {
 
     # Filter for 64-bit ISO download URL
     iso_download_link="$(echo "${iso_download_link_json}" | jq -r '.ProductDownloadOptions[].Uri' | grep x64)"
-    
-    { echo "iso_download_link - filtered:"; echo; echo "$iso_download_link"; echo 
+
+    { echo "iso_download_link - filtered:"; echo; echo "$iso_download_link"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
 
     if ! [ "$iso_download_link" ]; then
@@ -3389,9 +3390,9 @@ function download_windows_workstation() {
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
     web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
 
-    { echo "FILE_NAME"; echo; echo "$FILE_NAME"; echo 
+    { echo "FILE_NAME"; echo; echo "$FILE_NAME"; echo
     } >>  "/tmp/qe_win_dl_log.txt"
-    
+
 }
 
 function get_windows() {
@@ -3668,7 +3669,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.8.03b"
+        echo "FS 4.9.8.04"
         exit 0;;
     --help|-help|--h|-h)
         help_message
