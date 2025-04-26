@@ -22,7 +22,7 @@
 
 - Adds further tweaks and UI improvements
 
-More in the [release notes](#release-notes) and wiki pages
+More in the [release notes](#release-notes) and wiki pages (Also [fix](https://github.com/TuxVinyards/qqX#fixes-for-quickemu) for QuickEmu failing at Qemu version 10.0.0)
 
 ## Launch from the Linux desktop or from the command line
 
@@ -230,6 +230,18 @@ Plus downsteam fixes for :
 - Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
+
+### Qemu version 10.0.0
+
+See Settings file:
+
+```bash
+## QEMU VERSION
+
+# Overide to handle future quickemu errors from changes to Qemu numbering format
+# Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
+  QemuShortVerOveride=
+```
 
 ## FAQs and Help
 
