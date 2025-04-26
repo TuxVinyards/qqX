@@ -2,47 +2,31 @@
 
 - Create an easy to build collection of distros and desktops for testing, using and evaluating
 
-- Safe, carefully written, well tested and checked
+- _Safe, carefully written, well tested and checked_
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Adds fixes, tools and general improvements to the [Quickemu](https://github.com/quickemu-project/quickemu) system
+- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the Quickemu system
 
 - Allows the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
 
-- Offers a complete menu system within a unique hybrid interface
+- [Easy install](#how-to-install) menu system within a unique hybrid interface
 
-- Is more up-to-date and easier to mod than Gnome Boxes or VirtualBox
+- More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-- And has an easy [installation](#how-to-install)
-
 ## [Latest release 1.12.05](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Updates Quickget with yet more distro fixes (extending those in 1.2.04)
+- Updates Quickget with yet more downstream distro fixes
 
-- Adds a few tweaks and UI improvements
-
-1.12.03 reworks the update downloader plus adds other improvements and fixes
-
-1.12.02 gives a collection of UI/UX improvements and adds a distro finder
-
-1.12.01 adds a fix for Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
-
-- Includes the new storage maintence tools
-
-- Extended stop, start and resume for downloads.
-
-- And the now usual collection of _downstream fixes for quickget_
-
-1.11.0 added the ability to [_mount qcow2 drives in a file manager_](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing#other-tools)
+- Adds further tweaks and UI improvements
 
 More in the [release notes](#release-notes) and wiki pages
 
-### Launch from the Linux desktop or from the command line
+## Launch from the Linux desktop or from the command line
 
-_No need to wait_ for Quickget to add in the distros or releases that you want.
+[_No need to wait_ for Quickget](https://github.com/quickemu-project/quickemu/releases) to add in the distros or releases that you want.
 
 - Download, right click and install
 
@@ -50,7 +34,7 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 - Or at the terminal, simply `qqX /path/distro.iso`
 
-### Search the distro lists with _alphabetical zooming_
+## Search the distro lists with _alphabetical zooming_
 
 - Simple list browse, download, and organise countless distros
 
@@ -58,7 +42,7 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-### Simple and Straightforward
+## Simple and Straightforward
 
 - Clear to read display modes, utilities, optimizers and tools
 
@@ -66,11 +50,11 @@ _No need to wait_ for Quickget to add in the distros or releases that you want.
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-- Always up-to-date text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation)
+- Reliable text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation) methods.
 
 ### Get the latest fixes
 
-No need to wait for Quickemu bug fixes to make their way through the system either.
+[No need to wait for Quickemu bug fixes](https://github.com/quickemu-project/quickemu/releases) to make their way through the system either.
 
 - Built-in code releases ensure that any new input from the quickemu community can be quickly put to work.
 
@@ -84,7 +68,7 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
 
-### Range of utilities and functions
+## Range of utilities and functions
 
 - Qcow2 repair, resize and diagnostics
 
@@ -93,7 +77,7 @@ No need to wait for Quickemu bug fixes to make their way through the system eith
 - Backups and snapshot management
 
 - Controls for Secondary storage
-  
+
 - A configuration tune-up wizard
 
 - Custom Qemu boot parameters tools
@@ -124,7 +108,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Quickemu and Quickgui may be installed but are _not essential_.
 
-- Full installer details in the [wiki](https://github.com/TuxVinyards/qqX/wiki) pages
+- [Full installer details](https://github.com/TuxVinyards/qqX/wiki) in the wiki pages
 
 ## Release notes
 
