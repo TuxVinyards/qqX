@@ -291,26 +291,23 @@ QEMU_IMG="$(type -p qemu-img)"
 function qemu_version_check {
 
   if [[ ! $QEMU ]] || [[ ! $QEMU_IMG ]]; then
-
     printColor "\n\n QEMU not found. Check installations of qemu and qemu-img"
     printf "\n\n If using the quickemu packaging this should normally have been installed.\n\n"
     sleep 1
     return
-
   fi
 
-  QEMU_VER_LONG=$( "$QEMU" -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 )
-  QEMU_VER_SHORT="${QEMU_VER_LONG//./}"
-  QEMU_VER_SHORT="${QEMU_VER_SHORT:0:2}"
+  QEMU_VER_LONG="$("$QEMU" -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 )"
+  QEMU_VER_SHORT=$(cut -d '.' -f 1-2 <<< "$QEMU_VER_LONG")
+  QEMU_VER_SHORT="${QEMU_VER_SHORT//./}"
 
-  if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="61"
-
-  elif [[ $QEMU_VER_SHORT -lt 60 ]]; then
-
-    printf "\n\n QEMU 6.0.0 or newer is required. Current version is: %s"  "$QEMU_VER_LONG"
-    printf "\n\n Use overide in main settings to handle future errors from changes to Qemu numbering format\n\n"
-    sleep 1
-
+  if [[ $QemuShortVerOveride ]]; then  QEMU_VER_SHORT="666"
+  elif [[ $QEMU_VER_SHORT -lt 81 ]]; then
+    printf "\n\n  %s" "$("$QEMU" -version | head -n 1)"
+    printf "\n\n  QEMU version 8.1.0 or newer is normally required for all functions to work."
+    printf "\n\n  Use 'QemuShortVerOveride' in MAIN SETTINGS to supress error warnings,"
+    printf "\n\n  [enter] to continue and edit settings if current version is okay. \n\n"
+    read -rp "  >  "
   fi
 
 }
