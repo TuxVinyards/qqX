@@ -401,11 +401,19 @@ else
       DistroListing="$(tr '|' '\n' <<< "$DistroListing")"
       mapfile -t DistroListing_ARR <<< "$DistroListing"
       DistroHomePage="${DistroListing_ARR[2]}"
+      DistroLogin="${DistroListing_ARR[1]}"
+      [[ $DistroLogin == "-" ]] && DistroLogin=
     fi
 
     printf  "  [enter] refresh   "
     [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
-    printf " [h] show help & info  [q] quit \n\n"
+    printf " [h] show help & info  [q] quit "
+
+    if [[ $LiveBoot && $DistroLogin ]]; then
+      printColor "\n\n  Login:Password"
+      printf "  %s" "$DistroLogin"
+    fi
+    printf "\n\n"
 
     path_diagnostics
 
