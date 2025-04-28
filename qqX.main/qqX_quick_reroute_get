@@ -538,36 +538,22 @@ function_quick_get_wrap ()  {
           [[ "$QGW_OS_Arr_NameDisplay" == 'TRUENAS'* ]] && QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay/TRUE/True}"
 
           printColor  "\n  %s  "  "$QGW_OS_Arr_NameDisplay"
-
-          # Quickemu OS HOME PAGE coding format keeps changing. Varied checks are needed, eg:
-          # Check for quickemu 4.9.1 empty folder error  https://github.com/quickemu-project/quickemu/pull/854
-          # 4.9.2 (still numbered 4.9.1) only has 'echo 38 39' for fedora releases ...
-
           printColor "INFO:"
 
           QGW_OS_HomePage=
           QGW_OS_InfoText=
 
-          if grep -q -s '4=Homepage' "$QG_SourcePath" ; then
-            # @ 08/2024 this one is now deprecated, can't seem to be found ??
-            QGW_OS_HomePage="$("$QG_SourcePath" -4 "$QGW_OS_Arr_NameSelected")"
-            QGW_OS_HomePage="$(tr -cd "[:print:]" <<< "$QGW_OS_HomePage")"
-
-          elif  grep -q -s 'os_homepage' "$QG_SourcePath" &&  ! grep -q -s -e 'echo 33 34 35 36' "$QG_SourcePath" ; then
-            # 4.9.2 onwards seems to be okay  REVIEW
-            if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
-            else
-              # first listing, some may have two
-              QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
-              QGW_OS_Info="${QGW_OS_Info//';;'/}"
-              QGW_OS_Info="${QGW_OS_Info//'"'/}"
-
-              QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
-              mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
-
-              QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
-              QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
-            fi
+          # qget 4.9.2 onwards
+          if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
+          else
+            # first listing, some may have two
+            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+            QGW_OS_Info="${QGW_OS_Info//';;'/}"
+            QGW_OS_Info="${QGW_OS_Info//'"'/}"
+            QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+            mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+            QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
+            QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
           fi
 
           if [[ $QGW_OS_InfoText ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
