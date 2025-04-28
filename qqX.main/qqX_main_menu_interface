@@ -45,13 +45,13 @@ else
       printf  "  [u] show UTILS & technical"
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
-      # force verbose boot on Windows NEW INSTALLS
       if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then
-        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev.
-        VerboseArgs=1
-        printColor "   >> Windows install: Verbose mode enabled << \n\n"
+        printf "\n\n"
         [[ $WebBrowser ]] && printColor "  [qW]"
-        printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
+        printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru"
+      elif [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *archlinux* ]]; then
+        printColor "\n\n  After booting, type 'archinstall' at the command prompt for easier installation ..."
+        printColor "\n\n  See https://github.com/archlinux/archinstall for more details"
       else
         printf "   [bm] > "
         if [[ $BootStyle == "fast" ]]; then
