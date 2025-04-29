@@ -127,11 +127,19 @@ VM_SelectorStyle="A"
 
 # Quickemu is a good project but it has suffered at times from an intermittent maintenance cycle with
 # short notice releases and often months long periods of community-only activity.
-# 2024/04 has been A TURNING POINT which cames at the end of what was a frustratingly long period for many people,
+
+# The idea is still to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes,
+# and to have the possibilty, if needed or wished, of allowing in selected pre-release community contributions.
+
+# 2024/04 was A TURNING POINT which came at the end of what was a frustratingly long period for many people,
 # during which fixes and features from the quickemu community had accumulated and sat there waiting to be merged.
 
-# The idea is to REMAIN CLOSELY CONNECTED TO THE QUICKEMU SOURCE but to protect qqX from any unexpected API or code changes,
-# and to have the possibilty, if needed or wished, of allowing in selected pre-release community contributions.
+# However @ 2025/04 patchy upstream maintainence and developer differences continue ...
+
+# Running of STANDARD QUICKEMU FILES is NOW DEPRECATED as not all of the features and functions will work.
+# qqX versions now contain multiple downstream fixes and general improvements, plus various adjustments to runtime process controls
+
+# To run qqX generated machines in original upstream mode, use 'quickemu -vm  distro-name.conf' at the command line
 
 # Versions may be start default set and  additionally hot-swapped via the standard qqX menus
 

@@ -314,7 +314,7 @@ function qemu_version_check {
   elif [[ $qvFail ]]; then
     printf "\n\n  %s" "$("$QEMU" -version | head -n 1)"
     printf "\n\n  QEMU version 8.1.0 or newer is normally required for all functions to work."
-    printf "\n\n  Use 'QemuShortVerOveride' in MAIN SETTINGS to supress error warnings,"
+    printf "\n\n  Use 'QemuShortVerOveride' in MAIN SETTINGS to adjust errors and change warnings"
     printf "\n\n  [enter] to continue and edit settings if current version is okay. \n\n"
     read -rp "  >  "
   fi

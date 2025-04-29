@@ -241,7 +241,7 @@ function manage_and_repair_disks {
     printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere."
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  Snapshots will retained in the backups ...  [b] back to main menu "
+    printf "\n\n  Snapshots will be retained in the backups ...  [b] back to main menu "
 
   fi
 
@@ -290,7 +290,7 @@ function manage_and_repair_disks {
       sleep 3 ; return
     fi
 
-    printf "\n\n  Backups may be easily renamed and reused as previously, using the file manager"
+    printf "\n\n  Backups may be easily renamed and reused as previously using the file manager"
     DiskStorageChanges=1
 
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then
