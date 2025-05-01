@@ -240,12 +240,15 @@ function find_quick_version_numbers {
   # See function 'refresh_and_load_quickemu_sources'
 
   # QuickEMU also uses an internal variable '$VERSION' but this only works after the correct script has been sourced.
-  QE_VerNumber="$("$QE_SourcePath" --version 2>/dev/null)"
+  # But use grep to avoid bad original source $QEMU_VER_SHORT routines throwing errors
+  QE_VerNumber="$(grep -s 'VERSION=' "$QE_SourcePath" | cut -d'"' -f2)"
 
   # QuickGET as @ ver 4.9.2 'official-vanilla' actually makes a call to EMU to find the number.
   # But the 'quickget' call goes to a qqX capture function of the same name,
   # and allows re-routes to custom versions that may work differently.
-  QG_VerNumber="$("$QG_SourcePath" --version 2>/dev/null)"
+  if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then QG_VerNumber="$QE_VerNumber"
+  else QG_VerNumber="$("$QG_SourcePath" --version 2>/dev/null)"
+  fi
 
   # Release Quickemu 4.9.2 was still numbered 4.9.1
   # Use the changes to fedora releases 'echo 38 39' as a fixing flag:
