@@ -312,8 +312,9 @@ VM_SelectorStyle="A"
 
 ## QEMU VERSION
 
-# Overide to handle future quickemu errors from changes to Qemu numbering format
-# Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
+# QEMU version 8.1.0 or newer is currently required for all functions to work,
+# while QEMU version 6.1.0 is baseline for GL functions.
+# An overide may be used, if needed. Set =1 to force version present on system.
   QemuShortVerOveride=
 
 # Hardcoded quickemu default is 'qemu-system-x86_64' with machine 'q35'
