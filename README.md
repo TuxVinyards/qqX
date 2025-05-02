@@ -54,9 +54,9 @@ More in the [release notes](#release-notes) and wiki pages
 
 ### Get the latest fixes
 
-[No need to wait for Quickemu bug fixes](https://github.com/quickemu-project/quickemu/releases) to make their way through the system either.
+[No need to wait for Quickemu bug fixes](https://github.com/quickemu-project/quickemu/releases) to make their way through the system
 
-- Built-in code releases ensure that any new input from the quickemu community can be quickly put to work.
+- Built-in code releases ensure that any new input from the quickemu community can be quickly put to work
 
 ### Start the _main menu_ via the desktop or command line
 
@@ -105,6 +105,8 @@ That's it.
 - Un-installer included .....
 
 Start from scratch. Or safely test out the qqX difference on your existing VM's.
+
+- Fully compatible with Quickemu machines
 
 - Quickemu and Quickgui may be installed but are _not essential_.
 
@@ -237,18 +239,6 @@ Plus downsteam fixes for :
 - Windows [language fixes](https://github.com/quickemu-project/quickemu/issues/1113) mean that all the downloads work, not just English
 
 - The use of 'floatversion' allows qqX [_exclusive fixes_](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) for multiple distro downloads not available in Quickemu
-
-### Qemu version 10.0.0
-
-See Settings file:
-
-```bash
-## QEMU VERSION
-
-# Overide to handle future quickemu errors from changes to Qemu numbering format
-# Note QEMU 6.0.0 or newer is required   Set overide =1  if version is known to be newer.
-  QemuShortVerOveride=
-```
 
 ## FAQs and Help
 
