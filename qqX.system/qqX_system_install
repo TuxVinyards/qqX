@@ -123,64 +123,71 @@ fi
 
 # Use 'type -p' which is the 'newer' method and qqX tests have shown problems using 'command -v'
 # Using caps (type -P) will show aliases and qqX re-routes
+# @ 2025/04 test modified as while Fedora has Bash at usr/bin/bash it preferences usr/sbin/bash
 
-OS_BashLocation="$(type -p bash)"
+while true ; do
 
-if [[ ! $HideFHSwarnings ]] && [[ "$OS_BashLocation" != "/usr/bin/bash" ]]; then
+  InstallationAlert=
 
-  printf "\n\n\n  Please read the notes at the start of this installer script."
-
-  if [[ ! $OS_BashLocation ]]; then  printf "\n\n  Bash has not been found ....."
-  else
+  if [[ ! "$(type -p bash)" ]]; then
+    printf "\n\n  Problem locating Bash. Please read the notes at the start of this installer script."
     printf "\n\n  The start line to the qqX main script may need to be adjusted."
-    printf "\n\n  Bash has been located at %s" "$OS_BashLocation"
+    InstallationAlert=1
   fi
 
-  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
-  read -rp  "  >  "   FHS_Alert
-  [[ $FHS_Alert ]] &&  exit
-fi
-
-if [[ ! $HideFHSwarnings ]] &&  ! tput -V | grep -q ncurses 2> /dev/null; then
-  printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
-  printf "\n\n  [q] to quit   [enter]  to ignore or continue \n\n"
-  read -rp  "  >  "   FHS_Alert
-  [[ $FHS_Alert ]] &&  exit
-fi
-
-##  Check for items sometimes missing
-if [[ ! $(type -p curl) ]]; then
-  printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-if [[ ! $(type -p jq) ]]; then
-  printf "\n\n  'jq' is a listed dependency of QuickEmu ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-CoreList=("bc" "xrandr" "paste")
-for CP in "${CoreList[@]}"; do
-  if [[ ! $(type -p "$CP") ]]; then
-    printf "\n\n  A '%s' installation should normally be present and is required by qqX ...\n\n"  "$CP"
-    read -rp "  [enter] to ignore or continue > "
+  if ! tput -V | grep -q ncurses 2> /dev/null; then
+    printf "\n\n  Check your OS >  \n\n  An 'ncurses' installation should normally be present. Test using 'tput -V' "
+    InstallationAlert=1
   fi
+
+  ##  Check for items sometimes missing
+  if [[ ! $(type -p curl) ]]; then
+    printf "\n\n  'Curl' is a listed dependency of QuickEmu and is also used by qqX ..."
+    InstallationAlert=1
+  fi
+  if [[ ! $(type -p jq) ]]; then
+    printf "\n\n  'jq' is a listed dependency of QuickEmu ..."
+    InstallationAlert=1
+  fi
+  CoreList=("bc" "xrandr" "paste")
+  for CP in "${CoreList[@]}"; do
+    if [[ ! $(type -p "$CP") ]]; then
+      printf "\n\n  '%s' should normally be present and is required by qqX ..."  "$CP"
+      printf "\n  A utils package could be missing? Try sudo pacman -Syl | grep utils, etc apt dnf ..."
+      [[ $CP == "xrandr" ]] && printf "\n  xrandr can be listed as xorg-xrandr or as part of x11-xserver-utils"
+      InstallationAlert=1
+    fi
+  done
+  if [[ ! $(type -p wget) ]]; then
+    printf "\n\n  A 'wget' installation should normally be present and may be needed in certain places ..."
+    InstallationAlert=1
+  fi
+  if [[ ! $(type -p 7z) ]]; then
+    printf "\n\n  A command line '7zip'/'p7zip/p7zip-plugins' installation is needed for some distro downloads..."
+    InstallationAlert=1
+  fi
+  if [[ ! $(type -p spicy) ]]; then
+    printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ..."
+    InstallationAlert=1
+  fi
+  if [[ ! $(type -p qemu-system-x86_64) ]]; then
+    # REVIEW Arm compatibility
+    printf "\n\n  Check for 'qemu' installations: qemu-system-x86_64 or qemu-full, qemu-system etc ..."
+    InstallationAlert=1
+  fi
+
+  if [[ ! $InstallationAlert ]]; then  break
+  else
+    InstallationAlert=
+    printf "\n\n  A second terminal can be opened and software installed. Return here to re-check."
+    printf "\n\n  [q] to quit   [r] re-check   [c] ignore and continue \n\n"
+    read -rp  "  >  "   InstallationAlert
+    [[ $InstallationAlert == "q" ]] &&  exit
+    [[ $InstallationAlert == "c" ]] &&  break
+  fi
+
 done
-if [[ ! $(type -p wget) ]]; then
-  printf "\n\n  A 'wget' installation should normally be present and may be needed in certain places ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-if [[ ! $(type -p 7z) ]]; then
-  printf "\n\n  A command line '7zip'/'p7zip' installation is needed for some distro downloads...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-if [[ ! $(type -p spicy) ]]; then
-  printf "\n\n  Check for 'spice' installations 'spicy', 'spice-vdagent' and 'spice-gtk'/'spice-client-gtk' ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
-if [[ ! $(type -p qemu-system-x86_64) ]]; then
-  # REVIEW Arm compatibility
-  printf "\n\n  Check for 'qemu' installations: qemu-system-x86_64 or qemu-full-desktop etc ...\n\n"
-  read -rp "  [enter] to ignore or continue > "
-fi
+
 
 New_qqX_Version="$(./qqX --version 2>/dev/null)"
 
