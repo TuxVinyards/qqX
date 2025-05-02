@@ -316,12 +316,12 @@ function  main_menu_actions {
       printColor "\n  Live Boot Only:  Main Drive is only minimal in size at this stage. "
       printf "\n\n  See [conf] and [disk] utils, from the main menu, for more details."
     else
-      printf   "\n  VIRTUAL DISK SIZE is normally larger than the actual size occupied but both the CoW and snapshot "
-      printf "\n\n  processes can sometimes make the envelope size appear to be lower than the contents."
-      printf "\n\n  Deleting snapshots will reduce Disk Size even if host reported sizes may not always reflect this."
-      printf "\n\n  FILE LENGTH greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress."
-      printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations ..."
-      printColor "\n\n  Use the qqX disk utility to resize and to tidy."
+      printf   "\n  VIRTUAL DISK SIZE is normally larger than the actual size occupied but combined CoW"
+      printf "\n\n  and snapshot processes can sometimes make the contents appear to exceed that stated."
+      printf "\n\n  Snapshot deletion will reduce the occupied space but empty data can create a"
+      printf "\n\n  FILE LENGTH disparity. Excessive size differences may indicate a need to tidy and compress"
+      printf "\n\n  whilst small differences may be ignored and will later become self adjusted ..."
+      printColor "\n\n  Use the qqX disk utility to resize and tidy."
     fi
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
       [[ ! $LiveBoot ]] && printColor "\n\n  Scroll to View "

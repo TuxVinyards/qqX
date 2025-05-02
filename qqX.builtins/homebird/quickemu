@@ -347,7 +347,7 @@ function configure_cpu() {
 
     function ignore_non_robust_for_now {
 
-        # causes telescoped/nested VM's to fail ... 
+        # causes telescoped/nested VM's to fail ...
         # macos host not supported with qqX (yet)
         # qqX uses different aarch methods
 
@@ -414,18 +414,18 @@ function configure_cpu() {
         # A CPU with SSE4.2 support is required for >= macOS Catalina
         # A CPU with AVX2 support is required for >= macOS Ventura
 
-        # qqX mod based on 
+        # qqX mod based on
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2115516935
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2120274893
         # https://github.com/quickemu-project/quickemu/pull/1225#issuecomment-2117555805
 
-        # Skylake-Server-v3 should be default 
-        # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
+        # Skylake-Server-v3 should be default
+        # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications
         # Also retains IBRS spectre mitigation
         # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
         # Will work both with cpu_cores="16" and ="32" but 'About' will show Cpu as unrecognised, only sysctl will show the CPU name ...
         # Other Xeon oddballs like 14 or 28 don't boot, even when forced.
-        # CascadeLake is Mac Pro 2019 but is practically identical to Skylake 
+        # CascadeLake is Mac Pro 2019 but is practically identical to Skylake
         # Whilst switching from Sky to Cascade still leaves 'About' displaying iMacPro 2017 ...
 
         #CPU_MODEL="Haswell-v2"
@@ -449,7 +449,7 @@ function configure_cpu() {
             case ${macos_release} in
                 ventura|sonoma)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if ! check_cpu_flag sse4_2 || ! check_cpu_flag avx2; then 
+                    if ! check_cpu_flag sse4_2 || ! check_cpu_flag avx2; then
                         echo "ERROR! macOS ${macos_release} requires a CPU with both SSE 4.2 and AVX2 support."
                         echo "       Try macOS Monterey or Big Sur."
                         exit 1
@@ -489,7 +489,7 @@ function configure_cpu() {
             case ${macos_release} in
                 ventura|sonoma)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then 
+                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
                         CPU+=",+avx2,+sse4.1,+sse4.2"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
@@ -537,8 +537,8 @@ function configure_cpu() {
             done
         fi
 
-        # Only diff to Skylake is = PKU  AVX512VNNI  SPEC_CTRL  SPEC_CTRL_SSBD  
-        # plus the VMX which is to be ignored, unless Host = Intel ?? REVIEW 
+        # Only diff to Skylake is = PKU  AVX512VNNI  SPEC_CTRL  SPEC_CTRL_SSBD
+        # plus the VMX which is to be ignored, unless Host = Intel ?? REVIEW
         # But Qemu doesn't allow spec ctrl for V3, at least
         # And avx512_vnni has underscore in lscpu but not hyphenated in qemu, so:
         if [[ "$CPU_MODEL" == 'Cascadelake-Server'* ]]; then
@@ -546,7 +546,7 @@ function configure_cpu() {
             if ! check_cpu_flag "avx512_vnni"; then CPU+=",avx512vnni=off" ; fi
         fi
 
-        [[ $UseHostOverWrite ]] && CPU="-cpu host,kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off" 
+        [[ $UseHostOverWrite ]] && CPU="-cpu host,kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off"
 
         # Disable S3 support in the VM to prevent macOS suspending during install
         GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"

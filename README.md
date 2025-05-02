@@ -16,13 +16,13 @@
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
 
-## [Latest release 1.12.05](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.06](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Updates Quickget with yet more downstream distro fixes
+- Adds fixes for QuickEmu and new Qemu version 10.0.0
 
-- Adds further tweaks and UI improvements
+- Improves UI for dependency checker
 
-More in the [release notes](#release-notes) and wiki pages (Also [fix](https://github.com/TuxVinyards/qqX#fixes-for-quickemu) for QuickEmu failing at Qemu version 10.0.0)
+More in the [release notes](#release-notes) and wiki pages
 
 ## Launch from the Linux desktop or from the command line
 
@@ -202,16 +202,23 @@ And updates Quickget with downstream distro fixes for:
 - Parrot Sec
 - PC Linux
 
-@ Apr 25 [1.12.05](https://github.com/TuxVinyards/qqX/releases/latest)
+@ Apr 25
 
-- A few tweaks and UI improvements
-- Upstream fix Bazzite
+- 1.12.05 Adds a few tweaks and UI improvements
+- Adds upstream fix Bazzite
 
 Plus downsteam fixes for :
 
 - Fedora 42 KDE
 - VanillaOS
 - VX
+
+@ May 2
+
+[1.12.06](https://github.com/TuxVinyards/qqX/releases/latest)
+
+- Adds fixes for QuickEmu and new Qemu version 10.0.0
+- Improves UI for dependency checker
 
 ## Reliability
 

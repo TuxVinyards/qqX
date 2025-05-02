@@ -45,13 +45,15 @@ else
       printf  "  [u] show UTILS & technical"
       [[ $KVM_MSR_Error || $KVM_MSR_Warn ]] && printf  "   [m]  msrs help "
 
-      # force verbose boot on Windows NEW INSTALLS
-      if [[ $LiveBoot ]] && [[ "${VM_InstanceName,,}" == *windows* ]]; then
-        #BootStyle="slow" # REVIEW keep things simpler and add user help msg instead. But leave this here for easy dev.
-        VerboseArgs=1
-        printColor "   >> Windows install: Verbose mode enabled << \n\n"
-        [[ $WebBrowser ]] && printColor "  [qW]"
-        printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru. "
+      if [[ $LiveBoot ]]; then
+        if [[ "${VM_InstanceName,,}" == *windows* ]]; then
+          printf "\n\n"
+          [[ $WebBrowser ]] && printColor "  [qW]"
+          printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru"
+        elif [[ "${VM_InstanceName,,}" == *archlinux* ]]; then
+          printColor "\n\n  After booting, type 'archinstall' at the command prompt for easier installation ..."
+          printColor "\n\n  See https://github.com/archlinux/archinstall for more details"
+        fi
       else
         printf "   [bm] > "
         if [[ $BootStyle == "fast" ]]; then
@@ -374,38 +376,44 @@ else
       printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
     fi
 
-    if  grep -qs 'os_homepage' "$QG_SourcePath" &&  ! grep -qs -e 'echo 33 34 35 36' "$QG_SourcePath" ; then
-      # 4.9.2 onwards seems to be okay  Also see quickget reroute ...
-      if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
-        VM_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")"
-      elif [[ $(cat "$VM_InstanceName/QemuVirtHardwareRecord.txt" 2>/dev/null) ]]; then
-        VM_RecordedName="$(grep -sm1 -e '-name' "$VM_InstanceName/QemuVirtHardwareRecord.txt" | cut -d'=' -f2)"
-      else  VM_RecordedName="$VM_InstanceName"
-      fi
-      VM_RecordedName="${VM_RecordedName,,}"
-      mapfile -t VM_RecordedNameArr <<< "$(tr '-' '\n' <<< "$VM_RecordedName")"
-      # note grep with space or probs like ubuntu picks (ed)ubuntu first
-      # needs to cope with ubuntu variants, for daily-live, for renamed instances, and for custom ISO installed
-      if grep -qs "  ${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]})" "$QG_SourcePath" ; then
-        VM_RecordedName_Listed="${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]}"
-      elif grep -qs "  ${VM_RecordedNameArr[0]})" "$QG_SourcePath" ; then
-        VM_RecordedName_Listed="${VM_RecordedNameArr[0]}"
-      else VM_RecordedName_Listed=
-      fi
-      if [[ ! $VM_RecordedName_Listed ]]; then DistroHomePage=
-      else
-        QGW_OS_Info="$(grep -m1 "  ${VM_RecordedName_Listed})" "$QG_SourcePath" | cut -d'=' -f2)"
-        QGW_OS_Info="${QGW_OS_Info//';;'/}"
-        QGW_OS_Info="${QGW_OS_Info//'"'/}"
-        QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
-        mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
-        DistroHomePage="${QGW_OS_Info_ARR[2]}"
-      fi
+    # qget 4.9.2 onwards - use recorded name as VM can get renamed
+    if [[ $(cat "$VM_InstanceName/dl-url.txt" 2>/dev/null) ]]; then
+      VM_RecordedName="$(awk '/http/{print $1}' "$VM_InstanceName/dl-url.txt")"
+    elif [[ $(cat "$VM_InstanceName/QemuVirtHardwareRecord.txt" 2>/dev/null) ]]; then
+      VM_RecordedName="$(grep -sm1 -e '-name' "$VM_InstanceName/QemuVirtHardwareRecord.txt" | cut -d'=' -f2)"
+    else  VM_RecordedName="$VM_InstanceName"
+    fi
+    VM_RecordedName="${VM_RecordedName,,}"
+    mapfile -t VM_RecordedNameArr <<< "$(tr '-' '\n' <<< "$VM_RecordedName")"
+    # note grep with space or probs like ubuntu picks (ed)ubuntu first
+    # needs to cope with ubuntu variants, for daily-live, for renamed instances, and for custom ISO installed
+    if grep -qs "  ${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]})" "$QG_SourcePath" ; then
+      VM_RecordedName_Listed="${VM_RecordedNameArr[0]}-${VM_RecordedNameArr[1]}"
+    elif grep -qs "  ${VM_RecordedNameArr[0]})" "$QG_SourcePath" ; then
+      VM_RecordedName_Listed="${VM_RecordedNameArr[0]}"
+    else VM_RecordedName_Listed=
+    fi
+    if [[ ! $VM_RecordedName_Listed ]]; then DistroHomePage=
+    else
+      DistroListing="$(grep -m1 "  ${VM_RecordedName_Listed})" "$QG_SourcePath" | cut -d'=' -f2)"
+      DistroListing="${DistroListing//';;'/}"
+      DistroListing="${DistroListing//'"'/}"
+      DistroListing="$(tr '|' '\n' <<< "$DistroListing")"
+      mapfile -t DistroListing_ARR <<< "$DistroListing"
+      DistroHomePage="${DistroListing_ARR[2]}"
+      DistroLogin="${DistroListing_ARR[1]}"
+      [[ $DistroLogin == "-" ]] && DistroLogin=
     fi
 
     printf  "  [enter] refresh   "
     [[ $DistroHomePage ]] &&  printf "[w] distro homepage  "
-    printf " [h] show help & info  [q] quit \n\n"
+    printf " [h] show help & info  [q] quit "
+
+    if [[ $LiveBoot && $DistroLogin ]]; then
+      printColor "\n\n  Login:Password"
+      printf "  %s" "$DistroLogin"
+    fi
+    printf "\n\n"
 
     path_diagnostics
 
