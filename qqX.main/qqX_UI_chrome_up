@@ -67,7 +67,7 @@ echColor () {
 
 
 # General default title:
-qqX_title="[quickemu quickget X terminal project] - $qqX_Version "
+qqX_title="[quickemu quickget X terminal project] - $qqX_Version - Basically Better:"
 
 ## qqX chrome up
 
