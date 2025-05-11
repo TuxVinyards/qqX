@@ -6,15 +6,21 @@
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the Quickemu system
-
 - Allows the easy running of Linux, Windows, MacOS, etc with [Qemu / KVM](https://qemu.readthedocs.io)
 
-- [Easy install](#how-to-install) menu system within a unique hybrid interface
+## Basically Better
+
+- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the Quickemu system
 
 - More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
 - Much easier than the complex Qemu front-ends based on LibVirt.
+
+### Launch from the Linux desktop or from the command line
+
+- [Easy install](#how-to-install) menu system within a unique hybrid interface
+
+- Modern coding and modern methods applied to traditional simplicity
 
 ## [Latest release 1.12.06](https://github.com/TuxVinyards/qqX/releases/latest)
 
@@ -24,17 +30,19 @@
 
 More in the [release notes](#release-notes) and wiki pages
 
-## Launch from the Linux desktop or from the command line
+## Ease of the GUI
+
+![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
 
 [_No need to wait_ for Quickget](https://github.com/quickemu-project/quickemu/releases) to add in the distros or releases that you want.
 
 - Download, right click and install
 
-![qqX-mouse-click-iso](https://github.com/TuxVinyards/qqX/assets/3956806/ae6c9fe1-0c46-4e05-b75a-b6964f35bad2)
-
 - Or at the terminal, simply `qqX /path/distro.iso`
 
-## Search the distro lists with _alphabetical zooming_
+## Power and simplicity of the command line
+
+Search the distro lists with _alphabetical zooming_
 
 - Simple list browse, download, and organise countless distros
 
@@ -42,9 +50,11 @@ More in the [release notes](#release-notes) and wiki pages
 
 ![alpha-zoom-qget](https://github.com/TuxVinyards/qqX/assets/3956806/bfde0aef-9094-443d-a11d-5bd6745e5702)
 
-## Simple and Straightforward
+## Straightforward and easy to work with
 
 - Clear to read display modes, utilities, optimizers and tools
+
+- Easy to fix, mod and customise
 
 - Choice of Custom Menus or 5 built-in _menu styles_
 
@@ -52,13 +62,27 @@ More in the [release notes](#release-notes) and wiki pages
 
 - Reliable text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation) methods.
 
-### Get the latest fixes
+## Always the latest fixes
 
 [No need to wait for Quickemu bug fixes](https://github.com/quickemu-project/quickemu/releases) to make their way through the system
 
 - Built-in code releases ensure that any new input from the quickemu community can be quickly put to work
 
-### Start the _main menu_ via the desktop or command line
+## Easy utilities
+
+- Safeguard your machines with easy snapshot management
+
+- Make sure drives are healthy with Qcow2 repair, resize and diagnostics
+
+- Edit machine partitions by booting from maintence ISO's
+
+- View inside virtual machines using a file manager
+
+![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
+
+- Plus a configuration tune-up wizard, and more
+
+## Start qqX from the _desktop main menu_ or the command line
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
@@ -67,30 +91,6 @@ More in the [release notes](#release-notes) and wiki pages
 ### Or start specific VM's straight from the filemanager
 
 ![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
-
-## Range of utilities and functions
-
-- Qcow2 repair, resize and diagnostics
-
-- Boot manager and ISO boot selector
-
-- Backups and snapshot management
-
-- Controls for Secondary storage
-
-- A configuration tune-up wizard
-
-- Custom Qemu boot parameters tools
-
-- Tools to run [Arm64, Risc-V +](https://github.com/TuxVinyards/qqX/wiki/Custom-Machine-Types)
-
-- Distro rename and move utility
-
-- Extended controls for screen size
-
-- Days count on 'daily-live' ISO's
-
-![Screenshot at 2023-02-22 12-59-04-1920](https://user-images.githubusercontent.com/3956806/220619057-f63883d2-4d0d-4130-94e1-d444f1567be4.jpg)
 
 ## How to Install
 
