@@ -204,7 +204,7 @@ check_disk_is_okay () {
     # DiskChkMsg="$("$QEMU_IMG" check -q "$DiskCheckFolderName/$DiskCheck_Disk" 2>&1)"
     case "$?" in
       0) DiskChkStatus="Okay" ;;
-      1) DiskChkStatus="Check not completed because of internal errors" ;;
+      1) DiskChkStatus="Check unable to be completed" ;;
       2) DiskChkStatus="Check completed, image is corrupted"
          DiskChkExitCode=2 ;;
       3) DiskChkStatus="Check completed, image has leaked clusters, but is not corrupted"

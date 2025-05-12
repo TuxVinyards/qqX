@@ -225,7 +225,7 @@ function manage_and_repair_disks {
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost/G/}"
     DiskFreeGiB_OnHost="${DiskFreeGiB_OnHost//' '/}"
 
-    printColor "\n\n  Space required for creating a mandatory back-up: %s  " "${DiskSize_GiB_OnDisk}G"
+    printColor "\n\n  Space required for creating a mandatory BACK-UP: %s  " "${DiskSize_GiB_OnDisk}G"
 
     if [[ $(bc <<< "$DiskFreeGiB_OnHost < ($DiskSize_GiB_OnDisk + 10)") == "1" ]]; then
       printf "\n\n  WARNING %s : insufficient or very low space." "${DiskFreeGiB_OnHost}G"
@@ -236,12 +236,13 @@ function manage_and_repair_disks {
       elif [[ $DiskChkExitCode == "2" ]]; then printColor "  [full] attempt complex repair  [FULL] slow method"
       else printColor "  [rd] reduce only - clear ALL snapshots, remove deleted files & tidy 'empty' space   [rz] resize the envelope"
       fi
+      printf "\n\n  The virtual machine should not be running & not started elsewhere"
+      # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
+      [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
     fi
 
-    printf "\n\n  The virtual machine MUST NOT BE RUNNING & not started elsewhere."
-    # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
-    [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
-    printf "\n\n  Snapshots will be retained in the backups ...  [b] back to main menu "
+    printf "\n\n  Backups may be easily renamed and reused as previously using the file manager"
+    printf "\n\n  All snapshots and data will be SAFELY retained ...   [b] return to main menu "
 
   fi
 
@@ -254,7 +255,6 @@ function manage_and_repair_disks {
     read -rp "  >  "  DiskManage
     [[ $DiskManage ]] && break
   done
-  printf "\n\n"
 
   # https://qemu.readthedocs.io/en/v7.2.2/tools/qemu-img.html#cmdoption-qemu-img-commands-arg-convert
 
@@ -266,7 +266,7 @@ function manage_and_repair_disks {
   else
 
     if [[ $DiskManage == "rz" ]]; then
-      printf "  This will resize the external envelope. Internal partitions may require additional treatment."
+      printf "\n\n  This will resize the external envelope. Internal partitions may require additional treatment."
       printf "\n\n  For main drive partitions, follow up with the [iso] utility > 'gparted' is recommended."
       printf "\n\n  See https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing "
       printColor "\n\n\n  Give extra GigaBytes TO ADD, as integer, eg 16 "
@@ -293,32 +293,29 @@ function manage_and_repair_disks {
     printf "\n\n  Backups may be easily renamed and reused as previously using the file manager"
     DiskStorageChanges=1
 
+    function dd_progress_report {
+      sleep 5
+      while true ; do
+        DU_SelectedSize="$(du "$2" | cut -f 1  2>/dev/null)"
+        DU_BackUpSize="$1"
+        [[ ! $DU_SelectedSize ]] && DU_SelectedSize=1
+        DD_ProgressPercent="$(bc <<< "scale=5; ($DU_SelectedSize/$DU_BackUpSize)*100")"
+        DD_ProgressPercent="$(bc <<< "scale=0; ($DD_ProgressPercent + 0.5)/1")"
+        [[ $DD_ProgressPercent -ge 98 ]] && break
+        printf "\r  New Drive Progress = %s%%   "  "$DD_ProgressPercent"
+        sleep 3
+      done
+    }
+
     if [[ $DiskManage == "LK" || $DiskManage == "FULL" ]]; then
       printf "" > "$Qemu_IMG_ErrorLog"
       DU_BackUpSize="$(du "$DiskBackup" | cut -f 1)"
-
-      function dd_progress_report {
-        sleep 5
-        while true ; do
-          DU_SelectedSize="$(du "$2" | cut -f 1  2>/dev/null)"
-          DU_BackUpSize="$1"
-          [[ ! $DU_SelectedSize ]] && DU_SelectedSize=1
-          DD_ProgressPercent="$(bc <<< "scale=5; ($DU_SelectedSize/$DU_BackUpSize)*100")"
-          DD_ProgressPercent="$(bc <<< "scale=0; ($DD_ProgressPercent + 0.5)/1")"
-          [[ $DD_ProgressPercent -ge 98 ]] && break
-          printf "\r  New Drive Progress = %s%%   "  "$DD_ProgressPercent"
-          sleep 3
-        done
-      }
-
       dd_progress_report  "$DU_BackUpSize"  "$Selected_Drive"  &
       printColor "\n  Attemping repair .... \n\n"
       "$QEMU_IMG" dd -f qcow2 -O qcow2  if="$DiskBackup" of="$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
-
     else
       printf "\n  Processing >  monitor the hard drive activity light ... \n\n"
       "$QEMU_IMG" convert -O qcow2 "$DiskBackup" "$Selected_Drive"
-
     fi
 
     if [[ -e  "$DiskBackup" ]] && [[ -e "$Selected_Drive" ]]; then
@@ -332,6 +329,9 @@ function manage_and_repair_disks {
           SnapTitle="$(date +%b%d.%H.%M)"
           "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive"
         fi
+        printf "\n BEFORE: \n\n"
+        "$QEMU_IMG" info "$DiskBackup"
+        printf "\n AFTER: \n\n"
         "$QEMU_IMG" info "$Selected_Drive"
         printColor "\n\n  Drive Updated ..."
         if [[ $DiskManage == "rd" ]]; then
