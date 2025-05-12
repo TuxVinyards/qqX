@@ -28,7 +28,7 @@
 
 - Improves UI for dependency checker
 
-More in the [release notes](#release-notes-and highlights) and wiki pages
+More in the [release notes](#release-notes-and-highlights) and wiki pages
 
 ## Ease of the GUI
 
@@ -74,7 +74,7 @@ Search the distro lists with _alphabetical zooming_
 
 - Make sure drives are healthy with Qcow2 repair, resize and diagnostics
 
-- Edit machine partitions by booting from maintence ISO's
+- Edit machine partitions by booting from maintenance ISO's
 
 - View inside virtual machines using a file manager
 
@@ -82,7 +82,7 @@ Search the distro lists with _alphabetical zooming_
 
 - Plus a configuration tune-up wizard, and more
 
-## Start qqX from the _desktop main menu_ or the command line
+## Start qqX from the desktop main menu _or_ the command line
 
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
 
@@ -156,7 +156,7 @@ Also try the Quickemu forum at <https://discord.gg/sNmz3uw>
 
 @ Feb 23 - 1.12.0
 
-- Added storage maintence tools
+- Added storage maintenance tools
 
 ![new size-ui](https://github.com/user-attachments/assets/0df37ca8-b4c1-4af8-a883-82ef60744649)
 
@@ -266,9 +266,9 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 ## Contributions
 
-As [here,](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) there are always a few places in Quickget where snippets of code need updating or could do with the addition of [floatversion](https://github.com/TuxVinyards/floatversion) tweaks.
+[Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed. Or just places where Quickget could do with further [floatversion](https://github.com/TuxVinyards/floatversion) tweaks.
 
-If anyone wants to pick those up and add them to the latest [freespirit](https://github.com/TuxVinyards/quickemu/branches) branch or to the [dev-next](https://github.com/TuxVinyards/qqX/branches) branch, that would always be useful.
+If anyone wants to pick up on those and add them to the latest [freespirit](https://github.com/TuxVinyards/quickemu/branches) branch or to the [dev-next](https://github.com/TuxVinyards/qqX/branches) branch, that would always be useful.
 
 If anyone has used the custom menu feature and wants to share their work, that would be great too.
 
