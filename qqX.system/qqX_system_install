@@ -153,7 +153,7 @@ while true ; do
   for CP in "${CoreList[@]}"; do
     if [[ ! $(type -p "$CP") ]]; then
       printf "\n\n  '%s' should normally be present and is required by qqX ..."  "$CP"
-      printf "\n  A utils package could be missing? Try sudo pacman -Syl | grep utils, etc apt dnf ..."
+      printf "\n\n  Sometimes a utils package can be missing: Try sudo pacman -Syl | grep utils  OR: apt dnf etc ..."
       [[ $CP == "xrandr" ]] && printf "\n  xrandr can be listed as xorg-xrandr or as part of x11-xserver-utils"
       InstallationAlert=1
     fi
