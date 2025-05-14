@@ -403,6 +403,16 @@ function configure_cpu() {
         fi
     fi
 
+    # SMM is also required for Linux guests when Secure Boot is enabled
+    if [ "${secureboot}" == "on" ]; then
+        if [ "${guest_os}" == "linux" ]; then
+        # SMM is not available on QEMU for macOS via Homebrew
+            if [ "${OS_KERNEL}" == "Linux" ]; then
+                SMM="on"
+            fi
+        fi
+    fi
+
     case ${guest_os} in
         batocera|freedos|haiku|solaris) MACHINE_TYPE="pc";;
         kolibrios|reactos)
@@ -756,8 +766,8 @@ function configure_bios() {
         if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             case ${secureboot} in
                 on) # shellcheck disable=SC2054,SC2140
-                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
+                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.ms.fd" \
+                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.secboot.fd" \
                         "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
                         "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
                         "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
@@ -835,7 +845,7 @@ function configure_bios() {
 
 function configure_os_quirks() {
 
-    if [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "kolibrios" ]; then
+    if [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "kolibrios" ]; then
         NET_DEVICE="rtl8139"
     fi
 
@@ -846,7 +856,8 @@ function configure_os_quirks() {
     case ${guest_os} in
         windows-server) NET_DEVICE="e1000";;
         *bsd|linux*|windows) NET_DEVICE="virtio-net";;
-        freedos) sound_card="sb16";;
+        freedos) sound_card="sb16"
+                 NET_DEVICE="pcnet";;
         *solaris) usb_controller="xhci"
                   sound_card="ac97";;
         reactos) NET_DEVICE="e1000"
@@ -2029,7 +2040,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="FS 4.9.8.04"
+readonly VERSION="FS 4.9.8.05"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
@@ -2053,7 +2064,9 @@ if [ "${OS_KERNEL}" == "Darwin" ]; then
 fi
 
 QEMU_VER_LONG=$(${QEMU_IMG} --version | head -n 1 | awk '{print $3}')
-QEMU_VER_SHORT=$(echo "${QEMU_VER_LONG//./}" | cut -c1-2)
+# strip patch version and remove dots. 6.0.0 => 60 / 10.0.0 => 100
+# shellcheck disable=SC2001
+QEMU_VER_SHORT=$(echo "${QEMU_VER_LONG%.*}" | sed 's/\.//g')
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
     echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
     exit 1

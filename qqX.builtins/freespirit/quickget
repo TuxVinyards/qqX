@@ -71,6 +71,7 @@ function os_info() {
         netbsd)           INFO="NetBSD|-|https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
         nitrux)           INFO="Nitrux|-|https://nxos.org/|Powered by Debian, KDE Plasma and Frameworks, and AppImages.";;
         nixos)            INFO="NixOS|-|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
+        nobara)           INFO="nobara|-|https://nobaraproject.org/|Fedora based distro, optimized for gamers. Official version has custom theming.";;
         nwg-shell)        INFO="nwg-shell|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
         macos)            INFO="macOS|-|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
         openbsd)          INFO="OpenBSD|-|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
@@ -94,7 +95,7 @@ function os_info() {
         slint)            INFO="Slint|-|https://slint.fr/|Slint is an easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.";;
         slitaz)           INFO="SliTaz|-|https://www.slitaz.org/en/|Simple, fast and low resource Linux OS for servers & desktops.";;
         solus)            INFO="Solus|-|https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
-        sparkylinux)      INFO="SparkyLinux|-|https://sparkylinux.org/|Fast, lightweight and fully customizable operating system which offers several versions for different use cases.";;
+        sparkylinux)      INFO="SparkyLinux|-|https://sparkylinux.org/about/|Lightweight Debian - Rolling, Stable and 32bit minimal. Multiple versions for different use cases.";;
         spirallinux)      INFO="SpiralLinux|-|https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
         tails)            INFO="Tails|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
@@ -477,6 +478,7 @@ function os_support() {
     netbsd \
     nitrux \
     nixos \
+    nobara \
     nwg-shell \
     openbsd \
     openindiana \
@@ -879,7 +881,19 @@ function releases_nixos() {
 }
 
 function editions_nixos() {
-    echo minimal plasma gnome
+    echo "minimal plasma gnome"
+}
+
+function releases_nobara() {
+    echo "Standard Nvidia"
+}
+
+function editions_nobara() {
+    if [[ $RELEASE == "Nvidia" ]]; then
+        echo "Official-NV GNOME-NV  KDE-NV  Steam-HTPC-NV "
+    else
+        echo "Official GNOME KDE Steam-HTPC Steam-Handheld"
+    fi
 }
 
 function releases_nwg-shell() {
@@ -912,7 +926,10 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-  floatversion -qs -M 3  "$(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -s href)"
+  #floatversion -qs -M 3  "$(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -s href)"
+  # May 2025 > 'downloads' still works at site but reflect changes for now (?)
+  # upstream commit #1643 is incomplete > also needs changes to get_parrotsec ...
+  floatversion -qs -M 3  "$(web_pipe "https://deb.parrot.sh/parrot/iso/" | grep -s href)"
 }
 
 function editions_parrotsec() {
@@ -1021,23 +1038,27 @@ function releases_slitaz() {
 }
 
 function releases_solus() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe_json "https://downloads.getsol.us/isos/" | jq -r '.[].name[:-1]' | grep -E "^[0-9-]+$" | sort -u)
+    #echo $(web_pipe_json "https://downloads.getsol.us/isos/" | jq -r '.[].name[:-1]' | grep -E "^[0-9-]+$" | sort -u)
+    web_pipe "https://getsol.us/download/" | grep iso | tr ':' '\n' | grep Release | awk '{print $1}' | cut -d '/' -f 5 | sort -ru | paste -s -d ' '
 }
 
 function editions_solus() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
+    #echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
+    web_pipe "https://getsol.us/download/" | grep -A 3 'title' | grep h2 | cut -d '<' -f2 | cut -d' ' -f2 | paste -s -d ' '
 }
 
 function releases_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" |  grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f2 | sort -ru)
+    #echo $(web_pipe "https://sparkylinux.org/download/stable/" |  grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f2 | sort -ru)
+    echo "Rolling Stable 32bit-Minimal Specialist"
 }
 
 function editions_sparkylinux() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
+    # May 2025 > listing task probably exceeds quickget's capabilities > probably needs a sub-editions category
+    # Website subject to change, plus older specialist versions still being listed in addition to the newer ones
+    # Best to get users to download manually ...
+    # echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
+    echo "Manual Download Required"
 }
 
 function releases_spirallinux() {
@@ -2268,6 +2289,16 @@ function get_nixos() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_nobara() {
+    local HASH= ; local URL= ; local IsoRef= ; local IsoFront= ; local IsoTail=
+    IsoRef="$(web_pipe "https://nobaraproject.org/download-nobara/" | tr '/' '\n' | grep 'iso"' | cut -d'"' -f1 | grep -v NV | grep Official )"
+    IsoFront="$(cut -d- -f1,2 <<< "$IsoRef")"
+    IsoTail="$(cut -d- -f4- <<< "$IsoRef")"
+    URL="https://nobara-images.nobaraproject.org/${IsoFront}-${EDITION}-${IsoTail}"
+    HASH="$(web_pipe "${URL}.sha256sum" | cut -d' ' -f1)"
+    echo "${URL} ${HASH}"
+}
+
 function get_nwg-shell() {
     local HASH=""
     local ISO="nwg-live-${RELEASE}-x86_64.iso"
@@ -2337,7 +2368,8 @@ function get_parrotsec() {
     local ISO=""
     local URL=""
     ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
-    URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
+    #URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
+    URL="https://deb.parrot.sh/parrot/iso/${RELEASE}"
     HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep "${ISO}" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2523,6 +2555,8 @@ function get_slitaz() {
 }
 
 function get_solus() {
+    # https://downloads.getsol.us/isos/2025-01-26/Solus-Plasma-Release-2025-01-26.iso
+    # https://downloads.getsol.us/isos/2025-01-26/Solus-Plasma-Release-2025-01-26.iso.sha256sum
     local HASH=""
     local ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
@@ -3669,7 +3703,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.8.04"
+        echo "FS 4.9.8.05"
         exit 0;;
     --help|-help|--h|-h)
         help_message
