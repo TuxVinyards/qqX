@@ -4,9 +4,11 @@
 
 - But don't worry if you only know POSIX Shell and Coding Style is getting in the way
 
-- Things can always get sorted out in a separate branch if need be, later
+Things can always get sorted out in a separate branch if need be, later.
 
-- Updates and new additions to Quickget/FreeSpirit are always welcome.
+- Quickget built-ins do need frequent updating. New additions are always welcome.
+
+- Check the [freespirit-next](https://github.com/TuxVinyards/quickemu/branches) and [dev-next](https://github.com/TuxVinyards/qqX/branches) branches
 
 ## Do explain what's going and why
 
