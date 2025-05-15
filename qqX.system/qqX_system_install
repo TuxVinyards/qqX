@@ -152,8 +152,8 @@ while true ; do
   CoreList=("bc" "xrandr" "paste")
   for CP in "${CoreList[@]}"; do
     if [[ ! $(type -p "$CP") ]]; then
-      printf "\n\n  '%s' should normally be present and is required by qqX ..."  "$CP"
-      printf "\n  A utils package could be missing? Try sudo pacman -Syl | grep utils, etc apt dnf ..."
+      printf "\n\n  '%s' should normally be present and is required by qqX"  "$CP"
+      printf "\n\n  Sometimes a utils package can be missing or standard utils can be packaged differently ...."
       [[ $CP == "xrandr" ]] && printf "\n  xrandr can be listed as xorg-xrandr or as part of x11-xserver-utils"
       InstallationAlert=1
     fi
@@ -179,8 +179,8 @@ while true ; do
   if [[ ! $InstallationAlert ]]; then  break
   else
     InstallationAlert=
-    printf "\n\n  A second terminal can be opened and software installed. Return here to re-check."
-    printf "\n\n  [q] to quit   [r] re-check   [c] ignore and continue \n\n"
+    printf "\n\n  A second terminal can be opened and software installed ... \n\n  Return here to re-check:"
+    printf "\n\n  [r] re-check   [c] ignore and continue   [q] to quit \n\n"
     read -rp  "  >  "   InstallationAlert
     [[ $InstallationAlert == "q" ]] &&  exit
     [[ $InstallationAlert == "c" ]] &&  break

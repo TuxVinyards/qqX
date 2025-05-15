@@ -272,7 +272,8 @@ function  main_menu_actions {
     elif ! grep -sqi sdl <<< "$(qemu-system-x86_64 -display help)" ; then
       printColor "\n\n  SDL cannot be found:"
       printf "\n\n  OpenSUSE distros lack -official- support for 'qemu-ui-sdl' "
-      printf "\n\n  This may apply to others ??  Community tweaks might be available."
+      printf "\n\n  See the installation pdf/wiki for more details"
+      printf "\n\n  Community packages might be available for different distros."
       printf "\n\n  [enter] to return \n\n"
       read -rp "  >  "
     else

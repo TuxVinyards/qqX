@@ -22,11 +22,19 @@
 
 - Modern coding and modern methods applied to traditional simplicity
 
-## [Latest release 1.12.06](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.12.07](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Adds fixes for QuickEmu and new Qemu version 10.0.0
+- Adds several downstream fixes: Solus, Parrot, Sparky
 
-- Improves UI for dependency checker
+- Adds Nobara and a few UI improvents
+
+1.12.06
+
+- Added fixes for QuickEmu and new Qemu version 10.0.0
+
+1.12.01
+
+- Fixed the Quickemu Windows Installer issue
 
 More in the [release notes](#release-notes-and-highlights) and wiki pages
 
@@ -82,15 +90,7 @@ Search the distro lists with _alphabetical zooming_
 
 - Plus a configuration tune-up wizard, and more
 
-## Start qqX from the desktop main menu _or_ the command line
-
 ![ubuntu-qqX-zsync](https://github.com/TuxVinyards/qqX/assets/3956806/c3104e5d-c008-4dbc-9666-42d13d2af357)
-
-- For tiling VM's simply type `qqX` at the terminal
-
-### Or start specific VM's straight from the filemanager
-
-![qqX-mouse-conf-open](https://github.com/TuxVinyards/qqX/assets/3956806/76a2431b-0573-4fb7-961b-3aa048ea2ca2)
 
 ## How to Install
 
@@ -205,10 +205,17 @@ Plus downsteam fixes for :
 - VanillaOS
 - VX
 
-@ May 2 - [1.12.06](https://github.com/TuxVinyards/qqX/releases/latest)
+@ May 2 - 1.12.06
 
 - Adds fixes for QuickEmu and new Qemu version 10.0.0
 - Improves UI for dependency checker
+
+@ May 2 - 1.12.07
+
+- Adds several downstream fixes: Solus, Parrot, Sparky
+- Adds Nobara and a few UI improvents
+
+Full details in [releases](https://github.com/TuxVinyards/qqX/releases) and [commits](https://github.com/TuxVinyards/qqX/commits/main/)
 
 ## Relationship with Quickemu
 
@@ -266,11 +273,13 @@ See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for
 
 ## Contributions
 
-[Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed. Or just places where Quickget could do with further [floatversion](https://github.com/TuxVinyards/floatversion) tweaks.
+[Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed. And older style Bash can be used on those too, if you are still updating your skills.
+
+Or just places where Quickget could do with further [floatversion](https://github.com/TuxVinyards/floatversion) tweaks ...
 
 If anyone wants to pick up on those and add them to the latest [freespirit](https://github.com/TuxVinyards/quickemu/branches) branch or to the [dev-next](https://github.com/TuxVinyards/qqX/branches) branch, that would always be useful.
 
-If anyone has used the custom menu feature and wants to share their work, that would be great too.
+Also if anyone has used the custom menu feature and wants to share their work, that would be great as well.
 
 ## Why the Vinyards?
 

@@ -2,30 +2,30 @@
 
 ##  qqX component to be located in folder 'qqX.main'
 
-# NB Avoid use of "#!/usr/bin/env bash" in this script 
+# NB Avoid use of "#!/usr/bin/env bash" in this script
 # as it will mask process names & inhibit process controls.
 
 ##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
-# 	Otherwise:  
-#   Licence  GPL3   https://www.gnu.org/licenses 
-##  qqX - quickemu quickget X terminal project   
+# 	Otherwise:
+#   Licence  GPL3   https://www.gnu.org/licenses
+##  qqX - quickemu quickget X terminal project
 
 ## ShellCheck global disables:
 # https://www.shellcheck.net/wiki/SC2242 as it clashes with use of exit traps used to keep mouse click scripts open
 # And SC1090,SC1091,SC2024, SC2154 for necessity of dynamic file sourcing
 
-#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009  
+#  shellcheck disable=SC2242,SC1090,SC1091,SC2034,SC2154,SC2009
 
 #  MOUNTS and UNMOUNTS the Shared Drive, or other, if present, in the designated HOST File Manager
 #  To be run in a separate terminal to ensure qqX main does NOT get elevated permissions
 
 #  DUMMY CUSTOM VERSION that may be edited and placed at "$qqX_CustomFolder/custom_filemanage_qcow_drive"
-#  and which will be auto-detected and run by function 'qcow2_filemanagement_launcher' 
+#  and which will be auto-detected and run by function 'qcow2_filemanagement_launcher'
 
-#  Variance theoretically can exist in the functioning of NBD file mounting routines 
+#  Variance theoretically can exist in the functioning of nbd file mounting routines
 #  so some distro desktop combinations may need some form of custom tweaking ??
 
 source "/tmp/qqX_nbd_vars"
-source "$qqX_MainFolder/qqX_filemanage_qcow_drive" 
+source "$qqX_MainFolder/qqX_filemanage_qcow_drive"
