@@ -73,7 +73,8 @@ drives_and_snapshots() {
       fi
     fi
 
-    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive" ; fi
+    if [[ $2 == "as_disk_util" ]]; then  check_disk_is_okay PrintErrors "$SharedDrive" ; echo ; else check_disk_is_okay "$SharedDrive"
+    fi
 
     check_if_disk_needs_a_cleanup  "$SharedDrive"
 
@@ -86,10 +87,10 @@ drives_and_snapshots() {
 
   fi
 
-  if [[ $SharedDrive_Conf == "no-shared" ]]; then printColor "\n  Shared Drive:"; printf "\n\n  Disabled (see .conf file) \n\n" ; fi
+  if [[ $SharedDrive_Conf == "no-shared" ]]; then printColor "\n  Shared Drive:"; printf "\n\n  Disabled (see .conf file) \n\n"
+  fi
 
   if [[ ! -e $MainDrive ]]; then  printColor "\n\n  NO MAIN DRIVE  (yet) \n\n"
-
   else
 
     if [[ $SharedDriveArgs || $SecondDriveArgs ]]; then printColor "\n  Main Drive: \n\n"
@@ -121,29 +122,22 @@ drives_and_snapshots() {
   if [[ $1 == "select" ]] && [[ ! $Selected_DrivePreset ]] && [[ $SharedDriveArgs || $SecondDriveArgs ]]; then
 
     printColor "\n  SELECT:  [enter]  MAIN DRIVE (or back to main menu)"
-
     [[ $SecondDriveArgs ]] && printColor "   [2]  Second Drive"
     [[ $SharedDriveArgs ]] && printColor "   [3]  Shared Drive"
     [[ $SharedDriveArgs && $SecondDriveArgs ]] && printColor "  (scroll to view)"
-
     printf "\n\n"
-
     read -rp "  >  "   Selected_Drive
 
     case "$Selected_Drive" in
-
       2)  Selected_Drive="$SecondDrive"
           Selected_DriveName="Second Drive"
       ;;
-
       3)  Selected_Drive="$SharedDrive"
           Selected_DriveName="Shared Drive"
       ;;
-
       *)  Selected_Drive="$MainDrive"
           Selected_DriveName="Main Drive"
       ;;
-
     esac
 
   else
@@ -156,26 +150,20 @@ drives_and_snapshots() {
   if [[ $1 == "select" ]] && [[ -e "$Selected_Drive" ]] ; then
 
     printColor "\n\n Selected Drive = %s \n\n"  "$Selected_DriveName"
-
     "$QEMU_IMG" info "$Selected_Drive"
     check_disk_is_okay "$Selected_Drive"
     Selected_DriveSize="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size' | cut -d: -f2)"
-
     if [[ $2 != "as_disk_util" ]]; then
-
       printf "\n\n  Health Status:  %s  (%s)"  "$DiskChkStatus"  "$Selected_DriveName"
       if [[ $DiskChkStatus == "Okay" ]]; then  printf " > No errors " ; else printColor "\n\n  See qqX [disk] utility for repairs" ; fi
       printf "\n\n  IMPORTANT > For disk operations, the virtual machine must *not* be running & not started elsewhere."
-
     fi
-
     # use pgrep with -x exact match to avoid 'kvm-cleanup' processes being detected
     [[ $(pgrep -x kvm) ]] &&  printColor "\n\n  VIRTUAL MACHINE ACTIVITY has been DETECTED \n"
 
   fi
 
 }
-
 
 function manage_and_repair_disks {
 
@@ -187,36 +175,29 @@ function manage_and_repair_disks {
 
     printf "\n\n  Selected Drive is %s " "$Selected_DriveName"
     check_disk_is_okay  "$Selected_Drive"
-
-    if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus" ; else printf "\n\n  Status:  %s"  "$DiskChkStatus" ; fi
-
-    [[ $DiskChkStatus == "Okay" ]] && printf " > No errors "
-
+    if [[ $DiskChkStatus != "Okay" ]]; then printColor "\n\n  Status:  %s"  "$DiskChkStatus"
+    else printf "\n\n  Status:  %s  > No errors "  "$DiskChkStatus"
+    fi
     DiskSize_Envelope="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'virtual size:')"
     DiskSize_Envelope="${DiskSize_Envelope/'virtual size: '/}"
     DiskSize_Occupied="$("$QEMU_IMG" info "$Selected_Drive" | grep -m 1 'disk size:')"
     DiskSize_Occupied="${DiskSize_Occupied/'disk size: '/}"
 
     if [[ $DiskChkStatus == "Okay" ]]; then
-
       printf "\n\n  Theoretical Envelope: %s  containing  %s " "$DiskSize_Envelope" "$DiskSize_Occupied"
       printf "\n\n  Copy on Write and snapshots can sometimes make envelope size appear to be lower than the contents ..."
       printf "\n\n  File Length greater than Disk Size can cause size mis-reportage and indicate a need to tidy and compress"
       printf "\n\n  Small differences may be ignored and may later become self adjusted by Qemu background operations"
       check_if_disk_needs_a_cleanup  "$Selected_Drive"
       [[ $DiskDisparity -ge "1" ]] && printColor "\n\n  DISK.QCOW2 may need an [rd] clean up "
-
     fi
 
     if [[ $DiskChkExitCode == "3" || $DiskChkExitCode == "2" ]]; then
-
       printf "\n\n  Standard repair uses multithreads. Use slow method if standard fails."
       [[ $DiskChkExitCode == "2" ]] && printf "\n\n  WARNING - Full repair may cause some data loss if there are damaged data clusters ..."
-
     fi
 
     # Check there is disk free space to make a backup
-
     if [[ "$DiskSize_Occupied" == *'KiB'* ]] || [[ "$DiskSize_Occupied" == *'MiB'* ]] ; then DiskSize_GiB_OnDisk="1"
     else DiskSize_GiB_OnDisk="${DiskSize_Occupied/'GiB'/}"; DiskSize_GiB_OnDisk="${DiskSize_GiB_OnDisk//' '/}"
     fi
@@ -319,7 +300,6 @@ function manage_and_repair_disks {
     fi
 
     if [[ -e  "$DiskBackup" ]] && [[ -e "$Selected_Drive" ]]; then
-
       [[ $DiskManage == "lk" || $DiskManage == "LK" ]] && "$QEMU_IMG" check -f qcow2 -r leaks "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
       [[ $DiskManage == "full" || $DiskManage == "FULL" ]] && "$QEMU_IMG" check -f qcow2 -r all "$Selected_Drive" 2> "$Qemu_IMG_ErrorLog"
       # option 'rd' is basically 'convert' process only  (all options do this as standard)
@@ -345,12 +325,9 @@ function manage_and_repair_disks {
         fi
       fi
       DiskManage="b"
-
     else
-
       printColor  "\n\n  ERROR: a NEW drive could not be created from the backup ??"
       printf "\n\n  Check the VM folder with a file manager. The backup may be renamed and reused as previously"
-
     fi
 
     printf "\n\n  [enter] to return to menu \n\n "
@@ -375,7 +352,6 @@ function qqX_snapshot_delete {
 
   i=0
   SnapListArrSeparated=()
-
   printColor "\n\n ID   Array  Name \n\n"
   while [[ "${SnapListArrRaw[i]}" ]]; do
     IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
@@ -385,7 +361,6 @@ function qqX_snapshot_delete {
   done
 
   SnapListArrTotal=$((i-1))
-
   printColor "\n Enter ARRAY number [0] to [%s], either for individual snapshot, or for the start of snapshot range"  "$SnapListArrTotal"
   printf "\n\n or [full individual name] for difficult names only showing correctly in the FULL listing"
   printf "\n\n or [enter] to return to main menu "
@@ -399,36 +374,23 @@ function qqX_snapshot_delete {
   read -rp " >  "  SnapDeleteStart
 
   if [[ $SnapDeleteStart ]]; then
-
-      SpecialSnapName="$SnapDeleteStart"
-      SpecialSnapName="$(tr -d "[:digit:]" <<< "$SpecialSnapName")"
-
+    SpecialSnapName="$SnapDeleteStart"
+    SpecialSnapName="$(tr -d "[:digit:]" <<< "$SpecialSnapName")"
     if  [[ $SpecialSnapName ]]; then
-
       # restore name as valid name if, when all digits removed, there is still something
       SpecialSnapName="$SnapDeleteStart"
       printf "\n  Snap to delete: \"%s\"" "$SpecialSnapName"
-
     else
-
       printColor "\n [enter] for an individual snapshot or to correct an error \n\n Or ARRAY [number] for end of range (inclusive) \n\n"
       read -rp " >  "  SnapDeleteEnd
-
       if [[ $SnapDeleteEnd ]]; then
-
         SnapDeleteEnd="$(tr -cd "[:digit:]" <<< "$SnapDeleteEnd")"
-
         if [[ $SnapDeleteEnd ]]; then  [[ $SnapDeleteEnd -gt "$SnapListArrTotal" ]] && SnapDeleteEnd="$SnapListArrTotal"
-
         else  SnapDeleteEnd="$SnapListArrTotal"
-
         fi
-
         printf "\n Array Range = %s to %s" "$SnapDeleteStart"  "$SnapDeleteEnd"
-
         i="$SnapDeleteStart"
         SnapListArrSeparated=()
-
         printColor "\n\n ID   Array  Name \n\n"
         while true; do
           IFS=' ' read -ra SnapListArrSeparated <<< "${SnapListArrRaw[i]}"
@@ -437,18 +399,15 @@ function qqX_snapshot_delete {
           [[ $i == "$SnapDeleteEnd" ]] && break
           ((i+=1))
         done
-
       else
         printf "\n Delete = ARRAY entry %s " "$SnapDeleteStart"
         printf "\n\n  %s \n" "${SnapListArrRaw[SnapDeleteStart]}"
         SnapDeleteEnd="$SnapDeleteStart"
       fi
-
     fi
 
     printColor "\n [enter] to delete   [b] back to main menu (or reselect) \n\n"
     read -rp " >  "  SnapDeleteConfirm
-
 
     if [[ $SnapDeleteConfirm == "b" ]]; then  printf "\n\n Deletion schedule has been CANCELLED"
     else
@@ -579,14 +538,10 @@ function create_new_drives {
       else
 
         if [[ $MainMenuChoice == "2" ]]; then
-
           printf "\n\n  A Storage Drive will be created in the VM's folder \n\n  %s"  "$VM_InstanceName"
-
         elif [[ $MainMenuChoice == "3" ]]; then
-
           printf "\n\n  A folder 'SharedDrive will be created in the Default_VM_Folder \n\n  %s"  "$Default_VM_Folder"
           printf "\n\n  It may later be moved. Editing settings file: \n\n  %s" "$qqX_SettingsFile"
-
         fi
 
         printColor "\n\n  [enter] to continue  [b] to go back \n\n"
