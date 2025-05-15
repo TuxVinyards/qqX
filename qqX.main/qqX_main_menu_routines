@@ -21,15 +21,16 @@ show_msg_pid_found() {
       if [[ $(pgrep -x kvm) ]]; then printColor "\n\n and KVM VIRTUAL MACHINE ACTIVITY has been DETECTED "
       else printf " \n\n  but as no KVM activity has been detected, this file can probably be deleted."
       fi
-      printf "\n\n  [enter] to return and/or to open File Manager and check \n\n"
-      read -rp "  >  "
+      printColor "\n\n  [enter] to return and/or to open File Manager and check"
+      printf "\n\n  [P] to remove and return - ONLY if known previous crash or error ... \n\n"
+      RemovePid=
+      read -rp "  >  " RemovePid
+      [[ $RemovePid == "P" ]] && [[ -e "$VM_InstanceName/${VM_InstanceName}.pid" ]] && rm "$VM_InstanceName/${VM_InstanceName}.pid"
 }
-
 
 vm_pid_kill_menu() {
 
   tput civis
-
 	# WAIT for background load & QEMU messages to appear before showing menu (unless reloading)
 	if [[ $KillPID_Menu_Exited ]]; then  KillPID_Menu_Exited=
   elif [[ $BreakAtVerboseArgs ]]; then BreakAtVerboseArgs= ; return
