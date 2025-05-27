@@ -96,7 +96,7 @@ For standard Linux, most users will only need to install `qemu` `spice-gtk` and 
 
 - Some distro versions may need `curl` `7z` `jq` `bc` and possibly `xrandr`
 
-- The qqX latest release is available [here](https://github.com/TuxVinyards/qqX/releases/latest)
+- The qqX latest release is available at [https://github.com/TuxVinyards/qqX/releases/latest](https://github.com/TuxVinyards/qqX/releases/latest)
 
 That's it.
 
@@ -292,8 +292,8 @@ neither set a tree nor plant their _**vinyard**_, nor undertake any mean work wi
 
 Traditionally Linux has used the X window system from X.org and classically the 'Xterm' command line interface.
 
-- <https://en.wikipedia.org/wiki/X_Window_System>
+- [https://en.wikipedia.org/wiki/X_Window_System](https://en.wikipedia.org/wiki/X_Window_System)
 
-- <https://en.wikipedia.org/wiki/Wayland_(protocol)>
+- [https://en.wikipedia.org/wiki/Wayland_(protocol)](https://en.wikipedia.org/wiki/Wayland_\(protocol\))
 
 Technically speaking, qqX runs in a 'terminal emulator' and can also run with Wayland display systems as well as with 'X'
