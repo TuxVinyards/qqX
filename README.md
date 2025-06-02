@@ -202,13 +202,21 @@ Lack of upstream maintenance and creative differences managed to form [several g
 
 - See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
 
-There needs to be an improvement in relationships, so that more people can benefit from the work being done here.
+There needed to be an improvement in relationships, so that more people could benefit from the work being done here.
 
-- Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would be a good move.
+- Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would have been a good move.
 
 ![qqX-on-the-quickemu-wiki](https://github.com/user-attachments/assets/3c11249e-4898-4882-a82e-c460472e8099)
 
-## Downstream Fixes for Quickemu
+### Competition
+
+qqX was always intended as an extra optional interface for Quickemu. It was never intended to be a competitive project.
+
+However during 2025, the upstream stance hardened further and any [attempts to provide simple help or to address issues within the upstream code base](https://github.com/quickemu-project/quickemu/issues/1660) continued to be misconstrued as competitive attacks. Instead of rifts healing, recent pushes for improvements in relationships have failed abysmally.
+
+Please _be reassured_ that qqX _will continue to support virtual machines_ that have been created via either command line QuickEmu or QuickGUI or vice versa, despite being forced into becoming a competitor.
+
+## Downstream fixes for Quickemu
 
 - Available via qqX's [freebird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) or in the qqX code itself
 
