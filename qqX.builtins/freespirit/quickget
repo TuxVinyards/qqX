@@ -11,11 +11,9 @@ function cleanup() {
     fi
 }
 
-function os_info() {
-    local SIMPLE_NAME=""
+function os_info_QG() {
     local INFO=""
-    SIMPLE_NAME="${1}"
-    case ${SIMPLE_NAME} in
+    case "$1" in
         #name)            INFO="PrettyName|Credentials|Homepage|Info";;
         alma)             INFO="AlmaLinux|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
         alpine)           INFO="Alpine Linux|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
@@ -100,12 +98,12 @@ function os_info() {
         tails)            INFO="Tails|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
         trisquel)         INFO="Trisquel-|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
-        truenas-core)     INFO="TrueNAS Core|-|https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
+        truenas-core)     INFO="TrueNAS Core|-|https://www.truenas.com/truenas-core/|World's most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
         truenas-scale)    INFO="TrueNAS Scale|-|https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
         tuxedo-os)        INFO="Tuxedo OS|-|https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
         ubuntu)           INFO="Ubuntu|-|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
         ubuntu-budgie)    INFO="Ubuntu Budgie|-|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
-        ubuntucinnamon)   INFO="Ubuntu Cinnamon|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
+        ubuntucinnamon)   INFO="Ubuntu Cinnamon|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint's Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
         ubuntukylin)      INFO="Ubuntu Kylin|-|https://ubuntukylin.com/|Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world.";;
         ubuntu-mate)      INFO="Ubuntu MATE|-|https://ubuntu-mate.org/|Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.";;
         ubuntu-server)    INFO="Ubuntu Server|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
@@ -114,7 +112,7 @@ function os_info() {
         vanillaos)        INFO="Vanilla OS|-|https://vanillaos.org/|Immutable Gnome DE based on Debian Sid and DistroBox. Designed to be a reliable and productive operating system for your daily work.";;
         void)             INFO="Void Linux|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
         vxlinux)          INFO="VX Linux|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
-        windows)          INFO="Windows|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
+        windows)          INFO="Windows|-|https://www.microsoft.com/en-us/windows/|Whether you're gaming, studying, running a business, or running a household, Windows helps you get it done.";;
         windows-server)   INFO="Windows Server|-|https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
         xubuntu)          INFO="Xubuntu|-|https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
         zorin)            INFO="Zorin OS|-|https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
@@ -908,7 +906,9 @@ function releases_openbsd() {
 
 function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
+    #echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep 'href="./2' | cut -d'/' -f 2 | sort -r |  head -n 5)
+
 }
 
 function editions_openindiana() {
@@ -3483,50 +3483,53 @@ function create_vm() {
     if [ -n "${HASH}" ]; then
         check_hash "${ISO}" "${HASH}"
     fi
-
-    case "${OS}" in
-        batocera)
-            if [[ ${ISO} = *".gz"* ]]; then
-                gzip -d "${VM_PATH}/${ISO}"
-                ISO="${ISO/.gz/}"
-            fi;;
-        dragonflybsd)
-            #  Could be other OS iso files compressed with bzip2 or gzip
-            #  but for now we'll keep this to know cases
-            if [[ ${ISO} = *".bz2"* ]]; then
-                bzip2 -d  "${VM_PATH}/${ISO}"
-                ISO="${ISO/.bz2/}"
-            fi;;
-        easyos)
-            if [[ ${ISO} = *".img"* ]]; then
-                ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
-                ISO="${ISO/.img/}"
-            fi;;
-        freedos)
-            if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
-                rm -f "${VM_PATH}/${ISO}"
-                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
-                ISO="$(basename "${ISO}")"
-            fi;;
-        kolibrios)
-            if [[ ${ISO} = *".7z" ]]; then
-                if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
-                else
-                    7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+    if [[ $(type -t "finalize_${OS}") == function ]]; then
+        "finalize_${OS}"
+    else
+        case "${OS}" in
+            batocera)
+                if [[ ${ISO} = *".gz"* ]]; then
+                    gzip -d "${VM_PATH}/${ISO}"
+                    ISO="${ISO/.gz/}"
+                fi ;;
+            dragonflybsd)
+                #  Could be other OS iso files compressed with bzip2 or gzip
+                #  but for now we'll keep this to know cases
+                if [[ ${ISO} = *".bz2"* ]]; then
+                    bzip2 -d  "${VM_PATH}/${ISO}"
+                    ISO="${ISO/.bz2/}"
+                fi ;;
+            easyos)
+                if [[ ${ISO} = *".img"* ]]; then
+                    ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+                    ISO="${ISO/.img/}"
+                fi ;;
+            freedos)
+                if [[ ${ISO} = *".zip"* ]]; then
+                    unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                     rm -f "${VM_PATH}/${ISO}"
                     ISO="$(ls -1 "${VM_PATH}/"*.iso)"
                     ISO="$(basename "${ISO}")"
-                fi
-            fi;;
-        reactos)
-            if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
-                rm -f "${VM_PATH}/${ISO}"
-                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
-                ISO="$(basename "${ISO}")"
-            fi;;
-    esac
+                fi ;;
+            kolibrios)
+                if [[ ${ISO} = *".7z" ]]; then
+                    if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
+                    else
+                        7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+                        rm -f "${VM_PATH}/${ISO}"
+                        ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                        ISO="$(basename "${ISO}")"
+                    fi
+                fi ;;
+            reactos)
+                if [[ ${ISO} = *".zip"* ]]; then
+                    unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                    rm -f "${VM_PATH}/${ISO}"
+                    ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                    ISO="$(basename "${ISO}")"
+                fi ;;
+        esac
+    fi
     make_vm_config "${ISO}"
 }
 
@@ -3675,7 +3678,8 @@ if [ ! -x "${QEMU_IMG}" ]; then
     exit 1
 fi
 
-#TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
+[[ -e "qqX_quickget_mods" ]] && source "qqX_quickget_mods"
+
 case "${1}" in
     --download|-download)
         OPERATION="download"
@@ -3703,7 +3707,7 @@ case "${1}" in
     --version|-version)
         #WHERE=$(dirname "${BASH_SOURCE[0]}")
         #"${WHERE}/quickemu" --version
-        echo "FS 4.9.8.05"
+        echo "FS 4.9.8.06"
         exit 0;;
     --help|-help|--h|-h)
         help_message
