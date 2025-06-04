@@ -3678,7 +3678,10 @@ if [ ! -x "${QEMU_IMG}" ]; then
     exit 1
 fi
 
-[[ -e "qqX_quickget_mods" ]] && source "qqX_quickget_mods"
+mapfile -t -d':' PathArr <<< "$PATH"
+for ModPath in "${PathArr[@]}"; do
+    [[ -e "$ModPath/qqX_quickget_mods" ]] && source "$ModPath/qqX_quickget_mods" && break
+done
 
 case "${1}" in
     --download|-download)
