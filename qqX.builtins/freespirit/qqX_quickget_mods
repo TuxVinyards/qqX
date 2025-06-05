@@ -26,12 +26,12 @@
 #  However, NOT TO WORRY if you are only familiar the older more POSIX styles, there are still plenty of options
 #  for contributions to the quickemu built-ins, particularly with this file ...
 
-#  Uses 4 space tabs as with QuickGet so that code can be directly pasted into here and tweaked.
+#  Uses 4 space tabs, as with QuickGet, so that code can be directly pasted into here and tweaked.
 #  QuickGet and qqX house styles may be mixed. See notes at end for qqX coding style.
 
 ##########################################
 
-## 1:  LISTS
+## 1:  LISTS  (alphabetical, space separated and space isolated at each end)
 
 # osAddList for new qqX listed distros
 osAddList=" anduinos bluestar "
@@ -53,14 +53,14 @@ osRemoveList="${osRemoveList//'  '/' '}"
 osRemoveList="${osRemoveList//'  '/' '}"
 mapfile -t -d ' ' osRemoveArr <<< "$osRemoveList"
 
-# filters
-osServersList=" alpine centos-stream  "
-osServersList+=" proxmox-ve rockylinux "
+# filters  (for new filters, see start of quick_reroute_get)
+osServersList=" alpine centos-stream freedos proxmox-ve "
+osServersList+=" rockylinux truenas-core truenas-scale ubuntu-server windows-server "
 osServersList="${osServersList//'  '/' '}"
 osServersList="${osServersList//'  '/' '}"
 
 if [[ $1 == "qqlist-desktop"  ]] ; then mapfile -t -O "${#osRemoveArr[@]}" -d ' ' osRemoveArr <<< "$osServersList"
-elif [[ $1 == "qqlist-server" ]] ; then osSupported="$osServersList"
+elif [[ $1 == "qqlist-server-cl" ]] ; then osSupported="$osServersList"
 else osSupported="$osSupported_All"
 fi
 

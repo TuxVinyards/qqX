@@ -116,6 +116,11 @@ VM_SelectorStyle="A"
 # Set value at 2x actual. Suggest around 15 or 20 distros, eg set @ 30 or 40, default = 32
   ShowFindPoint="32"
 
+# FILTERS:
+# From version 1.13, defaults to showing desktop focussed distros only, with in-menu filter selection for other types
+# ="qqlist-all" ="qqlist-desktop" ="qqlist-server-cl" etc to force otherwise, see filter menu for full list.
+  VM_ListingFilterDefault=
+
 #  -------------------------------------------------------------------------------------------------------------------
 
 ## 'QUICKEMU' & 'QUICKGET'  SOURCE:

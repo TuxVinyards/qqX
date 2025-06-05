@@ -30,10 +30,13 @@ function quickget {
 }
 
 QGW_OS_Array=()
+[[ ! $VM_ListingFilter ]] && VM_ListingFilter="qqlist-desktop"
+VM_ListingArray=("qqlist-server-cl" "qqlist-all" "qqlist-desktop")
+[[ $ShowQGetLists ]] && { echo; declare -p VM_ListingArray; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
 
 load_QGW_OS_Array () {
-  mapfile -t QGW_OS_Array <<< "$(quickget "qqlist-all" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
-  [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; }
+  mapfile -t QGW_OS_Array <<< "$(quickget "$VM_ListingFilter" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
+  [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
   if [[ ! ${QGW_OS_Array[0]} ]]; then
     printColor "\n\n  INTERNAL ERROR: load_QGW_OS_Array"
     printf "\n\n  Quickget OS distro list output not be read or found. \n\n"
@@ -308,7 +311,9 @@ function show_QWG_header {
   # printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
   printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber"  # REVIEW
   if [[ $InternetUp ]]; then
-    printf "(internet is working)  [R] to re-check \n\n"
+    printf "(internet working) [R] to re-check   ("
+    printColor "%s" "${VM_ListingFilter/'qqlist-'/}"
+    printf ") [fl] adjust filter \n\n"
   else
     printf "(internet is needed for some menu items as well as downloads) \n\n"
   fi
@@ -422,9 +427,11 @@ function_quick_get_wrap ()  {
     VM_InstanceName=
     MainDrive=
     IsoImg=
+    [[ ! $VM_ListingFilter ]] && VM_ListingFilter="qqlist-desktop"
 
     show_hot_swap_line
     load_QGW_OS_Array ; print_quickget_and_folder_choices  "QGW_OS_Array"
+
 
     while true ; do
 
@@ -438,7 +445,15 @@ function_quick_get_wrap ()  {
 
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
 
-      elif [[ $QGW_List_NumSelected == "HF" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help "f" ; GT_Help=1
+      elif [[ ${QGW_List_NumSelected^^} == "HF" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help "f" ; GT_Help=1
+
+      elif [[ ${QGW_List_NumSelected,,} == "fl" ]]; then
+        qqLselect= ; echo
+        print_quickget_and_folder_choices  "VM_ListingArray"
+        printf "\n\n  [number] to select \n\n"
+        read -rp "  >  " qqLselect
+        [[ $(tr -cd '[:digit:]' <<< "$qqLselect") ]] && VM_ListingFilter="${VM_ListingArray[qqLselect-1]}"
+        load_QGW_OS_Array ;  refresh_QWG_selector
 
       elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
 
