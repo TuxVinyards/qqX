@@ -67,7 +67,7 @@ echColor () {
 
 
 # General default title:
-qqX_title="[quickemu quickget X terminal project] - $qqX_Version - Basically Better:"
+qqX_title="[quickemu quickget X terminal project] - $qqX_Version - basically better ..."
 
 ## qqX chrome up
 
@@ -220,18 +220,15 @@ function show_qqX_general_help {
 
   while true; do
 
-    if [[ $1 ]]; then  HelpSelect="$1" ; shift ; fi
-
-    printf "\n\n  FOR HELP with settings and user modes, SEE NOTES IN THE GENERAL SETTINGS file"
-    printf "\n\n  Also see:  https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help  etc "
-    printf "\n\n  For code contributions, bugs and updates, see: https://github.com/TuxVinyards/qqX"
+    if [[ $1 ]]; then  HelpSelect="$1" ; shift
+    fi
 
     cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
-
     printf "\n  Translations:  https://github.com/TuxVinyards/qqX/wiki/Translation   Release Notes:  https://github.com/TuxVinyards/qqX#release-notes"
-    printColor  "\n\n  [w] Online: qqX WIKI PAGES    Offline: [f] FreeBird notes  [c] command line & mouse notes  [enter] to RETURN"
+    printf "\n\n  For SETTINGS and user modes, see notes in the general settings file"
+    printColor  "\n\n  [enter] to return  [f] FreeBird notes  [c] command line & mouse notes  [w] Online: qqX WIKI PAGES and FAQs"
     printf "\n\n"
-    [[ ! $HelpSelect ]] && read -rp "  >  "  HelpSelect
+    [[ $HelpSelect ]] || read -rp "  >  "  HelpSelect
 
     if [[ $HelpSelect == "c" ]]; then
       show_CLI_usage
@@ -240,7 +237,7 @@ function show_qqX_general_help {
 
     elif [[ $HelpSelect == "f" ]]; then
       printf "\n  Hot-Swappable from all main menus:  [FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev] \n\n"
-      grep -m 1 -A 100  '# Branches' "$qqX_SettingsFile" | grep -m 1 -B 100 '# FreeBird or FreeSpirit are recommended'| tr '#' ' '
+      grep -m 1 -A 100  '# Named versions' "$qqX_SettingsFile" | grep -m 1 -B 100 '# FreeBird or FreeSpirit are recommended'| tr '#' ' '
       if [[ -e "$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" ]]; then
         printf "\n\n  Custom =   Default_VM_Folder > qqX.custom  > %s " "$("$Default_VM_Folder/qqX.custom/QE.Custom/quickemu" --version)"
       fi

@@ -292,7 +292,7 @@ function check_new_vm_folder_name {
   # Alert if found
   if [[ ${SimilarVM_Arr_Display[*]} ]]; then
     for DailyCheckVM in "${SimilarVM_Arr_Display[@]}" ; do [[ "$DailyCheckVM" == *'daily'* ]] && DailyVMsPresent=1; done
-    [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=   # REVIEW
+    [[ $DailyVMsPresent ]] && [[ ! $QGW_OverWriteAllow ]] && QGW_OverWriteAlert=
     printf "\n\n  CHECK TARGET > similar name match(es) found in THIS target folder: \n"
     print_quickget_and_folder_choices  "SimilarVM_Arr_Display" 6
     printf "\n\n  names-may-get-hyphenated or slightlymodified during download ... \n"
@@ -305,7 +305,8 @@ function check_new_vm_folder_name {
 function show_QWG_header {
   printf "\033c"
   qqX_logo_printf_title "$qqX_Version"
-  printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
+  # printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
+  printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber"  # REVIEW
   if [[ $InternetUp ]]; then
     printf "(internet is working)  [R] to re-check \n\n"
   else
@@ -316,7 +317,7 @@ function show_QWG_header {
 function show_hot_swap_line {
     printColor "               Using %s:  " "$QE_SourceVersion"
     printf "[FS] FreeSpirit  [FB] FreeBird  [HB]  [Ech]  [Sys]  [Cust]  [Dev]"
-    printf "  [H] help on different versions\n"
+    printf "  [HF] help on different versions\n"
   if [[ $CodingHotSwap && $CodingHotSwapShow ]] || [[ $DevStart ]]; then
     printf "\n               Code Source: %s " "$QE_SourcePath"
     [[ $CodingHotSwap ]] && CodingHotSwapShow=
@@ -436,6 +437,8 @@ function_quick_get_wrap ()  {
       [[ ! $QGW_List_NumSelected ]] && read -rp "  >  "  QGW_List_NumSelected
 
       if [[ $QGW_List_NumSelected == "H" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help ; GT_Help=1
+
+      elif [[ $QGW_List_NumSelected == "HF" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help "f" ; GT_Help=1
 
       elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
 
