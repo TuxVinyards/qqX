@@ -27,17 +27,19 @@
 #  for contributions to the quickemu built-ins, particularly with this file ...
 
 #  Uses 4 space tabs as with QuickGet so that code can be directly pasted into here and tweaked.
+#  QuickGet and qqX house styles may be mixed. See notes at end for qqX coding style.
 
 ##########################################
 
+## 1:  LISTS
+
+# osAddList for new qqX listed distros
 osAddList=" anduinos bluestar "
 #osAddList+=" another "
 
+# osRemoveList for distros that are problematic or no longer maintained, but still listed by Quickget
 osRemoveList=" vxlinux "
 #osRemoveList+=" another and-one-more "
-
-osServersList=" alpine centos-stream  "
-osServersList+=" proxmox-ve rockylinux "
 
 osSupported="$(os_support)"
 osSupported+=" $osAddList "
@@ -51,6 +53,9 @@ osRemoveList="${osRemoveList//'  '/' '}"
 osRemoveList="${osRemoveList//'  '/' '}"
 mapfile -t -d ' ' osRemoveArr <<< "$osRemoveList"
 
+# filters
+osServersList=" alpine centos-stream  "
+osServersList+=" proxmox-ve rockylinux "
 osServersList="${osServersList//'  '/' '}"
 osServersList="${osServersList//'  '/' '}"
 
@@ -73,6 +78,10 @@ function os_support { echo "$osSupported" ; }
 
 ##########################################
 
+## 2: INFO
+
+# Needed for new qqX listed distros or for INFO overwrites
+
 function os_info {
     local INFO=
     InfoStream=
@@ -88,9 +97,48 @@ function os_info {
 
 ##########################################
 
+## 3: RELEASES and EDITIONS
+
+# Needed for new qqX listed distros or for function overwrites
+# Try to keep web greps dynamic, where possible. Data may be floatversion filtered, and may include fv pipes.
+
 # Anduin OS
 
 # Blue Star
+
+##########################################
+
+## 4: DOWNLOAD
+
+# Needed for new qqX listed distros or for function overwrites
+
+# Anduin OS
+
+# Blue Star
+
+##########################################
+
+## 5: GUEST TYPE
+
+# Needed only for special case instructions, such as non-iso
+# Use for new qqX listed distros or for case overwrites
+# Add in the format of "guest_type_${OS} ()"
+
+##########################################
+
+## 6: CONFIGURATION
+
+# Needed only for special case instructions, such as needs legacy boot etc
+# Use for new qqX listed distros or for case overwrites
+# Add in the format of "config_${OS} ()"
+
+##########################################
+
+## 7: FINALIZING
+
+# Needed only for special case instructions, such as decompression routines
+# Use for new qqX listed distros or for case overwrites
+# Add in the format of "finalize_${OS} ()"
 
 ##########################################
 

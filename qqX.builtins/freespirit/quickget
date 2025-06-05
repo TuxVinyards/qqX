@@ -1383,70 +1383,74 @@ function make_vm_config() {
     fi
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    case "${OS}" in
-        batocera)
-            GUEST="batocera"
-            IMAGE_TYPE="img";;
-        custom)
-            GUEST="${CUSTOM_OS}"
-            IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
-        dragonflybsd)
-            GUEST="dragonflybsd"
-            IMAGE_TYPE="iso";;
-        easyos)
-            GUEST="linux"
-            IMAGE_TYPE="img";;
-        freebsd|ghostbsd)
-            GUEST="freebsd"
-            IMAGE_TYPE="iso";;
-        haiku)
-            GUEST="haiku"
-            IMAGE_TYPE="iso";;
-        freedos)
-            GUEST="freedos"
-            IMAGE_TYPE="iso";;
-        kolibrios)
-            GUEST="kolibrios"
-            IMAGE_TYPE="iso";;
-        macos)
-            GUEST="macos"
-            IMAGE_TYPE="img";;
-        netbsd)
-            GUEST="netbsd"
-            IMAGE_TYPE="iso";;
-        openbsd)
-            GUEST="openbsd"
-            IMAGE_TYPE="iso";;
-        openindiana)
-            GUEST="solaris"
-            IMAGE_TYPE="iso";;
-        reactos)
-            GUEST="reactos"
-            IMAGE_TYPE="iso";;
-        truenas*)
-            GUEST="truenas"
-            IMAGE_TYPE="iso";;
-        ubuntu*)
-            GUEST="linux"
-            IMAGE_TYPE="iso"
-            # If there is a point in the release, check if it is less than 16.04
-            if [[ "${RELEASE}" != *"daily"* ]]; then
-                if [ "${RELEASE//./}" -lt 1604 ]; then
-                    GUEST="linux_old"
-                fi
-            fi
-            ;;
-        windows)
-            GUEST="windows"
-            IMAGE_TYPE="iso";;
-        windows-server)
-            GUEST="windows-server"
-            IMAGE_TYPE="iso";;
-        *)
-            GUEST="linux"
-            IMAGE_TYPE="iso";;
-    esac
 
+    if [[ $(type -t "guest_type_${OS}") == function ]]; then
+        "guest_type_${OS}"
+    else
+        case "${OS}" in
+            batocera)
+                GUEST="batocera"
+                IMAGE_TYPE="img";;
+            custom)
+                GUEST="${CUSTOM_OS}"
+                IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
+            dragonflybsd)
+                GUEST="dragonflybsd"
+                IMAGE_TYPE="iso";;
+            easyos)
+                GUEST="linux"
+                IMAGE_TYPE="img";;
+            freebsd|ghostbsd)
+                GUEST="freebsd"
+                IMAGE_TYPE="iso";;
+            haiku)
+                GUEST="haiku"
+                IMAGE_TYPE="iso";;
+            freedos)
+                GUEST="freedos"
+                IMAGE_TYPE="iso";;
+            kolibrios)
+                GUEST="kolibrios"
+                IMAGE_TYPE="iso";;
+            macos)
+                GUEST="macos"
+                IMAGE_TYPE="img";;
+            netbsd)
+                GUEST="netbsd"
+                IMAGE_TYPE="iso";;
+            openbsd)
+                GUEST="openbsd"
+                IMAGE_TYPE="iso";;
+            openindiana)
+                GUEST="solaris"
+                IMAGE_TYPE="iso";;
+            reactos)
+                GUEST="reactos"
+                IMAGE_TYPE="iso";;
+            truenas*)
+                GUEST="truenas"
+                IMAGE_TYPE="iso";;
+            ubuntu*)
+                GUEST="linux"
+                IMAGE_TYPE="iso"
+                # If there is a point in the release, check if it is less than 16.04
+                if [[ "${RELEASE}" != *"daily"* ]]; then
+                    if [ "${RELEASE//./}" -lt 1604 ]; then
+                        GUEST="linux_old"
+                    fi
+                fi
+                ;;
+            windows)
+                GUEST="windows"
+                IMAGE_TYPE="iso";;
+            windows-server)
+                GUEST="windows-server"
+                IMAGE_TYPE="iso";;
+            *)
+                GUEST="linux"
+                IMAGE_TYPE="iso";;
+        esac
+    fi
     CONF_FILE="${VM_PATH}.conf"
 
     if [ ! -e "${CONF_FILE}" ]; then
@@ -1463,97 +1467,101 @@ EOF
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
 
-        # OS specific tweaks
-        case ${OS} in
-            alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
-                echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-            openindiana)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-            batocera)
-                echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
-            bazzite)
-                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
-            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-            deepin)
+        if [[ $(type -t "config_${OS}") == function ]]; then
+            "config_${OS}"
+        else
+            # OS specific tweaks
+            case ${OS} in
+                alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
+                    echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                openindiana)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                batocera)
+                    echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+                bazzite)
+                    echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
+                dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+                deepin)
+                    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+                    echo "ram=\"4G\"" >> "${CONF_FILE}"
+                    ;;
+                freedos)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+                    echo "ram=\"256M\"" >> "${CONF_FILE}"
+                    ;;
+                kolibrios)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+                    echo "ram=\"128M\"" >> "${CONF_FILE}"
+                    ;;
+                slint)
+                    echo "disk_size=\"50G\"" >> "${CONF_FILE}"
+                    ;;
+                slitaz)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+                    echo "ram=\"512M\"" >> "${CONF_FILE}"
+                    ;;
+                truenas-scale|truenas-core)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    # the rest is non-functional
+                    # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+                    # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+                    # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+                    ;;
+                ubuntu-server)
+                    # 22.04+ fails on LVM build if disk size is < 10G
+                    # 22.04.1 fails on auto-install if TPM is disabled
+                    echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+                    echo "ram=\"4G\"" >> "${CONF_FILE}"
+                    if [[ "${RELEASE}" == *"22.04"* ]]; then
+                        echo "tpm=\"on\"" >> "${CONF_FILE}"
+                    fi
+                    ;;
+                vanillaos)
+                    ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
+                    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+                    ;;
+                zorin)
+                    case ${EDITION} in
+                        education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                    esac;;
+                reactos)
+                    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                    echo "disk_size=\"12G\"" >> "${CONF_FILE}"
+                    echo "ram=\"2048M\"" >> "${CONF_FILE}"
+                    ;;
+                macos)
+                    echo "disk_size=\"128G\"" >> "${CONF_FILE}"
+                    echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
+                    # https://github.com/quickemu-project/quickemu/issues/438
+                    if [ "${RELEASE}" == "monterey" ]; then
+                        echo "cpu_cores=2" >> "${CONF_FILE}"
+                    fi
+                    ;;
+                proxmox-ve)
+                    echo "disk_size=\"20G\"" >> "${CONF_FILE}"
+                    echo "ram=\"4G\"" >> "${CONF_FILE}"
+                    ;;
+            esac
+
+            if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
+                # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
+                echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+            fi
+
+            if [[ "${OS}" == "windows"* ]]; then
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-                echo "ram=\"4G\"" >> "${CONF_FILE}"
-                ;;
-            freedos)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-                echo "ram=\"256M\"" >> "${CONF_FILE}"
-                ;;
-            kolibrios)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"2G\"" >> "${CONF_FILE}"
-                echo "ram=\"128M\"" >> "${CONF_FILE}"
-                ;;
-            slint)
-                echo "disk_size=\"50G\"" >> "${CONF_FILE}"
-                ;;
-            slitaz)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-                echo "ram=\"512M\"" >> "${CONF_FILE}"
-                ;;
-            truenas-scale|truenas-core)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                # the rest is non-functional
-                # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
-                # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
-                # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
-                ;;
-            ubuntu-server)
-                # 22.04+ fails on LVM build if disk size is < 10G
-                # 22.04.1 fails on auto-install if TPM is disabled
-                echo "disk_size=\"10G\"" >> "${CONF_FILE}"
-                echo "ram=\"4G\"" >> "${CONF_FILE}"
-                if [[ "${RELEASE}" == *"22.04"* ]]; then
-                    echo "tpm=\"on\"" >> "${CONF_FILE}"
-                fi
-                ;;
-            vanillaos)
-                ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
-                echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-                ;;
-            zorin)
-                case ${EDITION} in
-                    education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-                esac;;
-            reactos)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"12G\"" >> "${CONF_FILE}"
-                echo "ram=\"2048M\"" >> "${CONF_FILE}"
-                ;;
-            macos)
-                echo "disk_size=\"128G\"" >> "${CONF_FILE}"
-                echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
-                # https://github.com/quickemu-project/quickemu/issues/438
-                if [ "${RELEASE}" == "monterey" ]; then
-                    echo "cpu_cores=2" >> "${CONF_FILE}"
-                fi
-                ;;
-            proxmox-ve)
-                echo "disk_size=\"20G\"" >> "${CONF_FILE}"
-                echo "ram=\"4G\"" >> "${CONF_FILE}"
-                ;;
-        esac
+            fi
 
-        if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
-            # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
-            echo "disk_size=\"32G\"" >> "${CONF_FILE}"
-        fi
-
-        if [[ "${OS}" == "windows"* ]]; then
-            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-        fi
-
-        # Enable TPM for Windows 11 and Windows Server 2022
-        if [[ "${OS}" == "windows" && "${RELEASE}" == "11" || "${OS}" == "windows-server" && "${RELEASE}" == "2022" ]]; then
-            echo "tpm=\"on\"" >> "${CONF_FILE}"
-            echo "secureboot=\"off\"" >> "${CONF_FILE}"
+            # Enable TPM for Windows 11 and Windows Server 2022
+            if [[ "${OS}" == "windows" && "${RELEASE}" == "11" || "${OS}" == "windows-server" && "${RELEASE}" == "2022" ]]; then
+                echo "tpm=\"on\"" >> "${CONF_FILE}"
+                echo "secureboot=\"off\"" >> "${CONF_FILE}"
+            fi
         fi
     fi
     echo -e "\nTo start your $(pretty_name "${OS}") virtual machine run:"
