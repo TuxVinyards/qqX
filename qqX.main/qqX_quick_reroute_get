@@ -318,9 +318,13 @@ function show_QWG_header {
   # printColor "  wrapping QUICKGET version %s '%s'  " "$QG_VerNumber"  "$QE_SourceVersion"
   printColor "  wrapping QUICKGET version %s  " "$QG_VerNumber"  # REVIEW
   if [[ $InternetUp ]]; then
-    printf "(internet working) [R] to re-check   ("
-    printColor "%s" "${VM_ListingFilter/'qqlist-'/}"
-    printf ") [fl] adjust filter \n\n"
+    printf "(internet working) [R] to re-check"
+    if [[ $QG_Modpath ]]; then
+      printf "   ("
+      printColor "%s" "${VM_ListingFilter/'qqlist-'/}"
+      printf ") [fl] adjust filter "
+    fi
+    printf "\n\n"
   else
     printf "(internet is needed for some menu items as well as downloads) \n\n"
   fi
@@ -455,17 +459,17 @@ function_quick_get_wrap ()  {
 
       elif [[ ${QGW_List_NumSelected^^} == "HF" ]]; then  QGW_List_NumSelected= ; show_qqX_general_help "f" ; GT_Help=1
 
-      elif [[ ${QGW_List_NumSelected,,} == "fl" ]]; then
+      elif [[ ${QGW_List_NumSelected,,} == "fl" ]] && [[ $QG_Modpath ]]; then
         qqLselect= ; echo
         print_quickget_and_folder_choices  "VM_ListingArray"
-        printColor "\n\n  [number] to select,"
-        printColor "  or use with FilterDefault in the general settings file ..."
+        printColor "\n\n  [number] to select"
+        printColor "   [enter] to return, or use with FilterDefault in the general settings file ..."
         printf "\n\n"
         read -rp "  >  " qqLselect
         [[ $(tr -cd '[:digit:]' <<< "$qqLselect") ]] && VM_ListingFilter="${VM_ListingArray[qqLselect-1]}"
         load_QGW_OS_Array ;  refresh_QWG_selector "no-set"
 
-      elif [[ $QGW_List_NumSelected == "B" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
+      elif [[ $QGW_List_NumSelected == "B" ]] || [[ ${QGW_List_NumSelected,,} == "vm" ]]; then printf "\n\n" ; GT_Exit=1 ; break
 
       elif [[ $QGW_List_NumSelected == "Q" ]]; then  sleep 0.3 ; exit directly
 
@@ -570,19 +574,21 @@ function_quick_get_wrap ()  {
 
           QGW_OS_HomePage=
           QGW_OS_InfoText=
+          QGW_OS_Info=
 
-          # qget 4.9.2 onwards
-          if [[ $QGW_OS_Arr_NameSelected == "ubuntu" ]]; then  QGW_OS_HomePage="https://ubuntu.com/"
-          else
-            # first listing, some may have two
-            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
-            QGW_OS_Info="${QGW_OS_Info//';;'/}"
-            QGW_OS_Info="${QGW_OS_Info//'"'/}"
-            QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
-            mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
-            QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
-            QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
+          # @ june 2025
+          if [[ $QG_Modpath ]]; then
+            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_Modpath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
           fi
+          if [[ ! $QGW_OS_Info ]]; then
+            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+          fi
+          QGW_OS_Info="${QGW_OS_Info//';;'/}"
+          QGW_OS_Info="${QGW_OS_Info//'"'/}"
+          QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+          mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+          QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
+          QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
 
           if [[ $QGW_OS_InfoText ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
           else printf "\n\n  Not available, see webpage for more details \n\n"

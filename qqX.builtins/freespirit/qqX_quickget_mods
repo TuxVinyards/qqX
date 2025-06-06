@@ -28,6 +28,7 @@
 
 #  Uses 4 space tabs, as with QuickGet, so that code can be directly pasted into here and tweaked.
 #  QuickGet and qqX house styles may be mixed. See notes at end for qqX coding style.
+#  Take care to maintain QuickGet variable name continuity.
 
 ##########################################
 
@@ -80,26 +81,25 @@ function os_support { echo "$osSupported" ; }
 
 ## 2: INFO
 
-# Needed for new qqX listed distros or for INFO overwrites
+# Needed for new qqX listed distros or use for INFO overwrites
 
 function os_info {
     local INFO=
-    InfoStream=
     case "$1" in
         #name)            INFO="PrettyName|Credentials|Homepage|Info";;
-        anduinos)         INFO="Anduin OS|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
+        anduinos)         INFO="Anduin OS|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL.";;
         bluestar)         INFO="Blue Star|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
+        tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Nomadic ultra small graphical desktop operating system capable of booting from cdrom, pendrive, or frugally from a hard drive.";;
     esac
-    InfoStream="$INFO"
-	[[ ! $InfoStream ]] && InfoStream="$(os_info_QG "$1")"
-    echo "$InfoStream"
+	[[ ! $INFO ]] && INFO="$(os_info_QG "$1")"
+    echo "$INFO"
 }
 
 ##########################################
 
 ## 3: RELEASES and EDITIONS
 
-# Needed for new qqX listed distros or for function overwrites
+# Needed for new qqX listed distros or use for "releases_${OS} ()" and "editions_${OS} ()" overwrites
 # Try to keep web greps dynamic, where possible. Data may be floatversion filtered, and may include fv pipes.
 
 # Anduin OS
@@ -110,7 +110,7 @@ function os_info {
 
 ## 4: DOWNLOAD
 
-# Needed for new qqX listed distros or for function overwrites
+# Needed for new qqX listed distros or use for "get_${OS} ()" overwrites
 
 # Anduin OS
 
