@@ -19,10 +19,6 @@
 Default_VM_SelectorStyle="A"
 [[ ! $VM_SelectorStyle ]]  &&  VM_SelectorStyle="$Default_VM_SelectorStyle"
 
-if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
-else VM_ListingFilter="qqlist-desktop"
-fi
-
 function_create_VM_folderList() {
 
   DefaultFolderError=

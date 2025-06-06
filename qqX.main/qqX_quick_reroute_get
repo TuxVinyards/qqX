@@ -24,17 +24,21 @@ function quickget {
   # And if rerunning after a settings change, to be run after 'find_quickemu_source_functions_and_vars'
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
-
   eval command '"$QG_SourcePath"' " $*"
 
 }
 
+# DISTRO LISTINGS
+
+VM_ListingArray=("qqlist-all" "qqlist-desktop" "qqlist-server-cl")
+
+if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
+else VM_ListingFilter="qqlist-desktop"
+fi
 QGW_OS_Array=()
-[[ ! $VM_ListingFilter ]] && VM_ListingFilter="qqlist-desktop"
-VM_ListingArray=("qqlist-server-cl" "qqlist-all" "qqlist-desktop")
-[[ $ShowQGetLists ]] && { echo; declare -p VM_ListingArray; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
 
 load_QGW_OS_Array () {
+  [[ ! $VM_ListingFilter ]] && VM_ListingFilter="qqlist-desktop"
   mapfile -t QGW_OS_Array <<< "$(quickget "$VM_ListingFilter" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
   [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
   if [[ ! ${QGW_OS_Array[0]} ]]; then
@@ -42,6 +46,9 @@ load_QGW_OS_Array () {
     printf "\n\n  Quickget OS distro list output not be read or found. \n\n"
   fi
 }
+
+[[ $ShowQGetLists ]] && { echo; declare -p VM_ListingArray; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
+
 
 print_quickget_and_folder_choices () {
 
@@ -333,7 +340,8 @@ function show_hot_swap_line {
 }
 
 function refresh_QWG_selector {
-  SettingsFileAdjusted=1 ; refresh_sources_and_load_VM_arrays
+  [[ $1 != "no-set" ]] && SettingsFileAdjusted=1
+  refresh_sources_and_load_VM_arrays
   clear_main_gt_start_vars
   show_QWG_header ; show_hot_swap_line
   print_quickget_and_folder_choices  "QGW_OS_Array"
@@ -435,7 +443,7 @@ function_quick_get_wrap ()  {
 
     while true ; do
 
-      printColor "\n\n  [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH  [E] exit quickget "
+      printColor "\n\n  [a-z] to zoom or switch zoom, or OS [item number] for download or browsing OS website  [H] help  [R] REFRESH   [B] go back  [Q] quit"
       printf "\n\n"
 
       [[ $QGW_List_NumSelected_Next ]] && QGW_List_NumSelected="$QGW_List_NumSelected_Next"
@@ -450,14 +458,16 @@ function_quick_get_wrap ()  {
       elif [[ ${QGW_List_NumSelected,,} == "fl" ]]; then
         qqLselect= ; echo
         print_quickget_and_folder_choices  "VM_ListingArray"
-        printf "\n\n  [number] to select \n\n"
+        printColor "\n\n  [number] to select,"
+        printColor "  or use with FilterDefault in the general settings file ..."
+        printf "\n\n"
         read -rp "  >  " qqLselect
         [[ $(tr -cd '[:digit:]' <<< "$qqLselect") ]] && VM_ListingFilter="${VM_ListingArray[qqLselect-1]}"
-        load_QGW_OS_Array ;  refresh_QWG_selector
+        load_QGW_OS_Array ;  refresh_QWG_selector "no-set"
 
-      elif [[ $QGW_List_NumSelected == "E" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
+      elif [[ $QGW_List_NumSelected == "B" ]]; then  printf "\n\n" ; GT_Exit=1 ; break
 
-      elif [[ $QGW_List_NumSelected == "Q" ]]; then  exit maybe  # hidden
+      elif [[ $QGW_List_NumSelected == "Q" ]]; then  sleep 0.3 ; exit directly
 
       elif [[ ${QGW_List_NumSelected^^} == "FS" ]] ; then
         CodingHotSwap="FreeSpirit" ; SettingsFileAdjusted=1 ; CodingHotSwapShow=1 ; refresh_sources_and_load_VM_arrays

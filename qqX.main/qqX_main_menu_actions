@@ -306,8 +306,7 @@ function  main_menu_actions {
 
   elif  [[ $MainMenuChoice == "q" ]] ; then
 
-    printf "\n\n" ; MainMenuChoice=
-    exit directly
+    cnorm ; echo ; sleep 0.3 ; exit directly
 
   elif  [[ $MainMenuChoice == "i" ]] ; then
 
