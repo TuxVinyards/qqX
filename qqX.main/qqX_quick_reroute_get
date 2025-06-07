@@ -344,8 +344,10 @@ function show_hot_swap_line {
 }
 
 function refresh_QWG_selector {
-  [[ $1 != "no-set" ]] && SettingsFileAdjusted=1
-  refresh_sources_and_load_VM_arrays
+  if [[ $1 != "no-set" ]] ; then
+    SettingsFileAdjusted=1
+    refresh_sources_and_load_VM_arrays
+  fi
   clear_main_gt_start_vars
   show_QWG_header ; show_hot_swap_line
   print_quickget_and_folder_choices  "QGW_OS_Array"
@@ -466,7 +468,10 @@ function_quick_get_wrap ()  {
         printColor "   [enter] to return, or use with FilterDefault in the general settings file ..."
         printf "\n\n"
         read -rp "  >  " qqLselect
-        [[ $(tr -cd '[:digit:]' <<< "$qqLselect") ]] && VM_ListingFilter="${VM_ListingArray[qqLselect-1]}"
+        VM_ListingArrayCount="${#VM_ListingArray[@]}"
+        if [[ $(tr -cd '[:digit:]' <<< "$qqLselect") ]] && (( 0 < qqLselect && qqLselect <= VM_ListingArrayCount )); then
+          VM_ListingFilter="${VM_ListingArray[qqLselect-1]}"
+        fi
         load_QGW_OS_Array ;  refresh_QWG_selector "no-set"
 
       elif [[ $QGW_List_NumSelected == "B" ]] || [[ ${QGW_List_NumSelected,,} == "vm" ]]; then printf "\n\n" ; GT_Exit=1 ; break

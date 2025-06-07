@@ -391,10 +391,9 @@ refresh_sources_and_load_VM_arrays() {
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
   source "$qqX_SettingsFile"
 
-  if [[ $SettingsFileAdjusted ]]; then
-     if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
-     else VM_ListingFilter="qqlist-desktop" ; fi
-  fi
+  #if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
+  #else VM_ListingFilter="qqlist-desktop"
+  #fi   REVIEW  > follow refresh doesn't change builtin model, so leave filter unchanged too
 
   [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap"
   refresh_and_load_quickemu_sources
