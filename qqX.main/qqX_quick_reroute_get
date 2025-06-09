@@ -43,7 +43,7 @@ load_QGW_OS_Array () {
   [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
   if [[ ! ${QGW_OS_Array[0]} ]]; then
     printColor "\n\n  INTERNAL ERROR: load_QGW_OS_Array"
-    printf "\n\n  Quickget OS distro list output not be read or found. \n\n"
+    printf "\n\n  Quickget OS distro list output not read or found. \n\n"
   fi
 }
 
@@ -188,31 +188,35 @@ function_test_iso_url () {
       printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
       iso_get_message
     else
+      echo > "/tmp/qmod-dl-size"
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      curl --disable -sLf --retry 2 --retry-max-time 3 --retry-delay 1 --max-time 8 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
+      curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output "/tmp/qmod-dl-size" "$DL_Url" &
+      wait "$!"
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
-        printf "  twice ........ \n\n"
-        curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 2 --max-time 16 --head --output "/tmp/qmod-dl-size" "$DL_Url" || echo > "/tmp/qmod-dl-size"
+        sleep 2 ; printf "  and a second time ........ \n\n"
+        curl --disable -sLf --retry 2 --retry-max-time 3 --retry-delay 2 --max-time 10 --head --output "/tmp/qmod-dl-size" "$DL_Url" &
+        wait "$!"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
-        DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
-        [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
         DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
         DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
+        DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
+        [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
+        [[ ! $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -s -i 'HTTP' "/tmp/qmod-dl-size" | grep 200)"
       fi
       if [[ $DL_PotentialOkay ]]; then
-        printColor "  Appears to be Okay "; QGW_Download_BadLink=
+        printColor "  Appears to be Okay \n\n"; QGW_Download_BadLink=
       else
         printColor "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
       fi
       if [[ $DL_PotentialSize ]]; then
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
-        printf "  reported size: %s " "$DL_HumanSize"
+        printf "  Reported size: %s " "$DL_HumanSize"
         printf "\n"
       elif [[ $QGW_Download_BadLink ]]; then
-        printf "  and reported size not available either ...."
+        printf "  Reported size not available ...."
         [[ $DL_PotentialHtml ]] && printf "\n\n  Check website or switch release/edition"
         printf "\n\n"
         iso_get_message ; show_distro_homepage_check_results
@@ -605,7 +609,7 @@ function_quick_get_wrap ()  {
 
           QGW_OS_HomePage_Working=
           if [[ $QGW_OS_HomePage ]]; then
-            printf "\n  Checking Distro Home Page ...."
+            printf "\n  Checking Distro Home Page ....\n"
             printf "" > "/tmp/qmod-dl-homepage-report.txt"
             {
               printf "\n\n  HomePage = %s"  "$QGW_OS_HomePage"
@@ -884,9 +888,8 @@ function_quick_get_wrap ()  {
         QGW_Editions_ListRaw=
         QGW_Editions_Array=()
 
-        if grep -qs "editions_$QGW_OS_Arr_NameSelected" "$QG_SourcePath" ; then
-          # if NO editions function is present in the code for that distro, then no editions are available
-          # quickget will auto-start as no editions are available, so only check for data if a named function is present
+        if [[ $QGW_Editions_FullList ]]; then
+          # quickget will auto-start if no editions are available, so only check if data is present
           QGW_EditionsFunction=1
           # Check the editions list specific to the selected release
           # running checks in the background (&) means that we can stop the process if it hangs (as with releases check)

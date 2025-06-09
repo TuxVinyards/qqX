@@ -3,7 +3,25 @@
 #  - https://www.shellcheck.net/wiki/SC2317
 #  - Disable globally because many functions are called indirectly
 # shellcheck disable=SC2317
-# Use qqX C.UTF-8 locale, not:  export LC_ALL=C
+
+# For qqX use with C.UTF-8 locale, not:  export LC_ALL=C
+
+# This section enables testing via './quickget --check distroname' from a terminal opened in the built-ins folder:
+if [[ -e "$(pwd)/qqX_quickget_mods" ]]; then
+    if [[ $(pgrep -aAi qqX 2>/dev/null) ]] ; then
+        printf "\n\n  qqX running elsewhere ... \n\n" ; exit 1
+    else
+        OriginalPATH="$PATH"
+        CurrentFolder="$(pwd)"
+        if [[ -e "/usr/share/qqX/qqX.lib/fv" ]]; then qqX_LibraryFolder="/usr/share/qqX/qqX.lib"
+        else printf "\n\n  qqX libraries not found OR qqX running elsewhere ... \n\n" ; exit 1
+        fi
+        export PATH="$CurrentFolder:${qqX_LibraryFolder}:${OriginalPATH}"
+        if  grep -sqi 'C.utf8' <<< "$(locale -a)"; then export "LC_NUMERIC=C.UTF-8" ; export "LC_COLLATE=C.UTF-8"
+        else export "LC_NUMERIC=C" ; export "LC_COLLATE=C"
+        fi
+    fi
+fi
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
@@ -380,7 +398,7 @@ function test_all() {
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+                URL=$(get_"${OS}" "$RELEASE" | cut -d' ' -f1 | head -n 1)
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
@@ -1215,13 +1233,13 @@ function check_hash() {
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
     #curl --disable --silent --location "${1}"
-    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 "${1}"
+    curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 "${1}"
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json() {
     #curl --disable --silent --location --header "Accept: application/json" "${1}"
-    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --header "Accept: application/json" "${1}"
+    curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -1302,7 +1320,7 @@ function web_redirect() {
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
     #REDIRECT_URL=$(curl --disable --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
-    REDIRECT_URL=$(curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    REDIRECT_URL=$(curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1324,7 +1342,7 @@ function web_check() {
         fi
     done
     #curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
-    curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
+    curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
 }
 
 function zsync_get() {
@@ -3167,7 +3185,7 @@ function download_windows_server() {
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
     echo " - Parsing download page: ${url}"
-    iso_download_page_html="$(curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --max-filesize 1M --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --continue-at - --max-filesize 1M --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -3240,7 +3258,7 @@ function download_windows_server() {
     # Follow redirect so proceeding log message is useful
     # This is a request we make this Fido doesn't
     # We don't need to set "--max-filesize" here because this is a HEAD request and the output is to /dev/null anyway
-    iso_download_link="$(curl --disable -sLf --retry 5 --retry-max-time 3 --retry-delay 2 --max-time 20 --continue-at - --o /dev/null --write-out "%{url_effective}" --head --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
+    iso_download_link="$(curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --continue-at - --o /dev/null --write-out "%{url_effective}" --head --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
         # This should only happen if the Microsoft servers are down
         handle_curl_error $?
         return $?
@@ -3785,6 +3803,8 @@ if [ -n "${2}" ]; then
             fi
         else
             show_os_info "${OS}"
+            echo -en " - Releases:\t"
+            "releases_${OS}" | fmt -w 80
             echo -e " - Editions:\t$("editions_${OS}" | fmt -w 80)"
             echo -e "\nERROR! You must specify an edition."
             exit 1

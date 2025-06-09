@@ -26,13 +26,14 @@
 #  However, NOT TO WORRY if you are only familiar the older more POSIX styles, there are still plenty of options
 #  for contributions to the quickemu built-ins, particularly with this file ...
 
-#  Uses 4 space tabs, as with QuickGet, so that code can be directly pasted into here and tweaked.
+#  Use 4 space tabs with this file, as with QuickGet, so that code can be directly pasted into here and tweaked.
 #  QuickGet and qqX house styles may be mixed. See notes at end for qqX coding style.
+#  This script is sourced when running a Quickget builtin. It remains variable isolated from running instances of qqX.
 #  Take care to maintain QuickGet variable name continuity.
 
 ##########################################
 
-## 1:  LISTS  (alphabetical, space separated and space isolated at each end)
+## 1:  LISTS & FILTERS (alphabetical, space separated and space isolated at each end)
 
 # osAddList for new qqX listed distros
 osAddList=" anduinos bluestar "
@@ -54,7 +55,9 @@ osRemoveList="${osRemoveList//'  '/' '}"
 osRemoveList="${osRemoveList//'  '/' '}"
 mapfile -t -d ' ' osRemoveArr <<< "$osRemoveList"
 
-# filters  (for new filters, see start of quick_reroute_get)
+## For FILTER CALLS, see/add at start of quick_REROUTE_get
+# The call will cause a defined list to be shown by triggering a controlled error state in Quickget ...
+
 osServersList=" alpine centos-stream freedos proxmox-ve "
 osServersList+=" rockylinux truenas-core truenas-scale ubuntu-server windows-server "
 osServersList="${osServersList//'  '/' '}"
@@ -66,7 +69,6 @@ else osSupported="$osSupported_All"
 fi
 
 for Rem in "${osRemoveArr[@]}"; do
-	# space isolated
 	osSupported="${osSupported//" $Rem "/' '}"
 done
 
@@ -75,19 +77,18 @@ osSupported="${osSupported//'  '/' '}"
 osSupported="${osSupported//'  '/' '}"
 
 # replace old function but only after old one has been read
-function os_support { echo "$osSupported" ; }
+function os_support { echo " $osSupported " ; }
 
 ##########################################
 
 ## 2: INFO
-
 # Needed for new qqX listed distros or use for INFO overwrites
 
 function os_info {
     local INFO=
     case "$1" in
         #name)            INFO="PrettyName|Credentials|Homepage|Info";;
-        anduinos)         INFO="Anduin OS|-|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL.";;
+        anduinos)         INFO="Anduin OS|-|https://www.anduinos.com/|Ubuntu-based Linux distribution that aims to facilitate developers transitioning from Windows.";;
         bluestar)         INFO="Blue Star|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Nomadic ultra small graphical desktop operating system capable of booting from cdrom, pendrive, or frugally from a hard drive.";;
     esac
@@ -97,28 +98,86 @@ function os_info {
 
 ##########################################
 
-## 3: RELEASES and EDITIONS
+## 3: RELEASES, EDITIONS and DOWNLOAD URL
+# Needed for new qqX listed distros or use for "releases_${OS} ()" and "editions_${OS} ()" overwrites.
 
-# Needed for new qqX listed distros or use for "releases_${OS} ()" and "editions_${OS} ()" overwrites
-# Try to keep web greps dynamic, where possible. Data may be floatversion filtered, and may include fv pipes.
+# Quickget's behaviour is to continually exit on error until the correct input combination is made.
+# This means that Quickget probes normally have to be carried out via repeated and discontiguous command line args requests
+# and that the use of global variables is either limited or not possible:
 
-# Anduin OS
+# IF CHECKING editions, the var $RELEASE becomes available in the function editions_$OS
+# When running complete distro checks, via './quickget --check distroname', this uses function 'test-all' and
+# both vars $RELEASE & $EDITION become available in the 'get' function.
+# Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
+
+# The first two FUNCTIONS feed STDOUT to the look-up function 'validate_release' followed by
+# the last lines of Quickget where distro editions are handled.
+
+# Note that Quickget's 'web_pipe()' is an alias for Curl and will generate STDOUT by itself, without needing 'echo'.
+# Also that further echoes can be avoided via Bash's <<< 'herestring' feature.
+
+# THE 'GET' FUNCTION should generate the download target and a checksum.
+# Quickget often employs local variables $URL and $HASH but any format may be used.
+# The last line should supply the DOWNLOAD TARGET TO STDOUT to $1, to be read by create_vm() or test-all() etc.
+# If available, the checksum should be downloaded, cleaned and supplied to $2.
+
+# Where possible, try to keep web greps dynamic. This is made easier with 'floatversion' and may include 'fv' pipes.
+# See https://github.com/TuxVinyards/floatversion
+
+# Place standard sized 'get' functions here, next to releases and editions, and any oversized ones in section 7.
+# Downloads may occasionally need a special tidy-up and finalization. See sections 4 to 6.
+
+# For testing code, run './quickget --check distroname' from a terminal opened in the relevant builtin folder.
+
+function releases_anduinos {
+    echo "LTS Standard"
+}
+function editions_anduinos {
+    while true ; do
+        if ! { grep -qs "$OS" "/tmp/qGet.rel.data.txt" && grep -s ReleaseName "/tmp/qGet.rel.data.txt" | grep -qs "$RELEASE"; } ; then
+            printf "qGetDistro=\"%s\"" "$OS"> "/tmp/qGet.rel.data.txt"
+            if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
+            else ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
+            fi
+            # Checks work with Anduin if we slow down the 'bot' behaviour, make it seem more human:
+            RndNum="$( (tr -cd '2-4' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
+            ReleasePoint="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/" | grep href | fv -M -Q )"
+            RndNum="$( (tr -cd '2-4' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
+            ReleaseEditions="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
+            | grep -v sha256 | grep -v torrent | tr '>' '\n' | grep iso | grep -v '<a' | cut -d'<' -f1 | cut -d'-' -f3 | cut -d'.' -f1 | paste -s -d' ')"
+            printf "\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"\nReleasePoint=\"%s\"\nReleaseEditions=\"%s\"" "$RELEASE" "$ReleaseNumber" "$ReleasePoint" "$ReleaseEditions" >> "/tmp/qGet.rel.data.txt"
+            RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
+        fi
+        ReleaseName= ; ReleaseNumber= ; ReleasePoint= ; ReleaseEditions=
+        source "/tmp/qGet.rel.data.txt"
+        if [[ $ReleaseName && $ReleaseNumber && $ReleasePoint && $ReleaseEditions ]] ; then break
+        else printf "" > "/tmp/qGet.rel.data.txt"
+        fi
+    done
+    # @june 2025 "ar_SA de_DE en_GB en_US es_ES fr_FR it_IT ja_JP ko_KR nl_NL pl_PL pt_BR pt_PT ru_RU sv_SE th_TH tr_TR vi_VN zh_CN zh_HK zh_TW"
+    printf "%s" "$RELEASE" > "/tmp/qGet.ED.data.txt"
+    printf "" > "/tmp/qGet.GET.data.txt"
+    [[ ! $ReleaseEditions ]] && source "/tmp/qGet.rel.data.txt"
+    echo "$ReleaseEditions"
+}
+function get_anduinos {
+    source "/tmp/qGet.rel.data.txt"
+    # This slowdown needed for looping through test-all()
+    if [[ $(cat "/tmp/qGet.GET.data.txt" 2>/dev/null) ]]; then
+        RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "1$RndNum"
+    fi
+    AnduinIso="https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.iso"
+    AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" | cut -d':' -f2 | tr -cd '[:graph:]')"
+    echo "$AnduinIso $AnduinHash"
+    #printf "%s %s" "$RELEASE" "$EDITION" > "/tmp/qGet.GET.data.txt"
+    printf "%s" "$EDITION" > "/tmp/qGet.GET.data.txt"
+}
 
 # Blue Star
 
 ##########################################
 
-## 4: DOWNLOAD
-
-# Needed for new qqX listed distros or use for "get_${OS} ()" overwrites
-
-# Anduin OS
-
-# Blue Star
-
-##########################################
-
-## 5: GUEST TYPE
+## 4: GUEST TYPE
 
 # Needed only for special case instructions, such as non-iso
 # Use for new qqX listed distros or for case overwrites
@@ -126,7 +185,7 @@ function os_info {
 
 ##########################################
 
-## 6: CONFIGURATION
+## 5: CONFIGURATION
 
 # Needed only for special case instructions, such as needs legacy boot etc
 # Use for new qqX listed distros or for case overwrites
@@ -134,7 +193,7 @@ function os_info {
 
 ##########################################
 
-## 7: FINALIZING
+## 6: FINALIZING
 
 # Needed only for special case instructions, such as decompression routines
 # Use for new qqX listed distros or for case overwrites
@@ -142,6 +201,11 @@ function os_info {
 
 ##########################################
 
+## 7: DOWNLOAD XL
+# For special and oversized 'get' functions or "get_${OS} ()" overwrites eg Windows or Mac
+# Normally place 'get' functions next to releases and editions
+
+##########################################
 
 ## CODING STYLE  (as listed at the end of the main 'qqX' script)
 
