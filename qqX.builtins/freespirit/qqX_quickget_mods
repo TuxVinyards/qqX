@@ -89,7 +89,7 @@ function os_info {
     case "$1" in
         #name)            INFO="PrettyName|Credentials|Homepage|Info";;
         anduinos)         INFO="Anduin OS|-|https://www.anduinos.com/|Ubuntu-based Linux distribution that aims to facilitate developers transitioning from Windows.";;
-        bluestar)         INFO="Blue Star|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
+        bluestar)         INFO="Blue Star|-|https://sourceforge.net/projects/bluestarlinux/|Arch based, MacOS-like take on KDE Plasma that's easy to use.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Nomadic ultra small graphical desktop operating system capable of booting from cdrom, pendrive, or frugally from a hard drive.";;
     esac
 	[[ ! $INFO ]] && INFO="$(os_info_QG "$1")"
@@ -108,10 +108,12 @@ function os_info {
 # IF CHECKING editions, the var $RELEASE becomes available in the function editions_$OS
 # When running complete distro checks, via './quickget --check distroname', this uses function 'test-all' and
 # both vars $RELEASE & $EDITION become available in the 'get' function.
-# Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
 
 # The first two FUNCTIONS feed STDOUT to the look-up function 'validate_release' followed by
 # the last lines of Quickget where distro editions are handled.
+
+# Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
+# Some distros single release with no editions eg. bluestar
 
 # Note that Quickget's 'web_pipe()' is an alias for Curl and will generate STDOUT by itself, without needing 'echo'.
 # Also that further echoes can be avoided via Bash's <<< 'herestring' feature.
@@ -173,7 +175,17 @@ function get_anduinos {
     printf "%s" "$EDITION" > "/tmp/qGet.GET.data.txt"
 }
 
-# Blue Star
+function releases_bluestar {
+    echo "latest"
+}
+function get_bluestar {
+    BlueStarRelease="$(web_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
+    BlueStarIso="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease}"
+    BlueStarHash="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease/iso/md5}"
+    BlueStarHash="$(web_pipe "$BlueStarHash" | cut -d' ' -f1)"
+    echo "$BlueStarIso $BlueStarHash"
+}
+
 
 ##########################################
 
