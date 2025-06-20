@@ -1341,8 +1341,12 @@ function web_check() {
             shift
         fi
     done
+    [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && return 1
     #curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
-    curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --head --output /dev/null   "${HEADERS[@]}" "${URL}"
+    if curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --head "${HEADERS[@]}" "${URL}" \
+    | grep -si 'HTTP/' | grep -qs '200' ; then  return 0
+    else return 1
+    fi
 }
 
 function zsync_get() {

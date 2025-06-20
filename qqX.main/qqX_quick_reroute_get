@@ -204,7 +204,7 @@ function_test_iso_url () {
         DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
         [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
-        [[ ! $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -s -i 'HTTP' "/tmp/qmod-dl-size" | grep 200)"
+        [[ ! $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -si 'HTTP/' "/tmp/qmod-dl-size" | grep 200)"
       fi
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay \n\n"; QGW_Download_BadLink=
