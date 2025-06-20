@@ -368,8 +368,8 @@ function  main_menu_actions {
       "$QEMU_IMG" snapshot  -c "$SnapTitle" "$Selected_Drive"
       "$QEMU_IMG" info "$Selected_Drive"
       DiskStorageChanges=1
-      printColor "\n\n  Drive Updated ..."
-      printf "\n\n  [enter] to return to menu   [sd] delete older snaps \n\n "
+      printf "\n\n  Drive Updated ..."
+      printColor "\n\n  [enter] to return to menu   [sd] delete older snaps \n\n "
       read -rp "  >  "  scReturn
       if [[ $scReturn ]]; then MainMenuChoicePreset="sd" ; Selected_DrivePreset=1
       else MainMenuChoicePreset= ; Selected_DrivePreset=
