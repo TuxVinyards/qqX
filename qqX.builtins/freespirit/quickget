@@ -51,6 +51,7 @@ function os_info_QG() {
         cachyos)          INFO="CachyOS|-|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
         centos-stream)    INFO="CentOS Stream|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
         chimeralinux)     INFO="Chimera Linux|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
+        clearlinux)       INFO="Clear Linux|-|https://www.clearlinux.org/|Clear Linux OS is an open source, rolling release Linux distribution optimized for performance and security, from the Cloud to the Edge, designed for customization, and manageability.";;
         crunchbang++)     INFO="Crunchbangplusplus|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
         debian)           INFO="Debian|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
         deepin)           INFO="Deepin|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
@@ -457,6 +458,7 @@ function os_support() {
     cachyos \
     centos-stream \
     chimeralinux \
+    clearlinux \
     crunchbang++ \
     debian \
     deepin \
@@ -665,6 +667,10 @@ function releases_chimeralinux() {
 
 function editions_chimeralinux() {
     echo base gnome
+}
+
+function releases_clearlinux() {
+    echo latest
 }
 
 function releases_crunchbang++() {
@@ -891,13 +897,13 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    # Lists unstable plus the two most recent releases
+    # Lists unstable plus the most recent release
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +1)
 }
 
 function editions_nixos() {
-    echo "minimal plasma gnome"
+    echo "minimal graphical"
 }
 
 function releases_nobara() {
@@ -1488,7 +1494,6 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
-
         if [[ $(type -t "config_${OS}") == function ]]; then
             "config_${OS}"
         else
@@ -1503,6 +1508,8 @@ EOF
                     echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
                 bazzite)
                     echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
+            clearlinux)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
                 dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                     echo "boot=\"legacy\"" >> "${CONF_FILE}";;
                 deepin)
@@ -1788,6 +1795,19 @@ function get_chimeralinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_clearlinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local RELEASE=""
+
+    RELEASE=$(curl -s https://cdn.download.clearlinux.org/releases/ | grep -oE "[0-9]+" | sort -nr | head -1)
+    ISO="clear-${RELEASE}-live-desktop.iso"
+    URL="https://cdn.download.clearlinux.org/releases/${RELEASE}/clear"
+    HASH=$(web_pipe "${URL}/${ISO}-SHA512SUMS" | grep "${ISO}" | cut -d' ' -f 1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_crunchbang++() {
     local HASH=""
     local ISO=""
@@ -1951,14 +1971,17 @@ function get_freebsd() {
 function get_freedos() {
     local HASH=""
     local ISO=""
-    local URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    local BASE_URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}"
+    local URL=""
     case ${RELEASE} in
-        1.2) ISO="FD12CD.iso"
+        1.2) URL="${BASE_URL}/official"
+             ISO="FD12CD.iso"
              HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
-        1.3) ISO="FD13-LiveCD.zip"
+        1.3) URL="${BASE_URL}/official"
+             ISO="FD13-LiveCD.zip"
              HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
-        1.4) ISO="FD14-LiveCD.zip"
-             URL="${URL/'/official'/}"
+        1.4) URL="${BASE_URL}"
+             ISO="FD14-LiveCD.zip"
              HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
     esac
     echo "${URL}/${ISO} ${HASH}"
@@ -2303,13 +2326,12 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
-    # Adapt the plasma edition according to the NixOS release
+    # NixOS "gnome" and "plasma" ISOs are unified as "graphical" since 25.05
+    # https://github.com/NixOS/nixpkgs/pull/355893
     case "${EDITION}" in
-        plasma)
-            if [ "${RELEASE}" == "23.11" ]; then
-                EDITION+="5"
-            else
-                EDITION+="6"
+        plasma6|gnome)
+            if [[ "${RELEASE}" == "25.05" || "${RELEASE}" == "unstable" ]]; then
+                EDITION="graphical"
             fi
             ;;
     esac
