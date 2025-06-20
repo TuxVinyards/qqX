@@ -202,7 +202,7 @@ VM_loader_selector_and_menu () {
       elif [[ "${VM_Selection,,}" == dev* ]] ; then
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
 
-      elif [[ $VM_Selection == "q" ]]; then cnorm ; echo ; sleep 0.3 ; exit directly
+      elif [[ $VM_Selection == "q" ]]; then tput cnorm ; echo ; sleep 0.3 ; exit directly
 
       elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
 
