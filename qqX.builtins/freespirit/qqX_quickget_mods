@@ -59,7 +59,7 @@ mapfile -t -d ' ' osRemoveArr <<< "$osRemoveList"
 # The call will cause a defined list to be shown by triggering a controlled error state in Quickget ...
 
 osServersList=" alpine centos-stream freedos proxmox-ve "
-osServersList+=" rockylinux truenas-core truenas-scale ubuntu-server windows-server "
+osServersList+=" truenas-core truenas-scale ubuntu-server windows-server "
 osServersList="${osServersList//'  '/' '}"
 osServersList="${osServersList//'  '/' '}"
 
