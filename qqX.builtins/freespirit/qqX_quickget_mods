@@ -191,6 +191,18 @@ function get_anduinos {
     printf "%s" "$EDITION" > "/tmp/qGet.GET.data.txt"
 }
 
+## FIX artix community editions and hash grep
+function get_artixlinux() {
+    local HASH="" ; local ISO=""
+    local URL="https://download.artixlinux.org/iso"
+    if [[ $EDITION == "community-gtk" ]]; then ISO="artix-community-gtk-openrc-${RELEASE}-x86_64.iso"
+    elif [[ $EDITION == "community-qt" ]]; then ISO="artix-community-qt-openrc-${RELEASE}-x86_64.iso"
+    else ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
+    fi
+    HASH=$(web_pipe "${URL}/sha256sums" | grep -s "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 ## ADD
 function releases_bluestar {
     echo "latest"
