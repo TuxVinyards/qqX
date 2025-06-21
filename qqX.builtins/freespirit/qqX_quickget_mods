@@ -42,7 +42,7 @@ osAddList=" anduinos bluestar "
 #osAddList+=" another "
 
 # osRemoveList for distros that are problematic or no longer maintained, but still listed by Quickget
-osRemoveList=" vxlinux "
+osRemoveList=" vxlinux arcolinux "
 #osRemoveList+=" another and-one-more "
 
 osSupported="$(os_support)"
@@ -172,7 +172,8 @@ function get_anduinos {
         RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "1$RndNum"
     fi
     AnduinIso="https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.iso"
-    AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" | cut -d':' -f2 | tr -cd '[:graph:]')"
+    AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
+    | cut -d':' -f2 | tr -cd '[:graph:]')"
     echo "$AnduinIso $AnduinHash"
     #printf "%s %s" "$RELEASE" "$EDITION" > "/tmp/qGet.GET.data.txt"
     printf "%s" "$EDITION" > "/tmp/qGet.GET.data.txt"
