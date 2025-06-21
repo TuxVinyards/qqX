@@ -31,6 +31,8 @@
 #  This script is sourced when running a Quickget builtin. It remains variable isolated from running instances of qqX.
 #  Take care to maintain QuickGet variable name continuity.
 
+#  To test code, run './quickget --check distroname' etc from a terminal opened in the relevant builtin folder.
+
 ##########################################
 
 ## 1:  LISTS & FILTERS (alphabetical, space separated and space isolated at each end)
