@@ -1344,7 +1344,7 @@ function web_redirect() {
 function web_check() {
     local HEADERS=()
     local URL="${1}"
-    # Process any headers
+    # Normally just a URL. Mac OS has URL as $1 then followed by repeated headers requests.
     while (( "$#" )); do
         if [ "${1}" == "--header" ]; then
             HEADERS+=("${1}" "${2}")
@@ -1353,7 +1353,8 @@ function web_check() {
             shift
         fi
     done
-    [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && return 1
+    # check is standard *.* filename or Ubuntu SUMS file, not an html web page or such ...
+    [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]] && return 1
     #curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
     if curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 4 --max-time 20 --head "${HEADERS[@]}" "${URL}" \
     | grep -si 'HTTP/' | grep -qs '200' ; then  return 0
