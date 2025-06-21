@@ -98,6 +98,18 @@ function os_info {
     echo "$INFO"
 }
 
+# Add release/installation notes where needed, omit if not.
+
+function distro_release_notes {
+    local RelNotes=
+    case "$1" in
+        #name)            RelNotes="mm/yyyy notes on installation or problems to watch out for";;
+        artixlinux)       RelNotes="06/2025 The new online install option is still work-in-progress, users are advised to select 'Offline' when prompted.";;
+        macos)            RelNotes="06/2025 Sequoia is currently having issues with slow running. See qqX issue #9";;
+    esac
+    echo "$RelNotes"
+}
+
 ##########################################
 
 ## 3: RELEASES, EDITIONS and DOWNLOAD URL

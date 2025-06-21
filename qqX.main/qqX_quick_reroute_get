@@ -578,12 +578,10 @@ function_quick_get_wrap ()  {
           QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay^^}"
           [[ "$QGW_OS_Arr_NameDisplay" == 'TRUENAS'* ]] && QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay/TRUE/True}"
 
-          printColor  "\n  %s  "  "$QGW_OS_Arr_NameDisplay"
-          printColor "INFO:"
+          QGW_OS_HomePage= ; QGW_OS_InfoText= ; QGW_OS_Info= ; QGW_OS_RelNotes= ; QGW_OS_Login=
 
-          QGW_OS_HomePage=
-          QGW_OS_InfoText=
-          QGW_OS_Info=
+          printColor "\n  INFO:"
+          printf  "  %s"  "$QGW_OS_Arr_NameDisplay"
 
           # @ june 2025
           if [[ $QG_Modpath ]]; then
@@ -596,11 +594,28 @@ function_quick_get_wrap ()  {
           QGW_OS_Info="${QGW_OS_Info//'"'/}"
           QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
           mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+          QGW_OS_Login="${QGW_OS_Info_ARR[1]}"
           QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
           QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
 
-          if [[ $QGW_OS_InfoText ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
+          if [[ $QGW_OS_InfoText ]]; then
+            if [[ ! $QGW_OS_Login ]] || [[ $QGW_OS_Login == "-" ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
+            elif [[ $QGW_OS_Login ]]; then
+              printf "\n\n  Distro Login:  %s"  "$QGW_OS_Login" ; printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
+            fi
           else printf "\n\n  Not available, see webpage for more details \n\n"
+          fi
+
+          if [[ $QG_Modpath ]]; then
+            QGW_OS_RelNotes="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_Modpath" | grep -m 1 'RelNotes=' | cut -d '=' -f 2)"
+          fi
+          if [[ $QGW_OS_RelNotes ]] ; then
+            QGW_OS_RelNotes="${QGW_OS_RelNotes//';;'/}"
+            QGW_OS_RelNotes="${QGW_OS_RelNotes//'"'/}"
+            QGW_OS_RelNotes="$(tr '|' '\n' <<< "$QGW_OS_RelNotes")"
+            printColor "\n\n  Release Notes:"
+            printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_RelNotes"
+            printf "\n"
           fi
 
           if [[ "$QGW_OS_Arr_NameSelected" == "macos"* ]]; then
