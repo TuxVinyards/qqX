@@ -215,6 +215,18 @@ function get_bluestar {
     echo "$BlueStarIso $BlueStarHash"
 }
 
+## FIX Easy OS release list
+function releases_easyos() {
+    local ALL_RELEASES="" ; local YEAR=""
+    # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
+    TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
+    for YEAR in ${TWO_YEARS} ; do
+        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / )"
+    done
+    ALL_RELEASES="$(floatversion -qs -r "$ALL_RELEASES")"
+    echo "${ALL_RELEASES}"
+}
+
 ## FIX Cosmic Atomic
 function get_fedora() {
     local HASH="" ; local ISO="" ; local JSON="" ; local URL="" ; local VARIANT=""
