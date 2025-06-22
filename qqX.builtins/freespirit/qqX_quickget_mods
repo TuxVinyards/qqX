@@ -129,6 +129,9 @@ function distro_release_notes {
 # Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
 # Some distros single release with no editions eg. bluestar
 
+# Quickget's legacy behaviour is to return a 'STOCK LIST' of editions when no release is supplied ...
+# Probably has room for improvement but a list should be given. See 'editions_anduinos' for example script.
+
 # Note that Quickget's 'web_pipe()' is an alias for Curl and will generate STDOUT by itself, without needing 'echo'.
 # Also that further echoes can be avoided via Bash's <<< 'herestring' feature.
 
@@ -151,8 +154,12 @@ function releases_anduinos {
 }
 function editions_anduinos {
     while true ; do
-        if ! { grep -qs "$OS" "/tmp/qGet.rel.data.txt" && grep -s ReleaseName "/tmp/qGet.rel.data.txt" | grep -qs "$RELEASE"; } ; then
-            printf "qGetDistro=\"%s\"" "$OS"> "/tmp/qGet.rel.data.txt"
+        if [[ ! $RELEASE ]]; then
+            echo "ar_SA de_DE en_GB en_US es_ES fr_FR it_IT ja_JP ko_KR nl_NL pl_PL pt_BR pt_PT ru_RU sv_SE th_TH tr_TR vi_VN zh_CN zh_HK zh_TW"
+            return 0  # Stock List @ June 2025
+        fi
+        if ! { grep -qs "$OS" "/tmp/qGet.Mods.REL.data.txt" && grep -s 'ReleaseName=' "/tmp/qGet.Mods.REL.data.txt" | grep -qs "$RELEASE"; } ; then
+            printf "qGetDistro=\"%s\"\nReleaseName=\"%s\"" "$OS" "$RELEASE" > "/tmp/qGet.Mods.REL.data.txt"
             if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
             else ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
             fi
@@ -162,33 +169,32 @@ function editions_anduinos {
             RndNum="$( (tr -cd '2-4' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
             ReleaseEditions="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
             | grep -v sha256 | grep -v torrent | tr '>' '\n' | grep iso | grep -v '<a' | cut -d'<' -f1 | cut -d'-' -f3 | cut -d'.' -f1 | paste -s -d' ')"
-            printf "\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"\nReleasePoint=\"%s\"\nReleaseEditions=\"%s\"" "$RELEASE" "$ReleaseNumber" "$ReleasePoint" "$ReleaseEditions" >> "/tmp/qGet.rel.data.txt"
+            printf "\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"\nReleasePoint=\"%s\"\nReleaseEditions=\"%s\"" "$RELEASE" "$ReleaseNumber" "$ReleasePoint" "$ReleaseEditions" > "/tmp/qGet.Mods.REL.data.txt"
             RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
         fi
         ReleaseName= ; ReleaseNumber= ; ReleasePoint= ; ReleaseEditions=
-        source "/tmp/qGet.rel.data.txt"
+        source "/tmp/qGet.Mods.REL.data.txt"
         if [[ $ReleaseName && $ReleaseNumber && $ReleasePoint && $ReleaseEditions ]] ; then break
-        else printf "" > "/tmp/qGet.rel.data.txt"
+        else printf "" > "/tmp/qGet.Mods.REL.data.txt"
         fi
     done
-    # @june 2025 "ar_SA de_DE en_GB en_US es_ES fr_FR it_IT ja_JP ko_KR nl_NL pl_PL pt_BR pt_PT ru_RU sv_SE th_TH tr_TR vi_VN zh_CN zh_HK zh_TW"
-    printf "%s" "$RELEASE" > "/tmp/qGet.ED.data.txt"
-    printf "" > "/tmp/qGet.GET.data.txt"
-    [[ ! $ReleaseEditions ]] && source "/tmp/qGet.rel.data.txt"
+    printf "%s" "$RELEASE" > "/tmp/qGet.Mods.ED.data.txt"
+    printf "" > "/tmp/qGet.Mods.GET.data.txt"
+    [[ ! $ReleaseEditions ]] && source "/tmp/qGet.Mods.REL.data.txt"
     echo "$ReleaseEditions"
 }
 function get_anduinos {
-    source "/tmp/qGet.rel.data.txt"
+    source "/tmp/qGet.Mods.REL.data.txt"
     # This slowdown needed for looping through test-all()
-    if [[ $(cat "/tmp/qGet.GET.data.txt" 2>/dev/null) ]]; then
+    if [[ $(cat "/tmp/qGet.Mods.GET.data.txt" 2>/dev/null) ]]; then
         RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "1$RndNum"
     fi
     AnduinIso="https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.iso"
     AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
     | cut -d':' -f2 | tr -cd '[:graph:]')"
     echo "$AnduinIso $AnduinHash"
-    #printf "%s %s" "$RELEASE" "$EDITION" > "/tmp/qGet.GET.data.txt"
-    printf "%s" "$EDITION" > "/tmp/qGet.GET.data.txt"
+    #printf "%s %s" "$RELEASE" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
+    printf "%s" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
 }
 
 ## FIX artix community editions and hash grep
@@ -274,6 +280,49 @@ function get_fedora() {
 ## 7: DOWNLOAD XL
 # For special and oversized 'get' functions or "get_${OS} ()" overwrites eg Windows or Mac
 # Normally place 'get' functions next to releases and editions
+
+##########################################
+
+## OTHER FUNCTIONS
+#  This section is more for qqX runtimes than Quickget itself. But you never know ...?
+
+## TWEAK make sure we wait for the check functions to return, as they might have to check the web.
+function error_specify_release() {
+    show_os_info "${OS}"
+    case ${OS} in
+        *ubuntu-server*)
+            echo -en " - Releases:\t"
+            releases_ubuntu-server &
+            wait "$!"
+            ;;
+        *ubuntu*)
+            echo -en " - Releases:\t"
+            releases_ubuntu &
+            wait "$!"
+            ;;
+        *windows*)
+            echo -en " - Releases:\t"
+            "releases_${OS}" &
+            wait "$!"
+            echo -en " - Languages:\t"
+            "languages_${OS}" &
+            wait "$!"
+            echo "${I18NS[@]}"
+            ;;
+        *)
+            echo -en " - Releases:\t"
+            "releases_${OS}" | fmt -w 80 &
+            wait "$!"
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                echo -en " - Editions:\t"
+                "editions_${OS}" | fmt -w 80 &
+                wait "$!"
+            fi
+            ;;
+    esac
+    echo -e "\nERROR! You must specify a release."
+    exit 1
+}
 
 ##########################################
 
