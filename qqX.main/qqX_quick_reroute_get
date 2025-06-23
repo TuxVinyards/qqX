@@ -28,18 +28,19 @@ function quickget {
 
 }
 
-# DISTRO LISTINGS
+## DISTRO LISTINGS  (non-function sections are run only during initialization)
 
-VM_ListingArray=("qqlist-all" "qqlist-desktop" "qqlist-server-cl")
-
+# An eventual qqlist- prefix is needed to make sure any calls to Quickget don't confuse list names with distro names
+VM_ListingArray=("all" "desktop" "server-cl")
 if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
-else VM_ListingFilter="qqlist-desktop"
+else VM_ListingFilter="desktop"
 fi
 QGW_OS_Array=()
 
 load_QGW_OS_Array () {
-  [[ ! $VM_ListingFilter ]] && VM_ListingFilter="qqlist-desktop"
-  mapfile -t QGW_OS_Array <<< "$(quickget "$VM_ListingFilter" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
+  [[ $VM_ListingFilter ]] && VM_ListingCall="qqlist-""$VM_ListingFilter"
+  [[ ! $VM_ListingFilter ]] && VM_ListingCall="qqlist-desktop"
+  mapfile -t QGW_OS_Array <<< "$(quickget "$VM_ListingCall" | grep -v ERROR | tr ' ' '\n' | grep -E '[[:graph:]]')"
   [[ $ShowQGetLists ]] && { echo; declare -p QGW_OS_Array; echo; echo "VM_ListingFilter: $VM_ListingFilter"; echo; }
   if [[ ! ${QGW_OS_Array[0]} ]]; then
     printColor "\n\n  INTERNAL ERROR: load_QGW_OS_Array"
@@ -325,7 +326,7 @@ function show_QWG_header {
     printf "(internet working) [R] to re-check"
     if [[ $QG_Modpath ]]; then
       printf "   ("
-      printColor "%s" "${VM_ListingFilter/'qqlist-'/}"
+      printColor "%s" "$VM_ListingFilter"
       printf ") [fl] adjust filter "
     fi
     printf "\n\n"

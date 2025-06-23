@@ -118,7 +118,7 @@ VM_SelectorStyle="A"
 
 # FILTERS:
 # From version 1.13, defaults to showing desktop focussed distros only, with in-menu filter selection for other types
-# ="qqlist-all" ="qqlist-desktop" ="qqlist-server-cl" etc to force otherwise, see filter menu for full list.
+# ="all" ="desktop" ="server-cl" etc to force otherwise, see filter menu for full list.
   VM_ListingFilterDefault=
 
 #  -------------------------------------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ osAddList=" anduinos bluestar "
 #osAddList+=" another "
 
 # osRemoveList for distros that are problematic or no longer maintained, but still listed by Quickget
-osRemoveList=" vxlinux arcolinux "
+osRemoveList=" arcolinux vxlinux "
 #osRemoveList+=" another and-one-more "
 
 osSupported="$(os_support)"
@@ -65,6 +65,8 @@ osServersList+=" truenas-core truenas-scale ubuntu-server windows-server "
 osServersList="${osServersList//'  '/' '}"
 osServersList="${osServersList//'  '/' '}"
 
+# A qqlist- prefix is used to make sure any calls to Quickget don't confuse list names with distro names
+# See function 'load_QGW_OS_Array' in the 'reroute_get' script
 if [[ $1 == "qqlist-desktop"  ]] ; then mapfile -t -O "${#osRemoveArr[@]}" -d ' ' osRemoveArr <<< "$osServersList"
 elif [[ $1 == "qqlist-server-cl" ]] ; then osSupported="$osServersList"
 else osSupported="$osSupported_All"
@@ -284,9 +286,12 @@ function get_fedora() {
 ##########################################
 
 ## OTHER FUNCTIONS
-#  This section is more for qqX runtimes than Quickget itself. But you never know ...?
+# The 'Mods' script gets read towards the end of the standard Quickget script via
+# some lines added to the FreeSpirit branch. Any functions of the same name as in the original,
+# here or above, will overwrite any of that name that have been previously declared.
+# This particular section is more for qqX runtimes than Quickget itself. But you never know ...?
 
-## TWEAK make sure we wait for the check functions to return, as they might have to check the web.
+## TWEAK to make sure we wait for the check functions to return, as they might have to check the web.
 function error_specify_release() {
     show_os_info "${OS}"
     case ${OS} in
