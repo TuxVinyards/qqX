@@ -24,12 +24,12 @@
 #  A more MODERN BASH style of coding is used for qqX than that used for QuickEmu.
 
 #  However, NOT TO WORRY if you are only familiar the older more POSIX styles, there are still plenty of options
-#  for contributions to the quickemu built-ins, particularly with this file ...
-
+#  for contributions to the quickemu built-ins, particularly with this file:
 #  Use 4 space tabs with this file, as with QuickGet, so that code can be directly pasted into here and tweaked.
-#  QuickGet and qqX house styles may be mixed. See notes at end for qqX coding style.
+#  QuickGet and qqX house styles may be mixed, WHICHEVER IS EASIEST. See notes at end for qqX coding style.
+
 #  This script is sourced when running a Quickget builtin. It remains variable isolated from running instances of qqX.
-#  Take care to maintain QuickGet variable name continuity.
+#  Take care to maintain QuickGet variable name continuity where needed.
 
 #  To test code, run './quickget --check distroname' etc from a terminal opened in the relevant builtin folder.
 
@@ -105,9 +105,10 @@ function os_info {
 function distro_release_notes {
     local RelNotes=
     case "$1" in
-        #name)            RelNotes="mm/yyyy notes on installation or problems to watch out for";;
+        #name)            RelNotes="mm/yyyy (as needed)  Notes on installation or problems to watch out for";;
         artixlinux)       RelNotes="06/2025 The new online install option is still work-in-progress, users are advised to select 'Offline' when prompted.";;
         macos)            RelNotes="06/2025 Sequoia is currently having issues with slow running. See qqX issue #9";;
+        void)             RelNotes="To install the packages for the desktop environment, DON'T choose 'install from network' choose the 'local install' option.";;
     esac
     echo "$RelNotes"
 }
@@ -155,24 +156,22 @@ function releases_anduinos {
     echo "LTS Standard"
 }
 function editions_anduinos {
+    if [[ ! $RELEASE ]]; then
+        echo "ar_SA de_DE en_GB en_US es_ES fr_FR it_IT ja_JP ko_KR nl_NL pl_PL pt_BR pt_PT ru_RU sv_SE th_TH tr_TR vi_VN zh_CN zh_HK zh_TW"
+        return 0  # Stock List @ June 2025
+    fi
+    # Otherwise check for editions per release
     while true ; do
-        if [[ ! $RELEASE ]]; then
-            echo "ar_SA de_DE en_GB en_US es_ES fr_FR it_IT ja_JP ko_KR nl_NL pl_PL pt_BR pt_PT ru_RU sv_SE th_TH tr_TR vi_VN zh_CN zh_HK zh_TW"
-            return 0  # Stock List @ June 2025
-        fi
         if ! { grep -qs "$OS" "/tmp/qGet.Mods.REL.data.txt" && grep -s 'ReleaseName=' "/tmp/qGet.Mods.REL.data.txt" | grep -qs "$RELEASE"; } ; then
             printf "qGetDistro=\"%s\"\nReleaseName=\"%s\"" "$OS" "$RELEASE" > "/tmp/qGet.Mods.REL.data.txt"
-            if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
-            else ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
+            if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(grep_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
+            else ReleaseNumber="$(grep_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
             fi
-            # Checks work with Anduin if we slow down the 'bot' behaviour, make it seem more human:
-            RndNum="$( (tr -cd '2-4' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
-            ReleasePoint="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/" | grep href | fv -M -Q )"
-            RndNum="$( (tr -cd '2-4' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
-            ReleaseEditions="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
+            ReleasePoint="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/" | grep href | fv -M -Q )"
+            ReleaseEditions="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
             | grep -v sha256 | grep -v torrent | tr '>' '\n' | grep iso | grep -v '<a' | cut -d'<' -f1 | cut -d'-' -f3 | cut -d'.' -f1 | paste -s -d' ')"
             printf "\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"\nReleasePoint=\"%s\"\nReleaseEditions=\"%s\"" "$RELEASE" "$ReleaseNumber" "$ReleasePoint" "$ReleaseEditions" > "/tmp/qGet.Mods.REL.data.txt"
-            RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "$RndNum"
+            sleep 1
         fi
         ReleaseName= ; ReleaseNumber= ; ReleasePoint= ; ReleaseEditions=
         source "/tmp/qGet.Mods.REL.data.txt"
@@ -187,15 +186,12 @@ function editions_anduinos {
 }
 function get_anduinos {
     source "/tmp/qGet.Mods.REL.data.txt"
-    # This slowdown needed for looping through test-all()
-    if [[ $(cat "/tmp/qGet.Mods.GET.data.txt" 2>/dev/null) ]]; then
-        RndNum="$( (tr -cd '6-9' | head -c 1) < /dev/urandom )" ; sleep "1$RndNum"
-    fi
+    # for looping through test-all
+    sleep 0.5
     AnduinIso="https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.iso"
-    AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
+    AnduinHash="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
     | cut -d':' -f2 | tr -cd '[:graph:]')"
     echo "$AnduinIso $AnduinHash"
-    #printf "%s %s" "$RELEASE" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
     printf "%s" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
 }
 
@@ -207,7 +203,7 @@ function get_artixlinux() {
     elif [[ $EDITION == "community-qt" ]]; then ISO="artix-community-qt-openrc-${RELEASE}-x86_64.iso"
     else ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
     fi
-    HASH=$(web_pipe "${URL}/sha256sums" | grep -s "${ISO}" | cut -d' ' -f1)
+    HASH=$(grep_pipe "${URL}/sha256sums" | grep -s "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -216,10 +212,10 @@ function releases_bluestar {
     echo "latest"
 }
 function get_bluestar {
-    BlueStarRelease="$(web_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
+    BlueStarRelease="$(grep_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
     BlueStarIso="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease}"
     BlueStarHash="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease/iso/md5}"
-    BlueStarHash="$(web_pipe "$BlueStarHash" | cut -d' ' -f1)"
+    BlueStarHash="$(grep_pipe "$BlueStarHash" | cut -d' ' -f1)"
     echo "$BlueStarIso $BlueStarHash"
 }
 
@@ -227,9 +223,9 @@ function get_bluestar {
 function releases_easyos() {
     local ALL_RELEASES="" ; local YEAR=""
     # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
-    TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
+    TWO_YEARS=$(grep_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
     for YEAR in ${TWO_YEARS} ; do
-        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / )"
+        ALL_RELEASES="${ALL_RELEASES} $(grep_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / )"
     done
     ALL_RELEASES="$(floatversion -qs -r "$ALL_RELEASES")"
     echo "${ALL_RELEASES}"
@@ -247,7 +243,7 @@ function get_fedora() {
     # for the URL search in the JSON if RELEASE contains an underscore, replace it with a space
     [[ "${RELEASE}" == *"_"* ]] && RELEASE="${RELEASE/_/ }"
     # shellcheck disable=SC2086
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
+    JSON=$(web_pipe_json "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -289,22 +285,22 @@ function get_fedora() {
 # The 'Mods' script gets read towards the end of the standard Quickget script via
 # some lines added to the FreeSpirit branch. Any functions of the same name as in the original,
 # here or above, will overwrite any of that name that have been previously declared.
+
 # This particular section is more for qqX runtimes than Quickget itself. But you never know ...?
+# A lot of these have already modded in the FreeSpirit branch but move here as they're NOW MUCH EASIER TO ADJUST
 
 ## TWEAK to make sure we wait for the check functions to return, as they might have to check the web.
-function error_specify_release() {
+function error_specify_release {
     show_os_info "${OS}"
     case ${OS} in
         *ubuntu-server*)
             echo -en " - Releases:\t"
             releases_ubuntu-server &
-            wait "$!"
-            ;;
+            wait "$!" ;;
         *ubuntu*)
             echo -en " - Releases:\t"
             releases_ubuntu &
-            wait "$!"
-            ;;
+            wait "$!" ;;
         *windows*)
             echo -en " - Releases:\t"
             "releases_${OS}" &
@@ -312,8 +308,8 @@ function error_specify_release() {
             echo -en " - Languages:\t"
             "languages_${OS}" &
             wait "$!"
-            echo "${I18NS[@]}"
-            ;;
+            # shellcheck disable=SC2153
+            echo "${I18NS[@]}" ;;
         *)
             echo -en " - Releases:\t"
             "releases_${OS}" | fmt -w 80 &
@@ -322,11 +318,128 @@ function error_specify_release() {
                 echo -en " - Editions:\t"
                 "editions_${OS}" | fmt -w 80 &
                 wait "$!"
-            fi
-            ;;
+            fi ;;
     esac
-    echo -e "\nERROR! You must specify a release."
-    exit 1
+    echo -e "\nERROR! You must specify a release." ; exit 1
+}
+
+## TWEAK
+# A lot of these have already modded in the FreeSpirit branch but move here as they're NOW MUCH EASIER TO ADJUST
+
+# Download a file from the web and pipe it to stdout
+function web_pipe {
+    curl --disable -sLf --retry 8 --connect-timeout 2 --max-time 30 "${@}"
+}
+# Download a JSON file from the web and pipe it to stdout
+function web_pipe_json {
+    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 --header "Accept: application/json" "${@}"
+}
+
+## ADD
+function check_pipe {
+    curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted  "${@}" > "/tmp/qGet_check_pipe.txt"
+}
+# Check the file headers. To be used for returns of 0 or 1 with pipe to log file,
+# where HTTP/ 200 = success (with size data etc as readable) and 404 = not found = fail
+# --location-trusted as we are only getting the header, otherwise 302 redirects will lose https and cause probs that way
+# --no-keepalive/--keepalive-time as we don't need much, and so we then move on cleanly and can drop any cookies, if possible
+
+# Download a SMALL file page etc from the web and pipe it to stdout
+function grep_pipe {
+    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 "${@}"
+}
+
+## TWEAK
+function web_check {
+    local HEADERS=() ; local URL="${1}"
+    # Normally just a URL. Mac OS has URL as $1 then followed by repeated headers requests.
+    while (( "$#" )); do
+        if [ "${1}" == "--header" ]; then HEADERS+=("${1}" "${2}") ; shift 2
+        else shift
+        fi
+    done
+    # check is standard *.* filename or Ubuntu SUMS file, not an html web page or such ...
+    if [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]]; then
+        printf "\n%s" "$URL" > "/tmp/qmod-dl-url" ; return 1
+    fi
+    check_pipe "${HEADERS[@]}" "${URL}"
+}
+
+## ADD HASH CHECK
+# Checks if 'get_$OS' is outputting a checksum and, if so, that it is correctly formatted
+function test_result {
+    local OS="${1}" ; local RELEASE="${2}" ; local EDITION="${3:-}"
+    local URL="${4:-}" ; local RESULT="${5:-}" ; local HASH="${6}" ; local HashTest= ; local HashLength="0"
+    if [ -n "${EDITION}" ]; then OS="${OS}-${RELEASE}-${EDITION}"
+    else OS="${OS}-${RELEASE}"
+    fi
+    HASH="$(tr -cd '[:graph:]' <<< "$HASH")" ; [[ $HASH ]] && HashLength="${#HASH}"
+    case $HashLength in
+        32|40|64|128) HashTest="PASS" ;;
+        0) HashTest="n/a" ;;
+        *) HashTest="FAIL" ;;
+   esac
+   OS="${OS:0:30}"
+    if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
+    else printf "%-30s %s\n" "${OS}" "${URL}"
+    fi
+}
+
+function test_all {
+    OS="${1}"
+    os_supported
+    local CHECK="" ; local FUNC="${OS}" ; local GetLine="" ; local URL="" ; local HASH=""
+    [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]] &&  FUNC="ubuntu"
+
+    for RELEASE in $("releases_${FUNC}"); do
+        if [[ "${OS}" == "windows"* ]]; then
+            "languages_${OS}"
+            for I18N in "${I18NS[@]}"; do
+                validate_release releases_"${OS}"
+                if [ "${OPERATION}" == "show" ]; then
+                    test_result "${OS}" "${RELEASE}" "${I18N}" ""
+                elif [ "${OPERATION}" == "test" ]; then
+                    test_result "${OS}" "${RELEASE}" "${I18N}" "${URL}" "SKIP"
+                fi
+            done
+        elif [[ "${OS}" == "macos" ]]; then
+            validate_release releases_macos
+            (get_macos)
+        elif [ "${OS}" == "ubuntu-server" ]; then
+            validate_release releases_ubuntu-server
+            (get_ubuntu-server)
+        elif [[ "${OS}" == *ubuntu* ]]; then
+            validate_release releases_ubuntu
+            (get_ubuntu)
+        elif [[ $(type -t "editions_${OS}") == function ]]; then
+            for EDITION in $(editions_"${OS}"); do
+                validate_release releases_"${OS}"
+                GetLine=$(get_"${OS}" "$RELEASE")
+                printf "\n%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
+                URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+                HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
+                if [ "${OPERATION}" == "show" ]; then
+                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                elif [ "${OPERATION}" == "test" ]; then
+                    CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}" "$HASH"
+                fi
+            done
+        else
+            validate_release releases_"${OS}"
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+            if [ "${OPERATION}" == "show" ]; then
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+            elif [ "${OPERATION}" == "test" ]; then
+                GetLine=$(get_"${OS}" "$RELEASE")
+                printf "\n%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
+                URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+                HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
+                CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}" "$HASH"
+            fi
+        fi
+    done
 }
 
 ##########################################

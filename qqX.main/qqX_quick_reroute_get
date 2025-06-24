@@ -147,57 +147,55 @@ function_test_iso_url () {
 
   if ! grep -q -e '--url' "$QG_SourcePath" ; then
 
+    # quickget --url is from  4.9.3  onwards
     printColor "\n\n  Link cannot be checked ... "; QGW_Download_BadLink=
 
   else
 
-    DL_Url=
-    DL_FileName=
-    DL_PotentialSize=
-    DL_PotentialOkay=
-    DL_PotentialHtml=
+    DL_Url= ; DL_FileName= ; DL_PotentialSize= ; DL_PotentialOkay= ; DL_PotentialHtml= ; DL_SlowMsg=
     printf "\n\n  Checking download link .... \n\n"
-    printf "" > "/tmp/qmod-dl-url"
-    printf "" > "/tmp/qmod-dl-size"
+    printf "" > "/tmp/qmod-dl-url" ; printf "" > "/tmp/qmod-dl-size"
 
-    if grep -q -e '--url' "$QG_SourcePath"; then
-      SECONDS=0
-      # quickget --show-iso-url  is version 4.9.1  &  quickget --url from  4.9.3  onwards
-      # running checks in the background (&) means that we can stop the process if it hangs
-      # --url uses curl BUT --show-iso-url uses wget and other varied coding >> too complex, @ jan 2025 drop support
-      quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"  &
-      sleep 1
-
-      DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
-      [[ $ShowQGetLists ]] && { echo "Check URL:"; (ps -ef | grep bash | grep quickget); echo; }
-      [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
-      while true ; do
-        [[ $ShowQGetLists ]] && echo "Secs: $SECONDS"
-        if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then
-          DL_Url="$(awk '{print $2 $3}' < "/tmp/qmod-dl-url")"
-          break
-        elif [[ "$SECONDS" -ge 20 ]]; then
-          [[ $DataPID ]] && kill "$DataPID" &>/dev/null
-          break
-        fi
-        sleep 0.5
-      done
-      [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
+    # running checks in the background (&) means that we can stop the process if it hangs
+    SECONDS=0
+    if [[ $ModPath ]]; then quickget " --check $QGW_DownloadSelection" &
+    else quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"  &
     fi
+    sleep 1
+    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+    [[ $ShowQGetLists ]] && { echo "Check URL:"; (ps -ef | grep bash | grep quickget); echo; }
+    [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+    while true ; do
+      [[ $ShowQGetLists ]] && echo "Secs: $SECONDS"
+      if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then
+        DL_Url="$(awk '{print $2 $3}'  < "/tmp/qmod-dl-url")"
+        break
+      elif [[ "$SECONDS" -ge 90 ]]; then
+        [[ $DataPID ]] && kill "$DataPID" &>/dev/null
+        break
+      elif [[ "$SECONDS" -ge 30 ]] && [[ ! $DL_SlowMsg ]]; then
+        printf "  Slow Server or anti-bot slow-downs ....\n\n" ; DL_SlowMsg=1
+      fi
+      sleep 0.5
+    done
+    [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
 
     if [[ ! $DL_Url ]]; then
-      printColor "\n\n  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
+      printColor "  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
       iso_get_message
     else
       echo > "/tmp/qmod-dl-size"
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      curl --disable -sLf --retry 3 --retry-max-time 3 --retry-delay 1 --max-time 12 --head --output "/tmp/qmod-dl-size" "$DL_Url" &
-      wait "$!"
+      if [[ $ModPath ]]; then cp "/tmp/qGet_check_pipe.txt" "/tmp/qmod-dl-size"
+      else
+        curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --output "/tmp/qmod-dl-size" "$DL_Url" &
+        wait "$!"
+      fi
       if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
         sleep 2 ; printf "  and a second time ........ \n\n"
-        curl --disable -sLf --retry 2 --retry-max-time 3 --retry-delay 2 --max-time 10 --head --output "/tmp/qmod-dl-size" "$DL_Url" &
+        curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --output "/tmp/qmod-dl-size" "$DL_Url" &
         wait "$!"
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
@@ -385,11 +383,10 @@ function clear_main_gt_start_vars {
 
 test_internet_is_up () {
 
-  #printColor  "               Checking connections ... \n\n"
   printf  "\n  Checking connections ...  \n\n" ; sleep 1
-  if   curl --disable -L -I -s -o /dev/null --max-time 2 --fail  "1.1.1.1"  2> /dev/null ; then InternetUp=1
-  elif curl --disable -L -I -s -o /dev/null --max-time 3 --fail  "cloudflare.com"  2> /dev/null ; then InternetUp=1
-  elif curl --disable -L -I -s -o /dev/null --max-time 4 --fail  "google.com"  2> /dev/null ; then InternetUp=1
+  if   curl --disable -sLf -I -o /dev/null --retry 4 --max-time 3 --no-keepalive  "1.1.1.1"  2> /dev/null ; then InternetUp=1
+  elif curl --disable -sLf -I -o /dev/null --retry 4 --max-time 3 --no-keepalive  "cloudflare.com"  2> /dev/null ; then InternetUp=1
+  elif curl --disable -sLf -I -o /dev/null --retry 4 --max-time 4 --no-keepalive  "google.com"  2> /dev/null ; then InternetUp=1
   elif wget -q -T2  -t2 --spider 1.1.1.1  2> /dev/null ; then InternetUp=1
   elif wget -q -T2 -t2 --spider google.com 2> /dev/null ; then InternetUp=1
   # Note that 'ping' doesn't work inside a Qemu VM, so prefer wget
@@ -836,6 +833,7 @@ function_quick_get_wrap ()  {
       fi
 
     done
+    QGW_List_NumSelected=
   }
 
   function choose_QGW_edition {
@@ -1098,7 +1096,7 @@ function_quick_get_wrap ()  {
         printf "  Selected:  %s"  "$QWG_NewVM_Name"
         [[ ! $DL_PotentialOkay ]] &&  printf "   MAY NOT BE WORKING CORRECTLY"
         printf "\n\n"
-        printColor "  Installation target folder:  %s"   "$QWG_Conf_Dir"
+        printColor "  %s"   "$QWG_Conf_Dir"
       fi
 
       # If NOT sync updating, list other copies of similar VM's in the target folder
