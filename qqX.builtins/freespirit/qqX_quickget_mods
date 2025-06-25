@@ -249,6 +249,19 @@ function get_fedora() {
     echo "${URL} ${HASH}"
 }
 
+## FIX  SLINT (only 15.0, and hopefully higher, has downloadable iso's)
+function releases_slint() {
+    web_pipe "https://slackware.uk/slint/x86_64/" | grep -e '<a href=' | fv -M -Q
+}
+function get_slint() {
+    local HASH="" ; local MIN_VER= ; local URL=
+    MIN_VER="$(web_pipe "https://slackware.uk/slint/x86_64/slint-$RELEASE/iso" | grep -e '<a href=' | grep -s -e 'iso\.sha' | fv -f -M -Q | tr -cd '[:graph:]')"
+    local ISO="slint64-${MIN_VER}.iso"
+    local URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO}" "${HASH}"
+}
+
 ## FIX invalid VOID folders (use 'current' only as some folders have variants)
 function releases_void() {
     web_pipe "https://repo-default.voidlinux.org/live/current" | grep -e '<a href=' | grep x86 | grep 'base\.iso' | grep -v musl | cut -d'-' -f4 | tr -cd '[:graph:]'
