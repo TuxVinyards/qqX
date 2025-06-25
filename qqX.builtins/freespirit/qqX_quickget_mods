@@ -249,6 +249,22 @@ function get_fedora() {
     echo "${URL} ${HASH}"
 }
 
+## FIX invalid VOID folders (use 'current' only as some folders have variants)
+function releases_void() {
+    web_pipe "https://repo-default.voidlinux.org/live/current" | grep -e '<a href=' | grep x86 | grep 'base\.iso' | grep -v musl | cut -d'-' -f4 | tr -cd '[:graph:]'
+ }
+function get_void() {
+    local HASH="" ; local ISO="" ; local URL="https://repo-default.voidlinux.org/live/$RELEASE"
+    case ${EDITION} in
+        glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
+        musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+        xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+    esac
+    HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 ##########################################
 
 ## 4: GUEST TYPE
