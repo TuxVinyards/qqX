@@ -164,11 +164,11 @@ function editions_anduinos {
     while true ; do
         if ! { grep -qs "$OS" "/tmp/qGet.Mods.REL.data.txt" && grep -s 'ReleaseName=' "/tmp/qGet.Mods.REL.data.txt" | grep -qs "$RELEASE"; } ; then
             printf "qGetDistro=\"%s\"\nReleaseName=\"%s\"" "$OS" "$RELEASE" > "/tmp/qGet.Mods.REL.data.txt"
-            if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(grep_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
-            else ReleaseNumber="$(grep_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
+            if [[ $RELEASE == "LTS" ]]; then ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep LTS | fv -M -Q)"
+            else ReleaseNumber="$(web_pipe "https://docs.anduinos.com/VERSIONS.html" |tr '>' '\n' | grep '</td' | grep -v LTS | fv -M -Q)"
             fi
-            ReleasePoint="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/" | grep href | fv -M -Q )"
-            ReleaseEditions="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
+            ReleasePoint="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/" | grep href | fv -M -Q )"
+            ReleaseEditions="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}" \
             | grep -v sha256 | grep -v torrent | tr '>' '\n' | grep iso | grep -v '<a' | cut -d'<' -f1 | cut -d'-' -f3 | cut -d'.' -f1 | paste -s -d' ')"
             printf "\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"\nReleasePoint=\"%s\"\nReleaseEditions=\"%s\"" "$RELEASE" "$ReleaseNumber" "$ReleasePoint" "$ReleaseEditions" > "/tmp/qGet.Mods.REL.data.txt"
             sleep 1
@@ -189,7 +189,7 @@ function get_anduinos {
     # for looping through test-all
     sleep 0.5
     AnduinIso="https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.iso"
-    AnduinHash="$(grep_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
+    AnduinHash="$(web_pipe "https://download.anduinos.com/${ReleaseNumber}/${ReleasePoint}/AnduinOS-${ReleasePoint}-${EDITION}.sha256" \
     | cut -d':' -f2 | tr -cd '[:graph:]')"
     echo "$AnduinIso $AnduinHash"
     printf "%s" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
@@ -203,7 +203,7 @@ function get_artixlinux() {
     elif [[ $EDITION == "community-qt" ]]; then ISO="artix-community-qt-openrc-${RELEASE}-x86_64.iso"
     else ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
     fi
-    HASH=$(grep_pipe "${URL}/sha256sums" | grep -s "${ISO}" | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/sha256sums" | grep -s "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -212,10 +212,10 @@ function releases_bluestar {
     echo "latest"
 }
 function get_bluestar {
-    BlueStarRelease="$(grep_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
+    BlueStarRelease="$(web_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
     BlueStarIso="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease}"
     BlueStarHash="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease/iso/md5}"
-    BlueStarHash="$(grep_pipe "$BlueStarHash" | cut -d' ' -f1)"
+    BlueStarHash="$(web_pipe "$BlueStarHash" | cut -d' ' -f1)"
     echo "$BlueStarIso $BlueStarHash"
 }
 
@@ -223,9 +223,9 @@ function get_bluestar {
 function releases_easyos() {
     local ALL_RELEASES="" ; local YEAR=""
     # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
-    TWO_YEARS=$(grep_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
+    TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
     for YEAR in ${TWO_YEARS} ; do
-        ALL_RELEASES="${ALL_RELEASES} $(grep_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / )"
+        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/"${YEAR}"/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / )"
     done
     ALL_RELEASES="$(floatversion -qs -r "$ALL_RELEASES")"
     echo "${ALL_RELEASES}"
@@ -326,9 +326,9 @@ function error_specify_release {
 ## TWEAK
 # A lot of these have already modded in the FreeSpirit branch but move here as they're NOW MUCH EASIER TO ADJUST
 
-# Download a file from the web and pipe it to stdout
+# Download a SMALL file page etc from the web and pipe it to stdout  (not to confuse with 'web_get')
 function web_pipe {
-    curl --disable -sLf --retry 8 --connect-timeout 2 --max-time 30 "${@}"
+    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 "${@}"
 }
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json {
@@ -336,17 +336,83 @@ function web_pipe_json {
 }
 
 ## ADD
+# Check the file headers. To be used for returns of 0 or 1 with pipe to log file,
 function check_pipe {
     curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted  "${@}" > "/tmp/qGet_check_pipe.txt"
 }
-# Check the file headers. To be used for returns of 0 or 1 with pipe to log file,
 # where HTTP/ 200 = success (with size data etc as readable) and 404 = not found = fail
-# --location-trusted as we are only getting the header, otherwise 302 redirects will lose https and cause probs that way
+# --location-trusted means extend secure connection to the mirror or to the CDN otherwise 302 redirects will lose https.
 # --no-keepalive/--keepalive-time as we don't need much, and so we then move on cleanly and can drop any cookies, if possible
 
-# Download a SMALL file page etc from the web and pipe it to stdout
-function grep_pipe {
-    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 "${@}"
+## TWEAK
+# Check if a URL needs to be redirected and returns the final URL mirror or CDN
+function web_redirect() {
+    local REDIRECT_URL="" ; local URL="${1}"
+    # Check for URL redirections. Output to nonexistent directory so the download fails fast
+    REDIRECT_URL=$(curl --disable -sLf --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --max-time 20 --write-out '%{url_effective}' \
+    --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    if [ "${REDIRECT_URL}" != "${URL}" ]; then echo "${REDIRECT_URL}"
+    else echo "${URL}"
+    fi
+}
+
+## TWEAK
+# Download a file from the web, to storage
+function web_get() {
+
+    local CHECK="" ; local HEADERS=() ; local URL="${1}" ; local DIR="${2}" ; local FILE=""
+    local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    if [ -n "${3}" ]; then FILE="${3}"
+    else FILE="${URL##*/}"
+    fi
+    # Process any URL redirections after the file name has been extracted
+    URL=$(web_redirect "${URL}")
+    # Process any headers
+    while (( "$#" )); do
+        if [ "${1}" == "--header" ]; then HEADERS+=("${1}" "${2}") ; shift 2
+        else shift
+        fi
+    done
+
+    # Test mode for ISO
+    if [ "${OPERATION}" == "show" ]; then
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+        exit 0
+    elif [ "${OPERATION}" == "test" ]; then
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+        exit 0
+    elif [ "${OPERATION}" == "download" ]; then
+        DIR="$(pwd)"
+    fi
+
+    if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
+        echo "ERROR! Unable to create directory ${DIR}"
+        exit 1
+    fi
+
+    #  Allow qqX or any external process to pick up the FINALIZED NAME
+    # - avoids overwrites eg windows 'unattended'
+    # - external proc should clear this file before starting so the grep test will function
+    if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then
+        printf "\n New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
+    fi
+
+    if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
+        echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
+        echo "- URL: ${URL}"
+    fi
+
+    # Add retries to the standard Quickemu 4.9.x method:
+    # --continue-at -  will continue/resume a previous file transfer but we need to make sure we actually have a connection to start with ...
+    if ! curl --disable -Lf --retry 6 --retry-max-time 3 --retry-delay 1 --progress-bar --continue-at - --output "${DIR}/${FILE}" \
+    --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+        # qqX needs to take control here, use exit instead
+        if pgrep qqX >/dev/null ; then echo ; exit
+        else
+            echo "ERROR! Failed to download ${URL} with curl." ; rm -f "${DIR}/${FILE}"
+        fi
+    fi
 }
 
 ## TWEAK
