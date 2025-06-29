@@ -111,6 +111,7 @@ function distro_release_notes {
         #name)            RelNotes="mm/yyyy (as needed)  Notes on installation or problems to watch out for";;
         artixlinux)       RelNotes="06/2025 The new online install option is still work-in-progress, users are advised to select 'Offline' when prompted.";;
         macos)            RelNotes="06/2025 Sequoia is currently having issues with slow running. See qqX issue #9";;
+        sparkylinux)      RelNotes="07/2025 Older specialist versions: 'gameover' 'multimedia' and 'rescue' are available via manual download";;
         void)             RelNotes="To install the packages for the desktop environment, DON'T choose 'install from network' choose the 'local install' option.";;
     esac
     echo "$RelNotes"
@@ -262,6 +263,43 @@ function get_slint() {
     local ISO="slint64-${MIN_VER}.iso"
     local URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO}" "${HASH}"
+}
+
+## UPDATE
+function releases_sparkylinux() {
+    printf "" > "/tmp/qGet.Mods.REL.data.txt" ; echo "Rolling Stable"
+}
+function editions_sparkylinux() {
+    # May 2025 > listing task tends to exceed quickget's capabilities but July 2025 now allows Mods installer notes
+    # Website subject to change, plus older specialist versions still being listed in addition to the newer ones
+    if [[ ! $RELEASE ]]; then  echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI  MinimalGUI_32bit MinimalCLI_32bit"
+    elif [[ $RELEASE == "Rolling" ]] ; then echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI"
+    elif [[ $RELEASE == "Stable" ]] ; then echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI MinimalGUI_32bit MinimalCLI_32bit"
+    fi
+}
+function get_sparkylinux() {
+    local HASH="" ; local ISO="" ; local URL="" ; SparkyFolder= ; ReleaseNumber=
+    # Stable    https://sourceforge.net/projects/sparkylinux/files/lxqt/sparkylinux-7.7-x86_64-lxqt.iso/download
+    # Stable    https://sourceforge.net/projects/sparkylinux/files/base/sparkylinux-7.7-x86_64-minimalgui.iso/download
+    # Rolling   https://sourceforge.net/projects/sparkylinux/files/lxqt/sparkylinux-2025.03-x86_64-lxqt.iso/download
+    # Rolling   https://sourceforge.net/projects/sparkylinux/files/base/sparkylinux-2025.03-x86_64-minimalgui.iso/download
+    # But not all roll at the same speed:
+    # eg.       https://sourceforge.net/projects/sparkylinux/files/kde/sparkylinux-2024.12-x86_64-kde.iso/download
+    EDITION="${EDITION,,}"
+    case "$EDITION" in
+        minimalcli*)    SparkyFolder="cli" ;;
+        minimalgui*)    SparkyFolder="base" ;;
+                  *)    SparkyFolder="$EDITION" ;;
+    esac
+    URL="https://sourceforge.net/projects/sparkylinux/files/${SparkyFolder}"
+    if [[ $RELEASE == "Rolling" ]]; then ReleaseNumber="$(web_pipe "$URL" | tr '=' '\n' | grep source | cut -d'"' -f2 | grep -v "iso\." | tr -d '-' | fv -c -Q | grep 2'[[:digit:]]')"
+    else ReleaseNumber="$(web_pipe "$URL" | tr '=' '\n' | grep source | cut -d'"' -f2 | grep -v "iso\." | tr -d '-' | fv -c -Q | grep -v 2'[[:digit:]]' | fv -Q -M)"
+    fi
+    if [[ "$EDITION" == *'32bit'* ]]; then EDITION="${EDITION/_32bit/}" ; ISO="sparkylinux-${ReleaseNumber}-i686-${EDITION}.iso"
+    else ISO="sparkylinux-${ReleaseNumber}-x86_64-${EDITION}.iso"
+    fi
+    HASH="$(web_pipe "${URL}/${ISO}.allsums.txt" | head -n 2 | grep 'iso' | cut -d' ' -f1)"
     echo "${URL}/${ISO}" "${HASH}"
 }
 
@@ -489,7 +527,7 @@ function web_check {
 ## ADD HASH CHECK
 # Checks if 'get_$OS' is outputting a checksum and, if so, that it is correctly formatted
 function test_result {
-    local OS="${1}" ; local RELEASE="${2}"
+    local OS="${1}" ; local OsShort="${OS:0:30}" ; local RELEASE="${2}"
     if [[ "$3" == *'://'* ]]; then
         local URL="${3}" ; local RESULT="${4}" ; local HASH="${5}" ; local HashTest= ; local HashLength="0"
     else
@@ -504,18 +542,17 @@ function test_result {
         0) HashTest="n/a" ;;
         *) HashTest="FAIL" ;;
     esac
-    OS="${OS:0:30}"
     if [[ $QuietOps ]]; then {
-        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
-        else printf "%-30s %s\n" "${OS}" "${URL}"
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OsShort}" "${URL}" "$HASH"
+        else printf "%-30s %s\n" "${OsShort}" "${URL}"
         fi } >> "/tmp/qGet_QuietResult.txt"
     elif [[ $CompactOps ]]; then {
-        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s\n" "$HashTest" "${RESULT}" "${OS}"
-        else printf "%-30s %s\n" "${OS}" "${URL}"
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-40s\n" "$HashTest" "${RESULT}" "${OS}"
+        else printf "%-40s %s\n" "${OS}" "${URL}"
         fi } | tee -a "/tmp/qGet_CompactResult.txt"
     else {
-        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
-        else printf "%-30s %s\n" "${OS}" "${URL}"
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OsShort}" "${URL}" "$HASH"
+        else printf "%-30s %s\n" "${OsShort}" "${URL}"
         fi } | tee -a "/tmp/qGet_FullResult.txt"
     fi
 }
