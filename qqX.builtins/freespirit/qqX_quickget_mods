@@ -508,11 +508,15 @@ function test_result {
     if [[ $QuietOps ]]; then {
         if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
         else printf "%-30s %s\n" "${OS}" "${URL}"
-        fi } > "/tmp/qGet_QuietResult.txt"
-    else
+        fi } >> "/tmp/qGet_QuietResult.txt"
+    elif [[ $CompactOps ]]; then {
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s\n" "$HashTest" "${RESULT}" "${OS}"
+        else printf "%-30s %s\n" "${OS}" "${URL}"
+        fi } | tee -a "/tmp/qGet_CompactResult.txt"
+    else {
         if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
         else printf "%-30s %s\n" "${OS}" "${URL}"
-        fi
+        fi } | tee -a "/tmp/qGet_FullResult.txt"
     fi
 }
 
@@ -575,12 +579,13 @@ function test_all {
 # Case mods will either clear any listed args and set flags early, or will run something and exit here,
 # effectively being able to bypass selected original Quickget case statements, or add new ones ...
 
-QuietOps=
+QuietOps= ; CompactOps=
 printf "Webget NOT used\n" > "/tmp/qGet_webget_report.txt"
 
 case "${1}" in
-    --url|-url)
-        OPERATION="show" ; shift
+    --full-check|--check|-check)
+        OPERATION="test" ; shift
+        printf "" > "/tmp/qGet_FullResult.txt"
         if [[ ! $1 ]]; then
             for OS in $(os_support); do test_all "${OS}"
             done
@@ -589,7 +594,9 @@ case "${1}" in
             test_all "${1}"
             exit 0
         fi ;;
-    --check|-check)
+    --quiet-check|--compact-check)
+        [[ $1 == "--quiet-check" ]] &&  QuietOps=1 && printf "" > "/tmp/qGet_QuietResult.txt"
+        [[ $1 == "--compact-check" ]] &&  CompactOps=1  && printf "" > "/tmp/qGet_CompactResult.txt"
         OPERATION="test" ; shift
         if [[ ! $1 ]]; then
             for OS in $(os_support); do test_all "${OS}"
@@ -599,18 +606,15 @@ case "${1}" in
             test_all "${1}"
             exit 0
         fi ;;
-    --quiet-check)
-        OPERATION="test" ; shift
-        QuietOps=1
-        # Outputs to "/tmp/qGet_QuietResult.txt"
-        if [[ ! $1 ]]; then
-            for OS in $(os_support); do test_all "${OS}"
-            done
-            exit 0
-        elif [[ ! $2 ]]; then
-            test_all "${1}"
-            exit 0
-        fi ;;
+    --help|-help|--h|-h)
+        help_message
+        printf "\n\nExtra qqX commands: \n\nfrom a terminal opened in a qqX 'built-in' folder"
+        printf "\n\n----------------------------- ./quickget -------------------------------"
+        printf "\n\n  --full-check      [os] [release] [edition] : Full Hash/Iso to StdOut, plus log to file \"/tmp/qGet_FullResult.txt\""
+        printf "\n\n  --compact-check   [os] [release] [edition] : Short line StdOut, plus log to file \"/tmp/qGet_CompactResult.txt\""
+        printf "\n\n  --quiet-check     [os] [release] [edition] : Only log check image URL(s) to file \"/tmp/qGet_QuietResult.txt\""
+        printf "\n\n----------------------------------------------------------------------------------\n\n"
+        exit 0 ;;
 esac
 
 ##########################################
