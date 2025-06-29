@@ -80,7 +80,7 @@ osSupported="${osSupported//'   '/' '}"
 osSupported="${osSupported//'  '/' '}"
 osSupported="${osSupported//'  '/' '}"
 
-# replace old function but only after old one has been read
+# replace old function, but only after old one has been read
 function os_support { echo " $osSupported " ; }
 
 ##########################################
@@ -93,6 +93,7 @@ function os_info {
     case "$1" in
         #name)            INFO="PrettyName|Credentials|Homepage|Info";;
         anduinos)         INFO="Anduin OS|-|https://www.anduinos.com/|Ubuntu-based Linux distribution that aims to facilitate developers transitioning from Windows.";;
+        archcraft)        INFO="Archcraft|-|https://archcraft.io/|Collection of minimal Linux distributions, based on Arch Linux.";;
         bluestar)         INFO="Blue Star|-|https://sourceforge.net/projects/bluestarlinux/|Arch based, MacOS-like take on KDE Plasma that's easy to use.";;
         slint)            INFO="Slint|-|https://slint.fr/|BLIND-FRIENDLY, easy-to-use, versatile Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Nomadic ultra small graphical desktop operating system capable of booting from cdrom, pendrive, or frugally from a hard drive.";;
@@ -307,7 +308,7 @@ function get_void() {
 ##########################################
 
 ## 7: DOWNLOAD XL
-# For special and oversized 'get' functions or "get_${OS} ()" overwrites eg Windows or Mac
+# For special and oversized 'get' functions or "get_${OS} ()" overwrites, eg Windows or Mac
 # Normally place 'get' functions next to releases and editions
 
 ##########################################
@@ -357,19 +358,31 @@ function error_specify_release {
 ## TWEAK
 # A lot of these have already modded in the FreeSpirit branch but move here as they're NOW MUCH EASIER TO ADJUST
 
-# Download a SMALL file page etc from the web and pipe it to stdout  (not to confuse with 'web_get')
+# Download a SMALL file page, checksum etc from the web and pipe it to stdout  (not to confuse with 'web_get')
 function web_pipe {
-    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 "${@}"
+    local Args=("${@}")
+    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 "${Args[@]}"; then
+        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 "${Args[@]}"
+    fi
 }
+
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json {
-    curl --disable -sLf --retry 8 --connect-timeout 2 --keepalive-time 2 --max-time 20 --header "Accept: application/json" "${@}"
+    local Args=("${@}")
+    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"; then
+        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"
+    fi
 }
 
 ## ADD
 # Check the file headers. To be used for returns of 0 or 1 with pipe to log file,
 function check_pipe {
-    curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted  "${@}" > "/tmp/qGet_check_pipe.txt"
+    local Args=("${@}")
+    printf "" > "/tmp/qGet_check_pipe.txt"
+    if ! curl --disable -sLf --head --retry 16 --retry-max-time 2 --connect-timeout 2 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"; then
+        curl --disable -sLf --head --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
+    fi
+    if grep -si 'HTTP/' "/tmp/qGet_check_pipe.txt" | tail -n 1 | grep -q 200; then return 0 ; else return 1 ; fi
 }
 # where HTTP/ 200 = success (with size data etc as readable) and 404 = not found = fail
 # --location-trusted means extend secure connection to the mirror or to the CDN otherwise 302 redirects will lose https.
@@ -382,6 +395,8 @@ function web_redirect() {
     # Check for URL redirections. Output to nonexistent directory so the download fails fast
     REDIRECT_URL=$(curl --disable -sLf --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --max-time 20 --write-out '%{url_effective}' \
     --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
+    [[ ! $REDIRECT_URL ]] && REDIRECT_URL=$(curl --disable -sLf --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --max-time 20 --write-out '%{url_effective}' \
+    --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then echo "${REDIRECT_URL}"
     else echo "${URL}"
     fi
@@ -390,7 +405,6 @@ function web_redirect() {
 ## TWEAK
 # Download a file from the web, to storage
 function web_get() {
-
     local CHECK="" ; local HEADERS=() ; local URL="${1}" ; local DIR="${2}" ; local FILE=""
     local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
     if [ -n "${3}" ]; then FILE="${3}"
@@ -404,14 +418,26 @@ function web_get() {
         else shift
         fi
     done
-
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
+        # CAUTION with current Quickemu, $RELEASE and $EDITION may be generated already.
+        # Current behaviour is that Quickemu will route distros with editions through web_GET.
+        # Others, such as Macos, have their own special routines.
+        # Those without, go through web_CHECK.
+        # CARE is also needed so that distro checks don't trigger background downloads.
+        # The QuickEmu VARIANT CONVOLUTIONS can have lots of twists and turns ....
+        if [[ "$OS" != *ubuntu* ]]; then
+            GetLine=$(get_"${OS}" "$RELEASE" "$EDITION")
+            printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
+            URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+            HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
+        fi
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
-        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+        printf "Using webget > %s %s" "$CHECK" "$URL" > "/tmp/qGet_webget_report.txt"
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}" "$HASH"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         DIR="$(pwd)"
@@ -421,19 +447,16 @@ function web_get() {
         echo "ERROR! Unable to create directory ${DIR}"
         exit 1
     fi
-
     #  Allow qqX or any external process to pick up the FINALIZED NAME
     # - avoids overwrites eg windows 'unattended'
     # - external proc should clear this file before starting so the grep test will function
     if ! grep -sq 'New_VM_InstanceName' "/tmp/qe_new_vm_name.txt" ; then
-        printf "\n New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
+        printf "New_VM_InstanceName=\"%s\" \n" "$(basename "$DIR")" > "/tmp/qe_new_vm_name.txt"
     fi
-
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
         echo "- URL: ${URL}"
     fi
-
     # Add retries to the standard Quickemu 4.9.x method:
     # --continue-at -  will continue/resume a previous file transfer but we need to make sure we actually have a connection to start with ...
     if ! curl --disable -Lf --retry 6 --retry-max-time 3 --retry-delay 1 --progress-bar --continue-at - --output "${DIR}/${FILE}" \
@@ -446,6 +469,7 @@ function web_get() {
     fi
 }
 
+
 ## TWEAK
 function web_check {
     local HEADERS=() ; local URL="${1}"
@@ -456,18 +480,22 @@ function web_check {
         fi
     done
     # check is standard *.* filename or Ubuntu SUMS file, not an html web page or such ...
-    if [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]]; then
-        printf "\n%s" "$URL" > "/tmp/qmod-dl-url" ; return 1
-    fi
-    check_pipe "${HEADERS[@]}" "${URL}"
+    printf "%s" "$URL" > "/tmp/qmod-dl-url"
+    [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]] && return 1
+    # returns 0 or 1, plus check_pipe outputs header to log file "/tmp/qGet_check_pipe.txt"
+    if check_pipe "${HEADERS[@]}" "${URL}" ; then return 0 ; else return 1 ; fi
 }
 
 ## ADD HASH CHECK
 # Checks if 'get_$OS' is outputting a checksum and, if so, that it is correctly formatted
 function test_result {
-    local OS="${1}" ; local RELEASE="${2}" ; local EDITION="${3:-}"
-    local URL="${4:-}" ; local RESULT="${5:-}" ; local HASH="${6}" ; local HashTest= ; local HashLength="0"
-    if [ -n "${EDITION}" ]; then OS="${OS}-${RELEASE}-${EDITION}"
+    local OS="${1}" ; local RELEASE="${2}"
+    if [[ "$3" == *'://'* ]]; then
+        local URL="${3}" ; local RESULT="${4}" ; local HASH="${5}" ; local HashTest= ; local HashLength="0"
+    else
+        local EDITION="${3}" ; local URL="${4}" ; local RESULT="${5}" ; local HASH="${6}" ; local HashTest= ; local HashLength="0"
+    fi
+    if [[ $EDITION ]]; then OS="${OS}-${RELEASE}-${EDITION}"
     else OS="${OS}-${RELEASE}"
     fi
     HASH="$(tr -cd '[:graph:]' <<< "$HASH")" ; [[ $HASH ]] && HashLength="${#HASH}"
@@ -475,10 +503,16 @@ function test_result {
         32|40|64|128) HashTest="PASS" ;;
         0) HashTest="n/a" ;;
         *) HashTest="FAIL" ;;
-   esac
-   OS="${OS:0:30}"
-    if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
-    else printf "%-30s %s\n" "${OS}" "${URL}"
+    esac
+    OS="${OS:0:30}"
+    if [[ $QuietOps ]]; then {
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
+        else printf "%-30s %s\n" "${OS}" "${URL}"
+        fi } > "/tmp/qGet_QuietResult.txt"
+    else
+        if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OS}" "${URL}" "$HASH"
+        else printf "%-30s %s\n" "${OS}" "${URL}"
+        fi
     fi
 }
 
@@ -486,33 +520,12 @@ function test_all {
     OS="${1}"
     os_supported
     local CHECK="" ; local FUNC="${OS}" ; local GetLine="" ; local URL="" ; local HASH=""
-    [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]] &&  FUNC="ubuntu"
-
+    [[ "${OS}" == *ubuntu* ]] && [[ "${OS}" != "ubuntu-server" ]] &&  FUNC="ubuntu"
     for RELEASE in $("releases_${FUNC}"); do
-        if [[ "${OS}" == "windows"* ]]; then
-            "languages_${OS}"
-            for I18N in "${I18NS[@]}"; do
-                validate_release releases_"${OS}"
-                if [ "${OPERATION}" == "show" ]; then
-                    test_result "${OS}" "${RELEASE}" "${I18N}" ""
-                elif [ "${OPERATION}" == "test" ]; then
-                    test_result "${OS}" "${RELEASE}" "${I18N}" "${URL}" "SKIP"
-                fi
-            done
-        elif [[ "${OS}" == "macos" ]]; then
-            validate_release releases_macos
-            (get_macos)
-        elif [ "${OS}" == "ubuntu-server" ]; then
-            validate_release releases_ubuntu-server
-            (get_ubuntu-server)
-        elif [[ "${OS}" == *ubuntu* ]]; then
-            validate_release releases_ubuntu
-            (get_ubuntu)
-        elif [[ $(type -t "editions_${OS}") == function ]]; then
+        if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
-                validate_release releases_"${OS}"
                 GetLine=$(get_"${OS}" "$RELEASE")
-                printf "\n%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
+                printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
                 URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
                 HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
                 if [ "${OPERATION}" == "show" ]; then
@@ -522,14 +535,30 @@ function test_all {
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}" "$HASH"
                 fi
             done
+        elif [[ "${OS}" == "windows"* ]]; then
+            # Caution with current Quickemu, --check windows with $2 (or/and $3) will trigger a windows download
+            "languages_${OS}"
+            for I18N in "${I18NS[@]}"; do
+                if [ "${OPERATION}" == "show" ]; then
+                    test_result "${OS}" "${RELEASE}" "${I18N}" ""
+                elif [ "${OPERATION}" == "test" ]; then
+                    test_result "${OS}" "${RELEASE}" "${I18N}" "${URL}" "SKIP"
+                fi
+            done
+            # Caution here, the get_$OS routines must run in subshells in order to loop properly
+        elif [[ "${OS}" == "macos" ]]; then
+            (get_macos)
+        elif [ "${OS}" == "ubuntu-server" ]; then
+            (get_ubuntu-server)
+        elif [[ "${OS}" == *ubuntu* ]]; then
+            (get_ubuntu)
         else
-            validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
                 GetLine=$(get_"${OS}" "$RELEASE")
-                printf "\n%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
+                printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
                 URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
                 HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
                 CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
@@ -538,6 +567,51 @@ function test_all {
         fi
     done
 }
+
+##########################################
+
+## QUICKGET COMMANDS
+# The 'Mods' script gets read towards the end of the standard Quickget script via lines added to the FreeSpirit branch.
+# Case mods will either clear any listed args and set flags early, or will run something and exit here,
+# effectively being able to bypass selected original Quickget case statements, or add new ones ...
+
+QuietOps=
+printf "Webget NOT used\n" > "/tmp/qGet_webget_report.txt"
+
+case "${1}" in
+    --url|-url)
+        OPERATION="show" ; shift
+        if [[ ! $1 ]]; then
+            for OS in $(os_support); do test_all "${OS}"
+            done
+            exit 0
+        elif [[ ! $2 ]]; then
+            test_all "${1}"
+            exit 0
+        fi ;;
+    --check|-check)
+        OPERATION="test" ; shift
+        if [[ ! $1 ]]; then
+            for OS in $(os_support); do test_all "${OS}"
+            done
+            exit 0
+        elif [[ ! $2 ]]; then
+            test_all "${1}"
+            exit 0
+        fi ;;
+    --quiet-check)
+        OPERATION="test" ; shift
+        QuietOps=1
+        # Outputs to "/tmp/qGet_QuietResult.txt"
+        if [[ ! $1 ]]; then
+            for OS in $(os_support); do test_all "${OS}"
+            done
+            exit 0
+        elif [[ ! $2 ]]; then
+            test_all "${1}"
+            exit 0
+        fi ;;
+esac
 
 ##########################################
 

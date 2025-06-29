@@ -25,7 +25,7 @@ function quickget {
   # has been, so that the right QE & QG versions have been established and loaded.
   # See function 'refresh_and_load_quickemu_sources'
   eval command '"$QG_SourcePath"' " $*"
-
+  return
 }
 
 ## DISTRO LISTINGS  (non-function sections are run only during initialization)
@@ -135,13 +135,13 @@ print_quickget_and_folder_choices () {
 }
 
 function show_distro_homepage_check_results {
-  # runs during start of function_quick_get_wrap and gets included at end of 'function_test_iso_url' too
+  # runs during start of function_quick_get_wrap and gets included at end of 'function test_iso_url' too
   if [[ $(cat "/tmp/qmod-dl-homepage-report.txt" 2>/dev/null) ]]; then
     cat "/tmp/qmod-dl-homepage-report.txt"
   fi
 }
 
-function_test_iso_url () {
+function test_iso_url {
 
   [[ $GT_Exit ]] && return
 
@@ -153,25 +153,36 @@ function_test_iso_url () {
   else
 
     DL_Url= ; DL_FileName= ; DL_PotentialSize= ; DL_PotentialOkay= ; DL_PotentialHtml= ; DL_SlowMsg=
+    DataPID= ; SECONDS=0
     printf "\n\n  Checking download link .... \n\n"
     printf "" > "/tmp/qmod-dl-url" ; printf "" > "/tmp/qmod-dl-size"
-
-    # running checks in the background (&) means that we can stop the process if it hangs
-    SECONDS=0
-    if [[ $ModPath ]]; then quickget " --check $QGW_DownloadSelection" &
-    else quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"  &
+    if [[ $QG_Modpath ]]; then
+      quickget " --quiet-check $QGW_DownloadSelection"
+    else
+      quickget " --url $QGW_DownloadSelection" > "/tmp/qmod-dl-url"
     fi
     sleep 1
-    DataPID="$(pgrep -af bash | grep quickget | head -n 1 | cut -d' ' -f1 2>/dev/null)"
-    [[ $ShowQGetLists ]] && { echo "Check URL:"; (ps -ef | grep bash | grep quickget); echo; }
-    [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+    [[ $ShowQGetLists ]] && { echo "Check Command:"; (ps -ef | grep bash | grep quickget); echo; }
     while true ; do
       [[ $ShowQGetLists ]] && echo "Secs: $SECONDS"
       if [[ $(cat "/tmp/qmod-dl-url" 2>/dev/null) ]]; then
-        DL_Url="$(awk '{print $2 $3}'  < "/tmp/qmod-dl-url")"
+        DL_Url="$(tr -cd '[:graph:]'  < "/tmp/qmod-dl-url")"
         break
       elif [[ "$SECONDS" -ge 90 ]]; then
-        [[ $DataPID ]] && kill "$DataPID" &>/dev/null
+        while true; do
+          DataPID="$(pgrep -af bash | grep -e 'quickget --url' | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+          [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+          if [[ $DataPID ]]; then kill "$DataPID" &>/dev/null
+          else break
+          fi
+        done
+        while true; do
+          DataPID="$(pgrep -af bash | grep -e 'quickget --quiet-check' | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+          [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+          if [[ $DataPID ]]; then kill "$DataPID" &>/dev/null
+          else break
+          fi
+        done
         break
       elif [[ "$SECONDS" -ge 30 ]] && [[ ! $DL_SlowMsg ]]; then
         printf "  Slow Server or anti-bot slow-downs ....\n\n" ; DL_SlowMsg=1
@@ -181,29 +192,41 @@ function_test_iso_url () {
     [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
 
     if [[ ! $DL_Url ]]; then
-      printColor "  QuickGet has been timed-out providing a link, or is unable to provide one ..."; QGW_Download_BadLink=1
+      printColor "  QuickGet is unable to provide a link, or has been timed-out ..."; QGW_Download_BadLink=1
       iso_get_message
     else
-      echo > "/tmp/qmod-dl-size"
       DL_FileName="$(basename "$DL_Url")"
       printf "  Checking download size .... \n\n"
+      while true; do
+         if pgrep -af bash | grep -q -e 'quickget --url' || pgrep -af bash | grep -q -e 'quickget --quiet-check' ; then sleep 0.5
+          else break
+          fi
+      done
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
-      if [[ $ModPath ]]; then cp "/tmp/qGet_check_pipe.txt" "/tmp/qmod-dl-size"
+      if [[ $QG_Modpath ]]; then
+        if [[ $ShowQGetLists ]]; then echo ; echo "qGet_check_pipe:" ; echo ; cat "/tmp/qGet_check_pipe.txt" ; echo ; fi
+        if [[ $ShowQGetLists ]]; then echo ; echo "qGet_QuietResult:" ; echo ; cat "/tmp/qGet_QuietResult.txt" ; echo ; fi
+        if [[ $ShowQGetLists ]]; then echo ; echo "qGet_webget_report:" ; echo ; cat "/tmp/qGet_webget_report.txt" ; echo ; fi
+        if [[ -e "/tmp/qGet_check_pipe.txt" ]]; then cp -f "/tmp/qGet_check_pipe.txt" "/tmp/qmod-dl-size" ; fi
       else
         curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --output "/tmp/qmod-dl-size" "$DL_Url" &
         wait "$!"
-      fi
-      if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
-        sleep 2 ; printf "  and a second time ........ \n\n"
-        curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --output "/tmp/qmod-dl-size" "$DL_Url" &
-        wait "$!"
+        if [[ ! $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
+          sleep 2 ; printf "  and a second time ........ \n\n"
+          curl --disable -sLf --head --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --output "/tmp/qmod-dl-size" "$DL_Url" &
+          wait "$!"
+        fi
       fi
       if [[ $(cat "/tmp/qmod-dl-size" 2>/dev/null) ]]; then
         DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
-        DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tr -cd '[:digit:]')"
+        DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tail -n 1 | tr -cd '[:digit:]')"
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
-        [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
-        [[ ! $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -si 'HTTP/' "/tmp/qmod-dl-size" | grep 200)"
+        [[ $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -si 'HTTP/' "/tmp/qmod-dl-size" | grep 200)"
+        if [[ ! $DL_PotentialHtml ]]; then
+          [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
+          [[ ! $DL_PotentialOkay ]] && [[ $QG_Modpath ]] && DL_PotentialOkay="$(grep -s -i 'Iso: PASS' "/tmp/qGet_QuietResult.txt")"
+          [[ ! $DL_PotentialOkay ]] && [[ $QG_Modpath ]] && DL_PotentialOkay="$(grep -s -i -e 'Using webget > PASS' "/tmp/qGet_webget_report.txt")"
+        fi
       fi
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay \n\n"; QGW_Download_BadLink=
@@ -211,6 +234,7 @@ function_test_iso_url () {
         printColor "  May not be working correctly.  Try anyway? \n\n"; QGW_Download_BadLink=
       fi
       if [[ $DL_PotentialSize ]]; then
+        [[ $ShowQGetLists ]] && { echo ; echo "DL_PotentialSize: $DL_PotentialSize"; echo; }
         DL_HumanSize="$(numfmt --to=iec "$DL_PotentialSize")"
         printf "  Reported size: %s " "$DL_HumanSize"
         printf "\n"
@@ -226,7 +250,6 @@ function_test_iso_url () {
         iso_get_message ; show_distro_homepage_check_results
       fi
     fi
-
   fi
 }
 
@@ -1027,16 +1050,13 @@ function_quick_get_wrap ()  {
 
     printColor "  Selected:  %s "  "$QWG_NewVM_Name"
 
-    # TEST DOWNLOAD URL is correct and is good to go  (except Windows, where you get blocked if there too many calls)
-
+    # TEST DOWNLOAD URL is correct and is good to go,
+    # except Windows, where you get blocked if there too many calls, but should be 'potentially okay'
     if [[ "$QGW_OS_Arr_NameSelected"  == "windows"* ]]; then
       printf "\n\n  Microsoft servers may not report back accurately, may block repeat attempts or may need manual download ... "
       show_distro_homepage_check_results
-    elif [[ "$QGW_OS_Arr_NameSelected"  == "macos"* ]]; then
-      printf "\n\n  Apples servers may not report back accurately, but the download may still work ... "
-      show_distro_homepage_check_results
-    else
-      function_test_iso_url
+      DL_PotentialOkay=1
+    else test_iso_url
     fi
 
     if [[ $MainMenuZsync && $Zsync_Updatable_ISO ]]; then
@@ -1256,7 +1276,7 @@ function_quick_get_wrap ()  {
 
         *)
           if [[ $QGW_Download_BadLink ]]; then
-            QGW_BadLink_ReTest=1 ; function_test_iso_url
+            QGW_BadLink_ReTest=1 ; test_iso_url
           else
             if [[ $QGW_OverWriteAlert ]] && [[ ! $MainMenuZsync ]]; then
               printf "  RECONFIRMATION is required  >>  %s"  "$QWG_NewVM_Name"
