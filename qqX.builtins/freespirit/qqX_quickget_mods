@@ -111,6 +111,7 @@ function distro_release_notes {
         #name)            RelNotes="mm/yyyy (as needed)  Notes on installation or problems to watch out for";;
         artixlinux)       RelNotes="06/2025 The new online install option is still work-in-progress, users are advised to select 'Offline' when prompted.";;
         macos)            RelNotes="06/2025 Sequoia is currently having issues with slow running. See qqX issue #9";;
+        sparkylinux)      RelNotes="07/2025 Older specialist versions: 'gameover' 'multimedia' and 'rescue' are available via manual download";;
         void)             RelNotes="To install the packages for the desktop environment, DON'T choose 'install from network' choose the 'local install' option.";;
     esac
     echo "$RelNotes"
@@ -132,7 +133,7 @@ function distro_release_notes {
 # The first two FUNCTIONS feed STDOUT to the look-up function 'validate_release' followed by
 # the last lines of Quickget where distro editions are handled.
 
-# Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
+# Transfer files may also be implemented: @ 06/2025 see 'anduinos' and 'sparkylinux' as examples ...
 # Some distros single release with no editions eg. bluestar
 
 # Quickget's legacy behaviour is to return a 'STOCK LIST' of editions when no release is supplied ...
@@ -262,6 +263,51 @@ function get_slint() {
     local ISO="slint64-${MIN_VER}.iso"
     local URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO}" "${HASH}"
+}
+
+## UPDATE
+function releases_sparkylinux() {
+    printf "" > "/tmp/qGet.Mods.REL.data.txt" ; echo "Rolling Stable"
+}
+function editions_sparkylinux() {
+    # May 2025 > listing task tends to exceed quickget's capabilities but July 2025 now allows Mods installer notes
+    # Website subject to change, plus older specialist versions still being listed in addition to the newer ones
+    if [[ ! $RELEASE ]]; then  echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI  MinimalGUI_32bit MinimalCLI_32bit"
+    elif [[ $RELEASE == "Rolling" ]] ; then echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI"
+    elif [[ $RELEASE == "Stable" ]] ; then echo "LXQt MATE Xfce KDE MinimalGUI MinimalCLI MinimalGUI_32bit MinimalCLI_32bit"
+    fi
+}
+function get_sparkylinux() {
+    local HASH="" ; local ISO="" ; local URL="" ; EDITION="${EDITION,,}"
+    # Stable    https://sourceforge.net/projects/sparkylinux/files/lxqt/sparkylinux-7.7-x86_64-lxqt.iso/download
+    # Stable    https://sourceforge.net/projects/sparkylinux/files/base/sparkylinux-7.7-x86_64-minimalgui.iso/download
+    # Rolling   https://sourceforge.net/projects/sparkylinux/files/lxqt/sparkylinux-2025.03-x86_64-lxqt.iso/download
+    # Rolling   https://sourceforge.net/projects/sparkylinux/files/base/sparkylinux-2025.03-x86_64-minimalgui.iso/download
+    while true ; do
+        if ! { grep -qs "$OS" "/tmp/qGet.Mods.REL.data.txt" && grep -s 'ReleaseName=' "/tmp/qGet.Mods.REL.data.txt" | grep -qs "$RELEASE"; } ; then
+            ReleaseNumber="$(web_pipe "https://sparkylinux.org/download/${RELEASE,,}/" | tr '=' '\n' | grep source | cut -d'"' -f2 | grep -v "iso\." | tr -d '-' | fv -Q -M)"
+            printf "\nOsName=\"%s\"\nReleaseName=\"%s\"\nReleaseNumber=\"%s\"" "$OS" "$RELEASE" "$ReleaseNumber" > "/tmp/qGet.Mods.REL.data.txt"
+            sleep 1
+        fi
+        ReleaseName= ; ReleaseNumber=
+        source "/tmp/qGet.Mods.REL.data.txt"
+        if [[ $ReleaseName && $ReleaseNumber ]] ; then break
+        else printf "" > "/tmp/qGet.Mods.REL.data.txt"
+        fi
+    done
+    [[ ! $ReleaseNumber ]] && source "/tmp/qGet.Mods.REL.data.txt"
+    if [[ "$EDITION" == *'32bit'* ]]; then
+        EDITION="${EDITION/_32bit/}" ; ISO="sparkylinux-${ReleaseNumber}-i686-${EDITION}.iso"
+    else
+        ISO="sparkylinux-${ReleaseNumber}-x86_64-${EDITION}.iso"
+    fi
+    case ${EDITION} in
+        minimalcli*) URL="https://sourceforge.net/projects/sparkylinux/files/cli";;
+        minimalgui*) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
+        *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
+    esac
+    HASH="$(web_pipe "${URL}/${ISO}.allsums.txt" | head -n 2 | grep 'iso' | cut -d' ' -f1)"
     echo "${URL}/${ISO}" "${HASH}"
 }
 
