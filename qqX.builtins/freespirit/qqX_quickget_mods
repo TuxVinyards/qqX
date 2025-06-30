@@ -260,6 +260,15 @@ function get_fedora() {
     echo "${URL} ${HASH}"
 }
 
+## FIX hashes
+function get_parrotsec() {
+    local HASH="" ; local ISO="" ; local URL=""
+    ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
+    URL="https://deb.parrot.sh/parrot/iso/${RELEASE}"
+    HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep -s -A 30 'sha256' | grep -B 30 'sha384' | grep "${ISO}" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 ## FIX  SLINT (only 15.0, and hopefully higher, has downloadable iso's)
 function releases_slint() {
     web_pipe "https://slackware.uk/slint/x86_64/" | grep -e '<a href=' | fv -M -Q
