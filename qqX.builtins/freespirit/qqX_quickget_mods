@@ -230,6 +230,14 @@ function get_bluestar {
     echo "$BlueStarIso $BlueStarHash"
 }
 
+## FIX bodhi editions
+function editions_bodhi() {
+    if [[ ! $RELEASE ]]; then echo "standard hwe s76"
+    elif  fv -Q --gt "$RELEASE 6.9" ; then echo "standard hwe s76"
+    else echo "standard hwe"
+    fi
+}
+
 ## FIX Easy OS release list
 function releases_easyos() {
     local ALL_RELEASES="" ; local YEAR=""
