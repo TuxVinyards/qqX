@@ -211,6 +211,17 @@ function get_artixlinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+## UPDATE new repo
+function releases_athenaos() {
+    echo latest
+}
+function get_athenaos() {
+    local HASH=""
+    local URL="https://github.com/Athena-OS/athena/releases/latest/download/athenaos-rolling-x86_64.iso"
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
 ## UPDATE url
 function get_blendos() {
     local HASH=""
