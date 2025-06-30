@@ -187,7 +187,7 @@ function test_iso_url {
       elif [[ "$SECONDS" -ge 30 ]] && [[ ! $DL_SlowMsg ]]; then
         printf "  Slow Server or anti-bot slow-downs ....\n\n" ; DL_SlowMsg=1
       fi
-      sleep 0.5
+      sleep 0.5 ; [[ $ShowQGetLists ]] && echo "$SECONDS"
     done
     [[ $ShowQGetLists ]] && { echo ; echo "DL_Url: $DL_Url"; echo; cat "/tmp/qmod-dl-url"; echo; }
 
@@ -195,12 +195,29 @@ function test_iso_url {
       printColor "  QuickGet is unable to provide a link, or has been timed-out ..."; QGW_Download_BadLink=1
       iso_get_message
     else
-      DL_FileName="$(basename "$DL_Url")"
+      DL_FileName="$(basename "$DL_Url")" ; SECONDS=0
       printf "  Checking download size .... \n\n"
-      while true; do
-         if pgrep -af bash | grep -q -e 'quickget --url' || pgrep -af bash | grep -q -e 'quickget --quiet-check' ; then sleep 0.5
-          else break
-          fi
+      [[ $ShowQGetLists ]] && pgrep -af bash | grep -q -e 'quickget --url'
+      [[ $ShowQGetLists ]] && pgrep -af bash | grep -q -e 'quickget --quiet-check'
+      while pgrep -af bash | grep -q -e 'quickget --url' || pgrep -af bash | grep -q -e 'quickget --quiet-check' ; do
+        sleep 0.5 ; [[ $ShowQGetLists ]] && echo "$SECONDS"
+        if [[ $SECONDS -ge 30 ]]; then
+          while true; do
+            DataPID="$(pgrep -af bash | grep -e 'quickget --url' | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+            [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+            if [[ $DataPID ]]; then kill "$DataPID" &>/dev/null
+            else break
+            fi
+          done
+          while true; do
+            DataPID="$(pgrep -af bash | grep -e 'quickget --quiet-check' | head -n 1 | cut -d' ' -f1 2>/dev/null)"
+            [[ $ShowQGetLists ]] && { echo; echo "DataPID: ${DataPID}"; echo; }
+            if [[ $DataPID ]]; then kill "$DataPID" &>/dev/null
+            else break
+            fi
+          done
+          break
+        fi
       done
       [[ $ShowQGetLists ]] && { echo ; echo "DL_FileName: $DL_FileName"; echo; }
       if [[ $QG_Modpath ]]; then
@@ -221,13 +238,15 @@ function test_iso_url {
         DL_PotentialHtml="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i html )"
         DL_PotentialSize="$(grep -s -i 'content-length' "/tmp/qmod-dl-size" | tail -n 1 | tr -cd '[:digit:]')"
         DL_PotentialOkay="$(grep -s -i 'content-type' "/tmp/qmod-dl-size" | grep -i application )"
-        [[ $DL_PotentialOkay ]] && [[ $DL_PotentialSize ]] && DL_PotentialOkay="$(grep -si 'HTTP/' "/tmp/qmod-dl-size" | grep 200)"
+        [[ $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -si 'HTTP/' "/tmp/qmod-dl-size" | grep 200)"
         if [[ ! $DL_PotentialHtml ]]; then
           [[ ! $DL_PotentialOkay ]] && DL_PotentialOkay="$(grep -s -i 'Vary:' "/tmp/qmod-dl-size" | grep -i 'Accept-Encoding' )"
           [[ ! $DL_PotentialOkay ]] && [[ $QG_Modpath ]] && DL_PotentialOkay="$(grep -s -i 'Iso: PASS' "/tmp/qGet_QuietResult.txt")"
           [[ ! $DL_PotentialOkay ]] && [[ $QG_Modpath ]] && DL_PotentialOkay="$(grep -s -i -e 'Using webget > PASS' "/tmp/qGet_webget_report.txt")"
         fi
+        [[ $DL_PotentialSize ]] && [[ ! $DL_PotentialOkay ]] && DL_PotentialSize=
       fi
+
       if [[ $DL_PotentialOkay ]]; then
         printColor "  Appears to be Okay \n\n"; QGW_Download_BadLink=
       else

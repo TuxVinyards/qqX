@@ -398,7 +398,7 @@ function error_specify_release {
 
 # Download a SMALL file page, checksum etc from the web and pipe it to stdout  (not to confuse with 'web_get')
 function web_pipe {
-    local Args=("${@}")
+    local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
     if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 "${Args[@]}"; then
         curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 "${Args[@]}"
     fi
@@ -406,7 +406,7 @@ function web_pipe {
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json {
-    local Args=("${@}")
+    local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
     if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"; then
         curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"
     fi
@@ -415,7 +415,7 @@ function web_pipe_json {
 ## ADD
 # Check the file headers. To be used for returns of 0 or 1 with pipe to log file,
 function check_pipe {
-    local Args=("${@}")
+    local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
     printf "" > "/tmp/qGet_check_pipe.txt"
     if ! curl --disable -sLf --head --retry 16 --retry-max-time 2 --connect-timeout 2 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"; then
         curl --disable -sLf --head --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
@@ -430,12 +430,9 @@ function check_pipe {
 # Check if a URL needs to be redirected and returns the final URL mirror or CDN
 function web_redirect() {
     local REDIRECT_URL="" ; local URL="${1}"
-    # Check for URL redirections. Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --disable -sLf --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --max-time 20 --write-out '%{url_effective}' \
-    --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
-    [[ ! $REDIRECT_URL ]] && REDIRECT_URL=$(curl --disable -sLf --retry 8 --connect-timeout 2 --no-keepalive --location-trusted --max-time 20 --write-out '%{url_effective}' \
-    --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
-    if [ "${REDIRECT_URL}" != "${URL}" ]; then echo "${REDIRECT_URL}"
+    REDIRECT_URL=$(curl --disable -sLf --connect-timeout 4 --no-keepalive --location-trusted --max-time 6 --write-out '%{url_effective}' -o "/dev/null" "${URL}" | tr -cd '[:print:]')
+    [[ ! $REDIRECT_URL ]] && REDIRECT_URL=$(curl --disable -sLf --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 8 --write-out '%{url_effective}' -o "/dev/null" "${URL}" | tr -cd '[:print:]')
+    if [[ $REDIRECT_URL ]] && [[ $REDIRECT_URL != "${URL}" ]]; then echo "${REDIRECT_URL}"
     else echo "${URL}"
     fi
 }
@@ -519,7 +516,9 @@ function web_check {
     done
     # check is standard *.* filename or Ubuntu SUMS file, not an html web page or such ...
     printf "%s" "$URL" > "/tmp/qmod-dl-url"
-    [[ $URL ]] && [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]] && return 1
+    if [[ ! $URL ]]; then return 1
+    else [[ "$(basename "$URL")" != *.* ]] && [[ "$(basename "$URL")" != *SUMS* ]] && return 1
+    fi
     # returns 0 or 1, plus check_pipe outputs header to log file "/tmp/qGet_check_pipe.txt"
     if check_pipe "${HEADERS[@]}" "${URL}" ; then return 0 ; else return 1 ; fi
 }
@@ -527,7 +526,7 @@ function web_check {
 ## ADD HASH CHECK
 # Checks if 'get_$OS' is outputting a checksum and, if so, that it is correctly formatted
 function test_result {
-    local OS="${1}" ; local OsShort="${OS:0:30}" ; local RELEASE="${2}"
+    local OS="${1}" ; local RELEASE="${2}"
     if [[ "$3" == *'://'* ]]; then
         local URL="${3}" ; local RESULT="${4}" ; local HASH="${5}" ; local HashTest= ; local HashLength="0"
     else
@@ -542,6 +541,7 @@ function test_result {
         0) HashTest="n/a" ;;
         *) HashTest="FAIL" ;;
     esac
+    local OsShort="${OS:0:30}"
     if [[ $QuietOps ]]; then {
         if [[ "${RESULT}" ]]; then printf "Checksum: %-4s   Iso: %s   %-30s  %s  %s \n" "$HashTest" "${RESULT}" "${OsShort}" "${URL}" "$HASH"
         else printf "%-30s %s\n" "${OsShort}" "${URL}"
@@ -607,6 +607,9 @@ function test_all {
             fi
         fi
     done
+    [[ $QuietOps ]] && printf "Log file: \"/tmp/qGet_QuietResult.txt\" \n"
+    [[ $CompactOps ]] && printf "Log file: \"/tmp/qGet_CompactResult.txt\" \n"
+    [[ $FullCheckOps ]] && printf "Log file: \"/tmp/qGet_FullResult.txt\" \n"
 }
 
 ##########################################
@@ -622,7 +625,7 @@ printf "Webget NOT used\n" > "/tmp/qGet_webget_report.txt"
 case "${1}" in
     --full-check|--check|-check)
         OPERATION="test" ; shift
-        printf "" > "/tmp/qGet_FullResult.txt"
+        FullCheckOps=1 && printf "" > "/tmp/qGet_FullResult.txt"
         if [[ ! $1 ]]; then
             for OS in $(os_support); do test_all "${OS}"
             done
