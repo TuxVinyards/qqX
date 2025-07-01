@@ -347,7 +347,7 @@ function configure_cpu() {
 
     function ignore_non_robust_for_now {
 
-        # causes telescoped/nested VM's to fail ...
+        # causes telescoped/nested VM's to fail ... 
         # macos host not supported with qqX (yet)
         # qqX uses different aarch methods
 
@@ -414,18 +414,18 @@ function configure_cpu() {
         # A CPU with SSE4.2 support is required for >= macOS Catalina
         # A CPU with AVX2 support is required for >= macOS Ventura
 
-        # qqX mod based on
+        # qqX mod based on 
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2115516935
         # https://github.com/quickemu-project/quickemu/issues/1114#issuecomment-2120274893
         # https://github.com/quickemu-project/quickemu/pull/1225#issuecomment-2117555805
 
-        # Skylake-Server-v3 should be default
-        # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications
+        # Skylake-Server-v3 should be default 
+        # See https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications 
         # Also retains IBRS spectre mitigation
         # Tests suggest edit of .conf file to cpu_cores="8"  ie 4 core x 2 threads for MacOS to recognise Xeon
         # Will work both with cpu_cores="16" and ="32" but 'About' will show Cpu as unrecognised, only sysctl will show the CPU name ...
         # Other Xeon oddballs like 14 or 28 don't boot, even when forced.
-        # CascadeLake is Mac Pro 2019 but is practically identical to Skylake
+        # CascadeLake is Mac Pro 2019 but is practically identical to Skylake 
         # Whilst switching from Sky to Cascade still leaves 'About' displaying iMacPro 2017 ...
 
         #CPU_MODEL="Haswell-v2"
@@ -447,9 +447,9 @@ function configure_cpu() {
             CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off"
 
             case ${macos_release} in
-                ventura|sonoma)
+                ventura|sonoma|sequoia)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if ! check_cpu_flag sse4_2 || ! check_cpu_flag avx2; then
+                    if ! check_cpu_flag sse4_2 || ! check_cpu_flag avx2; then 
                         echo "ERROR! macOS ${macos_release} requires a CPU with both SSE 4.2 and AVX2 support."
                         echo "       Try macOS Monterey or Big Sur."
                         exit 1
@@ -487,9 +487,9 @@ function configure_cpu() {
             CPU="-cpu ${CPU_MODEL},kvm=on,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+ssse3,vmware-cpuid-freq=on"
 
             case ${macos_release} in
-                ventura|sonoma)
+                ventura|sonoma|sequoia)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
+                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then 
                         CPU+=",+avx2,+sse4.1,+sse4.2"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
@@ -537,8 +537,8 @@ function configure_cpu() {
             done
         fi
 
-        # Only diff to Skylake is = PKU  AVX512VNNI  SPEC_CTRL  SPEC_CTRL_SSBD
-        # plus the VMX which is to be ignored, unless Host = Intel ?? REVIEW
+        # Only diff to Skylake is = PKU  AVX512VNNI  SPEC_CTRL  SPEC_CTRL_SSBD  
+        # plus the VMX which is to be ignored, unless Host = Intel ?? REVIEW 
         # But Qemu doesn't allow spec ctrl for V3, at least
         # And avx512_vnni has underscore in lscpu but not hyphenated in qemu, so:
         if [[ "$CPU_MODEL" == 'Cascadelake-Server'* ]]; then
@@ -546,7 +546,7 @@ function configure_cpu() {
             if ! check_cpu_flag "avx512_vnni"; then CPU+=",avx512vnni=off" ; fi
         fi
 
-        [[ $UseHostOverWrite ]] && CPU="-cpu host,kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off"
+        [[ $UseHostOverWrite ]] && CPU="-cpu host,kvm=on,vendor=GenuineIntel,vmware-cpuid-freq=on,pdpe1gb=off" 
 
         # Disable S3 support in the VM to prevent macOS suspending during install
         GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
@@ -859,7 +859,7 @@ function configure_os_quirks() {
             #   * VirtIO Memory Balloning is supported since Big Sur (https://pmhahn.github.io/virtio-balloon/)
             #   * VirtIO RNG is supported since Big Sur, but exposed to all guests by default.
             case ${macos_release} in
-                big-sur|monterey|ventura|sonoma)
+                big-sur|monterey|ventura|sonoma|sequoia)
                     BALLOON="-device virtio-balloon"
                     MAC_DISK_DEV="virtio-blk-pci"
                     NET_DEVICE="virtio-net"
@@ -886,7 +886,10 @@ function configure_os_quirks() {
 
 function configure_storage() {
     local create_options=""
-    echo " - Disk:     ${disk_img} (${disk_size})"
+    # 'disk_size' is only reliable on first creation as it is read from .conf ....
+    #  remove size report here as disks can be resized when using qqX, plus qqX supplies much more boot data anyway
+    # echo " - Disk:     ${disk_img} (${disk_size})"
+    echo " - Disk:     ${disk_img}"
     if [ ! -f "${disk_img}" ]; then
         # If there is no disk image, create a new image.
         mkdir -p "${VMDIR}" 2>/dev/null
@@ -975,7 +978,12 @@ function configure_storage() {
 function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
-    if ! command -v pacmd >/dev/null 2>&1 ; then
+    if pidof pipewire >/dev/null 2>&1; then
+        # QEMU's pipewire audio backend was added in version 8.1
+        if [ "${QEMU_VER_SHORT}" -ge 81 ]; then
+            AUDIO_DRIVER="pipewire"
+        fi
+    elif ! pidof pulseaudio >/dev/null 2>&1; then
       AUDIO_DRIVER="alsa"
     fi
 
@@ -1276,6 +1284,8 @@ function vm_boot() {
     # Set the hostname of the VM
     NET="user,hostname=${VMNAME}"
 
+    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
+
     configure_cpu
     configure_ram
     configure_bios
@@ -1287,8 +1297,6 @@ function vm_boot() {
     configure_file_sharing
     configure_usb
     configure_tpm
-
-    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
     # Changing process name is not supported on macOS
     if [ "${OS_KERNEL}" == "Linux" ]; then
@@ -1474,10 +1482,6 @@ function vm_boot() {
         args+=(-boot order=d
             -drive if=ide,index=2,media=cdrom,file="${iso}")
         iso=""
-    elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
-        # Attach the unattended configuration to Windows guests when booting from ISO
-        # shellcheck disable=SC2054
-        args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
     fi
 
     if [ -n "${floppy}" ]; then
@@ -1490,7 +1494,24 @@ function vm_boot() {
         args+=(-drive media=cdrom,index=0,file="${iso}")
     fi
 
-    if [ -n "${fixed_iso}" ]; then
+    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
+        # Attach the unattended configuration to Windows guests when booting from ISO
+        if [[ ! -e "${VMDIR}/disk.qcow2" ]] || [[ ! $(du -b -t 1000000 "${VMDIR}/disk.qcow2" 2>/dev/null) ]]; then
+            if [ -e "${VMDIR}/unattended.iso" ] && [ -n "${fixed_iso}" ]; then
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=1,file="${VMDIR}/unattended.iso")
+                # shellcheck disable=SC2054
+                args+=(-drive media=cdrom,index=2,file="${fixed_iso}")
+            else
+                echo; echo "ERROR!  Windows download incomplete:"
+                echo "Required ISO files 'virtio-win.iso' and 'unattended.iso' not found." 
+                exit 1
+            fi
+        else
+            # shellcheck disable=SC2054
+            args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+        fi
+    elif [ -n "${fixed_iso}" ]; then
         # shellcheck disable=SC2054
         args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
     fi
@@ -2008,7 +2029,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="HB 4.9.6.08"
+readonly VERSION="HB 4.9.8.04"
 
 # TODO: Make this run the native architecture binary
 ARCH_VM="x86_64"
