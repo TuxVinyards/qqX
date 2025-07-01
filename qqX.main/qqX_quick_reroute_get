@@ -452,7 +452,7 @@ iso_get_message () {
 
 function_quick_get_wrap ()  {
 
-  InternetUp=
+  # InternetUp= is now cleared by '[R] refresh' and now calls 'test_internet_is_up' on demand.
   show_QWG_header
   QGW_List_NumSelected=
   GT_Exit=
