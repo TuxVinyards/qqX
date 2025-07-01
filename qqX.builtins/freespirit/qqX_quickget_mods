@@ -688,6 +688,8 @@ case "${1}" in
         printf "\n\n  --full-check      [os] [release] [edition] : Full Hash/Iso to StdOut, plus log to file \"/tmp/qGet_FullResult.txt\""
         printf "\n\n  --compact-check   [os] [release] [edition] : Short line StdOut, plus log to file \"/tmp/qGet_CompactResult.txt\""
         printf "\n\n  --quiet-check     [os] [release] [edition] : Only log check image URL(s) to file \"/tmp/qGet_QuietResult.txt\""
+        printf "\n\n  Without a specified 'OS' will run a complete 'test_all' whilst with 'OS' will test all releases and editions of that specified."
+        printf "\n\n  Lastly, 2 or 3 part final descriptor checks will route through 'web_get' and will output plain results, without a log filename reminder."
         printf "\n\n----------------------------------------------------------------------------------\n\n"
         exit 0 ;;
 esac
