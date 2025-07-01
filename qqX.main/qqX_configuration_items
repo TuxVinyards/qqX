@@ -39,6 +39,7 @@ custom_conf_notes () {
     keyboard=           'usb' (default), 'ps2', 'virtio'
     keyboard_layout=    'en-us' (default)
     mouse=              'tablet' (default), 'ps2', 'usb', 'virtio'
+    network=            'bridge' >> -nic bridge,br=bridge,model=virtio-net-pci
 
     boot=\"legacy\"     (use bios, not UEFI) default: =\"efi\"
 
