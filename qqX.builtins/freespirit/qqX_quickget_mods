@@ -150,7 +150,8 @@ function distro_release_notes {
 # Some distros single release with no editions eg. bluestar
 
 # Quickget's legacy behaviour is to return a 'STOCK LIST' of editions when no release is supplied ...
-# Probably has room for improvement but a list should be given. See 'editions_anduinos' for example script.
+# Probably has room for improvement but a list should be given.
+# See 'editions_anduinos' for example script. Also see 'editions_gnomeos' for a per edition check routine, where some may be absent.
 
 # Note that Quickget's 'web_pipe()' is an alias for Curl and will generate STDOUT by itself, without needing 'echo'.
 # Also that further echoes can be avoided via Bash's <<< 'herestring' feature.
@@ -290,6 +291,44 @@ function get_fedora() {
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
+}
+
+## FIX & UPDATE to current format
+function releases_gnomeos() {
+    web_pipe "https://download.gnome.org/gnomeos/" | grep -s href | grep link | fv -M 3 -Q
+}
+function editions_gnomeos() {
+    if [[ ! $RELEASE ]]; then  echo "release rc beta alpha"
+    else
+        local GnomeBase= ; GnomeBase="${RELEASE/%.*}"
+        local GnomeFolder= ; local BaseUrl= ; local ISO= ; local GnomeChk= ; local GnomeEditions=
+        for GnomeChk in release rc beta alpha ; do
+            case $GnomeChk in
+                release)    GnomeFolder="${GnomeBase}.0" ;;
+                rc)         GnomeFolder="${GnomeBase}.rc" ;;
+                beta)       GnomeFolder="${GnomeBase}.beta" ;;
+                alpha)      GnomeFolder="${GnomeBase}.alpha" ;;
+            esac
+            BaseUrl="https://download.gnome.org/gnomeos/${GnomeFolder}"
+            # each folder has the latest only, but alpha may exist without beta and rc etc
+            ISO="$(web_pipe "$BaseUrl" | grep -s href | tr ' ' '\n' | grep title | head -n 1 | cut -d'"' -f2 )"
+            [[ "$ISO" == *'.iso' ]] && GnomeEditions+="$GnomeChk "
+        done
+        echo "$GnomeEditions"
+    fi
+}
+function get_gnomeos() {
+    local GnomeBase= ; GnomeBase="${RELEASE/%.*}" ; local GnomeFolder= ; local BaseUrl= ; local ISO=
+    case $EDITION in
+        release)    GnomeFolder="${GnomeBase}.0" ;;
+        rc)         GnomeFolder="${GnomeBase}.rc" ;;
+        beta)       GnomeFolder="${GnomeBase}.beta" ;;
+        alpha)      GnomeFolder="${GnomeBase}.alpha" ;;
+    esac
+    BaseUrl="https://download.gnome.org/gnomeos/${GnomeFolder}"
+    # each folder has the latest only, plus NO checksum eg. alpha.8.iso  Pick the list top just in case of changes. (REVIEW)
+    ISO="$(web_pipe "$BaseUrl" | grep -s href | tr ' ' '\n' | grep title | head -n 1 | cut -d'"' -f2 )"
+    echo "$BaseUrl/$ISO"
 }
 
 ## FIX url and make dynamic (no hash available)
