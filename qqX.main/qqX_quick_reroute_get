@@ -31,13 +31,14 @@ function quickget {
 ## DISTRO LISTINGS  (non-function sections are run only during initialization)
 
 # An eventual qqlist- prefix is needed to make sure any calls to Quickget don't confuse list names with distro names
-VM_ListingArray=("all" "desktop" "server-cl" "gaming" "ultra-light")
+VM_ListingArray=("all" "desktop" "server-cl" "gaming" "ultra-light" "security")
 declare -gA VM_Listing_Info=()
 VM_Listing_Info[all,info]="All listed Distros, of all types."
 VM_Listing_Info[desktop,info]="All distros, minus the server list. The mainly Desktop focused distros."
 VM_Listing_Info[server-cl,info]="The mainly Server focused distros."
-VM_Listing_Info[gaming,info]="Distros with gaming tuned kernels or with releases that offer gaming focused options"
-VM_Listing_Info[ultra-light,info]="Super Small from ~100 to 500 Mb or so, ideal for USB sticks and similar"
+VM_Listing_Info[gaming,info]="Distros with gaming tuned kernels or with releases that offer gaming focused options."
+VM_Listing_Info[ultra-light,info]="Super Small from ~100 to 500 Mb or so, ideal for USB sticks and similar."
+VM_Listing_Info[security,info]="Distros for network specialists, security engineers, pen-testers and those wanting privacy lock-downs."
 if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
 else VM_ListingFilter="desktop"
 fi

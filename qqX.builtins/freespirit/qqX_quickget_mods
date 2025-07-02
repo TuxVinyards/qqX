@@ -75,12 +75,18 @@ osUsbList+=" slax slitaz tinycore "
 osUsbList="${osUsbList//'  '/' '}"
 osUsbList="${osUsbList//'  '/' '}"
 
+osSecList=" athenaos kali "
+osSecList+=" parrotsec tails "
+osSecList="${osSecList//'  '/' '}"
+osSecList="${osSecList//'  '/' '}"
+
 # A qqlist- prefix is used to make sure any calls to Quickget don't confuse list names with distro names
 # See function 'load_QGW_OS_Array' in the 'reroute_get' script
 if [[ $1 == "qqlist-desktop"  ]] ; then mapfile -t -O "${#osRemoveArr[@]}" -d ' ' osRemoveArr <<< "$osServersList"
 elif [[ $1 == "qqlist-server-cl" ]] ; then osSupported="$osServersList"
 elif [[ $1 == "qqlist-gaming" ]] ; then osSupported="$osGamingList"
 elif [[ $1 == "qqlist-ultra-light" ]] ; then osSupported="$osUsbList"
+elif [[ $1 == "qqlist-security" ]] ; then osSupported="$osSecList"
 else osSupported="$osSupported_All"
 fi
 
