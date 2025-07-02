@@ -292,6 +292,16 @@ function get_fedora() {
     echo "${URL} ${HASH}"
 }
 
+## FIX url and make dynamic (no hash available)
+function releases_guix() {
+    web_pipe "https://ftpmirror.gnu.org/gnu/guix" | grep -s -e 'system-install' | tr '<' '\n' | grep href | fv -M 2 -Q
+}
+function get_guix() {
+    local ISO="guix-system-install-${RELEASE}.x86_64-linux.iso"
+    local URL="https://ftpmirror.gnu.org/gnu/guix"
+    echo "${URL}/${ISO}"
+}
+
 ## FIX hashes
 function get_parrotsec() {
     local HASH="" ; local ISO="" ; local URL=""
