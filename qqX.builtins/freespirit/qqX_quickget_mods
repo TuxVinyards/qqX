@@ -523,10 +523,15 @@ function web_get() {
         # CARE is also needed so that distro checks don't trigger background downloads.
         # The QuickGet VARIANT CONVOLUTIONS can have lots of twists and turns ....
         if [[ "$OS" != *ubuntu* ]]; then
-            GetLine=$(get_"${OS}" "$RELEASE" "$EDITION")
+            local HASH= ; local GetLine= ; GetLine=$(get_"${OS}" "$RELEASE" "$EDITION")
+            # 'get_$OS' should output two args; a filepath URL, followed a checksum number
+            #  but additionally add mirror URL, if available or possible, to check the state of the mirror service,
+            #  noting that mirrors can block in the time gap between the location of a mirror URL and testing it.
             printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
-            URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+            # Leave as mirror URL, if available from above, if Check Mirrors requested. Otherwise reset.
+            [[ ! $CheckMirrors ]] && URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
             HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
+            [[ "$HASH" == *'://'* ]] && HASH=
         fi
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         printf "Using webget > %s %s" "$CHECK" "$URL" > "/tmp/qGet_webget_report.txt"
@@ -624,8 +629,12 @@ function test_all {
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 GetLine=$(get_"${OS}" "$RELEASE")
+                # 'get_$OS' should output two args; a filepath URL, followed a checksum number
+                #  but additionally add mirror URL, if available or possible, to check the state of the mirror service,
+                #  noting that mirrors can block in the time gap between the location of a mirror URL and testing it.
                 printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
                 URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+                [[ $CheckMirrors ]] &&  URL=$(web_redirect "${URL}")
                 HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
@@ -659,6 +668,7 @@ function test_all {
                 GetLine=$(get_"${OS}" "$RELEASE")
                 printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
                 URL=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $1}')
+                [[ $CheckMirrors ]] &&  URL=$(web_redirect "${URL}")
                 HASH=$(tr -cd '[:print:]' <<< "$GetLine" | awk '{print $2}')
                 CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}" "$HASH"
@@ -677,12 +687,16 @@ function test_all {
 # Case mods will either clear any listed args and set flags early, or will run something and exit here,
 # effectively being able to bypass selected original Quickget case statements, or add new ones ...
 
-QuietOps= ; CompactOps= ; FullCheckOps=
+QuietOps= ; CompactOps= ; FullCheckOps= ; CheckMirrors=
 printf "Webget NOT used\n" > "/tmp/qGet_webget_report.txt"
 
 case "${1}" in
+    --mirrors)
+        CheckMirrors=1 ; shift
+    ;;
     --full-check|--check|-check)
         OPERATION="test" ; shift
+        [[ $1 == "--mirrors" ]] && CheckMirrors=1 && shift
         FullCheckOps=1 && printf "" > "/tmp/qGet_FullResult.txt"
         if [[ ! $1 ]]; then
             for OS in $(os_support); do test_all "${OS}"
@@ -696,6 +710,7 @@ case "${1}" in
         [[ $1 == "--quiet-check" ]] &&  QuietOps=1 && printf "" > "/tmp/qGet_QuietResult.txt"
         [[ $1 == "--compact-check" ]] &&  CompactOps=1  && printf "" > "/tmp/qGet_CompactResult.txt"
         OPERATION="test" ; shift
+        [[ $1 == "--mirrors" ]] && CheckMirrors=1 && shift
         if [[ ! $1 ]]; then
             for OS in $(os_support); do test_all "${OS}"
             done
@@ -711,6 +726,7 @@ case "${1}" in
         printf "\n\n  --full-check      [os] [release] [edition] : Full Hash/Iso to StdOut, plus log to file \"/tmp/qGet_FullResult.txt\""
         printf "\n\n  --compact-check   [os] [release] [edition] : Short line StdOut, plus log to file \"/tmp/qGet_CompactResult.txt\""
         printf "\n\n  --quiet-check     [os] [release] [edition] : Only log check image URL(s) to file \"/tmp/qGet_QuietResult.txt\""
+        printf "\n\n  --mirrors         Add-on switch for the above tests, to check the state of possible mirror services."
         printf "\n\n  Without a specified 'OS' will run a complete 'test_all' whilst with 'OS' will test all releases and editions of that specified."
         printf "\n\n  Lastly, 2 or 3 part final descriptor checks will route through 'web_get' and will output plain results, without a log filename reminder."
         printf "\n\n----------------------------------------------------------------------------------\n\n"
