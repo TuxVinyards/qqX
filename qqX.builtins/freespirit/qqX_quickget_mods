@@ -70,11 +70,17 @@ osGamingList+=" popos sparkylinux "
 osGamingList="${osGamingList//'  '/' '}"
 osGamingList="${osGamingList//'  '/' '}"
 
+osUsbList=" alpine freedos kolibrios "
+osUsbList+=" slax slitaz tinycore "
+osUsbList="${osUsbList//'  '/' '}"
+osUsbList="${osUsbList//'  '/' '}"
+
 # A qqlist- prefix is used to make sure any calls to Quickget don't confuse list names with distro names
 # See function 'load_QGW_OS_Array' in the 'reroute_get' script
 if [[ $1 == "qqlist-desktop"  ]] ; then mapfile -t -O "${#osRemoveArr[@]}" -d ' ' osRemoveArr <<< "$osServersList"
 elif [[ $1 == "qqlist-server-cl" ]] ; then osSupported="$osServersList"
 elif [[ $1 == "qqlist-gaming" ]] ; then osSupported="$osGamingList"
+elif [[ $1 == "qqlist-ultra-light" ]] ; then osSupported="$osUsbList"
 else osSupported="$osSupported_All"
 fi
 
@@ -500,12 +506,12 @@ function web_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        # CAUTION with current Quickemu, $RELEASE and $EDITION may be generated already.
-        # Current behaviour is that Quickemu will route distros with editions through web_GET.
+        # CAUTION with current QuickGet, $RELEASE and $EDITION may be generated already.
+        # Current behaviour is that QuickGet will route distros with editions through web_GET.
         # Others, such as Macos, have their own special routines.
         # Those without, go through web_CHECK.
         # CARE is also needed so that distro checks don't trigger background downloads.
-        # The QuickEmu VARIANT CONVOLUTIONS can have lots of twists and turns ....
+        # The QuickGet VARIANT CONVOLUTIONS can have lots of twists and turns ....
         if [[ "$OS" != *ubuntu* ]]; then
             GetLine=$(get_"${OS}" "$RELEASE" "$EDITION")
             printf "%s" "$GetLine" > "/tmp/qGet-test-all-GetLine.txt"
@@ -661,7 +667,7 @@ function test_all {
 # Case mods will either clear any listed args and set flags early, or will run something and exit here,
 # effectively being able to bypass selected original Quickget case statements, or add new ones ...
 
-QuietOps= ; CompactOps=
+QuietOps= ; CompactOps= ; FullCheckOps=
 printf "Webget NOT used\n" > "/tmp/qGet_webget_report.txt"
 
 case "${1}" in
