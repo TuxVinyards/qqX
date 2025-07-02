@@ -245,7 +245,7 @@ while true; do
     [[ $EmptyInput ]] && [[ -e "$qqf_Input_Drivepath" ]] && printf "  EMPTY DRIVE (needs partioning?)"
   fi
 
-  printColor "\n\n\n  [enter] to change %s connections   or  [option] for different selection"  "$TargetName"
+  printColor "\n\n\n  [enter] to change %s connections   or  [option] for different selection"  "${TargetName^^}"
   printf "\n\n  [r] to refresh vars  [f] open drive in file-manager  [h] help   [q] to quit "
 
   printf "\n\n"
