@@ -65,7 +65,7 @@ osServersList+=" truenas-core truenas-scale ubuntu-server windows-server "
 osServersList="${osServersList//'  '/' '}"
 osServersList="${osServersList//'  '/' '}"
 
-osGamingList=" bazzite cachyos garuda nobara "
+osGamingList=" batocera bazzite cachyos garuda nobara "
 osGamingList+=" popos sparkylinux "
 osGamingList="${osGamingList//'  '/' '}"
 osGamingList="${osGamingList//'  '/' '}"
@@ -520,7 +520,9 @@ function web_pipe_json {
 function check_pipe {
     local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
     printf "" > "/tmp/qGet_check_pipe.txt"
-    if ! curl --disable -sLf --head --retry 16 --retry-max-time 2 --connect-timeout 2 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"; then
+    curl --disable -sLf --head --retry 16 --retry-max-time 2 --connect-timeout 2 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
+    if ! grep -si 'HTTP/' "/tmp/qGet_check_pipe.txt" | tail -n 1 | grep -q 200; then
+        printf "" > "/tmp/qGet_check_pipe.txt"
         curl --disable -sLf --head --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
     fi
     if grep -si 'HTTP/' "/tmp/qGet_check_pipe.txt" | tail -n 1 | grep -q 200; then return 0 ; else return 1 ; fi
@@ -668,7 +670,7 @@ function test_result {
 function test_all {
     OS="${1}"
     os_supported
-    local CHECK="" ; local FUNC="${OS}" ; local GetLine="" ; local URL="" ; local HASH=""
+    local CHECK="" ; local FUNC="${OS}" ; local GetLine="" ; local URL="" ; local HASH="" ; local EDITION= ; local RELEASE=
     [[ "${OS}" == *ubuntu* ]] && [[ "${OS}" != "ubuntu-server" ]] &&  FUNC="ubuntu"
     for RELEASE in $("releases_${FUNC}"); do
         if [[ $(type -t "editions_${OS}") == function ]]; then
@@ -771,7 +773,7 @@ case "${1}" in
         printf "\n\n  --full-check      [os] [release] [edition] : Full Hash/Iso to StdOut, plus log to file \"/tmp/qGet_FullResult.txt\""
         printf "\n\n  --compact-check   [os] [release] [edition] : Short line StdOut, plus log to file \"/tmp/qGet_CompactResult.txt\""
         printf "\n\n  --quiet-check     [os] [release] [edition] : Only log check image URL(s) to file \"/tmp/qGet_QuietResult.txt\""
-        printf "\n\n  --mirrors         Add-on switch for the above tests, to check the state of possible mirror services."
+        printf "\n\n  --mirrors         Add-on switch for the above tests, to show info on possible mirror services. Omit switch for definitive testing."
         printf "\n\n  Without a specified 'OS' will run a complete 'test_all' whilst with 'OS' will test all releases and editions of that specified."
         printf "\n\n  Lastly, 2 or 3 part final descriptor checks will route through 'web_get' and will output plain results, without a log filename reminder."
         printf "\n\n----------------------------------------------------------------------------------\n\n"
