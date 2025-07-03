@@ -347,6 +347,11 @@ function get_guix() {
     echo "${URL}/${ISO}"
 }
 
+## TWEAK  only 9 now ... REVIEW make dynamic?
+function releases_mageia() {
+    echo 9
+}
+
 ## FIX hashes and folders
 function releases_parrotsec() {
   # July 2025 > only latest folder now has iso's
