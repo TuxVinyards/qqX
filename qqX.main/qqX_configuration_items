@@ -274,26 +274,33 @@ function read_main_drive_and_img_iso_conf_vars {
 
 }
 
+check_conf_file_for_typos () {
+  # To be run before sourcing-in the config settings. Check for common mistakes.
+  local CheckFile= ; CheckFile="$1" ; local ConfChkArr=() ; local Line= ; ConfTypo=
+  mapfile -t ConfChkArr < "$CheckFile"
+  for Line in "${ConfChkArr[@]}" ; do
+    if awk '{print $1}' <<< "$Line" | grep -qs -e ^'#' ; then true
+    elif grep -q -e ' =' -e '= ' <<< "$Line" ; then ConfTypo="Equals Spacing:  $Line" ; break
+    fi
+  done
+  if [[ $ConfTypo ]]; then function_conf_error "ConfTypo" "$ConfTypo"
+  fi
+}
 
 function_conf_error () {
-
-  ErrorMenuSelect=
-  NewSetupFlag=
-
+  ErrorMenuSelect= ; NewSetupFlag=
   # clear any accidental initial double pressing of the enter key occuring while experiencing the error
   read -r -t 0.1
   read -r -t 0.1
   read -r -t 0.1
-
   if [[ $NewFileTuneUp_JustDone ]]; then NewFileTuneUp_JustDone= ; return ; fi
 
-  printf "\n\n  qqX Settings, VM folder & conf file(s)"
-
+  printColor "\n\n  qqX Settings, VM folder & conf file(s)"
   if [[ $1 == "No VMs" ]] ; then
     printColor "\n\n  No VMs - Probably time to welcome you to qqX and invite you to get some distros."
     printf "\n\n  The settings file and locations can usually be left till later ..."
   elif [[ $1 ]] ; then
-    printf "\n\n  Check %s settings, LOCATION & CONTENT ... "  "$1"
+    printf "\n\n  Check %s settings, possibly LOCATION and/or CONTENT ... "  "$1"
   else
     printf "\n\n  Check the settings and re-run this script ... "
   fi
@@ -301,27 +308,30 @@ function_conf_error () {
  [[ $GeneralLoopCheck ]] && echo
   dev_loop_check
 
-  printf "\n\n  Settings file:  %s \n\n" "$qqX_SettingsFile"
+  printf "\n\n  General Settings file:  %s \n\n" "$qqX_SettingsFile"
 
   if [[ "$1" == *'COMMAND'* ]]; then
-
     printColor "\n\n  [q] to quit "
     printf "  [enter] to view/edit settings file \n\n"
 
   elif [[ $1 == "new" ]]; then
-
-    printColor "\n  Starting NEW VIRTUAL MACHINE: \n\n"    #  REVIEW
+    printColor "\n  Starting NEW VIRTUAL MACHINE: \n\n"
     cat "$VM_Conf_File"
-    NewSetupFlag=1
-    IgnoreFolderCheck=1
-    SelectArrayError=
-
+    NewSetupFlag=1 ; IgnoreFolderCheck=1 ; SelectArrayError=
     printf "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
     printColor "\n\n  [c] continue  (with current settings) looks okay "
     printf "\\n\n  [d] delete   [e] to edit qqX general settings   [q] to quit \n\n"
 
-  elif [[ $1 == "folder" ]] ; then
+  elif [[ $1 == "ConfTypo" ]]; then
+    printColor "\n  Typo errors in the Config file: \n\n"
+    cat "$VM_Conf_File"
+    printColor "\n\n  %s" "$2"
+    NewSetupFlag= ; IgnoreFolderCheck= ; SelectArrayError=
+    printColor "\n\n\n  [enter]  edit the .conf file   [tune] run the config tune-up wizard "
+    printf "\n\n  [c] continue  (with current settings)  > ignore "
+    printf "\\n\n  [q] to quit \n\n"
 
+  elif [[ $1 == "folder" ]] ; then
     FolderConfigFlag=1
     printf "\n  Folder config ERROR:"
     [[ $2 ]] && printf "  '%s'"  "$2"
@@ -333,13 +343,11 @@ function_conf_error () {
     printf "   [q] to quit \n\n"
 
   elif [[ $1 == "qqX_SettingsFile" ]] ; then
-
     printf "\n  INTERNAL ERROR: "
     printColor "\n\n\n  Settings file not found: %s"  "$qqX_SettingsFile"
     printf "\n\n  [c] ignore and continue   [q] to quit \n\n"
 
   else
-
     # includes "$1" = ".conf file"
     printColor "\n\n  [Enter] to edit qqX general settings"
     [[ "$1" == *'No VMs'* ]] && printColor "  [gt] quickget a new distro "
@@ -382,9 +390,8 @@ function_conf_error () {
 
   else
 
-    if [[ $NewSetupFlag || $FolderConfigFlag ]]; then
-      NewSetupFlag=
-      FolderConfigFlag=
+    if [[ $NewSetupFlag || $FolderConfigFlag || $ConfTypo ]]; then
+      NewSetupFlag= ; FolderConfigFlag= ; ConfTypo=
       qqX_edit_settings  "conf"
     else  qqX_edit_settings
     fi
@@ -546,6 +553,7 @@ function refresh_conf_vars_and_values {
     done
 
     source "$ConfClearanceLog"
+    check_conf_file_for_typos "$VM_Conf_Dir/$VM_Conf_File"
     source "$VM_Conf_Dir/$VM_Conf_File"
 
     [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check

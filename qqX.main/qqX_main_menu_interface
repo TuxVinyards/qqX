@@ -373,6 +373,9 @@ else
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_Latest_ReleaseType" "$qqX_Latest_ReleaseNumber"
     fi
 
+    check_conf_file_for_typos "$VM_Conf_Dir/$VM_Conf_File"
+    [[ $ConfTypo ]] && printColor "\n\n  ERROR(s) detected in the Config file ...\n\n"
+
     if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then
       printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
     fi

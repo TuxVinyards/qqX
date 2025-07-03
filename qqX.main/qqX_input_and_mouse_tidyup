@@ -334,7 +334,7 @@ fi
 if [[ -e "$VM_Conf_Dir/$VM_Conf_File" ]] && [[ $XDG_Input_VM_qqX ]]; then
   cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to New VM Location"
   Current_VM_Folder="$Default_VM_Folder"
-  [[ $VM_Conf_File ]] && source "$VM_Conf_File"
+  [[ $VM_Conf_File ]] && check_conf_file_for_typos "$VM_Conf_File" && source "$VM_Conf_File"
   read_main_drive_and_img_iso_conf_vars
 else
   refresh_sources_and_load_VM_arrays
