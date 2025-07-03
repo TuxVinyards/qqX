@@ -406,6 +406,23 @@ function get_sparkylinux() {
     echo "${URL}/${ISO}" "${HASH}"
 }
 
+## tweak to avoid spamming on test_all
+function releases_spirallinux() {
+    Spiral_Latest="$(web_pipe "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name' | fv -M -Q)"
+    echo latest
+}
+function editions_spirallinux() {
+    echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+}
+function get_spirallinux() {
+    local HASH="" ; local LATEST="$Spiral_Latest"
+    [[ ! $LATEST ]] &&  LATEST="$(web_pipe "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name' | fv -M -Q)"
+    local ISO="SpiralLinux_${EDITION}_${LATEST}_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
+    HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
+    echo "${URL}/${ISO}" "${HASH}"
+}
+
 ## FIX invalid VOID folders (use 'current' only as some folders have variants)
 function releases_void() {
     web_pipe "https://repo-default.voidlinux.org/live/current" | grep -e '<a href=' | grep x86 | grep 'base\.iso' | grep -v musl | cut -d'-' -f4 | tr -cd '[:graph:]'
