@@ -372,6 +372,46 @@ function get_manjaro() {
     echo "${URL} ${HASH}"
 }
 
+## FIX and UPDATE to new folder styles and names
+function releases_opensuse() {
+    echo "leap leap-micro slowroll tumbleweed"
+}
+function editions_opensuse() {
+    if [[ ! $RELEASE ]]; then echo "DVD Gnome KDE XFCE Rescue"
+    elif [[ $RELEASE == "leap" ]]; then echo "Gnome KDE XFCE Rescue"
+    elif [[ $RELEASE == "leap-micro" ]]; then echo current
+    elif [[ $RELEASE == "slowroll" ]]; then echo DVD
+    elif [[ $RELEASE == "tumbleweed" ]]; then echo "DVD Gnome KDE XFCE Rescue"
+    fi
+}
+function get_opensuse() {
+    local HASH="" ; local ISO="" ; local URL="" ; local SuseEdition=  ; local SuseRollPoint=
+    case $EDITION in
+        DVD)        SuseEdition="DVD" ;;
+        Gnome)      SuseEdition="GNOME-Live" ;;
+        KDE)        SuseEdition="KDE-Live" ;;
+        XFCE)       SuseEdition="XFCE-Live" ;;
+        Rescue)     SuseEdition="Rescue-CD" ;;
+    esac
+    if [ "${RELEASE}" == "tumbleweed" ]; then
+        URL="https://download.opensuse.org/tumbleweed/iso"
+        ISO="openSUSE-Tumbleweed-${SuseEdition}-x86_64-Current.iso"
+    elif [ "${RELEASE}" == "leap" ]; then
+        URL="https://download.opensuse.org/distribution/openSUSE-current/live"
+        ISO="$(web_pipe "$URL" | tr '>' '\n' |  grep x86 | grep -e 'iso\"' | cut -d '"' -f 2 | cut -d '/' -f 2 | grep -v Build | grep -e "$SuseEdition"  )"
+    elif [ "${RELEASE}" == "leap-micro" ]; then
+        URL="https://download.opensuse.org/distribution/leap-micro-current/product/iso"
+        ISO="$(web_pipe "$URL" | tr '>' '\n' | grep -i -s -e 'current\.iso' | grep x86 | grep -v mirror | grep href | cut -d '"' -f 2 | cut -d '/' -f 2 | grep -v sha256)"
+    elif [ "${RELEASE}" == "slowroll" ]; then
+        URL="https://download.opensuse.org/slowroll/iso"
+        SuseRollPoint="$(web_pipe "$URL" | tr '<' '\n' | grep href | grep -s DVD | cut -d '"' -f 2 | cut -d '-' -f 5 | fv -M -Q)"
+        ISO="$(web_pipe "$URL" | tr '<' '\n'| grep href | grep DVD | cut -d '"' -f 2 | grep -s -v -e 'iso\.' | grep -v -e 'x\.' | grep "$SuseRollPoint" | cut -d '/' -f 2)"
+    fi
+    HASH="$(web_pipe "$URL/${ISO}.sha256" | cut -d ' ' -f 1)"
+    echo "$URL/${ISO} $HASH"
+}
+
+
 ## FIX hashes and folders
 function releases_parrotsec() {
   # July 2025 > only latest folder now has iso's
@@ -824,7 +864,7 @@ case "${1}" in
         printf "\n\n  --full-check      [os] [release] [edition] : Full Hash/Iso to StdOut, plus log to file \"/tmp/qGet_FullResult.txt\""
         printf "\n\n  --compact-check   [os] [release] [edition] : Short line StdOut, plus log to file \"/tmp/qGet_CompactResult.txt\""
         printf "\n\n  --quiet-check     [os] [release] [edition] : Only log check image URL(s) to file \"/tmp/qGet_QuietResult.txt\""
-        printf "\n\n  --mirrors         Add-on switch for the above tests, to show info on possible mirror services. Omit switch for definitive testing."
+        printf "\n\n  --mirrors         Add-on for the above tests, to show info on possible mirror services. Omit for more generalized testing."
         printf "\n\n  Without a specified 'OS' will run a complete 'test_all' whilst with 'OS' will test all releases and editions of that specified."
         printf "\n\n  Lastly, 2 or 3 part final descriptor checks will route through 'web_get' and will output plain results, without a log filename reminder."
         printf "\n\n----------------------------------------------------------------------------------\n\n"
