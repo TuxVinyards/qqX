@@ -528,16 +528,16 @@ function error_specify_release {
 # Download a SMALL file page, checksum etc from the web and pipe it to stdout  (not to confuse with 'web_get')
 function web_pipe {
     local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
-    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 "${Args[@]}"; then
-        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 "${Args[@]}"
+    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --no-keepalive --max-time 30 "${Args[@]}"; then
+        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --no-keepalive --max-time 30 "${Args[@]}"
     fi
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json {
     local Args=("${@}") ; [[ ! "${Args[*]}" ]] && return 1
-    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"; then
-        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --keepalive-time 2 --max-time 30 --header "Accept: application/json" "${Args[@]}"
+    if ! curl --disable -sLf --retry 8 --retry-max-time 4 --connect-timeout 4 --no-keepalive --max-time 30 --header "Accept: application/json" "${Args[@]}"; then
+        curl --disable -sLf --retry 6 --retry-max-time 6 --connect-timeout 6 --no-keepalive --max-time 30 --header "Accept: application/json" "${Args[@]}"
     fi
 }
 
@@ -549,7 +549,7 @@ function check_pipe {
     curl --disable -sLf --head --retry 16 --retry-max-time 2 --connect-timeout 2 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
     if ! grep -si 'HTTP/' "/tmp/qGet_check_pipe.txt" | tail -n 1 | grep -q 200; then
         printf "" > "/tmp/qGet_check_pipe.txt"
-        curl --disable -sLf --head --retry 8 --retry-max-time 4 --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
+        curl --disable -sLf --head --retry 8 --retry-max-time 4 --connect-timeout 4 --no-keepalive --location-trusted --max-time 30 "${Args[@]}" > "/tmp/qGet_check_pipe.txt"
     fi
     if grep -si 'HTTP/' "/tmp/qGet_check_pipe.txt" | tail -n 1 | grep -q 200; then return 0 ; else return 1 ; fi
 }
@@ -562,7 +562,7 @@ function check_pipe {
 function web_redirect() {
     local REDIRECT_URL="" ; local URL="${1}"
     REDIRECT_URL=$(curl --disable -sLf --connect-timeout 4 --no-keepalive --location-trusted --max-time 6 --write-out '%{url_effective}' -o "/dev/null" "${URL}" | tr -cd '[:print:]')
-    [[ ! $REDIRECT_URL ]] && REDIRECT_URL=$(curl --disable -sLf --connect-timeout 4 --keepalive-time 2 --location-trusted --max-time 8 --write-out '%{url_effective}' -o "/dev/null" "${URL}" | tr -cd '[:print:]')
+    [[ ! $REDIRECT_URL ]] && REDIRECT_URL=$(curl --disable -sLf --connect-timeout 4 --keepalive-time 1 --location-trusted --max-time 8 --write-out '%{url_effective}' -o "/dev/null" "${URL}" | tr -cd '[:print:]')
     if [[ $REDIRECT_URL ]] && [[ $REDIRECT_URL != "${URL}" ]]; then echo "${REDIRECT_URL}"
     else echo "${URL}"
     fi
