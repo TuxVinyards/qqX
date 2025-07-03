@@ -347,11 +347,20 @@ function get_guix() {
     echo "${URL}/${ISO}"
 }
 
-## FIX hashes
+## FIX hashes and folders
+function releases_parrotsec() {
+  # July 2025 > only latest folder now has iso's
+  Parrot_Latest="$(web_pipe "https://deb.parrot.sh/parrot/iso/" | grep -s href | fv -Q -M)"
+  echo latest
+}
+function editions_parrotsec() {
+    echo home htb security
+}
 function get_parrotsec() {
-    local HASH="" ; local ISO="" ; local URL=""
-    ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
-    URL="https://deb.parrot.sh/parrot/iso/${RELEASE}"
+    local HASH="" ; local ISO="" ; local URL="" ; local LATEST="$Parrot_Latest"
+    [[ ! $LATEST ]] && LATEST="$(web_pipe "https://deb.parrot.sh/parrot/iso/" | grep -s href | fv -Q -M)"
+    ISO="Parrot-${EDITION}-${LATEST}_amd64.iso"
+    URL="https://deb.parrot.sh/parrot/iso/${LATEST}"
     HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep -s -A 30 'sha256' | grep -B 30 'sha384' | grep "${ISO}" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
