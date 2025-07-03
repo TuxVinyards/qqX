@@ -352,6 +352,26 @@ function releases_mageia() {
     echo 9
 }
 
+## FIX sway
+function get_manjaro() {
+    local HASH="" ; local ISO="" ; local MANIFEST="" ; local URL="" ; local TYPE="official"
+    MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    case "${RELEASE}" in
+        sway) MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)" ; TYPE="sway" ;;
+        cinnamon|i3) TYPE="community";;
+    esac
+    if [ "${EDITION}" == "minimal" ] && [ "${TYPE}" != "sway" ]; then EDITION=".minimal"
+    else EDITION=""
+    fi
+    if [ "${RELEASE}" == "sway" ]; then
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | .url' | grep -v 'unstable')
+    else
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}.${RELEASE}${EDITION}".image)"
+    fi
+    HASH=$(web_pipe "${URL}.sha512" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
 ## FIX hashes and folders
 function releases_parrotsec() {
   # July 2025 > only latest folder now has iso's
