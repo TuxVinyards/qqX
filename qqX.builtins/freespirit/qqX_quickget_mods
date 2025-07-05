@@ -411,7 +411,6 @@ function get_opensuse() {
     echo "$URL/${ISO} $HASH"
 }
 
-
 ## FIX hashes and folders
 function releases_parrotsec() {
   # July 2025 > only latest folder now has iso's

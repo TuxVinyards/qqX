@@ -36,8 +36,8 @@ if [[ $XDG_MimeType_is_QCOW ]]; then
 fi
 
 if [[ $Trace_InputVars ]]; then
-  echo; echo "qqX VM = $XDG_Input_VM_qqX  I = $VM_InstanceName" ; echo "conf = $VM_Conf_File" ; sleep "$Trace_InputVars"
-  echo "VM_qqX = $XDG_Input_VM_qqX  NON_qqX = $XDG_Input_NON_qqX "
+  echo; echo "qqX VM=$XDG_Input_VM_qqX  I=$VM_InstanceName" ; echo "conf=$VM_Conf_File" ; sleep "$Trace_InputVars"
+  echo "VM_qqX=$XDG_Input_VM_qqX  NON_qqX=$XDG_Input_NON_qqX "
   echo "pwd  $(pwd)" ; echo; sleep "$Trace_InputVars"
 fi
 
@@ -56,8 +56,8 @@ input_re_route () {
     cd "$QCOW_Input_Dir" || printf "\n\n XDG .desktop starter  >  Disk's start Folder not found "
     Current_VM_Folder="$QCOW_Input_Dir"
     if [[ $Trace_InputVars ]]; then
-      echo; echo "qqX VM = $XDG_Input_VM_qqX  I = $VM_InstanceName" ; echo "conf = $VM_Conf_File" ; sleep "$Trace_InputVars"
-      echo "VM_qqX = $XDG_Input_VM_qqX  NON_qqX = $XDG_Input_NON_qqX "
+      echo; echo "qqX VM=$XDG_Input_VM_qqX  I=$VM_InstanceName" ; echo "conf=$VM_Conf_File" ; sleep "$Trace_InputVars"
+      echo "VM_qqX=$XDG_Input_VM_qqX  NON_qqX=$XDG_Input_NON_qqX "
       echo "pwd  $(pwd)" ; echo; sleep "$Trace_InputVars"
     fi
   elif [[ $XDG_StartVariant != "c" ]]; then
@@ -340,5 +340,5 @@ else
   refresh_sources_and_load_VM_arrays
 fi
 
-[[ $GeneralLoopCheck ]] && printf "\n\n End of Api & Mouse:" &&  dev_loop_check
+[[ $Loop_Diagnostics ]] && printf "\n\n End of Api & Mouse Tidy up:" &&  main_loop_diagnostics
 

@@ -107,7 +107,7 @@ fi
 #  Check any MOUSE CLICK or COMMAND LINE parameters and set any initial flags
 #  Further processing is done in the 'qqX_input_and_mouse_tidyup' script, after other functions have been loaded
 
-if [[ $Trace_InputVars ]]; then echo "1: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
+if [[ $Trace_InputVars ]]; then echo "Input Args 1: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 if [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit ; fi
 
@@ -119,23 +119,33 @@ if [[ $1 == "--help" || $1 == "-h" ]] ; then echo; show_CLI_usage ; exit ; fi
 # On right click starts, the '%f' gets auto-replaced by a filename.
 [[ $1 == '%f' ]] && shift
 
+if [[ $Trace_InputVars ]]; then echo "Input Args 2: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
-if [[ $Trace_InputVars ]]; then echo "2: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
+# clean up input as different terminals and desktops have their quirks
+InputFilePath="$1" ;  InputFilePath="${InputFilePath//\'/}";  InputFilePath="${InputFilePath//\"/}"
+while [[ ${InputFilePath:0:1} == " " ]]; do  InputFilePath="${InputFilePath:1}" ; done
+while [[ ${InputFilePath:(-1):1} == " " ]]; do  InputFilePath="${InputFilePath:0:(-1)}" ; done
+
+if [[ $Trace_InputVars ]]; then echo "Input Args 3: $InputFilePath"  ; echo  ; sleep "$Trace_InputVars" ; fi
 
 # SORT OUT if '$1' is a readable file or drive, what MIME-TYPE it is, and what main folder to CD to.
 
-if [[ -e "$1" ]]; then
+if [[ -e "$InputFilePath" ]]; then
 
   XDG_FileType_Recognised=
   XDG_MimeType_Recognised=
   XDG_MimeType_is_ISO=
   XDG_MimeType_is_QCOW=
   XDG_ISO_Name=
-  XDG_RealPathName="$(realpath "$1")"
-  XDG_MimeType="$(mimetype "$XDG_RealPathName" 2>/dev/null)"
+  XDG_RealPathName="$(realpath "$InputFilePath")"
+  if [[ $(type -p xdg-mime) ]]; then
+    XDG_MimeType="$(xdg-mime query filetype "$XDG_RealPathName" 2>/dev/null)"
+  elif [[ $(type -p mimetype) ]]; then
+    XDG_MimeType="$(mimetype "$XDG_RealPathName" 2>/dev/null)"
+  fi
   Current_VM_Folder="$(dirname "$XDG_RealPathName")"
   if [[ $Trace_InputVars ]]; then
-    echo "RP $XDG_RealPathName" ; echo "MT $XDG_MimeType" ; echo "CF  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars"
+    echo "RealPathName $XDG_RealPathName" ; echo "MimeType $XDG_MimeType" ; echo "Current_VM_Folder  $Current_VM_Folder"  ; echo  ; sleep "$Trace_InputVars"
   fi
 
   if [[ "$XDG_MimeType" == *'application/x-qemu-disk' ]]; then
@@ -172,7 +182,7 @@ if [[ -e "$1" ]]; then
 
   elif [[ "$XDG_RealPathName" == *'.iso' ]]; then
     XDG_FileType_Recognised=1
-    XDG_ISO_Name="$1"
+    XDG_ISO_Name="$InputFilePath"
     if [[ "$XDG_MimeType" == *'application/x-cd-image' || "$XDG_MimeType" == *'application/vnd.efi.iso' ]]; then
       XDG_MimeType_is_ISO=1 ; XDG_MimeType_Recognised=1
     fi
@@ -188,7 +198,7 @@ if [[ -e "$1" ]]; then
       VM_Conf_File="$(basename "$XDG_RealPathName")"
       VM_InstanceName="${VM_Conf_File/'.conf'/}"
       if [[ $Trace_InputVars ]]; then
-        echo "R: $XDG_RealPathName"  ; echo
+        echo; echo "R: $XDG_RealPathName" ; echo
         echo "D: $VM_Conf_Dir"  ; echo
         echo "C: $VM_Conf_File"  ; echo
         echo "N: $VM_InstanceName"  ; echo  ; sleep "$Trace_InputVars"
@@ -235,15 +245,15 @@ if [[ -e "$1" ]]; then
 
   fi
 
-  if [[ $Trace_InputVars ]]; then echo "3: $*"  ; echo  ; sleep "$Trace_InputVars" ; fi
-
 else  Current_VM_Folder="$(pwd)"
 
 fi
 
 # establishes a non-volatile transfer variable and flags qqX main loops to trigger 'input_and_mouse_tidy' script
-if [[ $1 ]]; then Initial_Input="$1" ; shift ; else Initial_Input=
+if [[ $1 ]]; then Initial_Input="$InputFilePath" ; shift ; else Initial_Input=
 fi
+
+[[ $Loop_Diagnostics ]] && printf "\n\n End of qqX Initialize:" &&  main_loop_diagnostics
 
 
 # vim:tabstop=2:shiftwidth=2:expandtab

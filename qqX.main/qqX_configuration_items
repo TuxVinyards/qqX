@@ -305,8 +305,8 @@ function_conf_error () {
     printf "\n\n  Check the settings and re-run this script ... "
   fi
 
- [[ $GeneralLoopCheck ]] && echo
-  dev_loop_check
+ [[ $Loop_Diagnostics ]] && echo
+  main_loop_diagnostics
 
   printf "\n\n  General Settings file:  %s \n\n" "$qqX_SettingsFile"
 
@@ -530,7 +530,7 @@ function refresh_conf_vars_and_values {
     # left off as if active then utils menu bm function reverts to defaults after booting once ...
     # at ver 1.12.01 has been placed into qqX main loop so switching vm is clean
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 1:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Conf refresh 1:" &&  main_loop_diagnostics
 
     # clear & re-populate the ConfClearanceLog with current fields, for the next occasion
 
@@ -556,7 +556,7 @@ function refresh_conf_vars_and_values {
     check_conf_file_for_typos "$VM_Conf_Dir/$VM_Conf_File"
     source "$VM_Conf_Dir/$VM_Conf_File"
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 2:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Conf refresh 2:" &&  main_loop_diagnostics
     # check any menu values that are based on the file .conf
     check_screen_percentage_and_output
     read_main_drive_and_img_iso_conf_vars
@@ -565,7 +565,7 @@ function refresh_conf_vars_and_values {
 
     refresh_logfile_locations
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n Conf refresh 3:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Conf refresh 3:" &&  main_loop_diagnostics
 
   fi
 

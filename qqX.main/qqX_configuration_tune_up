@@ -91,8 +91,8 @@ function_config_tune_up ()  {
   cp "$TuneUpTargetFile"  "$TuneUpOldFile"
   cp  "$TuneUpTargetFile"  "$TuneUpTmpCopy"
 
-  [[ $GeneralLoopCheck ]] && echo && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer" && echo "Conf_SysQE_Pointer = $Conf_SysQE_Pointer"  && echo
-  dev_loop_check
+  [[ $Loop_Diagnostics ]] && echo && echo "Conf_qqX_Pointer = $Conf_qqX_Pointer" && echo "Conf_SysQE_Pointer = $Conf_SysQE_Pointer"  && echo
+  main_loop_diagnostics
 
   printColor "\n\n  CHECK ME: \n\n"
   cat "$TuneUpTargetFile"
@@ -170,7 +170,7 @@ function_config_tune_up ()  {
   fi
 
 
-  dev_loop_check
+  main_loop_diagnostics
 
   # qcow disk
   ConfLine="$(grep -s 'disk_img' "$TuneUpTmpCopy")"

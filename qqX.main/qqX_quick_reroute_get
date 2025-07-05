@@ -458,7 +458,7 @@ function_quick_get_wrap ()  {
   show_QWG_header
   QGW_List_NumSelected=
   GT_Exit=
-  dev_loop_check ; [[ $GeneralLoopCheck ]] && echo
+  main_loop_diagnostics ; [[ $Loop_Diagnostics ]] && echo
   clear_main_gt_start_vars
 
   while [[ ! $InternetUp ]]; do
@@ -700,7 +700,7 @@ function_quick_get_wrap ()  {
 
       fi
 
-      [[ $GeneralLoopCheck ]] && printf "\n\n End of Quickget first loop, stage 1:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n End of Quickget first loop, stage 1:" &&  main_loop_diagnostics
 
 
       if [[ $CodingHotSwapShow || $GT_Help ]]; then
@@ -713,7 +713,7 @@ function_quick_get_wrap ()  {
       # End point of main OS selection loop
       QGW_List_NumSelected=
 
-      [[ $GeneralLoopCheck ]] && printf "\n\n End of Quickget first loop, stage 2:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n End of Quickget first loop, stage 2:" &&  main_loop_diagnostics
 
     done
 
@@ -1138,7 +1138,7 @@ function_quick_get_wrap ()  {
 
     while true ; do
 
-      dev_loop_check
+      main_loop_diagnostics
 
       if [[ $MainMenuZsync ]]; then
         QGW_OverWriteAlert=1
@@ -1346,7 +1346,7 @@ function_quick_get_wrap ()  {
   [[ $GT_Exit ]] && return
   finalize_QGW_targets
 
-  dev_loop_check
+  main_loop_diagnostics
 
   [[ $GT_Exit ]] && return
 

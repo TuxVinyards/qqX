@@ -136,7 +136,7 @@ function sort_qqX_builtin_settings {
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
   # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
 
-  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 1 :" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Sort builtins 1 :" &&  main_loop_diagnostics
 
   QE_SourcePath= ; QG_SourcePath= ; FreePath=
 
@@ -225,7 +225,7 @@ function sort_qqX_builtin_settings {
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10
   fi
 
-  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 2 :" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Sort builtins 2 :" &&  main_loop_diagnostics
 
 }
 

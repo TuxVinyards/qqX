@@ -632,7 +632,7 @@ move_rename_Selected_VM () {
   # Current behaviour, if moved, is to return to the VM selector and see the results of what we have done.
   # Or return back to menu if just renamed, but via the main loop and the configs reloader
 
-  [[ $GeneralLoopCheck ]] && printf "\n\n Move Finish:" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Move Finish:" &&  main_loop_diagnostics
 
 }
 

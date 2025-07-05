@@ -7,7 +7,7 @@
 # A text based Virtual Machine Manager for use with the 'quickemu' project
 # https://github.com/quickemu-project/quickemu
 
-# This script may be run directly from the folder but will need the settings file installing first.
+# This SCRIPT MAY BE RUN DIRECTLY FROM A DOWNLOAD, STORAGE or DEVELOPMENT FOLDER but will need the settings file installing first.
 # See notes in the Setup & Install script.
 
 # Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
@@ -60,42 +60,47 @@ sleep 0.4
 # Check name is okay. qqX but also lc qqx symlink.
 if [[ "$(basename "$0")" == "qqX" ]] || [[ "$(basename "$0")" == "qqx" ]]; then true; else echo; echo "Main File Name ERROR"; echo; exit 1 ; fi
 
-# DEV Start is used as flag to show which source is being used. Check if starting qqX directly from a source folder
-# i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present
+
+###############################################  DEVELOPER SELECTABLES  ##############################################
+
+# DEV Start is used as a flag to show which source is being used. Checks if it is starting qqX directly from a source folder
+# i.e one containing all the setup files etc, and not from /usr/bin etc where they wouldn't be present (normally leave this alone ...)
 if [[ -d "./qqX.system" ]]; then DevStart=1 ; else DevStart= ; fi
 
 # DEV FAULT TRACING: set vars as =0, or set =int/float for pauses; eg =1 to pause 1 sec, "0.2" etc for less,
 # where timed pauses are given. Some diagnostics require enter key to continue ...
-NoClear=  ;  GeneralLoopCheck= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=   ; ShowQGetLists=        ### DEV ###
+NoClear=  ;  Loop_Diagnostics= ;  Trace_InputVars=   ; ShowProcesses=   ; PathDiagnostics=  ; ShowQGetLists=        ### DEV ###
 
-function dev_loop_check {
-  if [[ $GeneralLoopCheck ]]; then
-    echo; echo "VM_Conf_Dir = $VM_Conf_Dir   VM_Conf_File = $VM_Conf_File   VM_InstanceName = $VM_InstanceName"
-    echo "pwd: $(pwd)   Current_VM_Folder = $Current_VM_Folder"
-    echo "BootStyle = $BootStyle   BootStyleMsg = $BootStyleMsg    BootStyle_Default = $BootStyle_Default   BootStyleMsg_Default = $BootStyleMsg_Default"
-    echo "ram = $ram   cpu_cores = $cpu_cores  mouse = $mouse  keyboard = $keyboard"
-    echo "SelectArrayError = $SelectArrayError  DefaultFolderError = $DefaultFolderError  ExtraFolderError = $ExtraFolderError"
-    echo "NewFileTuneUp_JustDone = $NewFileTuneUp_JustDone  QemuErrorLog = $QemuErrorLog"
-    echo "MainDrive = $MainDrive disk_img = $disk_img IsoImg = $IsoImg"
-    echo "SharedDrive = $SharedDrive SharedDrive_Conf = $SharedDrive_Conf SharedDrive_Mount = $SharedDrive_Mount"
-    echo "QE Source = $FreePath  QE_SystemFilePath = $QE_SystemFilePath  "
-    echo "QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script    CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
-    sleep "$GeneralLoopCheck"
+function main_loop_diagnostics {
+  if [[ $Loop_Diagnostics ]]; then
+    echo; echo "VM_Conf_Dir=$VM_Conf_Dir   VM_Conf_File=$VM_Conf_File   VM_InstanceName=$VM_InstanceName"
+    echo "pwd: $(pwd)   Current_VM_Folder=$Current_VM_Folder"
+    echo "BootStyle=$BootStyle   BootStyleMsg=$BootStyleMsg    BootStyle_Default=$BootStyle_Default   BootStyleMsg_Default=$BootStyleMsg_Default"
+    echo "ram=$ram   cpu_cores=$cpu_cores  mouse=$mouse  keyboard=$keyboard"
+    echo "SelectArrayError=$SelectArrayError  DefaultFolderError=$DefaultFolderError  ExtraFolderError=$ExtraFolderError"
+    echo "VM_Selection=$VM_Selection  VM_Selection_Overide=$VM_Selection_Overide"
+    echo "ByPass_VM_Array_Loader=$ByPass_VM_Array_Loader  ByPass_VM_Array_Selector=$ByPass_VM_Array_Selector"
+    echo "NewFileTuneUp_JustDone=$NewFileTuneUp_JustDone  QemuErrorLog=$QemuErrorLog"
+    echo "MainDrive=$MainDrive disk_img=$disk_img IsoImg=$IsoImg"
+    echo "SharedDrive=$SharedDrive SharedDrive_Conf=$SharedDrive_Conf SharedDrive_Mount=$SharedDrive_Mount"
+    echo "QE Source=$FreePath  QE_SystemFilePath=$QE_SystemFilePath  "
+    echo "QE_495_Script=$QE_495_Script  QE_496_Script=$QE_496_Script    CodingHotSwap=$CodingHotSwap  CodingHotSwapShow=$CodingHotSwapShow"
+    sleep "$Loop_Diagnostics"
   fi
 }
 
 function path_diagnostics {
   if [[ $PathDiagnostics ]]; then
-    echo; echo; echo "DevStart = $DevStart  - pwd: $(pwd) - System_qqX_Path: $System_qqX_Path"
-    echo; echo "OriginalPATH = $OriginalPATH"
-    echo; echo "Export PATH = $PATH"
+    echo; echo; echo "DevStart=$DevStart  - pwd: $(pwd) - System_qqX_Path: $System_qqX_Path"
+    echo; echo "OriginalPATH=$OriginalPATH"
+    echo; echo "Export PATH=$PATH"
     echo; echo "qqX_MainFolder: $qqX_MainFolder"
     echo "qqX_BuiltinsFolder: $qqX_BuiltinsFolder"
     echo "qqX_LibraryFolder: $qqX_LibraryFolder"
     echo "qqX_CustomFolder: $qqX_CustomFolder"
     echo "XDG_GUI_desktop_Folder: $XDG_GUI_desktop_Folder"
-    echo; echo "FreePath = $FreePath  QE_SystemFilePath = $QE_SystemFilePath"
-    echo "QE_495_Script = $QE_495_Script  QE_496_Script = $QE_496_Script  CodingHotSwap = $CodingHotSwap  CodingHotSwapShow = $CodingHotSwapShow"
+    echo; echo "FreePath=$FreePath  QE_SystemFilePath=$QE_SystemFilePath"
+    echo "QE_495_Script=$QE_495_Script  QE_496_Script=$QE_496_Script  CodingHotSwap=$CodingHotSwap  CodingHotSwapShow=$CodingHotSwapShow"
     echo "QE_SourceVersion: $QE_SourceVersion"
     echo "QE_SourcePath: $QE_SourcePath  QE_VerNumber: $QE_VerNumber"
     echo "QG_SourcePath: $QG_SourcePath  QG_VerNumber: $QG_VerNumber"
@@ -104,7 +109,10 @@ function path_diagnostics {
   fi
 }
 
-[[ $GeneralLoopCheck ]] && printf "\n\n Pre-initialize :" &&  dev_loop_check
+[[ $Loop_Diagnostics ]] && printf "\n\n Pre-initialize :" &&  main_loop_diagnostics  && printf "\n\n"
+
+##############################################################################################################################
+
 
 ## INITIALIZE
 
@@ -165,7 +173,7 @@ source "$qqX_MainFolder/qqX_Initialize"
 source "$qqX_MainFolder/qqX_read_main_settings"
 source "$qqX_MainFolder/qqX_UI_chrome_up"
 
-[[ $GeneralLoopCheck ]] && printf "\n\n QE_SourcePath = %s \n\n QG_SourcePath = %s \n"  "$QE_SourcePath" "$QG_SourcePath"
+[[ $Loop_Diagnostics ]] && printf "\n\n QE_SourcePath = %s \n\n QG_SourcePath = %s \n"  "$QE_SourcePath" "$QG_SourcePath"
 
 # Don't load up code until checked for other instances, as the defaults could overwrite hot-swapped source files on the other instance
 multi_instance_checks
@@ -185,12 +193,11 @@ source "$qqX_MainFolder/qqX_main_menu_routines"
 source "$qqX_MainFolder/qqX_main_menu_interface"
 source "$qqX_MainFolder/qqX_main_menu_actions"
 
-[[ $GeneralLoopCheck ]] && printf "\n\n Source files done:" &&  dev_loop_check
+[[ $Loop_Diagnostics ]] && printf "\n\n Source files done:" &&  main_loop_diagnostics
 
 function main_menu {
   while true ; do
-    MainMenuChoice=
-    SnapTitle= ; SnapNumber= ; SnapName=
+    MainMenuChoice= ; SnapTitle= ; SnapNumber= ; SnapName=
     show_main_menu_header
     if [[ $KillPID_Menu_Exited ]] ; then
       KillPID_Menu_Exited=  ;  UseCustomBootArgs=
@@ -218,7 +225,7 @@ if [[ ! $Disable_qqX_upd_Checks ]]; then
   find_latest_qemu_version &
 fi
 
-#  '$1' Check any MOUSE CLICK or COMMAND LINE parameters and read any flags set during 'qqX_initialize'
+#  The '$1' check for any MOUSE CLICK or COMMAND LINE parameters will read and set flags during 'qqX_initialize'
 #  General format is  --vm  "path/folder/file.conf", including .desktop starts which will have originally had 'XDG' as $1
 
 [[ $Initial_Input ]] && source "$qqX_MainFolder/qqX_input_and_mouse_tidyup"
@@ -234,7 +241,7 @@ path_diagnostics pause
 
 tput civis
 while true ; do
-  [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, start:" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Main Loop, start:" &&  main_loop_diagnostics
 
   # Where 'ByPass_VM_Array_Selector' implies run the loader section only
   # eg. for XDG and .conf clicked starts where we already have made the name decision and selection ...
@@ -242,7 +249,7 @@ while true ; do
 
   if [[ ! $VM_InstanceName ]] || [[ $ByPass_VM_Array_Selector ]]; then
     VM_loader_selector_and_menu
-    [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, VM selector:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Main Loop, VM selector:" &&  main_loop_diagnostics
   else
     # PWD should now be the conf directory but make sure we are actually there.
     # Could happen if tune up follows a download that was started in a different folder to the target new one.
@@ -251,11 +258,11 @@ while true ; do
       cd "$VM_Conf_Dir" || printColor "\n\n  ERROR changing to Conf Group Folder "
       Current_VM_Folder="$VM_Conf_Dir"
       reload_boot_style_defaults
-      [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, pre conf refresh:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n Main Loop, pre conf refresh:" &&  main_loop_diagnostics
       refresh_conf_vars_and_values
-      [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, post conf, pre main menu:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n Main Loop, post conf, pre main menu:" &&  main_loop_diagnostics
       main_menu
-      [[ $GeneralLoopCheck ]] && printf "\n\n Main Loop, post main menu:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n Main Loop, post main menu:" &&  main_loop_diagnostics
     else
       VM_InstanceName=
     fi

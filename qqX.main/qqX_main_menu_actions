@@ -444,7 +444,7 @@ function  main_menu_actions {
     # but run the selector
     ByPass_VM_Array_Selector=
     # signal to run the selector with absent VM_InstanceName and return to qqX main loop
-    VM_InstanceName=
+    VM_InstanceName= ; VM_Conf_Dir= ; VM_Conf_File= ; VM_Selection= ; VM_Selection_Overide=
     return
 
   elif [[ $MainMenuChoice == "xa" ]] ; then
