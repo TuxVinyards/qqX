@@ -69,6 +69,8 @@ else
 
     else
       printColor "\n  ----------------------------------------------------------------------------"
+      printf "\n\n  File Manager: '%s'  Text Editor: '%s'  Browser: '%s' " "$FileManager" "$TextEditor" "$WebBrowser"
+
       printf "\n\n  [del] delete selected VM   [mv] move, rename or link"
       printColor  "    [u] hide utils & technical"
 
@@ -274,11 +276,11 @@ else
       printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then
       if [[ $(type -p "$FileManager") ]]; then
-        if [[ $LiveBootMissing ]]; then  printColor "  [f]   open VM folder"
-        else printf "  [f]   open VM folder"
-        fi
-        printf "    [qf] | [qqf]  open qcow2"
+        printf "  [qf] | [qqf]  open a qcow2 drive"
         printf " in file manager"
+        if [[ $LiveBootMissing ]]; then  printColor "   [f]  open VM folder"
+        else printf "   [f]  open VM folder"
+        fi
       else  printColor "  [set]  ERROR file manager not found"
       fi
     fi

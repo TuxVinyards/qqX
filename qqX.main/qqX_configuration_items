@@ -452,7 +452,8 @@ qqX_edit_settings() {
         read -rp "  >  "
         exit directly
       else
-        printColor "\n  refreshing sources and arrays .... \n\n" ; sleep 0.2
+        sleep 1
+        printColor "\n  refreshing sources and arrays .... \n\n"
         SettingsFileAdjusted=1
         refresh_sources_and_load_VM_arrays
       fi

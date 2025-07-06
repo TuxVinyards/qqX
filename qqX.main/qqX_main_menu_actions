@@ -139,10 +139,16 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "f" ]] ; then
 
-    (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  & ) || file_manager_not_found_message
-    DiskStorageChanges=1 ; FileManager_Run=1
-    printf "\n\n  [enter] to refresh and continue \n\n"
-    read -rp "  >  "
+    printf "\n\n  Switching to view VM files in File Manager in new window ...."
+    printColor "\n\n  [enter] to open File Manager  [c] to cancel \n\n"
+    read -rp "  >  "  CancelFM
+    if [[ ! $CancelFM ]]; then
+      (nohup &> /dev/null  "$FileManager"  "$VM_Conf_Dir/$VM_InstanceName"  & ) || file_manager_not_found_message
+      DiskStorageChanges=1 ; FileManager_Run=1
+      sleep 2
+      printf "\n\n  [enter] to refresh and continue \n\n"
+      read -rp "  >  "
+    fi
 
   elif [[ $MainMenuChoice == "qqf" ]] ; then  qcow2_filemanagement_launcher qqf-info
 
@@ -369,7 +375,8 @@ function  main_menu_actions {
       "$QEMU_IMG" info "$Selected_Drive"
       DiskStorageChanges=1
       printf "\n\n  Drive Updated ..."
-      printColor "\n\n  [enter] to return to menu   [sd] delete older snaps \n\n "
+      printColor "\n\n  [enter] to return to menu"
+      printf "   [sd] delete older snaps \n\n "
       read -rp "  >  "  scReturn
       if [[ $scReturn ]]; then MainMenuChoicePreset="sd" ; Selected_DrivePreset=1
       else MainMenuChoicePreset= ; Selected_DrivePreset=
