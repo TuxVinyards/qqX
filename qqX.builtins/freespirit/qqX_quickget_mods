@@ -514,7 +514,7 @@ function get_sparkylinux() {
     echo "${URL}/${ISO}" "${HASH}"
 }
 
-## tweak to avoid spamming on test_all
+## TWEAK to avoid spamming on test_all
 function releases_spirallinux() {
     Spiral_Latest="$(web_pipe "https://sourceforge.net/projects/spirallinux/files/" | grep -s 'class="name' | fv -M -Q)"
     echo latest
@@ -529,6 +529,11 @@ function get_spirallinux() {
     local URL="https://sourceforge.net/projects/spirallinux/files/${LATEST}"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
     echo "${URL}/${ISO}" "${HASH}"
+}
+
+## IMPROVE make dynamic
+function releases_truenas-scale() {
+    web_pipe "https://www.truenas.com/download-truenas-community-edition/" | tr '<' '\n' | grep -s href | grep releasenotes |  grep wplink | cut -d'>' -f2 | fv -M -Q
 }
 
 ## FIX invalid VOID folders (use 'current' only as some folders have variants)
