@@ -10,7 +10,7 @@
 
 ## Basically Better
 
-- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the Quickemu system
+- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the popular Quickemu system
 
 - More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
@@ -20,11 +20,11 @@
 
 - Easy to use menu system with unique hybrid interface
 
-## [Latest release 1.12.07](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.13.01](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Adds several downstream fixes: Solus, Parrot, Sparky
+- Huge new upgrade for QuickGet, fixes and sorts about 20 distros
 
-- Adds Nobara and a few UI improvements
+- Adds fixes for qqX right click and Text Editor issues in Gnome
 
 Includes earlier downstream fixes for Quickemu issues:
 
@@ -192,6 +192,13 @@ Plus downsteam fixes for :
 - Adds several downstream fixes: Solus, Parrot, Sparky
 - Adds Nobara and a few UI improvents
 
+@ July 6 -1.13.01
+
+- Huge new upgrade for QuickGet, adds Mods overlay script making for much easier downstream fixes
+- and for easier community contributions.
+- Fixes and sorts about 20 distros (see commits list)
+- Adds fixes for qqX right click and Text Editor issues in Gnome
+
 Full details in [releases](https://github.com/TuxVinyards/qqX/releases) and [commits](https://github.com/TuxVinyards/qqX/commits/main/)
 
 ## Relationship with Quickemu
@@ -278,9 +285,9 @@ If you are more comfortable with older style Bash, this is permitted in the Quic
 
 - [Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed
 
-- Quickget could still do with further [floatversion](https://github.com/TuxVinyards/floatversion) tweaks ...
+The new Quickget Mods script is an ideal place to start ....
 
-Anyone wanting to pick up on those should add them to the latest [freespirit](https://github.com/TuxVinyards/quickemu/branches) or [dev-next](https://github.com/TuxVinyards/qqX/branches) branch
+Anyone wanting to pick up on those should add them to the latest [dev-next](https://github.com/TuxVinyards/qqX/branches) branch
 
 Also if anyone has used the custom menu feature and wants to share their work, that would be great as well
 
