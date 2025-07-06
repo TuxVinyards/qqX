@@ -285,7 +285,7 @@ If you are more comfortable with older style Bash, this is permitted in the Quic
 
 - [Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed
 
-The new Quickget Mods script is an ideal place to start ....
+The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
 
 Anyone wanting to pick up on those should add them to the latest [dev-next](https://github.com/TuxVinyards/qqX/branches) branch
 

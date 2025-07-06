@@ -8,7 +8,7 @@ Things can always get sorted out in a separate branch if need be, later.
 
 - Quickget built-ins do need frequent updating. New additions are always welcome.
 
-The new Quickget Mods script is an ideal place to start ....
+The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
 
 - Also check the [freespirit-next](https://github.com/TuxVinyards/quickemu/branches) and [dev-next](https://github.com/TuxVinyards/qqX/branches) branches
 
