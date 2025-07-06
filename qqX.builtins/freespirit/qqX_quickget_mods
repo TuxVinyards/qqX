@@ -131,6 +131,7 @@ function distro_release_notes {
         #name)            RelNotes="mm/yyyy (as needed)  Notes on installation or problems to watch out for";;
         artixlinux)       RelNotes="06/2025 The new online install option is still work-in-progress, users are advised to select 'Offline' when prompted.";;
         macos)            RelNotes="06/2025 Sequoia is currently having issues with slow running. See qqX issue #9";;
+        mxlinux)          RelNotes="Community Spins and 32 bit versions are also available in various flavors. See website for direct download";;
         sparkylinux)      RelNotes="07/2025 Older specialist versions: 'gameover' 'multimedia' and 'rescue' are available via manual download";;
         void)             RelNotes="To install the packages for the desktop environment, DON'T choose 'install from network' choose the 'local install' option.";;
     esac
@@ -153,12 +154,13 @@ function distro_release_notes {
 # The first two FUNCTIONS feed STDOUT to the look-up function 'validate_release' followed by
 # the last lines of Quickget where distro editions are handled.
 
-# Transfer files may also be implemented: @ 06/2025 see 'anduinos' as an example ...
+# Transfer files may also be implemented:
+# See 'editions_anduinos' for a more complex example script and 'get_parrotsec' for simpler cases
 # Some distros single release with no editions eg. bluestar
 
 # Quickget's legacy behaviour is to return a 'STOCK LIST' of editions when no release is supplied ...
 # Probably has room for improvement but a list should be given.
-# See 'editions_anduinos' for example script. Also see 'editions_gnomeos' for a per edition check routine, where some may be absent.
+# See 'editions_gnomeos' for a per edition check routine, where some may be absent.
 
 # Note that Quickget's 'web_pipe()' is an alias for Curl and will generate STDOUT by itself, without needing 'echo'.
 # Also that further echoes can be avoided via Bash's <<< 'herestring' feature.
@@ -382,6 +384,27 @@ function get_manjaro() {
     fi
     HASH=$(web_pipe "${URL}.sha512" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
+}
+
+## UPDATE to FIX release numbers varying with flavor
+function releases_mxlinux() {
+    echo latest
+}
+function editions_mxlinux() {
+    echo Xfce KDE Fluxbox
+}
+function get_mxlinux() {
+    local HASH= ; local URL= ; local ISO= ; local RELEASE=
+    URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
+    RELEASE="$(web_pipe "$URL" | tr '<' '\n' | grep -s href | grep "$RELEASE" | cut -d'=' -f2 | fv -Q -M)"
+    # eg https://sourceforge.net/projects/mx-linux/files/Final/KDE/MX-23.6.1_KDE_x64.iso.sha256/download
+    case ${EDITION} in
+        Xfce) ISO="MX-${RELEASE}_x64.iso";;
+        KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
+        Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 ## FIX and UPDATE to new folder styles and names
