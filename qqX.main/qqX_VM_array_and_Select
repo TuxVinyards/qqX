@@ -30,18 +30,35 @@ VM_loader_selector_and_menu () {
   if [[ $ByPass_VM_Array_Loader ]] && [[ ${VM_Array[0,0]} ]]; then
     # just clear the flag, may be bypassed if array present and nothing new added, or if settings not changed ...
     ByPass_VM_Array_Loader=
-    [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM loader:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Bypassing VM loader:" &&  main_loop_diagnostics
   else
     refresh_sources_and_load_VM_arrays
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM selector, post refresh_sources_and_load_VM_arrays:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n VM selector, post refresh_sources_and_load_VM_arrays:" &&  main_loop_diagnostics
+  fi
+
+  # Autorun Main Menu on start up, if only one distro present, and not a mouse click start or similar, to help new users ...
+  if [[ ! $SingleMenuHasRun ]] && [[ "${VM_Array[0,0]}" ]] && [[ ! "${VM_Array[1,0]}" ]] && [[ ! $Initial_Input ]]; then
+    ByPass_VM_Array_Selector=1 ; ByPass_VM_Array_Loader=1 ; SingleMenuHasRun=1
+    VM_Conf_Dir="${VM_Array[0,0]}" ; VM_Conf_File="${VM_Array[0,1]}" ; VM_InstanceName="${VM_Conf_File/'.conf'/}"
+    if [[ $Trace_InputVars ]]; then
+      echo; echo "R: Single Distro QuickStart"  ; echo
+      echo "D: $VM_Conf_Dir"  ; echo
+      echo "C: $VM_Conf_File"  ; echo
+      echo "N: $VM_InstanceName"  ; echo  ; sleep "$Trace_InputVars"
+    fi
+    if [[ $VM_InstanceName ]]; then
+      # set to General VM folder, where the .conf files are ... and flag to run the VM selector
+      cd "$VM_Conf_Dir"  || printf "\n\n Internal Error: Single Distro QuickStart  >  VM Folder not found "
+      Current_VM_Folder="$VM_Conf_Dir"
+    fi
   fi
 
   # SELECTOR
 
   if [[ $ByPass_VM_Array_Selector ]] ; then
-  
+
     VM_check_and_load
-    [[ $GeneralLoopCheck ]] && printf "\n\n Bypassing VM array selector :" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n Bypassing VM array selector :" &&  main_loop_diagnostics
 
   else
 
@@ -60,10 +77,10 @@ VM_loader_selector_and_menu () {
 
     while true; do
 
-      [[ $GeneralLoopCheck ]] && printf "\n\n VM selector loop:" &&  dev_loop_check
+      [[ $Loop_Diagnostics ]] && printf "\n\n VM selector loop:" &&  main_loop_diagnostics
 
       if [[ $Run_GT ]]; then  Run_GT= ; VM_Selection="gt"
-      
+
       else
         printf "\033c"
         show_qqX_title_bar
@@ -84,8 +101,8 @@ VM_loader_selector_and_menu () {
         if [[ $New_VM_Conf_File ]] && [[ ! $Current_VM_Folder_Recognised ]] && [[ -f "$(pwd)/$New_VM_Conf_File" ]]; then
           printColor "\n\n  For future display, add the NEW Current Folder to the VM array, [set] general settings ..."
         fi
-      
-        dev_loop_check
+
+        main_loop_diagnostics
 
         [[ $DefaultFolderError ]] && printf "\n\n  ERROR: DEFAULT FOLDER "
         [[ $ExtraFolderError ]] && printf "\n\n  ERROR: VM FOLDER ARRAY '%s' "  "$ExtraFolderError"
@@ -154,7 +171,7 @@ VM_loader_selector_and_menu () {
       #
 
       if [[ $DefaultFolderError || $ExtraFolderError || $SelectArrayError || $VM_Selection == "c" ]]; then
-            
+
         ExtraFolderError=
         VM_InstanceName=
         [[ $VM_Selection != "c" ]] && qqX_edit_settings
@@ -171,7 +188,7 @@ VM_loader_selector_and_menu () {
         fi
 
       elif [[ "$VM_Selection" == [A-Z] ]]; then
-      
+
         # NB different to VM_selector_menu_refresh
         VM_SelectorStyle="$VM_Selection"
         ByPass_VM_Array_Loader=1
@@ -202,7 +219,7 @@ VM_loader_selector_and_menu () {
       elif [[ "${VM_Selection,,}" == dev* ]] ; then
         CodingHotSwap="Dev" ; SettingsFileAdjusted=1; CodingHotSwapShow=1; VM_selector_menu_refresh ; return
 
-      elif [[ $VM_Selection == "q" ]]; then echo ; exit directly
+      elif [[ $VM_Selection == "q" ]]; then tput cnorm ; echo ; sleep 0.3 ; exit directly
 
       elif [[ $VM_Selection == "dl" ]]; then  download_new_release ; return
 

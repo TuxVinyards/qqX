@@ -136,7 +136,7 @@ function quickemu {
         # whether the run is made as [v] verbose & terminated
         printf "" > "/tmp/qqX_echo_output.log"
         printf "" > "$QemuErrorLog"
-        [[ $GeneralLoopCheck ]] && printf "\n\n pre drives_and_snapshots :" &&  dev_loop_check
+        [[ $Loop_Diagnostics ]] && printf "\n\n pre drives_and_snapshots :" &&  main_loop_diagnostics
         drives_and_snapshots  "info_current"
         printf "\n"
         if [[ $DiskChkStatus ]] && [[ $DiskChkStatus != "Okay" ]]; then
@@ -146,7 +146,7 @@ function quickemu {
           VM_ExecBoot=
           return
         fi
-        [[ $GeneralLoopCheck ]] && printf "\n\n pre-sourcing qmod-boot :" &&  dev_loop_check && printf "\n\n"
+        [[ $Loop_Diagnostics ]] && printf "\n\n pre-sourcing qmod-boot :" &&  main_loop_diagnostics && printf "\n\n"
         source "/tmp/qmod-boot-temp"
         VM_ExecBoot=
         if [[ $Mounted_ISO && $BootStyle == "slow" && $BootStyleMsg == "slow" ]]; then

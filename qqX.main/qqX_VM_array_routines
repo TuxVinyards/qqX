@@ -289,7 +289,7 @@ VM_check_and_load () {
 
   if  [[ $VM_Renamed || ! $ByPass_VM_Array_Selector ]] && [[ ! $SelectArrayError ]]; then
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 2:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n VM Array_Selector 2:" &&  main_loop_diagnostics
 
     ## Check file/folder exists and that we are where we need to be
     [[ ! -d "$VM_Conf_Dir" ]] &&  function_conf_error  "folder" "$VM_Conf_Dir" && SelectArrayError=1
@@ -337,7 +337,7 @@ VM_check_and_load () {
 
   else
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 3:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n VM Array_Selector 3:" &&  main_loop_diagnostics
 
     # All existing .CONF VARS MUST BE CLEARED before sourcing a new conf file
     # otherwise any items specified in the previous config, but not in the new one, will remain.
@@ -355,7 +355,7 @@ VM_check_and_load () {
     NewFileTuneUp=
     VM_Renamed=
 
-    [[ $GeneralLoopCheck ]] && printf "\n\n VM Array_Selector 4:" &&  dev_loop_check
+    [[ $Loop_Diagnostics ]] && printf "\n\n VM Array_Selector 4:" &&  main_loop_diagnostics
 
   fi
 
@@ -390,6 +390,10 @@ refresh_sources_and_load_VM_arrays() {
 
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
   source "$qqX_SettingsFile"
+
+  #if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
+  #else VM_ListingFilter="qqlist-desktop"
+  #fi   REVIEW  > follow refresh doesn't change builtin model, so leave filter unchanged too
 
   [[ $CodingHotSwap ]] && QE_SourceVersion="$CodingHotSwap"
   refresh_and_load_quickemu_sources

@@ -101,19 +101,21 @@ find_texteditor () {
 
   [[ $TextEditor ]] && [[ ! $(type -p "$TextEditor") ]] && texteditor_not_found_message && TextEditor=
   if [[ ! $TextEditor ]]; then
-    DefaultTextEditor="$(xdg-mime query default text/plain 2>/dev/null)"
-    EditorTest="${DefaultTextEditor/.desktop/}"
-    EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
-    # orggnomeTextEditor etc will fail
-    [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
-    if [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] ; then  TextEditor="$EditorTest"
-    elif [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
+    if [[ $(type -p gedit) ]] ; then  TextEditor="gedit"
     elif [[ $(type -p gnome-text-editor) ]] ; then  TextEditor="gnome-text-editor"
     elif [[ $(type -p pluma) ]] ; then  TextEditor="pluma"
     elif [[ $(type -p kate) ]] ; then   TextEditor="kate"
     elif [[ $(type -p mousepad) ]] ; then   TextEditor="mousepad"
     elif [[ $(type -p leafpad) ]] ; then   TextEditor="leafpad"
     elif [[ $(type -p okular) ]] ; then   TextEditor="okular"
+    else
+      # mime test is not always reliable > REVIEW
+      DefaultTextEditor="$(xdg-mime query default text/plain 2>/dev/null)"
+      EditorTest="${DefaultTextEditor/.desktop/}"
+      EditorTest="$(tr -cd "[:alnum:]" <<< "$EditorTest")"
+      # orggnomeTextEditor etc will fail
+      [[ $EditorTest == "orggnomeTextEditor" ]] && EditorTest="gnome-text-editor"
+      [[ $DefaultTextEditor ]] && [[ $(type -p "$EditorTest") ]] && TextEditor="$EditorTest"
     fi
   fi
 }
@@ -136,7 +138,7 @@ function sort_qqX_builtin_settings {
   # Check custom QE & QG, plus set the 'quickget' version  and set PATH for standard ancilliaries
   # Also standardize 'QE_SourceVersion' spelling so the version can be referenced if needed later
 
-  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 1 :" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Sort builtins 1 :" &&  main_loop_diagnostics
 
   QE_SourcePath= ; QG_SourcePath= ; FreePath=
 
@@ -203,7 +205,8 @@ function sort_qqX_builtin_settings {
 
     QE_SourcePath="$FreePath/quickemu"
     QG_SourcePath="$FreePath/quickget"
-
+    if [[ -e "$FreePath/qqX_quickget_mods" ]]; then QG_Modpath="$FreePath/qqX_quickget_mods"
+    else QG_Modpath= ; fi
   fi
 
   if [[ $FreePath ]]; then
@@ -224,7 +227,7 @@ function sort_qqX_builtin_settings {
     printf "\n\n  Settings File: %s \n\n" "$qqX_SettingsFile"  ; sleep 10
   fi
 
-  [[ $GeneralLoopCheck ]] && printf "\n\n Sort builtins 2 :" &&  dev_loop_check
+  [[ $Loop_Diagnostics ]] && printf "\n\n Sort builtins 2 :" &&  main_loop_diagnostics
 
 }
 

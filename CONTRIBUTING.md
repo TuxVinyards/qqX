@@ -8,7 +8,9 @@ Things can always get sorted out in a separate branch if need be, later.
 
 - Quickget built-ins do need frequent updating. New additions are always welcome.
 
-- Check the [freespirit-next](https://github.com/TuxVinyards/quickemu/branches) and [dev-next](https://github.com/TuxVinyards/qqX/branches) branches
+The new Quickget Mods script is an ideal place to start ....
+
+- Also check the [freespirit-next](https://github.com/TuxVinyards/quickemu/branches) and [dev-next](https://github.com/TuxVinyards/qqX/branches) branches
 
 ## Do explain what's going and why
 

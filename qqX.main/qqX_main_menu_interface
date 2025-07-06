@@ -69,6 +69,8 @@ else
 
     else
       printColor "\n  ----------------------------------------------------------------------------"
+      printf "\n\n  File Manager: '%s'  Text Editor: '%s'  Browser: '%s' " "$FileManager" "$TextEditor" "$WebBrowser"
+
       printf "\n\n  [del] delete selected VM   [mv] move, rename or link"
       printColor  "    [u] hide utils & technical"
 
@@ -169,10 +171,10 @@ else
         if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) "
         else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
 
-        printColor "\n\n  [g]   start with GTK display          "
+        printColor "\n\n  [g]   start with GTK display                 "
 
-        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"
-        else printColor "[gl] ON > toggle-off" ; fi
+        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl]  OFF > toggle GLX > on"
+        else printColor "[gl]  ON > toggle GLX > off" ; fi
 
         [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
 
@@ -232,7 +234,7 @@ else
 
     fi
 
-    dev_loop_check
+    main_loop_diagnostics
 
     if [[ "$VM_InstanceName" == *macos* && "$VM_InstanceName" == *sonoma* ]]; then
      if ! grep -q -s 'ventura|sonoma' "$QE_SourcePath" ; then printColor "\n\n  Warning: This version of QuickEmu will not run MacOS Sonoma ..." ; fi
@@ -274,11 +276,11 @@ else
       printColor "  [ql]  show qemu error log"
     elif [[ $FileManager ]]; then
       if [[ $(type -p "$FileManager") ]]; then
-        if [[ $LiveBootMissing ]]; then  printColor "  [f]   open VM folder"
-        else printf "  [f]   open VM folder"
-        fi
-        printf "    [qf] | [qqf]  open qcow2"
+        printf "  [qf] | [qqf]  open a qcow2 drive"
         printf " in file manager"
+        if [[ $LiveBootMissing ]]; then  printColor "   [f]  open VM folder"
+        else printf "   [f]  open VM folder"
+        fi
       else  printColor "  [set]  ERROR file manager not found"
       fi
     fi
@@ -372,6 +374,9 @@ else
     elif [[ $DiskDisparity -ge "2" ]]; then  printf "  DISK.QCOW2 may need a clean up  > [disk] repair utils \n\n"
     else  [[ $qqX_UpdateAvail ]] &&  printColor "  [dl]  view new qqX update details: %s %s \n\n" "$qqX_Latest_ReleaseType" "$qqX_Latest_ReleaseNumber"
     fi
+
+    check_conf_file_for_typos "$VM_Conf_Dir/$VM_Conf_File"
+    [[ $ConfTypo ]] && printColor "\n\n  ERROR(s) detected in the Config file ...\n\n"
 
     if ps -ef | grep nbd | grep -qi "$VM_InstanceName" ; then
       printf "\n\n  A mount conflict may exist ...  NBD drives may be viewed but must be disconnected before starting the VM \n\n"
