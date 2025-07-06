@@ -171,10 +171,10 @@ else
         if [[ $HeadlessDisplay ]]; then printColor 	"\n\n  [s]   start with Spice display (HEADLESS) "
         else  printColor 	"\n\n  [s]   start with Spice display (scaleable)   [sf]  spice full screen (shift F12 to exit)"  ; fi
 
-        printColor "\n\n  [g]   start with GTK display          "
+        printColor "\n\n  [g]   start with GTK display                 "
 
-        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl] OFF > toggle-on"
-        else printColor "[gl] ON > toggle-off" ; fi
+        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl]  OFF > toggle GLX > on"
+        else printColor "[gl]  ON > toggle GLX > off" ; fi
 
         [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
 
