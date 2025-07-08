@@ -22,9 +22,11 @@
 
 ## [Latest release 1.13.01](https://github.com/TuxVinyards/qqX/releases/latest)
 
-- Huge new upgrade for QuickGet, fixes and sorts about 20 distros
+- Huge new upgrade for QuickGet, fixes, sorts and adds over 25 distros
 
-- Adds fixes for qqX right click and Text Editor issues in Gnome
+- Adds a new Quickget filter system
+
+- And adds fixes for qqX right click and Text Editor issues in Gnome
 
 Includes earlier downstream fixes for Quickemu issues:
 
@@ -32,7 +34,7 @@ Includes earlier downstream fixes for Quickemu issues:
 
 - Windows Installer
 
-More in the [release notes](#release-notes-and-highlights) and wiki pages
+More in the [release notes](https://github.com/TuxVinyards/qqX/wiki/Release-Notes) and wiki pages
 
 ## Ease of the GUI
 
@@ -108,7 +110,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Quickemu and Quickgui may be installed but are _not essential_.
 
-- [Full installer details](https://github.com/TuxVinyards/qqX/wiki) in the wiki pages
+- [Full installer details](https://github.com/TuxVinyards/qqX/wiki/Installation) in the wiki pages
 
 ## Reliability
 
@@ -128,116 +130,21 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 Also try the Quickemu forum at <https://discord.gg/sNmz3uw>
 
-## Release notes and highlights
+## Development and Roadmap
 
-### Release 1.11
+See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for _more details_ and for _what's happening_ in future releases
 
-@ Nov 27th - 1.11.0.2
+## Coding Contributions
 
-- New feature [_mounting of qcow2 drives in a file manager_](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing#other-tools)
+If you are more comfortable with older style Bash, this is permitted in the Quickemu scripts
 
-### Release 1.12
+- [Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed
 
-@ Feb 23 - 1.12.0
+The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
 
-- Distro storage size analysis and size disparity checks
+Anyone wanting to pick up on those should add them to the latest [dev-next](https://github.com/TuxVinyards/qqX/branches) branch
 
-![new size-ui](https://github.com/user-attachments/assets/0df37ca8-b4c1-4af8-a883-82ef60744649)
-
-- And extended **stop, start and resume** for downloads
-
-![stop-start-resume](https://github.com/user-attachments/assets/d710f47f-a2b9-4bda-beda-5f5290dfad52)
-
-@ March 14 - 1.12.01
-
-- [Downstream fix for the Quickemu Windows Installer issue #1475](https://github.com/quickemu-project/quickemu/issues/1475)
-
-- [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS) in the qqX wiki
-
-@ March 28 - 1.12.02
-
-- Distro finder for searching large distro collections
-
-@ April 17 - 1.12.04
-
-- Upgrades [floatversion](https://github.com/TuxVinyards/floatversion) to 1.4.01
-
-And updates Quickget with _downstream_ distro fixes for:
-
-- AntiX
-- Freedos
-- Garuda
-- Kolibri
-- Oracle
-- Parrot Sec
-- PC Linux
-
-@ Apr 25 - 1.12.05
-
-- Adds upstream fix for Bazzite
-
-Plus downsteam fixes for :
-
-- Fedora 42 KDE
-- VanillaOS
-- VX
-
-@ May 2 - 1.12.06
-
-- Adds fixes for QuickEmu and new Qemu version 10.0.0
-- Improves UI for dependency checker
-
-@ May 2 - 1.12.07
-
-- Adds several downstream fixes: Solus, Parrot, Sparky
-- Adds Nobara and a few UI improvents
-
-@ July 6 -1.13.01
-
-- Huge new upgrade for QuickGet, adds Mods overlay script making for much easier downstream fixes
-- and for easier community contributions.
-- Fixes and sorts about 20 distros (see commits list)
-- Adds fixes for qqX right click and Text Editor issues in Gnome
-
-Full details in [releases](https://github.com/TuxVinyards/qqX/releases) and [commits](https://github.com/TuxVinyards/qqX/commits/main/)
-
-## Relationship with Quickemu
-
-Lack of upstream maintenance and creative differences managed to form [several growing rifts](https://github.com/orgs/quickemu-project/discussions/925) within the Quickemu project during 2024 and in June a growing count of developers decided to walk away.
-
-- An increasing number of fixes for Quickemu are now having to be added downstream
-
-- See [FreeBird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) wiki page for details on the built-ins
-
-There needed to be an improvement in relationships, so that more people could benefit from the work being done here.
-
-- Reinstating the [qqX listing](https://github.com/TuxVinyards/qqX/wiki/FreeBird#creative-differences) on the Quickemu wiki pages would have been a good move.
-
-![qqX-on-the-quickemu-wiki](https://github.com/user-attachments/assets/3c11249e-4898-4882-a82e-c460472e8099)
-
-### Competition
-
-qqX was always intended as an extra optional interface for Quickemu. It was never intended to be a competitive project.
-
-However during 2025, the upstream stance hardened further and any [attempts to provide simple help or to address issues within the upstream code base](https://github.com/quickemu-project/quickemu/issues/1660) continued to be misconstrued as competitive attacks. Instead of rifts healing, recent pushes for improvements in relationships have failed abysmally.
-
-Please _be reassured_ that qqX _will continue to support virtual machines_ that have been created via either command line QuickEmu or QuickGUI or vice versa, despite being forced into becoming a competitor.
-
-## Downstream fixes for Quickemu
-
-- Available via qqX's [freebird](https://github.com/TuxVinyards/qqX/wiki/FreeBird) or in the qqX code itself
-
-- Fixes problems causing Intel processors to run MacOS very slowly
-
-- Fixes the problem where telescoped/nested VM grind to a halt
-
-- Windows language fixes mean that [all](https://github.com/quickemu-project/quickemu/issues/1113)  the downloads work, not just English
-
-- Fixes the Quickemu Windows Installer issue [#1475](https://github.com/quickemu-project/quickemu/issues/1475)
-
-- The use of [floatversion](https://github.com/TuxVinyards/floatversion) allows multiple distro downloads not available in Quickemu
-
-- And more
+Also if anyone has used the custom menu feature and wants to share their work, that would be great as well
 
 ## Why Bash?
 
@@ -274,22 +181,6 @@ Bash is automatically there on almost every Linux system, directly on the comman
 Improving your knowledge of Bash is always time well spent
 
 - Most users already know or can understand at least a little of it.
-
-## Development and Roadmap
-
-See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for _more details_ and for _what's happening_ in future releases
-
-## Contributions
-
-If you are more comfortable with older style Bash, this is permitted in the Quickemu scripts
-
-- [Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed
-
-The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
-
-Anyone wanting to pick up on those should add them to the latest [dev-next](https://github.com/TuxVinyards/qqX/branches) branch
-
-Also if anyone has used the custom menu feature and wants to share their work, that would be great as well
 
 ## Why the Vinyards?
 
