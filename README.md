@@ -10,7 +10,7 @@
 
 ## Basically Better
 
-- Adds [fixes, tools and general improvements](https://github.com/TuxVinyards/qqX/wiki/FreeBird) to the popular Quickemu system
+- Adds [fixes, tools and general improvements](https://tuxvinyards.github.io/qqX/docs/FreeBird) to the popular Quickemu system
 
 - More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
@@ -34,7 +34,7 @@ Includes earlier downstream fixes for Quickemu issues:
 
 - Windows Installer
 
-More in the [release notes](https://github.com/TuxVinyards/qqX/wiki/Release-Notes) and wiki pages
+More in the [release notes](https://tuxvinyards.github.io/qqX/docs/Release-Notes) and qqX pages
 
 ## Ease of the GUI
 
@@ -64,13 +64,13 @@ Search the quickget distro list with _alphabetical zooming_
 
 ![new -vm-selector-qqX](https://github.com/TuxVinyards/qqX/assets/3956806/42a4b480-4d7d-47fe-91f5-0069fa1511a8)
 
-- Reliable text [translation](https://github.com/TuxVinyards/qqX/wiki/Translation) methods.
+- Reliable text [translation](https://tuxvinyards.github.io/qqX/docs/Translation) methods.
 
 ## The latest updates
 
 [No waiting months](https://github.com/quickemu-project/quickemu/releases) for Quickemu bug fixes and changes
 
-- qqX's built-in code [system](https://github.com/TuxVinyards/qqX/wiki/FreeBird) ensures that any new input can be quickly put to work
+- qqX's built-in code [system](https://tuxvinyards.github.io/qqX/docs/FreeBird) ensures that any new input can be quickly put to work
 
 - Choice of 3 easy-swap _rolling release_ models: Leading Edge, Standard or Slow
 
@@ -110,7 +110,7 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 - Quickemu and Quickgui may be installed but are _not essential_.
 
-- [Full installer details](https://github.com/TuxVinyards/qqX/wiki/Installation) in the wiki pages
+- [Full installer details](https://tuxvinyards.github.io/qqX/docs/Installation) in the qqX pages
 
 ## Reliability
 
@@ -120,11 +120,11 @@ Start from scratch. Or safely test out the qqX difference on your existing VM's.
 
 ## FAQs and Help
 
-- Lots of _Quickemu Help_ available in the [qqX wiki pages](https://github.com/TuxVinyards/qqX/wiki/FAQs-and-Help) too, not just qqX
+- Lots of _Quickemu Help_ available in the [qqX pages](https://tuxvinyards.github.io/qqX/docs/FAQs-and-Help) too, not just qqX
 
-- Full  Quickemu [MacOS installation guide](https://github.com/TuxVinyards/qqX/wiki/Mac-OS) and [Windows Installer walk-tru](https://github.com/TuxVinyards/qqX/wiki/Windows-OS)
+- Full  Quickemu [MacOS installation guide](https://tuxvinyards.github.io/qqX/docs/Guides/Mac-OS) and [Windows Installer walk-tru](https://tuxvinyards.github.io/qqX/docs/Guides/Windows-OS)
 
-- Qemu / qqX  guide to disk resizing and [disk maintenance](https://github.com/TuxVinyards/qqX/wiki/Disks-and-Resizing)
+- Qemu / qqX  guide to disk resizing and [disk maintenance](https://tuxvinyards.github.io/qqX/docs/Advanced/Disks-and-Resizing)
 
 - And more ...
 
@@ -132,13 +132,13 @@ Also try the Quickemu forum at <https://discord.gg/sNmz3uw>
 
 ## Development and Roadmap
 
-See the specific [wiki](https://github.com/TuxVinyards/qqX/wiki/Development) for _more details_ and for _what's happening_ in future releases
+See the specific [dev pages](https://tuxvinyards.github.io/qqX/docs/Advanced/Development) for _more details_ and for _what's happening_ in future releases
 
 ## Coding Contributions
 
 If you are more comfortable with older style Bash, this is permitted in the Quickemu scripts
 
-- [Downstream fixes for Quickget](https://github.com/TuxVinyards/qqX/wiki/FreeBird#exclusive-quickget-fixes) are always needed
+- [Downstream fixes for Quickget](https://tuxvinyards.github.io/qqX/docs/FreeBird#exclusive-quickget-fixes) are always needed
 
 The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
 
