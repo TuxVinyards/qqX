@@ -173,8 +173,8 @@ else
 
         printColor "\n\n  [g]   start with GTK display                 "
 
-        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl]  OFF > toggle GLX > on"
-        else printColor "[gl]  ON > toggle GLX > off" ; fi
+        if [[ $qqX_GL_Mode == "off" ]] ; then printColor "[gl]  OFF > toggle EGL/GLX > on"
+        else printColor "[gl]  ON > toggle EGL/GLX > off" ; fi
 
         [[ -e "$QemuArgsCustomFile" ]] && printColor "     [C] toggle normal/custom menu "
 
