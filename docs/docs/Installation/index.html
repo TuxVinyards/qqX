@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-Installation" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.8.1">
+<title data-rh="true">Installation | qqX</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://TuxVinyards.github.io/qqX/img/qqX.social.card.jpeg"><meta data-rh="true" name="twitter:image" content="https://TuxVinyards.github.io/qqX/img/qqX.social.card.jpeg"><meta data-rh="true" property="og:url" content="https://TuxVinyards.github.io/qqX/docs/Installation"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="qqX -Virtual Machine Manager"><meta data-rh="true" name="keywords" content="qemu, quickemu, quickget, quickgui, virtual machine, fixes, workarounds, easy"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Installation | qqX"><meta data-rh="true" name="description" content="qqX - Quickemu Virtual Machine Manager"><meta data-rh="true" property="og:description" content="qqX - Quickemu Virtual Machine Manager"><link data-rh="true" rel="icon" href="/qqX/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://TuxVinyards.github.io/qqX/docs/Installation"><link data-rh="true" rel="alternate" href="https://TuxVinyards.github.io/qqX/docs/Installation" hreflang="en"><link data-rh="true" rel="alternate" href="https://TuxVinyards.github.io/qqX/docs/Installation" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Installation","item":"https://TuxVinyards.github.io/qqX/docs/Installation"}]}</script><link rel="stylesheet" href="/qqX/assets/css/styles.c7f4a206.css">
+<script src="/qqX/assets/js/runtime~main.0f28a42c.js" defer="defer"></script>
+<script src="/qqX/assets/js/main.93f0f707.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t="light";var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",e||t),document.documentElement.setAttribute("data-theme-choice",e||t)}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/qqX/img/favicon.ico"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/qqX/"><div class="navbar__logo"><img src="/qqX/img/favicon.ico" alt="qqX Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/qqX/img/favicon.ico" alt="qqX Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">qqX Virtual Machine Manager</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/qqX/docs/Installation">Docs</a><a class="navbar__item navbar__link" href="/qqX/docs/Guides/Windows-OS">Guides for Windows and Mac</a><a class="navbar__item navbar__link" href="/qqX/docs/Advanced/Disks-and-Resizing">Advanced Docs</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://www.bing.com/translator" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Microsoft Translate<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><a href="https://translate.google.com" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Google Translate<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><a href="https://github.com/TuxVinyards/qqX" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Source Code and Downloads<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/qqX/docs/Installation">Installation</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Translation">Translation</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Release-Notes">Release Notes</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/About">About</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/FAQs-and-Help">FAQs-and-Help</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Command-line-and-Mouse">Command-line-and-Mouse</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/FreeBird">FreeBird, FreeSpirit and Creative Differences</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Folders-and-Organisation">Folders-and-Organisation</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Snapshots">Snapshots and Rollbacks</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/qqX/docs/Updates">Updates</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/qqX/docs/Advanced/Disks-and-Resizing">Advanced</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/qqX/docs/Guides/Windows-OS">Guides</a></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/qqX/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Installation</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Installation</h1></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="qqx---quickemu-virtual-machine-manager">qqX - Quickemu Virtual Machine Manager<a href="#qqx---quickemu-virtual-machine-manager" class="hash-link" aria-label="Direct link to qqX - Quickemu Virtual Machine Manager" title="Direct link to qqX - Quickemu Virtual Machine Manager">​</a></h2>
+<p>qqX will generally run straight &#x27;out of the box&#x27; on the vast majority of Linux distributions.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="host-systems">Host Systems<a href="#host-systems" class="hash-link" aria-label="Direct link to Host Systems" title="Direct link to Host Systems">​</a></h2>
+<ul>
+<li>
+<p>Installation on Windows hosts has now been partly implemented via the WSL Linux Subsystem with support hopefully in an upcoming release.</p>
+</li>
+<li>
+<p>Running qqX on MacOS hosts is unfortunately not supported at present, due to BSD variances.</p>
+</li>
+<li>
+<p>Users of non-standard OS&#x27;s such as <strong>NixOS</strong>, should view the installer script, plus read <a href="https://github.com/TuxVinyards/qqX/issues/1" target="_blank" rel="noopener noreferrer">issue #1</a> and details on <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard" target="_blank" rel="noopener noreferrer">Filesystem Hierarchy Standards</a></p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="install-from-scratch">Install from scratch<a href="#install-from-scratch" class="hash-link" aria-label="Direct link to Install from scratch" title="Direct link to Install from scratch">​</a></h2>
+<ul>
+<li>
+<p>Most users need only install <code>qemu</code> <code>spice-gtk</code> and <code>qqX</code></p>
+</li>
+<li>
+<p>Some distro versions may need <code>curl</code> <code>7z</code> <code>jq</code> <code>bc</code> and possibly <code>xrandr</code></p>
+</li>
+<li>
+<p>No further software, support structures or dependencies should be needed.</p>
+<p><code>7z</code> is sometimes listed as 7zip or p7zip-full and <code>xrandr</code> maybe found as part of x11-xserver-utils</p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="qemu">Qemu<a href="#qemu" class="hash-link" aria-label="Direct link to Qemu" title="Direct link to Qemu">​</a></h2>
+<p>Qemu may be listed with various names:</p>
+<ul>
+<li>
+<p><strong>Arch</strong> users should install &#x27;qemu-desktop&#x27; not qemu-base.</p>
+</li>
+<li>
+<p><strong>Debian</strong> based distros may need several separate components to create the packages</p>
+</li>
+</ul>
+<p>Some users may see Qemu listed by architecture as in <code>qemu-system-x86_64</code> and <code>qemu-system-aarch64</code></p>
+<ul>
+<li>Only &#x27;x86_64&#x27; is needed unless you wish to emulate Arm etc ...</li>
+</ul>
+<p>Spice gtk may be listed as <code>spice-client-gtk</code></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tpm">TPM<a href="#tpm" class="hash-link" aria-label="Direct link to TPM" title="Direct link to TPM">​</a></h2>
+<p>This is needed for Ubuntu Server and for installing Windows guests</p>
+<p>Ubuntu 24.04 LTS at 01/2025 is three versions behind for <code>swtpm</code></p>
+<ul>
+<li>This PPA may be used: <a href="https://launchpad.net/~stefanberger/+archive/ubuntu/swtpm-noble" target="_blank" rel="noopener noreferrer">https://launchpad.net/~stefanberger/+archive/ubuntu/swtpm-noble</a></li>
+</ul>
+<p>There is an on-going <code>swtpm / apparmor</code> <a href="https://github.com/stefanberger/swtpm/discussions/866" target="_blank" rel="noopener noreferrer">problem</a> too. Your mileage may vary.</p>
+<ul>
+<li>One way to fix this is to change swtpm settings from &#x27;enforce&#x27; mode to &#x27;complain&#x27;. See these <a href="https://github.com/quickemu-project/quickemu/issues/487" target="_blank" rel="noopener noreferrer">apparmor notes.</a></li>
+</ul>
+<p>Simplified GUI installers such as Gnome Software and KDE Discover may not list <code>swtpm</code></p>
+<p>Command line use of apt or dnf etc may be needed</p>
+<p>Also see the <a href="/qqX/docs/Guides/Windows-OS">Windows Walk-thru guide</a> for notes on Secure Boot</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="older-or-lts-distros">Older or LTS distros<a href="#older-or-lts-distros" class="hash-link" aria-label="Direct link to Older or LTS distros" title="Direct link to Older or LTS distros">​</a></h2>
+<p>Some distros can be a long way behind the curve and older QEMU versions may show occasional error messages.</p>
+<ul>
+<li>Ubuntu 22.04 can show <code>gui-module</code> <code>ui-ui</code> errors but tests seem to show these can be ignored.</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="other-notes">Other Notes<a href="#other-notes" class="hash-link" aria-label="Direct link to Other Notes" title="Direct link to Other Notes">​</a></h3>
+<ul>
+<li>
+<p><strong>Fedora</strong> does not have Zsync but this is non-critical as Quickget will switch to using Curl</p>
+</li>
+<li>
+<p>On <strong>Solus</strong>, <em>quickemu</em> won&#x27;t currently run in UEFI mode, so no Windows 11 for now. See this <a href="https://github.com/getsolus/packages/issues/3487" target="_blank" rel="noopener noreferrer">Solus issue.</a></p>
+</li>
+<li>
+<p>Support for SDL with <strong>OpenSUSE</strong> is patchy at best</p>
+</li>
+<li>
+<p>Grabbing <a href="https://software.opensuse.org/package/SDL3" target="_blank" rel="noopener noreferrer">https://software.opensuse.org/package/SDL3</a> and <a href="https://software.opensuse.org/package/qemu-ui-sdl" target="_blank" rel="noopener noreferrer">https://software.opensuse.org/package/qemu-ui-sdl</a>  <em>might work</em> with certain versions &gt; Select the file and open in Yast, then search sdl with the files option selected ...</p>
+</li>
+<li>
+<p>Immutable/atomic systems <a href="https://github.com/quickemu-project/quickemu/issues/1555" target="_blank" rel="noopener noreferrer">may not allow</a> installations ....</p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="install-on-top-of-quickemu">Install on top of Quickemu<a href="#install-on-top-of-quickemu" class="hash-link" aria-label="Direct link to Install on top of Quickemu" title="Direct link to Install on top of Quickemu">​</a></h2>
+<p>Test out the qqX difference on your existing VM&#x27;s:</p>
+<ul>
+<li>
+<p>qqX has been designed to work happily alongside quickgui or any quickemu shortcuts, if you already have them.</p>
+</li>
+<li>
+<p>The installation of quickemu is <em>not</em> essential but <strong>Ubuntu</strong> packages are available and will install the dependencies ...</p>
+</li>
+</ul>
+<p>The standard <em>Quickemu</em> instructions may be found on the <a href="https://github.com/quickemu-project/quickemu/wiki/01-Installation" target="_blank" rel="noopener noreferrer">quickemu-project pages</a></p>
+<ul>
+<li>Zsync is actively maintained by Ubuntu and only assists with Ubuntu Daily Live updates. Most distros do keep this package is up-to-date but you can ignore this install if you wish, as Quickget will revert to using Curl instead.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="qqx">qqX<a href="#qqx" class="hash-link" aria-label="Direct link to qqX" title="Direct link to qqX">​</a></h2>
+<ul>
+<li>
+<p>Download via the <a href="https://github.com/TuxVinyards/qqX/releases/latest" target="_blank" rel="noopener noreferrer">latest qqX release</a> which will have been carefully tested.</p>
+</li>
+<li>
+<p>Alternatively, if newer <a href="https://github.com/TuxVinyards/qqX/branches" target="_blank" rel="noopener noreferrer">branches</a> are present, they may have the latest tweaks or features, and may possibly have bug fixes. Switch branches, click on the &#x27;code&#x27; button and &#x27;download zip&#x27;.</p>
+</li>
+</ul>
+<p><img decoding="async" loading="lazy" src="https://github.com/user-attachments/assets/f4b42f6b-d7ab-4ea8-ad96-b6e27b273e5c" alt="qqX-releases-folder" class="img_ev3q"></p>
+<ul>
+<li>Default Folders for the updater are <code>~/Downloads/qqX.releases</code> and <code>.../VMQs/qqX.releases</code> but others may be used.</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="file-manager">File Manager<a href="#file-manager" class="hash-link" aria-label="Direct link to File Manager" title="Direct link to File Manager">​</a></h3>
+<ul>
+<li><em>For most usage cases, simply right clicking in a file manager</em> and selecting extract or extract with ....</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cmd-line">Cmd Line<a href="#cmd-line" class="hash-link" aria-label="Direct link to Cmd Line" title="Direct link to Cmd Line">​</a></h3>
+<p>Create a <code>qqX.releases</code> folder and a subfolder numbered as per the release. Move the tar.gz file into the subfolder and extract as so:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">mkdir -p &quot;$HOME/Downloads/qqX.releases/1.11.04&quot;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">mv qqX-1.11.04.tar.* &quot;$HOME/Downloads/qqX.releases/1.11.04/&quot;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">cd &quot;$HOME/Downloads/qqX.releases/1.11.04&quot;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">sha256sum -c qqX-1.11.04.tar.gz.sha256</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">qqX-1.11.04.tar.gz: OK</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">tar xvfz qqX-1.11.04.tar.gz</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="when-you-are-ready">When you are ready<a href="#when-you-are-ready" class="hash-link" aria-label="Direct link to When you are ready" title="Direct link to When you are ready">​</a></h3>
+<p>Run the installer:</p>
+<ul>
+<li>
+<p>In many file managers you can usually right click, then run as program, or similar.</p>
+<p>With Cinnamon and Mate, double click and &#x27;run in terminal&#x27;</p>
+<p><img decoding="async" loading="lazy" src="https://github.com/user-attachments/assets/8ced67f0-bbea-4133-8c80-efaa90fc85eb" alt="mate-open-t" class="img_ev3q"></p>
+</li>
+<li>
+<p>In KDE/Dolphin, use &#x27;run in konsole&#x27; or double click and execute.</p>
+</li>
+<li>
+<p>Also with Thunar, if the run scripts preference has been set.</p>
+</li>
+</ul>
+<p><img decoding="async" loading="lazy" src="https://github.com/user-attachments/assets/5be5331e-1ab1-4615-88bc-937375b9080e" alt="installer-menu-kde-konsole-8" class="img_ev3q"></p>
+<p>In other environments it may be necessary to start the installer script by opening a terminal first.</p>
+<ul>
+<li>In the file-manager folder &gt; right click &gt; open in terminal &gt;  type <code>./qqX_setup_and_install</code>  ~ note prefix <code>./</code></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="uninstall">Uninstall<a href="#uninstall" class="hash-link" aria-label="Direct link to Uninstall" title="Direct link to Uninstall">​</a></h4>
+<ul>
+<li>
+<p>Re-run the installer and select to remove ...</p>
+</li>
+<li>
+<p>To downgrade, using the installer from an earlier release will normally work without the the need to uninstall first.</p>
+</li>
+</ul>
+<p>Further notes are in the installer script itself.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="default-vm-folder">Default VM folder<a href="#default-vm-folder" class="hash-link" aria-label="Direct link to Default VM folder" title="Direct link to Default VM folder">​</a></h2>
+<ul>
+<li>
+<p>If you have existing <em>quickemu</em> virtual machines, start qqX and edit the settings file to point to where they are.</p>
+<p><img decoding="async" loading="lazy" src="https://github.com/user-attachments/assets/a7987fb0-7b6c-4670-9e08-05a30816826f" alt="vmq-folder" class="img_ev3q"></p>
+</li>
+<li>
+<p>&#x27;VMQs&#x27; is the standard default, in your Home folder, next to Downloads &amp; Videos.</p>
+</li>
+<li>
+<p>Moving or renaming the default folder can be easily done using your file manager. Start qqX and edit the settings to point to it.</p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="first-machines">First Machines<a href="#first-machines" class="hash-link" aria-label="Direct link to First Machines" title="Direct link to First Machines">​</a></h2>
+<p>If everything appears to be working correctly, you can start exploring ...</p>
+<ul>
+<li>
+<p>Installing a basic or familiar Linux distro will help tell you if Qemu and the sub-structure is working.</p>
+</li>
+<li>
+<p>An auto-detector will tell you when new qqX releases are available.</p>
+</li>
+<li>
+<p>The qqX installer can be used to <em>update, reinstall, uninstall or reconfigure</em>.</p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="adjusting-the-terminal">Adjusting the terminal<a href="#adjusting-the-terminal" class="hash-link" aria-label="Direct link to Adjusting the terminal" title="Direct link to Adjusting the terminal">​</a></h2>
+<p>qqX will test and setup most standard desktop associated terminals without problem.</p>
+<p>To MANUALLY SPECIFY the terminal name, the installer script&#x27;s &#x27;UserTerm&#x27; variable may be edited.</p>
+<ul>
+<li>Open the script in a standard text editor. From Version 1.11 this is located at the start of the script.</li>
+</ul>
+<p>From qqX version 1.10.02 onwards, a &#x27;CustomTerminalProfile&#x27; will now be stored in the qqX settings folder.
+This file will be checked and auto-read when carrying out updates. The (hidden) file &#x27;$HOME/.qqX/qqX_term.conf&#x27; may also be edited.</p>
+<p>MAKE SURE to SELECT option <code>[r] reconfigure desktop launcher</code> during installation, if changing the terminal command</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="profile-options">Profile options<a href="#profile-options" class="hash-link" aria-label="Direct link to Profile options" title="Direct link to Profile options">​</a></h3>
+<p>It is quite common for different distros to rename or tweak a standard terminal.
+Typing the terminal name, followed by &#x27;--help&#x27; should give you a list of the parameters that you can use.
+Note that options can vary slightly and can also be subject to theming or desktop environment overrides.</p>
+<p>For actual &#x27;XTERM&#x27; itself, also edit the installer script&#x27;s &#x27;CustomTerminalProfile&#x27;
+eg  xterm -geometry 145x50 -fa truetype -fs 12</p>
+<p>For CUSTOM PROFILES, only one profile line is required and the actual sizes are best stated.
+Auto-updating size variable lines are difficult to set, due to &#x27;escaping&#x27; routines,
+but may be initially be copied, if wished. Size variables will eventually become overwritten as numerics.</p>
+<p>eg.  CustomTerminalProfile=&quot; --geometry=145x50 --hide-menubar --title=qqX &quot;</p>
+<p>Remember that width and height are normally column/row units which are based on the size of your terminal font
+and that the window size will alter when the font size is changed.</p>
+<ul>
+<li>
+<p>CUSTOM terminal sizes &amp; profile may be <em>initially</em> set just after the initial system checking lines, at around line 290
+in the target script &quot;./qqX_system_install&quot; in the qqX.system folder. See notes in the target script.</p>
+</li>
+<li>
+<p>OR may be adjusted in the qqX config file following initial setup, which is possibly easier.</p>
+</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="other-installation-tips">Other Installation Tips<a href="#other-installation-tips" class="hash-link" aria-label="Direct link to Other Installation Tips" title="Direct link to Other Installation Tips">​</a></h3>
+<p>All folders can be easily moved around, <em>but</em> make sure that they have their .conf file next to them. And make sure the <em>config internals</em> point correctly. From version 1.7 onwards, there is now a handy move and rename tool to make this even easier still.</p>
+<p>Multiple folders can help organise your distros. You can edit which VMs to show first in the general settings.</p>
+<p>If you you are finding the interface a bit cramped, re-run the installer making sure to run the desktop part. This will allow you to tweak the terminal size.</p>
+<p>The qqX downloader script will have done this. But you can manually check the download integrity by opening a terminal in the release&#x27;s download folder and typing <code>sha256sum -c qqX-</code> &quot;tab-key&quot; <code>.s</code> &quot;tab-key&quot;, if you have downloaded both of the named files from the release tab.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="finally">Finally<a href="#finally" class="hash-link" aria-label="Direct link to Finally" title="Direct link to Finally">​</a></h2>
+<p>Please report any unnoticed errors. Also any difficulties you may have encountered. By using this software you become a valued member of the community and can help make this software better for others.</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--next" href="/qqX/docs/Translation"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Translation</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#qqx---quickemu-virtual-machine-manager" class="table-of-contents__link toc-highlight">qqX - Quickemu Virtual Machine Manager</a></li><li><a href="#host-systems" class="table-of-contents__link toc-highlight">Host Systems</a></li><li><a href="#install-from-scratch" class="table-of-contents__link toc-highlight">Install from scratch</a></li><li><a href="#qemu" class="table-of-contents__link toc-highlight">Qemu</a></li><li><a href="#tpm" class="table-of-contents__link toc-highlight">TPM</a></li><li><a href="#older-or-lts-distros" class="table-of-contents__link toc-highlight">Older or LTS distros</a><ul><li><a href="#other-notes" class="table-of-contents__link toc-highlight">Other Notes</a></li></ul></li><li><a href="#install-on-top-of-quickemu" class="table-of-contents__link toc-highlight">Install on top of Quickemu</a></li><li><a href="#qqx" class="table-of-contents__link toc-highlight">qqX</a><ul><li><a href="#file-manager" class="table-of-contents__link toc-highlight">File Manager</a></li><li><a href="#cmd-line" class="table-of-contents__link toc-highlight">Cmd Line</a></li><li><a href="#when-you-are-ready" class="table-of-contents__link toc-highlight">When you are ready</a></li></ul></li><li><a href="#default-vm-folder" class="table-of-contents__link toc-highlight">Default VM folder</a></li><li><a href="#first-machines" class="table-of-contents__link toc-highlight">First Machines</a></li><li><a href="#adjusting-the-terminal" class="table-of-contents__link toc-highlight">Adjusting the terminal</a><ul><li><a href="#profile-options" class="table-of-contents__link toc-highlight">Profile options</a></li><li><a href="#other-installation-tips" class="table-of-contents__link toc-highlight">Other Installation Tips</a></li></ul></li><li><a href="#finally" class="table-of-contents__link toc-highlight">Finally</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Source Code and Downloads</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/TuxVinyards/qqX" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 Alex Genovese</div></div></div></footer></div>
+</body>
+</html>
