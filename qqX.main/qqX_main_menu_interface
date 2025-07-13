@@ -49,7 +49,7 @@ else
         if [[ "${VM_InstanceName,,}" == *windows* ]]; then
           printf "\n\n"
           [[ $WebBrowser ]] && printColor "  [qW]"
-          printColor "  See https://github.com/TuxVinyards/qqX/wiki/Windows-OS for walk-thru"
+          printColor "  See https://tuxvinyards.github.io/qqX/docs/Guides/Windows-OS for walk-thru"
         elif [[ "${VM_InstanceName,,}" == *archlinux* ]]; then
           printColor "\n\n  After booting, type 'archinstall' at the command prompt for easier installation ..."
           printColor "\n\n  See https://github.com/archlinux/archinstall for more details"

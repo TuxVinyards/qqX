@@ -745,8 +745,8 @@ if [[ ! $SkipMkLauncher ]]; then
   else
 
     print_terminal_notes
-    printColor "\n  https://github.com/TuxVinyards/qqX/wiki "
-    printf "\n\n  https://github.com/TuxVinyards/qqX/wiki/Translation \n\n"
+    printColor "\n  https://tuxvinyards.github.io/qqX/ "
+    printf "\n\n  https://tuxvinyards.github.io/qqX/docs/Translation \n\n"
 
   fi
 

@@ -840,7 +840,7 @@ function_quick_get_wrap ()  {
 
       if [[ $WebBrowser ]]; then
         [[ $QGW_OS_HomePage ]] && printf "  [w] to open listed page with web browser"
-        printf "  [W] qqX wiki"
+        printf "  [W] qqX webpages"
       fi
 
       printf "  [b] back to main menu \n\n"
@@ -865,7 +865,7 @@ function_quick_get_wrap ()  {
         if [[ $QGW_List_NumSelected == "w" && $QGW_OS_HomePage_Working ]]; then
           (nohup &> /dev/null  "$WebBrowser"  "$QGW_OS_HomePage"  & ) || web_browser_not_found_message
         else
-          (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message
+          (nohup &> /dev/null  "$WebBrowser"  "https://tuxvinyards.github.io/qqX/"  & ) || web_browser_not_found_message
         fi
         QGW_List_NumSelected_Next="$QGW_VerifiedList_NumSelected"
         QGW_List_NumSelected="$QGW_VerifiedList_NumSelected"

@@ -24,7 +24,7 @@ function  main_menu_actions {
   elif [[ $MainMenuChoice == "tx" ]]; then
 
     printf "\n\n  Google Chrome or Microsoft Edge are Recommended"
-    printf "\n\n  For General notes on translation see: \n\n  https://github.com/TuxVinyards/qqX/wiki/Translation"
+    printf "\n\n  For General notes on translation see: \n\n  https://tuxvinyards.github.io/qqX/docs/Translation"
     printColor "\n\n  [enter] to translate settings using %s  [b] to go back "  "$WebBrowser"
     printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
     read -rp "  >  "  TxSetCode
@@ -178,11 +178,11 @@ function  main_menu_actions {
     sleep 1
   elif [[ $MainMenuChoice == "qw" ]] ; then
     printf "\n  Opening Browser ... \n\n"
-    (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki"  & ) || web_browser_not_found_message
+    (nohup &> /dev/null  "$WebBrowser"  "https://tuxvinyards.github.io/qqX"  & ) || web_browser_not_found_message
     sleep 1
   elif [[ $MainMenuChoice == "qW" ]] ; then
     printf "\n  Opening Browser ... \n\n"
-    (nohup &> /dev/null  "$WebBrowser"  "https://github.com/TuxVinyards/qqX/wiki/Windows-OS"  & ) || web_browser_not_found_message
+    (nohup &> /dev/null  "$WebBrowser"  "https://tuxvinyards.github.io/qqX/docs/Guides/Windows-OS"  & ) || web_browser_not_found_message
     sleep 1
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File"
