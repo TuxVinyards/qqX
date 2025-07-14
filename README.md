@@ -1,8 +1,10 @@
 # qqX  - quickemu quickget X terminal project
 
+NEXT LEVEL FRONT-END FOR THE POPULAR QUICKEMU / QEMU VIRTUAL MACHINE SYSTEM
+
 - Create an easy to build collection of distros and desktops for testing, using and evaluating
 
-- _Safe, carefully written, well tested and checked_
+- _Safe, carefully written and carefully checked_
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
@@ -10,7 +12,7 @@
 
 ## Basically Better
 
-- Adds [fixes, tools and general improvements](https://tuxvinyards.github.io/qqX/docs/FreeBird) to the popular Quickemu system
+- Adds [fixes, tools and general improvements](https://tuxvinyards.github.io/qqX/docs/FreeBird) to both Quickemu and Quickget
 
 - More up-to-date and easier to mod than Gnome Boxes or VirtualBox
 
@@ -20,7 +22,7 @@
 
 - Easy to use menu system with unique hybrid interface
 
-## [Latest release 1.13.01](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.13.02](https://github.com/TuxVinyards/qqX/releases/latest)
 
 - Huge new upgrade for QuickGet, fixes, sorts and adds over 25 distros
 
