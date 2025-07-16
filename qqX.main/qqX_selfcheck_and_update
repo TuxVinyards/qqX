@@ -132,28 +132,24 @@ function find_latest_qemu_version {
 function download_new_release {
 
     printf "\033c \n\n"
-    qqX_logo_printf_title  "qqX updater"
+    qqX_logo_printf_title  "$qqX_Version updater"
     printf "\n\n\n  https://github.com/TuxVinyards/qqX/releases/latest"
 
     if [[ ! $qqX_UpdateAvail ]] ; then
       printColor "\n\n  No new release found ...."
     else
-      if [[ ! $qqX_Latest_SecureTarBall_Addr ]]; then
-        printf "\n\n  Only Non-SHA checked download available (?)\n"
+      if [[ ! $qqX_Latest_SecureTarBall_Addr ]]; then printf "\n\n  Only Non-SHA checked download available (?)\n"
+      fi
+      printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
+      if floatversion -Q --gt "$qqX_Version  1.13.02 " ; then
+        # only if can handle new format, otherwise leave blank rather than a print a potential mess
+        printColor "\n\n  %s" "$qqX_Latest_ReleaseNumber"
+        #shellcheck disable=SC1003  # the double \
+        mapfile -t AboutReleaseArray <<< "$(grep body  "$qqX_Latest_ReleaseFile" | cut -d'"' -f 4 | cut -d'\' -f2- | tr '\\' '\n' \
+        | grep -e ^'n-' -e ^'n ' | cut -d'n' -f2-)"
+        for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n  %s"  "$Line" ; fi ; done
       else
-        printf "\n\n  %s \n"  "$qqX_Latest_SecureTarBall_Addr"
-        AboutRelease="$(tr ',' '\n' < "${qqX_Latest_ReleaseFile}" | grep -sA 12 'body')"
-        AboutRelease="$(tr -cd '[:print:]' <<< "$AboutRelease")"
-        AboutRelease="$(cut -d ':' -f2 <<< "$AboutRelease")"
-        AboutRelease="${AboutRelease//\"/}"
-        AboutRelease="${AboutRelease//'### '/}"
-        AboutRelease="${AboutRelease//'## '/}"
-        AboutRelease="${AboutRelease//'\n'/}"
-        AboutRelease="${AboutRelease//'\r'/}"
-        AboutRelease="${AboutRelease//'}'/}"
-        IFS='-' read -ra AboutReleaseArray <<< "$AboutRelease"
-        for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n * %s"  "$Line" ; fi ; done
-        # as long as there are no trailing colons or spaces in release list, prints a tidied up bullet-point summary
+        printf "\n\n  %s   >>   %s"  "$qqX_Version"  "$qqX_Latest_ReleaseNumber"
       fi
     fi
 
