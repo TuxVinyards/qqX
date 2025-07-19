@@ -22,4 +22,8 @@ Includes earlier downstream fixes for Quickemu issues:
 
 See release notes for full details
 
-### [qqX website: https://tuxvinyards.github.io/qqX](https://tuxvinyards.github.io/qqX)
+### New qqX website: 
+
+[qqxproject.org](https://qqxproject.org)
+
+18 - 20th July 2025: Probable website issues. Transitional work in progress
