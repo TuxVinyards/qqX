@@ -5,7 +5,7 @@
 # NB Avoid use of "#!/usr/bin/env bash" in this script
 # as it will mask process names & inhibit process controls.
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 # 	Otherwise:

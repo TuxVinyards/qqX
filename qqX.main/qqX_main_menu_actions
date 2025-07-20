@@ -2,7 +2,7 @@
 
 ##  qqX component to be located in folder 'qqX.main'
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 # 	Otherwise:
@@ -23,18 +23,18 @@ function  main_menu_actions {
 
   elif [[ $MainMenuChoice == "tx" ]]; then
 
-    printf "\n\n  For General notes on translation see: \n\n  https://tuxvinyards.github.io/qqX/docs/Translation"
+    printf "\n\n  For General notes on translation see: \n\n  https://qqxproject.org/docs/Translation"
     printf "\n\n  Google Chrome or Microsoft Edge are recommended"
     printf "\n\n  Or https://translate.google.com in Firefox and others"
     printColor "\n\n  [enter] to attempt Google auto-translate of settings using %s " "$WebBrowser"
     printColor "\n\n  [t] open 'translate.google' in %s  [T] open qqX translation notes  [b] to go back "  "$WebBrowser"
     printf "\n\n  This link may need pasting to the webpages tab:"
-    printf " \n\n  https://github.com/TuxVinyards/qqX/blob/main/qqX_settings \n\n"
+    printf " \n\n  https://github.com/qqxproject/qqX/blob/main/qqX_settings \n\n"
     read -rp "  >  "  TxSetCode
     if [[ ! $TxSetCode ]]; then
       printf "\n  Opening Browser ... \n\n"
       (nohup &> /dev/null  "$WebBrowser"  \
-      "https://github-com.translate.goog/TuxVinyards/qqX/blob/main/qqX_settings?_x_tr_sl=auto&_x_tr_tl=it&_x_tr_hl=en&_x_tr_pto=wapp"  & ) \
+      "https://github-com.translate.goog/qqxproject/qqX/blob/main/qqX_settings?_x_tr_sl=auto&_x_tr_tl=it&_x_tr_hl=en&_x_tr_pto=wapp"  & ) \
       || web_browser_not_found_message
       sleep 1
     elif [[ $TxSetCode == "t" ]]; then
@@ -43,7 +43,7 @@ function  main_menu_actions {
       sleep 1
     elif [[ $TxSetCode == "T" ]]; then
       printf "\n  Opening qqX Translation notes in Browser ... \n\n"
-      (nohup &> /dev/null  "$WebBrowser" "https://tuxvinyards.github.io/qqX/docs/Translation"  & ) || web_browser_not_found_message
+      (nohup &> /dev/null  "$WebBrowser" "https://qqxproject.org/docs/Translation"  & ) || web_browser_not_found_message
       sleep 1
     else
       TxSetCode= ; return
@@ -191,11 +191,11 @@ function  main_menu_actions {
     sleep 1
   elif [[ $MainMenuChoice == "qw" ]] ; then
     printf "\n  Opening Browser ... \n\n"
-    (nohup &> /dev/null  "$WebBrowser"  "https://tuxvinyards.github.io/qqX"  & ) || web_browser_not_found_message
+    (nohup &> /dev/null  "$WebBrowser"  "https://qqxproject.org"  & ) || web_browser_not_found_message
     sleep 1
   elif [[ $MainMenuChoice == "qW" ]] ; then
     printf "\n  Opening Browser ... \n\n"
-    (nohup &> /dev/null  "$WebBrowser"  "https://tuxvinyards.github.io/qqX/docs/Guides/Windows-OS"  & ) || web_browser_not_found_message
+    (nohup &> /dev/null  "$WebBrowser"  "https://qqxproject.org/docs/Guides/Windows-OS"  & ) || web_browser_not_found_message
     sleep 1
 
   elif [[ $MainMenuChoice == "tune" ]] ; then function_config_tune_up "$VM_Conf_Dir/$VM_Conf_File"

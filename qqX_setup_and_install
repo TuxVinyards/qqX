@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-#  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+#  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 
 #  THIS SCRIPT SHOULD BE RUN FROM INSIDE THE qqX DOWNLOAD/SOURCE FOLDER, where it will expect to find the right files
 #  OR  run the target script "./qqX_system_install"  from qqX.system folder directly
@@ -167,7 +167,7 @@ if [ -t 1 ] ; then
   printf "\n"
   printf "\n\n    qqX installer:  %s"  "$UserTerm"
   printf "\n"
-  printf "\n\n    Help and info always available at https://tuxvinyards.github.io/qqX/"
+  printf "\n\n    Help and info always available at https://qqxproject.org/"
   printf "\n"
   printf "\n\n    Your terminal or distro/terminal combination may need, or may have needed "
   printf "\n\n    this window to stay open until qqX has completed its tasks ..."

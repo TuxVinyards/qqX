@@ -4,7 +4,7 @@
 
 #   Helper file for qqX settings file updates
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
@@ -128,7 +128,7 @@ function  update_old_settings_file_with_new_options {
 
     if [[ $ChkSumOld != "$ChkSumBackup" ]]; then
       printColor "\n\n  ERROR:  unable to make a backup of the settings file."
-      printf "\n\n  Aborting update.  Please check at https://github.com/TuxVinyards/qqX/issues"
+      printf "\n\n  Aborting update.  Please check at https://github.com/qqxproject/qqX/issues"
       printf "\n\n\n  [enter] to exit ... \n\n"
       read -rp "  >  "
       printf "\n\n"

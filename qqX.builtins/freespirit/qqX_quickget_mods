@@ -5,7 +5,7 @@
 #  ADDS IN NEW DISTRO LISTINGS and ALLOWS FUNCTION OVERWRITES
 #  qqX component to be located in builtins folder
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 # 	Otherwise:
@@ -42,7 +42,7 @@ osAddList=" anduinos bluestar "
 #osAddList+=" another "
 
 # osRemoveList for distros that are problematic or no longer maintained, but still listed by Quickget
-osRemoveList=" arcolinux holoiso truenas-core vxlinux "
+osRemoveList=" arcolinux clearlinux holoiso truenas-core vxlinux "
 #osRemoveList+=" another and-one-more "
 
 osSupported="$(os_support)"

@@ -27,7 +27,7 @@ Did the problems start when somthing was updated?
 
 - Both older and newer versions of Quickemu are available as qqX builtins
 
-- Make sure that you have checked the [qqX branches](https://github.com/TuxVinyards/qqX/branches). Fixes may already have been committed.
+- Make sure that you have checked the [qqX branches](https://github.com/qqxproject/qqX/branches). Fixes may already have been committed.
 
 When checking the issues list make sure the filter is not just `is:issue is:open`
 
