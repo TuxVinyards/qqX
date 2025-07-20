@@ -19,7 +19,7 @@
 #   and may also be edited following initial setup, which is possibly easier ...
 
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 #   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
@@ -65,7 +65,7 @@
 
 # In NixOS we need to change '#!/bin/bash' to '#!/run/current-system/sw/bin/bash' but as every program needs its own unique store ID,
 # this probably (@ 2023/10) is a work in progress & a special qqX installer is needed, in the same way to that quickemu itself does ...
-# See https://github.com/TuxVinyards/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756
+# See https://github.com/qqxproject/qqX/issues/1  &  https://discourse.nixos.org/t/install-executable-at-usr-bin/21756
 
 # From qqX 1.6 onwards, a folder /usr/share/qqX should be created. This location may be group edited, further on in the script.
 
@@ -197,7 +197,7 @@ New_qqX_Version="$(./qqX --version 2>/dev/null)"
 # some systems have not adopted or allowed for the newer standard method and will only route
 # items on an individual basis.
 
-# In ref to https://github.com/TuxVinyards/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
+# In ref to https://github.com/qqxproject/qqX/issues/1  edit here for unusuals eg. nix/store/uniques etc
 
 Current_qqX_Location="$(type -p qqX)"
 
@@ -745,8 +745,8 @@ if [[ ! $SkipMkLauncher ]]; then
   else
 
     print_terminal_notes
-    printColor "\n  https://tuxvinyards.github.io/qqX/ "
-    printf "\n\n  https://tuxvinyards.github.io/qqX/docs/Translation \n\n"
+    printColor "\n  https://qqxproject.org/ "
+    printf "\n\n  https://qqxproject.org/docs/Translation \n\n"
 
   fi
 
@@ -1009,7 +1009,7 @@ else
 fi
 
 #  This script is based on ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg
-#  Also copyright (c)  Alex Genovese   https://github.com/TuxVinyards   https://github.com/theffxproject
+#  Also copyright (c)  Alex Genovese   https://github.com/qqxproject   https://github.com/ffxproject
 
 # https://code.visualstudio.com/  (recommended)
 # vim:tabstop=2:shiftwidth=2:expandtab

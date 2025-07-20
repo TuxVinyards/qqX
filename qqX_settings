@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards/qqX
+#  Copyright (c)  Alex Genovese   https://github.com/qqxproject/qqX
 #  Licence:  GPL3   https://www.gnu.org/licenses
 
 #  -------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ VM_SelectorStyle="A"
 
 # Versions may be start default set and  additionally hot-swapped via the standard qqX menus
 
-# Branches    - Source code and diff comparisons are at  https://github.com/TuxVinyards/quickemu/branches
+# Branches    - Source code and diff comparisons are at  https://github.com/qqxproject/quickemu/branches
 
 # Named versions are generally as follows:
 
@@ -435,7 +435,7 @@ VM_SelectorStyle="A"
 
 # NB no spaces in path, as quoted paths can only be added to the end of $PATH and we need the source path as first.
 
-# Branches    - Source code and diff comparisons are at  https://github.com/TuxVinyards/quickemu/branches
+# Branches    - Source code and diff comparisons are at  https://github.com/qqxproject/quickemu/branches
 
 # Named versions are generally as follows:
 

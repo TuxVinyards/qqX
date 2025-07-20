@@ -10,7 +10,7 @@ Things can always get sorted out in a separate branch if need be, later.
 
 The new Quickget Mods script is an ideal place to start. Located in the FreeSpirit builtins folder ....
 
-- Also check the [freespirit-next](https://github.com/TuxVinyards/quickemu/branches) and [dev-next](https://github.com/TuxVinyards/qqX/branches) branches
+- Also check the [freespirit-next](https://github.com/qqxproject/quickemu/branches) and [dev-next](https://github.com/qqxproject/qqX/branches) branches
 
 ## Do explain what's going and why
 

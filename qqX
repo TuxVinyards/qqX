@@ -3,14 +3,14 @@
 # NB Avoid use of "#!/usr/bin/env bash" in this script
 # as it will mask process names & inhibit process controls.
 
-# qqX - quickemu quickget X terminal project  https://github.com/TuxVinyards/qqX
+# qqX - quickemu quickget X terminal project  https://github.com/qqxproject/qqX
 # A text based Virtual Machine Manager for use with the 'quickemu' project
 # https://github.com/quickemu-project/quickemu
 
 # This SCRIPT MAY BE RUN DIRECTLY FROM A DOWNLOAD, STORAGE or DEVELOPMENT FOLDER but will need the settings file installing first.
 # See notes in the Setup & Install script.
 
-# Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+# Copyright (c)  Alex Genovese   https://github.com/qqxproject
 
 # Licence  GPL3   https://www.gnu.org/licenses
 

@@ -1,12 +1,12 @@
 # qqX  - quickemu quickget X terminal project
 
-SOURCE CODE for [QUICKEMU](https://github.com/TuxVinyards/qqX/blob/main/qqX.builtins/freespirit/quickemu) and [QUICKGET](https://github.com/TuxVinyards/qqX/blob/main/qqX.builtins/freespirit/quickget)  NEXT LEVEL
+SOURCE CODE for [QUICKEMU](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickemu) and [QUICKGET](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickget)  NEXT LEVEL
 
-![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
+![qqX-vmm](https://github.com/qqxproject/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-[Next level code adds huge number of fixes, tools and general improvements to the popular Quickemu system](https://tuxvinyards.github.io/qqX/docs/FreeBird)
+[Next level code adds huge number of fixes, tools and general improvements to the popular Quickemu system](https://qqxproject.org/docs/FreeBird)
 
-## [Latest release 1.13.02](https://github.com/TuxVinyards/qqX/releases/latest)
+## [Latest release 1.13.02](https://github.com/qqxproject/qqX/releases/latest)
 
 - Massive upgrade for QuickGet, fixes, sorts and adds over 25 distros
 

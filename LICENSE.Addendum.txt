@@ -1,14 +1,14 @@
 
-##  Copyright (c)  Alex Genovese   https://github.com/TuxVinyards
+##  Copyright (c)  Alex Genovese   https://github.com/qqxproject
 
 
-#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED  
+#   SMALL CODE SNIPPETS eg the function printColor MAY BE USED
 #   PERMISSIVELY in projects as MIT or similar, providing CLEAR ATTRIBUTIONS are shown.
 
-# 	Otherwise:  
+# 	Otherwise:
 
 
-# Licence  GPL3   https://www.gnu.org/licenses 
+# Licence  GPL3   https://www.gnu.org/licenses
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,15 +20,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# https://www.gnu.org/licenses 
+# https://www.gnu.org/licenses
 
 
 # IF CODE IN GENERAL BECOMES USED IN ANY OTHER PROJECT,
-# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS. 
+# THE GPL3 LICENCE APPLIES & YOU SHOULD SHOW CLEAR ATTRIBUTIONS
 
 
 
-qqX - quickemu quickget X terminal project  
+qqX - quickemu quickget X terminal project
 
 
 A independent text based menu interface designed to work with QEMU & with the 'quickemu' project
@@ -42,21 +42,14 @@ Users should install 'qemu' & 'quickemu' separately, as normal.
 
 Some scripts use code from ffX:
 
-ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg   
+ffX - the ff(mpeg) X-terminal project - AV processing scripts for ffmpeg
 
 https://github.com/theffxproject
 
 
-Other parts build on the work with quickemu-wrap:
-
-quickemu-mod / quickemu-wrap  >
-
-https://github.com/TuxVinyards/quickemu-mod
-
-
 All scripts from these projects are copyright (c)  Alex Genovese
 
-license:  GPL3   https://www.gnu.org/licenses 
+license:  GPL3   https://www.gnu.org/licenses
 
 Any references in qqX to the ffX project imply GPL3 and its transfer between the projects
 
