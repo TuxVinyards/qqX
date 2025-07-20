@@ -6,13 +6,15 @@ SOURCE CODE for [QUICKEMU](https://github.com/qqxproject/qqX/blob/main/qqX.built
 
 [Next level code adds huge number of fixes, tools and general improvements to the popular Quickemu system](https://qqxproject.org/docs/FreeBird)
 
-## [Latest release 1.13.02](https://github.com/qqxproject/qqX/releases/latest)
+## [Latest release 1.13.03](https://github.com/qqxproject/qqX/releases/latest)
+
+Further upgrades to new web pages system, plus earlier:
 
 - Massive upgrade for QuickGet, fixes, sorts and adds over 25 distros
 
-- Adds a new Quickget filter system
+- New Quickget filter system
 
-- And adds fixes for qqX right click and Text Editor issues in Gnome
+- Fixes for qqX right click and Text Editor issues in Gnome
 
 Includes earlier downstream fixes for Quickemu issues:
 
@@ -20,10 +22,6 @@ Includes earlier downstream fixes for Quickemu issues:
 
 - Windows Installer
 
-See release notes for full details
+See web pages and release notes for full details:
 
-### New qqX website: 
-
-[qqxproject.org](https://qqxproject.org)
-
-18 - 20th July 2025: Probable website issues. Transitional work in progress
+### [https://qqxproject.org](https://qqxproject.org/)

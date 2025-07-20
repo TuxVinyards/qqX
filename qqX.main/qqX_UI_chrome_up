@@ -226,7 +226,7 @@ function show_qqX_general_help {
     cat "$HOME/.qqX/icons/qqX.ascii.logo.8bit.25.txt"
     printf "\n  Translations:  https://qqxproject.org/docs/Translation   Release Notes:  https://qqxproject.org/docs/Release-Notes"
     printf "\n\n  For SETTINGS and user modes, see notes in the general settings file"
-    printColor  "\n\n  [enter] to return  [f] FreeBird notes  [c] command line & mouse notes  [w] Online: qqX WIKI PAGES and FAQs"
+    printColor  "\n\n  [enter] to return  [f] FreeBird notes  [c] command line & mouse notes  [w] Online: HELP PAGES and FAQs"
     printf "\n\n"
     [[ $HelpSelect ]] || read -rp "  >  "  HelpSelect
 
