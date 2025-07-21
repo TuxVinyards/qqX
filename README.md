@@ -1,10 +1,12 @@
 # qqX  - quickemu quickget X terminal project
 
-SOURCE CODE for [QUICKEMU](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickemu) and [QUICKGET](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickget)  NEXT LEVEL
+SPIN-OFF NEXT LEVEL [QUICKEMU](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickemu) / [QUICKGET](https://github.com/qqxproject/qqX/blob/main/qqX.builtins/freespirit/quickget)
 
 ![qqX-vmm](https://github.com/qqxproject/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-[Next level code adds huge number of fixes, tools and general improvements to the popular Quickemu system](https://qqxproject.org/docs/FreeBird)
+[Adds huge number of fixes, tools and general improvements to the popular Quickemu system](https://qqxproject.org/docs/FreeBird)
+
+- Easier to use interface harnesses extra features from upstream Qemu and the Linux desktop
 
 ## [Latest release 1.13.03](https://github.com/qqxproject/qqX/releases/latest)
 
