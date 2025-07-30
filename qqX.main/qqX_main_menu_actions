@@ -33,6 +33,8 @@ function  main_menu_actions {
       Iso_639_1_List+="or os pa pi pl ps pt qu rm rn ro ru rw sa sc sd se sg si sk sl sm sn so sq sr ss st su sv sw ta te tg th ti tk tl tn to tr "
       Iso_639_1_List+="ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zu"
 
+      # also see https://en.wikipedia.org/wiki/Comparison_of_machine_translation_applications#Multi-pair_translations
+
       [[ ! $TxLang ]] && TxLang="it"
       if grep -qs  "${LANG:0:2}" <<< "$Iso_639_1_List"; then TxLang="${LANG:0:2}"
       elif grep -qs  "${GDM_LANG:0:2}" <<< "$Iso_639_1_List"; then TxLang="${GDM_LANG:0:2}"

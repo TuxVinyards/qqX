@@ -961,7 +961,7 @@ if grep -qs 'gnome-terminal' "$XDG_GUI_desktop_Folder/qqX.desktop" ; then  Start
 
 End_Install=
 if [[ $Current_qqX_Version ]]; then
-  printf  "\n\n   Upgrade changes are now complete \n\n"
+  printf  "\n\n  Upgrade changes are now complete \n\n"
 else
   printColor  "\n\n  Install process finished:  "
   printf "\n\n\n  Start qqX straight from the system's MAIN MENU,"
