@@ -146,7 +146,7 @@ function download_new_release {
         printColor "\n\n  %s" "$qqX_Latest_ReleaseNumber"
         #shellcheck disable=SC1003  # the double \
         mapfile -t AboutReleaseArray <<< "$(grep body  "$qqX_Latest_ReleaseFile" | cut -d'"' -f 4 | cut -d'\' -f2- | tr '\\' '\n' \
-        | grep -e ^'n-' -e ^'n ' | cut -d'n' -f2-)"
+        | grep -e ^'n' | cut -d'n' -f2-)"
         for Line in "${AboutReleaseArray[@]}" ; do  if [[ "$Line" != *'+1'* ]] ; then printColor "\n\n  %s"  "$Line" ; fi ; done
       else
         printf "\n\n  %s   >>   %s"  "$qqX_Version"  "$qqX_Latest_ReleaseNumber"

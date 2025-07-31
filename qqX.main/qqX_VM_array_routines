@@ -391,6 +391,14 @@ refresh_sources_and_load_VM_arrays() {
   [[ ! -f $qqX_SettingsFile ]] && function_conf_error "qqX_SettingsFile"
   source "$qqX_SettingsFile"
 
+  # reset $X_Shade value
+  printColor () {
+    tput setaf "$X_Shade"
+    # shellcheck disable=SC2059
+    printf "$@"
+    tput sgr0
+  }
+
   #if [[ $VM_ListingFilterDefault ]]; then VM_ListingFilter="$VM_ListingFilterDefault"
   #else VM_ListingFilter="qqlist-desktop"
   #fi   REVIEW  > follow refresh doesn't change builtin model, so leave filter unchanged too

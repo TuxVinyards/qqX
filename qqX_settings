@@ -39,6 +39,12 @@ Extra_VM_Folder+=("")
 #  On Ubuntu purple, recommend 1 or 6   More:  https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 X_Shade="3"
 
+##  Translation LANGUAGE for [tx] pop-ups  See https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+#  Most of the active two character 639-1 codes are supported and @ 2025, the following have DIRECT PAIR Google data files:
+#  af ar az bg bn ca cs cy da de el es et fa fi fr gl gu hi hr ht hu id is it iw ja ka ko lt lv mr ms nl no pa pl pt
+#  ro ru sk sl sq sr sv sw th tr uk ur vi zh zh-TW
+Default_TxLang=""
+
 ## Other SETTINGS SECTIONS AVAILABLE:
 
   #   VM SELECTOR INTERFACE
