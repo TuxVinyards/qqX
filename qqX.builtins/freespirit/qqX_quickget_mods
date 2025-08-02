@@ -222,6 +222,16 @@ function get_anduinos {
     printf "%s" "$EDITION" > "/tmp/qGet.Mods.GET.data.txt"
 }
 
+## FIX Arch - Pre-emptively for PR  https://github.com/quickemu-project/quickemu/pull/1709
+function get_archlinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://geo.mirror.pkgbuild.com"
+    ISO=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
+    HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha256_sum')
+    echo "${URL}${ISO} ${HASH}"
+}
+
 ## FIX artix community editions and hash grep
 function get_artixlinux() {
     local HASH="" ; local ISO=""
