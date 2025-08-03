@@ -268,7 +268,8 @@ function releases_bluestar {
     echo "latest"
 }
 function get_bluestar {
-    BlueStarRelease="$(web_pipe https://sourceforge.net/projects/bluestarlinux/ | tr ' ' '\n' | grep -s -e '\.iso')"
+    BlueStarRelease="$(web_pipe https://sourceforge.net/projects/bluestarlinux/files/distro/ \
+    | grep green | grep title | cut -d'=' -f4 | cut -d':' -f1 | cut -d'/' -f3)"
     BlueStarIso="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease}"
     BlueStarHash="https://sourceforge.net/projects/bluestarlinux/files/distro/${BlueStarRelease/iso/md5}"
     BlueStarHash="$(web_pipe "$BlueStarHash" | cut -d' ' -f1)"
