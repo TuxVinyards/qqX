@@ -458,6 +458,25 @@ function get_opensuse() {
     echo "$URL/${ISO} $HASH"
 }
 
+## FIX - make sure integers -gt 9 can be used ...
+# eg. 6.10 and 10.0 > OracleLinux-R6-U10-Server-x86_64-dvd.iso and OracleLinux-R10-U0-x86_64-dvd.iso
+function releases_oraclelinux() {
+    #echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
+    floatversion -qs -M 4  "$(web_pipe "https://yum.oracle.com/oracle-linux-isos.html" | grep -s -e '<td><strong>')"
+}
+function get_oraclelinux() {
+    local HASH="" ; local ISO="" ; local VER_MAJ= ; local VER_MIN=
+    #local VER_MAJ=${RELEASE::1} #local VER_MIN=${RELEASE:2:1}
+    VER_MAJ=${RELEASE/.*/} ; VER_MIN=${RELEASE/*./}
+    local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64"
+    case ${VER_MAJ} in
+        7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+        *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
+    esac
+    HASH=$(web_pipe "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 ## FIX hashes and folders
 function releases_parrotsec() {
   # July 2025 > only latest folder now has iso's
