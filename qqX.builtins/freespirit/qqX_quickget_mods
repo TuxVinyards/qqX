@@ -506,6 +506,11 @@ function get_parrotsec() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+## REDUCE release count - 14 is too many!
+function releases_rockylinux() {
+    web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | fv -M 4 -qs
+}
+
 ## FIX  SLINT (only 15.0, and hopefully higher, has downloadable iso's)
 function releases_slint() {
     web_pipe "https://slackware.uk/slint/x86_64/" | grep -e '<a href=' | fv -M -Q
