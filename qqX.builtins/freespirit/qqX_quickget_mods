@@ -373,7 +373,18 @@ function get_kdeneon() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-## TWEAK  only 9 now ... REVIEW make dynamic?
+## FIX omit dirs only having an RC sub-folder
+function releases_linuxlite() {
+    local ReleasesList= ; local ReleasesTrue= ; i=0
+    ReleasesList="$(floatversion -M 5 -qs "$(web_pipe "https://sourceforge.net/projects/linux-lite/files/" | grep -s 'class="name')")"
+    for ChkRel in $ReleasesList; do
+        web_check "https://sourceforge.net/projects/linux-lite/files/${ChkRel}/linux-lite-${ChkRel}-64bit.iso" &&  ReleasesTrue+="$ChkRel "
+        ((i++)) ; [[ $i -gt 3 ]] && break
+    done
+    echo "$ReleasesTrue"
+}
+
+## TWEAK  only one release now ... REVIEW make dynamic?
 function releases_mageia() {
     echo 9
 }
