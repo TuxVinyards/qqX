@@ -384,9 +384,9 @@ function releases_linuxlite() {
     echo "$ReleasesTrue"
 }
 
-## TWEAK  only one release now ... REVIEW make dynamic?
+## UPGRADE only one release ... make dynamic
 function releases_mageia() {
-    echo 9
+    web_pipe "https://www.mageia.org/en/downloads" | grep Download | grep strong | cut -d'M' -f2 | cut -d' ' -f2
 }
 
 ## FIX sway
