@@ -447,8 +447,7 @@ test_internet_is_up () {
 iso_get_message () {
   if [[ $QGW_OS_Arr_NameSelected ]] && [[ "$QGW_OS_Arr_NameSelected" != "windows"* && $QGW_OS_Arr_NameSelected != "macos" ]]; then
     printColor "\n\n  qqX can also install Linux ISO's if downloaded directly from the distro's Web Pages"
-    printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  Right click on the downloaded ISO, then open-with > "
-    [[ $QGW_OS_HomePage ]] && printf "  HomePage = %s"  "$QGW_OS_HomePage"
+    printf "\n\n  Not all distro sites can be scanned for the 'latest' releases \n\n  When downloaded, right click on the ISO, then open-with > "
   fi
 }
 
@@ -651,6 +650,8 @@ function_quick_get_wrap ()  {
           QGW_OS_Info="${QGW_OS_Info//'"'/}"
           QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
           mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+          QGW_OS_Login= ; QGW_OS_HomePage= ; QGW_OS_InfoText=
+          [[ "${#QGW_OS_Info_ARR[@]}" != "4" ]] && printColor "\n\n  INTERNAL ERROR: QuickGet info-listing has missing elements ... "
           QGW_OS_Login="${QGW_OS_Info_ARR[1]}"
           QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
           QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
@@ -660,7 +661,7 @@ function_quick_get_wrap ()  {
             elif [[ $QGW_OS_Login ]]; then
               printf "\n\n  Distro Login:  %s"  "$QGW_OS_Login" ; printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
             fi
-          else printf "\n\n  Not available, see webpage for more details \n\n"
+          else printf "\n\n  Info not available .... \n\n"
           fi
 
           if [[ $QG_Modpath ]]; then
