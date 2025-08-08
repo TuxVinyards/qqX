@@ -152,6 +152,9 @@ function test_iso_url {
 
   [[ $GT_Exit ]] && return
 
+  # clear any accidental initial double pressing of the enter key
+  read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1
+
   if ! grep -q -e '--url' "$QG_SourcePath" ; then
 
     # quickget --url is from  4.9.3  onwards
@@ -277,6 +280,9 @@ function test_iso_url {
       fi
     fi
   fi
+  # clear any accidental initial double pressing of the enter key
+  read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1 ; read -r -t 0.1
+
 }
 
 
@@ -1202,6 +1208,8 @@ function_quick_get_wrap ()  {
           if [[ $DL_PercentageDone ]] && [[ $DL_PercentageDone != "0" ]]; then printf "\n  %s Percent appears to be downloaded"  "$DL_PercentageDone"
           else printf "\n  Percent downloaded not known"
           fi
+          # clear any accidental initial double pressing of the enter key
+          read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2
           printf  "\n\n  [enter] Start the download  "
           if [[ $DL_PercentageDone == "100.00" ]]; then printColor " ?? BACKUP ??  "
           else
@@ -1213,6 +1221,8 @@ function_quick_get_wrap ()  {
           if [[ $QE_SourceVersion == "System" || $QE_SourceVersion == "Echo" ]]; then
             printColor "\n\n  WARNING Source Version '%s' :  Stopping and Restarting of partly completed downloads requires the Freebird/FreeSpirit builtins." "$QE_SourceVersion"
           fi
+          # clear any accidental initial double pressing of the enter key
+          read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2 ; read -r -t 0.2
           if [[ "${#VM_Folder_List[*]}" -gt 1 ]]; then  printf  "\n\n  [enter] Start the download  "
           else printColor  "\n\n  [enter] Start the download  "
           fi
