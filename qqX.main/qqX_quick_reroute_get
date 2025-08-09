@@ -641,33 +641,33 @@ function_quick_get_wrap ()  {
           [[ "$QGW_OS_Arr_NameDisplay" == 'TRUENAS'* ]] && QGW_OS_Arr_NameDisplay="${QGW_OS_Arr_NameDisplay/TRUE/True}"
 
           QGW_OS_HomePage= ; QGW_OS_InfoText= ; QGW_OS_Info= ; QGW_OS_RelNotes= ; QGW_OS_Login=
+          QGW_OS_Info_ARR=()
 
           printColor "\n  INFO:"
           printf  "  %s"  "$QGW_OS_Arr_NameDisplay"
 
-          # @ june 2025
           if [[ $QG_Modpath ]]; then
-            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_Modpath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+            QGW_OS_Info="$(quickget --info-line "$QGW_OS_Arr_NameSelected")"
+            QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
+            mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
+            QGW_OS_Login= ; QGW_OS_HomePage= ; QGW_OS_InfoText=
+            [[ "${#QGW_OS_Info_ARR[@]}" != "4" ]] && printColor "\n\n  INTERNAL ERROR: QuickGet info-listing has incorrect element count ... "
+            QGW_OS_Login="${QGW_OS_Info_ARR[1]}"
+            QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
+            QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
           fi
-          if [[ ! $QGW_OS_Info ]]; then
-            QGW_OS_Info="$(grep "$QGW_OS_Arr_NameSelected)" "$QG_SourcePath" | grep -m 1 'INFO=' | cut -d '=' -f 2)"
+
+          if [[ ! $QGW_OS_Info ]] && [[ "$QG_SourcePath" ]] ; then  #  REVIEW
+            printf "\n\n  Using Upstream Data .... \n\n"
+            "$QG_SourcePath" --show "$QGW_OS_Arr_NameSelected"
           fi
-          QGW_OS_Info="${QGW_OS_Info//';;'/}"
-          QGW_OS_Info="${QGW_OS_Info//'"'/}"
-          QGW_OS_Info="$(tr '|' '\n' <<< "$QGW_OS_Info")"
-          mapfile -t QGW_OS_Info_ARR <<< "$QGW_OS_Info"
-          QGW_OS_Login= ; QGW_OS_HomePage= ; QGW_OS_InfoText=
-          [[ "${#QGW_OS_Info_ARR[@]}" != "4" ]] && printColor "\n\n  INTERNAL ERROR: QuickGet info-listing has missing elements ... "
-          QGW_OS_Login="${QGW_OS_Info_ARR[1]}"
-          QGW_OS_HomePage="${QGW_OS_Info_ARR[2]}"
-          QGW_OS_InfoText="${QGW_OS_Info_ARR[3]}"
 
           if [[ $QGW_OS_InfoText ]]; then
             if [[ ! $QGW_OS_Login ]] || [[ $QGW_OS_Login == "-" ]]; then printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
             elif [[ $QGW_OS_Login ]]; then
               printf "\n\n  Distro Login:  %s"  "$QGW_OS_Login" ; printf "\n\n" ; fmt -u -w "$(tput cols)" <<< "  $QGW_OS_InfoText"
             fi
-          else printf "\n\n  Info not available .... \n\n"
+          else printf "\n\n  Info not available .... ?? \n\n"
           fi
 
           if [[ $QG_Modpath ]]; then
